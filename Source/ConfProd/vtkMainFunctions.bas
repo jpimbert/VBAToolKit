@@ -22,6 +22,10 @@ Public Function vtkCreateProject(path As String, name As String, Optional displa
     MkDir path & "\" & name
     ' Create Project folder
     MkDir path & "\" & name & "\" & "Project"
+    ' Create Tests folder
+    MkDir path & "\" & name & "\" & "Tests"
+    ' Create Source folder
+    MkDir path & "\" & name & "\" & "Source"
 
 '    Debug.Print CurDir
     

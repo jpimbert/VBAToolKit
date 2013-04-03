@@ -14,14 +14,6 @@ Implements ITestCase
 Private mManager As TestCaseManager
 Private mAssert As IAssert
 
-Private Sub Wipedir(dir As String)
-    Dim filesys
-    Set filesys = CreateObject("Scripting.FileSystemObject")
-    If filesys.folderexists(dir) Then
-        filesys.deletefolder dir
-    End If
-End Sub
-
 Private Sub Class_Initialize()
     Set mManager = New TestCaseManager
 End Sub
@@ -38,20 +30,12 @@ Private Sub ITestCase_SetUp(Assert As IAssert)
     Set mAssert = Assert
     
     ' Delete all files and folder in the Tests Directory
+    dir (vtkTestPath)       ' Make sure to be out of the folder to clean
     On Error Resume Next    ' If there is no files here, this is not an error
-    Kill vtkTestPath & "\TestProject\Tests\*.*"
     RmDir vtkTestPath & "\TestProject\Tests"
-    Err.Clear
-    Kill vtkTestPath & "\TestProject\Source\*.*"
     RmDir vtkTestPath & "\TestProject\Source"
-    Err.Clear
-    Kill vtkTestPath & "\TestProject\Project\*.*"
     RmDir vtkTestPath & "\TestProject\Project"
-    Err.Clear
-    Kill vtkTestPath & "\TestProject\*.*"
     RmDir vtkTestPath & "\TestProject"
-    Err.Clear
-'    Wipedir vtkTestPath & "\TestProject"
 End Sub
 
 Private Sub ITestCase_TearDown()
