@@ -48,20 +48,25 @@ vtkCreateProject_Error:
     If displayError Then MsgBox "Error " & Err.Number & " (" & Err.Description & ") in procedure vtkCreateProject of Module MainFunctions"
 End Function
 
+'---------------------------------------------------------------------------------------
+' Procedure : createxlsfile
+' Author    : user
+' Date      : 17/04/2013
+' Purpose   :
+'---------------------------------------------------------------------------------------
+'
 Public Function createxlsfile(path As String, name As String, Optional displayError As Boolean = True) As Long
     
-        Dim Wb As Workbook
-        Set Wb = Workbooks.Add
-        Dim pathandfilename As String
-        pathandfilename = path & "\" & name & "\" & "Project" & "\" & name & ".xls"
+    Dim Wb As Workbook
+    Set Wb = Workbooks.Add
+        
+  
         On Error GoTo createxlsfile_Error
      'create an empty xls project
-        Wb.SaveAs Filename:=pathandfilename
+        Wb.SaveAs filename:=path & "\" & name & "\" & "Project" & "\" & name & ".xls"
        ' close created workbook
-        Workbooks(name & ".xls").Close savechanges:=False
+      ' Workbooks(name & ".xls").Close savechanges:=False ' we can't export modules when workbook is closed
         
-        
-    
         On Error GoTo 0
         createxlsfile = 0
         Exit Function
@@ -69,4 +74,33 @@ createxlsfile_Error:
         createxlsfile = Err.Number
         If displayError Then MsgBox "Error " & Err.Number & " (" & Err.Description & ") in procedure createxlsfile of Module MainFunctions"
       
+End Function
+
+'---------------------------------------------------------------------------------------
+' Procedure : exportvbaunitwithproject
+' Author    : user
+' Date      : 17/04/2013
+' Purpose   : -
+'---------------------------------------------------------------------------------------
+'
+Function exportvbaunitwithproject(name As String) As Long
+
+    Dim filename As String
+    Dim i As Integer
+    i = 0
+    
+    ChDir (ThisWorkbook.path)                                          'the current workbookpath
+    ChDir ".."                                                         'allow acces to parent folder path
+    vbaunitsourcepath = CurDir(ThisWorkbook.path) & "\Source\VbaUnit\" ' the vbaunitfolder path
+   
+  'init file
+    filename = Dir(vbaunitsourcepath, vbNormal) 'DIR function returns the first filename vbNormal= default
+  While filename <> ""
+    'On Error Resume Next
+    Workbooks(name & ".xls").VBProject.VBComponents.Import (vbaunitsourcepath & filename) 'add files to new workbook
+     filename = Dir
+     i = i + 1
+ Wend
+
+exportvbaunitwithproject = i
 End Function

@@ -37,18 +37,12 @@ Private Sub ITestCase_SetUp(Assert As IAssert)
     Dir (vtkTestPath)       ' Make sure to be out of the folder to clean
     On Error Resume Next    ' If there is no files here, this is not an error
     
-    'added by lahbib
+   
     Workbooks(name & ".xls").Close
     Kill vtkTestPath & "\" & name & "\" & "Project" & "\" & name & ".xls"
-   
-     
-     
     RmDir vtkTestPath & "\TestProject\Source\ConfProd"
     RmDir vtkTestPath & "\TestProject\Source\ConfTest"
     RmDir vtkTestPath & "\TestProject\Source\VbaUnit"
-    
-    
-    
     RmDir vtkTestPath & "\TestProject\Tests"
     RmDir vtkTestPath & "\TestProject\Source"
     RmDir vtkTestPath & "\TestProject\Project"
@@ -147,6 +141,17 @@ Public Sub Testxlafilecreated()
    
     mAssert.Equals returnValue, 0, "the workbook creation must be succeded"
 End Sub
+Public Sub Testvbaunitexported()
+    Dim returnValue As Long
+    Dim returnValue2 As Long
+    Dim returnValue3 As Long
+    Dim name  As String 'for file .xla
+    name = "TestProject" 'initialize it
+    returnValue = vtkCreateProject(path:=vtkTestPath, name:="TestProject", displayError:=False)
+    returnValue2 = createxlsfile(path:=vtkTestPath, name:="TestProject", displayError:=False)
+    returnValue3 = exportvbaunitwithproject(name:="TestProject")
+    mAssert.Should returnValue3 = 18, "the exported module number must be 18"
+End Sub
 
 Private Function ITest_Suite() As TestSuite
     Set ITest_Suite = New TestSuite
@@ -160,6 +165,7 @@ Private Function ITest_Suite() As TestSuite
     ITest_Suite.AddTest ITest_Manager.ClassName, "TestConfTestFolderIsCreated"
     ITest_Suite.AddTest ITest_Manager.ClassName, "TestVbaUnitFolderIsCreated"
     ITest_Suite.AddTest ITest_Manager.ClassName, "Testxlafilecreated"
+    ITest_Suite.AddTest ITest_Manager.ClassName, "Testvbaunitexported"
 End Function
 
 Private Sub ITestCase_RunTest()
@@ -174,6 +180,7 @@ Private Sub ITestCase_RunTest()
         Case "TestConfTestFolderIsCreated": TestConfTestFolderIsCreated
         Case "TestVbaUnitFolderIsCreated": TestVbaUnitFolderIsCreated
         Case "Testxlafilecreated": Testxlafilecreated
+        Case "Testvbaunitexported": Testvbaunitexported
         Case Else: mAssert.Should False, "Invalid test name: " & mManager.methodName
     End Select
 End Sub
