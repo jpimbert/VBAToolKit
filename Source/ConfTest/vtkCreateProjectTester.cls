@@ -42,6 +42,7 @@ Private Sub ITestCase_SetUp(Assert As IAssert)
     Kill vtkTestPath & "\" & name & "\" & "Project" & "\" & name & ".xls"
     RmDir vtkTestPath & "\TestProject\Source\ConfProd"
     RmDir vtkTestPath & "\TestProject\Source\ConfTest"
+    Kill vtkTestPath & "\TestProject\Source\VbaUnit\*"
     RmDir vtkTestPath & "\TestProject\Source\VbaUnit"
     RmDir vtkTestPath & "\TestProject\Tests"
     RmDir vtkTestPath & "\TestProject\Source"
@@ -149,7 +150,7 @@ Public Sub Testvbaunitexported()
     name = "TestProject" 'initialize it
     returnValue = vtkCreateProject(path:=vtkTestPath, name:="TestProject", displayError:=False)
     returnValue2 = createxlsfile(path:=vtkTestPath, name:="TestProject", displayError:=False)
-    returnValue3 = exportvbaunitwithproject(name:="TestProject")
+    returnValue3 = exportvbaunitwithproject(path:=vtkTestPath, name:="TestProject")
     mAssert.Should returnValue3 = 18, "the exported module number must be 18"
 End Sub
 

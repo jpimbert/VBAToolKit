@@ -83,7 +83,7 @@ End Function
 ' Purpose   : -
 '---------------------------------------------------------------------------------------
 '
-Function exportvbaunitwithproject(name As String) As Long
+Function exportvbaunitwithproject(path As String, name As String) As Long
 
     Dim filename As String
     Dim i As Integer
@@ -95,12 +95,16 @@ Function exportvbaunitwithproject(name As String) As Long
    
   'init file
     filename = Dir(vbaunitsourcepath, vbNormal) 'DIR function returns the first filename vbNormal= default
+  
   While filename <> ""
     'On Error Resume Next
-    Workbooks(name & ".xls").VBProject.VBComponents.Import (vbaunitsourcepath & filename) 'add files to new workbook
+    Workbooks(name & ".xls").VBProject.VBComponents.Import (vbaunitsourcepath & filename) 'add classes to new workbook
+    FileCopy vbaunitsourcepath & filename, path & "\" & name & "\Source\VbaUnit\" & filename 'copy vbaunit file to destination directory
      filename = Dir
      i = i + 1
  Wend
 
 exportvbaunitwithproject = i
 End Function
+
+
