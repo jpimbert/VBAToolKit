@@ -15,7 +15,7 @@ Private mManager As TestCaseManager
 Private mAssert As IAssert
 
 Private Sub Class_Initialize()
-    Set mManager = New TestCaseManager
+ Set mManager = New TestCaseManager
 End Sub
 
 Private Property Get ITestCase_Manager() As TestCaseManager
@@ -29,9 +29,9 @@ End Property
 Private Sub ITestCase_SetUp(Assert As IAssert)
     
     Set mAssert = Assert
-    
     Dim name  As String 'for file .xla
     name = "TestProject" 'initialize it
+    
     
    ' Delete all files and folder in the Tests Directory
     Dir (vtkTestPath)       ' Make sure to be out of the folder to clean
@@ -48,10 +48,13 @@ Private Sub ITestCase_SetUp(Assert As IAssert)
     RmDir vtkTestPath & "\TestProject\Source"
     RmDir vtkTestPath & "\TestProject\Project"
     RmDir vtkTestPath & "\TestProject"
-    
+   
+   
+  
  
     
 End Sub
+
 
 Private Sub ITestCase_TearDown()
 
@@ -128,31 +131,54 @@ Public Sub TestVbaUnitFolderIsCreated()
     mAssert.Should Dir(vtkTestPath & "\TestProject\source\VbaUnit", vbDirectory) <> "", "The source\VbaUnit folder must exist"
     mAssert.Equals returnValue, 0, "The project creation must succeed"
 End Sub
+
 Public Sub Testxlafilecreated()
-    ' The function how create excel project
     Dim name  As String 'for file .xla
     name = "TestProject" 'initialize it
     Dim returnValue As Long
     Dim returnValue2 As Long
-    
-    returnValue = vtkCreateProject(path:=vtkTestPath, name:="TestProject", displayError:=False)
-    
-    returnValue2 = createxlsfile(path:=vtkTestPath, name:="TestProject", displayError:=False)
-    mAssert.Should Dir(vtkTestPath & "\" & name & "\" & "Project" & "\" & name & ".xls", vbDirectory) <> "", "the work book must be created"
-   
-    mAssert.Equals returnValue, 0, "the workbook creation must be succeded"
+   returnValue = vtkCreateProject(path:=vtkTestPath, name:="TestProject", displayError:=False)
+   returnValue2 = createxlsfile(path:=vtkTestPath, name:="TestProject", displayError:=False)
+   mAssert.Should Dir(vtkTestPath & "\" & name & "\" & "Project" & "\" & name & ".xls", vbDirectory) <> "", "the work book must be created"
+ 
 End Sub
-Public Sub Testvbaunitexported()
+Public Sub Testvbaunitclassesexported()
     Dim returnValue As Long
     Dim returnValue2 As Long
-    Dim returnValue3 As Long
-    Dim name  As String 'for file .xla
-    name = "TestProject" 'initialize it
-    returnValue = vtkCreateProject(path:=vtkTestPath, name:="TestProject", displayError:=False)
-    returnValue2 = createxlsfile(path:=vtkTestPath, name:="TestProject", displayError:=False)
-    returnValue3 = exportvbaunitwithproject(path:=vtkTestPath, name:="TestProject")
-    mAssert.Should returnValue3 = 18, "the exported module number must be 18"
+    Dim filename As String
+    Dim vbaunitsourcepath As String
+    Dim name As String
+    Dim i As Integer
+    i = 0
+    name = "TestProject"
+    
+   returnValue = vtkCreateProject(path:=vtkTestPath, name:="TestProject", displayError:=False)
+   returnValue2 = createxlsfile(path:=vtkTestPath, name:="TestProject", displayError:=False)
+ 
+
+    
+    ChDir (ThisWorkbook.path)                                          'the current workbookpath
+    ChDir ".."                                                         'allow acces to parent folder path
+    vbaunitsourcepath = CurDir(ThisWorkbook.path) & "\Source\VbaUnit\" ' the vbaunitfolder path
+    mAssert.Equals GetAttr(vbaunitsourcepath), 16, "the source must be a vbdirectory" '16 Directory or folder
+  'init file
+    filename = Dir(vbaunitsourcepath, vbNormal) 'DIR function returns the first filename vbNormal= default=0 ,** 1 readonly ,2 hidden ,3 systemfile ,,32  File has been changed since last backup ,64  File name is an alias
+  
+  While filename <> ""
+    'On Error Resume Next
+    Workbooks(name & ".xls").VBProject.VBComponents.Import (vbaunitsourcepath & filename) 'add classes to new workbook
+    FileCopy vbaunitsourcepath & filename, vtkTestPath & "\" & name & "\Source\VbaUnit\" & filename 'copy vbaunit file to destination directory
+    
+    mAssert.Should FileLen(vbaunitsourcepath & filename) = FileLen(vtkTestPath & "\" & name & "\Source\VbaUnit\" & filename), filename & " source must be equal to " & filename & "destination"
+    
+    filename = Dir
+    i = i + 1
+ Wend
+
+   mAssert.Should i = 18, "the exported module number must be 18" 'vbNormal    0   Normal
+
 End Sub
+
 
 Private Function ITest_Suite() As TestSuite
     Set ITest_Suite = New TestSuite
@@ -166,7 +192,7 @@ Private Function ITest_Suite() As TestSuite
     ITest_Suite.AddTest ITest_Manager.ClassName, "TestConfTestFolderIsCreated"
     ITest_Suite.AddTest ITest_Manager.ClassName, "TestVbaUnitFolderIsCreated"
     ITest_Suite.AddTest ITest_Manager.ClassName, "Testxlafilecreated"
-    ITest_Suite.AddTest ITest_Manager.ClassName, "Testvbaunitexported"
+    ITest_Suite.AddTest ITest_Manager.ClassName, "Testvbaunitclassesexported"
 End Function
 
 Private Sub ITestCase_RunTest()
@@ -181,7 +207,7 @@ Private Sub ITestCase_RunTest()
         Case "TestConfTestFolderIsCreated": TestConfTestFolderIsCreated
         Case "TestVbaUnitFolderIsCreated": TestVbaUnitFolderIsCreated
         Case "Testxlafilecreated": Testxlafilecreated
-        Case "Testvbaunitexported": Testvbaunitexported
+        Case "Testvbaunitclassesexported": Testvbaunitclassesexported
         Case Else: mAssert.Should False, "Invalid test name: " & mManager.methodName
     End Select
 End Sub

@@ -52,7 +52,7 @@ End Function
 ' Procedure : createxlsfile
 ' Author    : user
 ' Date      : 17/04/2013
-' Purpose   :
+' Purpose   :- Create new workbook
 '---------------------------------------------------------------------------------------
 '
 Public Function createxlsfile(path As String, name As String, Optional displayError As Boolean = True) As Long
@@ -78,9 +78,10 @@ End Function
 
 '---------------------------------------------------------------------------------------
 ' Procedure : exportvbaunitwithproject
-' Author    : user
+' Author    : JPI-Conseil
 ' Date      : 17/04/2013
-' Purpose   : -
+' Purpose   : - export vbaunit classes from original project folder and note from current workbook
+ '            - export vbaunit files from vbatoolkit project folder to new prokect
 '---------------------------------------------------------------------------------------
 '
 Function exportvbaunitwithproject(path As String, name As String) As Long
