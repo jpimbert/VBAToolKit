@@ -8,6 +8,8 @@ Attribute VB_Name = "vtkMainFunctions"
 '               - Project containing the main Excel file for the project
 '               - an empty Tests folder
 '               - A Git repository is initialized for the project
+'               - Create Xlsm project
+'               - Rename Project
 ' Return    : Boolean True if the project is created
 '
 '   L'extension "Microsoft Visual Basic For Application Extensibility" doit être activée
@@ -36,12 +38,14 @@ Public Function vtkCreateProject(path As String, name As String, Optional displa
             MkDir path & "\" & name & "\" & "Source" & "\" & "ConfTest"
             ' Create VbaUnit folder
             MkDir path & "\" & name & "\" & "Source" & "\" & "VbaUnit"
-            
-  
-            'end added
-
-'    Debug.Print CurDir
-    
+               
+            Dim Wb As Workbook
+            Set Wb = Workbooks.Add
+            'Save created project with xlsm extention
+            Wb.SaveAs Filename:=(path & "\" & name & "\" & "Project" & "\" & name), FileFormat:=(52) '52 is xlsm format
+            'Rename Project
+            Workbooks(name & ".xlsm").VBProject.name = name
+   
     On Error GoTo 0
     vtkCreateProject = 0
     Exit Function

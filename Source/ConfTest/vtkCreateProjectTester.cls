@@ -28,10 +28,16 @@ End Property
 
 Private Sub ITestCase_SetUp(Assert As IAssert)
     Set mAssert = Assert
-      
-    dir (vtkTestPath)       ' Make sure to be out of the folder to clean
     
-    On Error Resume Next    ' If there is no files here, this is not an error
+    'allow to iterate over all files in a directory
+    dir (vtkTestPath)
+    'to not display messagebox how ask to save project
+    Application.DisplayAlerts = False
+    On Error Resume Next
+    'Close Created WorkBook
+    Workbooks(vtkTestProjectName & ".xlsm").Close
+    'Delete Created WorkBook
+    Kill vtkTestPath & "\" & vtkTestProjectName & "\Project\" & vtkTestProjectName & ".xlsm"
     RmDir vtkTestPath & "\" & vtkTestProjectName & "\Source\ConfProd"
     RmDir vtkTestPath & "\" & vtkTestProjectName & "\Source\ConfTest"
     RmDir vtkTestPath & "\" & vtkTestProjectName & "\Source\VbaUnit"
@@ -39,14 +45,21 @@ Private Sub ITestCase_SetUp(Assert As IAssert)
     RmDir vtkTestPath & "\" & vtkTestProjectName & "\Source"
     RmDir vtkTestPath & "\" & vtkTestProjectName & "\Project"
     RmDir vtkTestPath & "\" & vtkTestProjectName
-      
+    Application.DisplayAlerts = True
 End Sub
 
 
 Private Sub ITestCase_TearDown()
-    dir (vtkTestPath)       ' Make sure to be out of the folder to clean
     
-    On Error Resume Next    ' If there is no files here, this is not an error
+    'allow to iterate over all files in a directory
+    dir (vtkTestPath)
+    'to not display messagebox how ask to save project
+    Application.DisplayAlerts = False
+    On Error Resume Next
+    'Close Created WorkBook
+    Workbooks(vtkTestProjectName & ".xlsm").Close
+    'Delete Created WorkBook
+    Kill vtkTestPath & "\" & vtkTestProjectName & "\Project\" & vtkTestProjectName & ".xlsm"
     RmDir vtkTestPath & "\" & vtkTestProjectName & "\Source\ConfProd"
     RmDir vtkTestPath & "\" & vtkTestProjectName & "\Source\ConfTest"
     RmDir vtkTestPath & "\" & vtkTestProjectName & "\Source\VbaUnit"
@@ -54,7 +67,7 @@ Private Sub ITestCase_TearDown()
     RmDir vtkTestPath & "\" & vtkTestProjectName & "\Source"
     RmDir vtkTestPath & "\" & vtkTestProjectName & "\Project"
     RmDir vtkTestPath & "\" & vtkTestProjectName
-      
+    Application.DisplayAlerts = True
 End Sub
 
 Public Sub TestCreateProjectDoesNothingWhenPathDoesntExist()
@@ -128,6 +141,13 @@ Public Sub TestVbaUnitFolderIsCreated()
     mAssert.Should dir(vtkTestPath & "\" & vtkTestProjectName & "\source\VbaUnit", vbDirectory) <> "", "The source\VbaUnit folder must exist"
     mAssert.Equals returnValue, 0, "The project creation must succeed"
 End Sub
+Public Sub TestXlsmFileCreated()
+    Dim returnValue As Long
+    Dim returnValue2 As Long
+    
+    returnValue = vtkCreateProject(path:=vtkTestPath, name:=vtkTestProjectName, displayError:=False)
+    mAssert.Should dir(vtkTestPath & "\" & vtkTestProjectName & "\" & "Project" & "\" & vtkTestProjectName & ".xlsm", vbDirectory) <> "", "the workbook must be created"
+End Sub
 
 Private Function ITest_Suite() As TestSuite
     Set ITest_Suite = New TestSuite
@@ -140,6 +160,7 @@ Private Function ITest_Suite() As TestSuite
     ITest_Suite.AddTest ITest_Manager.ClassName, "TestConfProdFolderIsCreated"
     ITest_Suite.AddTest ITest_Manager.ClassName, "TestConfTestFolderIsCreated"
     ITest_Suite.AddTest ITest_Manager.ClassName, "TestVbaUnitFolderIsCreated"
+    ITest_Suite.AddTest ITest_Manager.ClassName, "TestXlsmFileCreated"
 End Function
 
 Private Sub ITestCase_RunTest()
@@ -153,6 +174,7 @@ Private Sub ITestCase_RunTest()
         Case "TestConfProdFolderIsCreated": TestConfProdFolderIsCreated
         Case "TestConfTestFolderIsCreated": TestConfTestFolderIsCreated
         Case "TestVbaUnitFolderIsCreated": TestVbaUnitFolderIsCreated
+        Case "TestXlsmFileCreated": TestXlsmFileCreated
         Case Else: mAssert.Should False, "Invalid test name: " & mManager.methodName
     End Select
 End Sub
