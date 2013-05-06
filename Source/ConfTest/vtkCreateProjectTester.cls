@@ -41,8 +41,10 @@ Private Sub ITestCase_SetUp(Assert As IAssert)
     RmDir vtkTestPath & "\" & vtkTestProjectName & "\Source\ConfProd"
     RmDir vtkTestPath & "\" & vtkTestProjectName & "\Source\ConfTest"
     RmDir vtkTestPath & "\" & vtkTestProjectName & "\Source\VbaUnit"
+    RmDir vtkTestPath & "\" & vtkTestProjectName & "\Source\GitLog"
     RmDir vtkTestPath & "\" & vtkTestProjectName & "\Tests"
     RmDir vtkTestPath & "\" & vtkTestProjectName & "\Source"
+    RmDir vtkTestPath & "\" & vtkTestProjectName & "\Delivery"
     RmDir vtkTestPath & "\" & vtkTestProjectName & "\Project"
     RmDir vtkTestPath & "\" & vtkTestProjectName
     Application.DisplayAlerts = True
@@ -50,6 +52,7 @@ End Sub
 
 
 Private Sub ITestCase_TearDown()
+
     'allow to iterate over all files in a directory
     Dir (vtkTestPath)
     'to not display messagebox how ask to save project
@@ -62,12 +65,13 @@ Private Sub ITestCase_TearDown()
     RmDir vtkTestPath & "\" & vtkTestProjectName & "\Source\ConfProd"
     RmDir vtkTestPath & "\" & vtkTestProjectName & "\Source\ConfTest"
     RmDir vtkTestPath & "\" & vtkTestProjectName & "\Source\VbaUnit"
+    RmDir vtkTestPath & "\" & vtkTestProjectName & "\Source\GitLog"
     RmDir vtkTestPath & "\" & vtkTestProjectName & "\Tests"
     RmDir vtkTestPath & "\" & vtkTestProjectName & "\Source"
+    RmDir vtkTestPath & "\" & vtkTestProjectName & "\Delivery"
     RmDir vtkTestPath & "\" & vtkTestProjectName & "\Project"
     RmDir vtkTestPath & "\" & vtkTestProjectName
     Application.DisplayAlerts = True
-
 End Sub
 
 Public Sub TestCreateProjectDoesNothingWhenPathDoesntExist()
@@ -141,6 +145,20 @@ Public Sub TestVbaUnitFolderIsCreated()
     mAssert.Should Dir(vtkTestPath & "\" & vtkTestProjectName & "\source\VbaUnit", vbDirectory) <> "", "The source\VbaUnit folder must exist"
     mAssert.Equals returnvalue, 0, "The project creation must succeed"
 End Sub
+Public Sub TestGitLogIsCreated()
+    ' The createProject subroutine must create a new folder named GitLog
+    Dim returnvalue As Long
+    returnvalue = vtkCreateProject(path:=vtkTestPath, name:=vtkTestProjectName, displayError:=False)
+    mAssert.Should Dir(vtkTestPath & "\" & vtkTestProjectName & "\source\GitLog", vbDirectory) <> "", "The \source\GitLog folder must exist"
+    mAssert.Equals returnvalue, 0, "The project creation must succeed"
+End Sub
+Public Sub TestDeliveryFolderIsCreated()
+    ' The createProject subroutine must create a new folder named Delivery
+    Dim returnvalue As Long
+    returnvalue = vtkCreateProject(path:=vtkTestPath, name:=vtkTestProjectName, displayError:=False)
+    mAssert.Should Dir(vtkTestPath & "\" & vtkTestProjectName & "\Delivery", vbDirectory) <> "", "The \Delivery folder must exist"
+    mAssert.Equals returnvalue, 0, "The project creation must succeed"
+End Sub
 Public Sub TestXlsmFileCreated()
 'test that xlsm file is created in the right path
     Dim returnvalue As Long
@@ -178,8 +196,11 @@ Private Function ITest_Suite() As TestSuite
     ITest_Suite.AddTest ITest_Manager.ClassName, "TestConfProdFolderIsCreated"
     ITest_Suite.AddTest ITest_Manager.ClassName, "TestConfTestFolderIsCreated"
     ITest_Suite.AddTest ITest_Manager.ClassName, "TestVbaUnitFolderIsCreated"
+    ITest_Suite.AddTest ITest_Manager.ClassName, "TestGitLogIsCreated"
+    ITest_Suite.AddTest ITest_Manager.ClassName, "TestDeliveryFolderIsCreated"
     ITest_Suite.AddTest ITest_Manager.ClassName, "TestXlsmFileCreated"
     ITest_Suite.AddTest ITest_Manager.ClassName, "TestXlsmFileIsNamedcorrectly"
+    ITest_Suite.AddTest ITest_Manager.ClassName, "TestReferencesWasActivated"
 End Function
 
 Private Sub ITestCase_RunTest()
@@ -193,8 +214,11 @@ Private Sub ITestCase_RunTest()
         Case "TestConfProdFolderIsCreated": TestConfProdFolderIsCreated
         Case "TestConfTestFolderIsCreated": TestConfTestFolderIsCreated
         Case "TestVbaUnitFolderIsCreated": TestVbaUnitFolderIsCreated
+        Case "TestGitLogIsCreated": TestGitLogIsCreated
+        Case "TestDeliveryFolderIsCreated": TestDeliveryFolderIsCreated
         Case "TestXlsmFileCreated": TestXlsmFileCreated
         Case "TestXlsmFileIsNamedcorrectly": TestXlsmFileIsNamedcorrectly
+        Case "TestReferencesWasActivated": TestReferencesWasActivated
         Case Else: mAssert.Should False, "Invalid test name: " & mManager.methodName
     End Select
 End Sub

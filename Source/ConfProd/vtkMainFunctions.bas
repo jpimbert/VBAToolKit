@@ -26,12 +26,16 @@ Public Function vtkCreateProject(path As String, name As String, Optional displa
 
             ' Create main folder
             MkDir path & "\" & name
+            ' Create Delivery folder
+            MkDir path & "\" & name & "\" & "Delivery"
             ' Create Project folder
             MkDir path & "\" & name & "\" & "Project"
             ' Create Tests folder
             MkDir path & "\" & name & "\" & "Tests"
             ' Create Source folder
             MkDir path & "\" & name & "\" & "Source"
+            ' Create GitLog Folder
+            MkDir path & "\" & name & "\" & "Source" & "\" & "GitLog"
             ' Create ConfProd folder
             MkDir path & "\" & name & "\" & "Source" & "\" & "ConfProd"
             ' Create ConfTest folder
