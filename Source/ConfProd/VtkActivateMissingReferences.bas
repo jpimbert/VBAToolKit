@@ -11,7 +11,7 @@ Option Explicit
 
 Public Function VtkActivateReferences(workbookname As String)
 
-If VtkWorkbokIsOpen(workbookname) = False Then     'if the workbook is open
+If VtkWorkbookIsOpenFunction(workbookname) = True Then     'if the workbook is open
 
 On Error Resume Next ' if the first extention is already activated, we will try to activate the second one
 

@@ -10,7 +10,7 @@ Attribute VB_Name = "vtkMainFunctions"
 '               - A Git repository is initialized for the project
 '               - Create Xlsm project
 '               - Rename Project
-' Return    : Boolean True if the project is created
+' Return    : Long error number
 '
 '   L'extension "Microsoft Visual Basic For Application Extensibility" doit être activée
 '
@@ -32,24 +32,25 @@ Public Function vtkCreateProject(path As String, name As String, Optional displa
             MkDir path & "\" & name & "\" & "Project"
             ' Create Tests folder
             MkDir path & "\" & name & "\" & "Tests"
+            ' Create GitLog Folder
+            MkDir path & "\" & name & "\" & "GitLog"
             ' Create Source folder
             MkDir path & "\" & name & "\" & "Source"
-            ' Create GitLog Folder
-            MkDir path & "\" & name & "\" & "Source" & "\" & "GitLog"
             ' Create ConfProd folder
             MkDir path & "\" & name & "\" & "Source" & "\" & "ConfProd"
             ' Create ConfTest folder
             MkDir path & "\" & name & "\" & "Source" & "\" & "ConfTest"
             ' Create VbaUnit folder
             MkDir path & "\" & name & "\" & "Source" & "\" & "VbaUnit"
-               
+             
             Dim Wb As Workbook
             Set Wb = Workbooks.Add
             'Save created project with xlsm extention
             Wb.SaveAs Filename:=(path & "\" & name & "\" & "Project" & "\" & name), FileFormat:=(52) '52 is xlsm format
             'Rename Project
-            Workbooks(name & ".xlsm").VBProject.name = name
-   
+            Workbooks(name & ".xlsm").VBProject.name = name & "_DEV"
+            'call function who activate references
+            VtkActivateReferences (name & ".xlsm")
     On Error GoTo 0
     vtkCreateProject = 0
     Exit Function

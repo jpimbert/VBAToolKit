@@ -26,11 +26,6 @@ Public Function vtkPathToTestFolder() As String '\VBAToolKit\Tests
     
 End Function
 
-Public Function vtkTestPath() As String '\VBAToolKit\Tests
-   
-   vtkTestPath = vtkPathToTestFolder
-End Function
-
 '---------------------------------------------------------------------------------------
 ' Procedure : vtkPathToSourceFolder
 ' Author    : Demonn

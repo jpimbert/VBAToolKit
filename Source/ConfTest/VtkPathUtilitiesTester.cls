@@ -48,12 +48,19 @@ Public Sub TestPathToSourceFolder()
     ' Verify the path of the current Source Folder
     mAssert.Equals vtkPathToSourceFolder, vtkInstallPath & "\Source"
 End Sub
+Public Sub TestPathfinishbyVBAToolKit()
+    ' Verify that the path finish by "\VBAToolKit"
+    mAssert.Equals Right(vtkPathOfCurrentProject, 11), "\VBAToolKit", "the install path must finish by \VBAToolKit"
+    ' Verify that the path contain ":\Users\"
+    mAssert.Equals Mid(vtkPathOfCurrentProject, 2, 8), ":\Users\", "the install path must contain :\Users\ "
+End Sub
 
 Private Function ITest_Suite() As TestSuite
     Set ITest_Suite = New TestSuite
     ITest_Suite.AddTest ITest_Manager.ClassName, "TestPathOfCurrentProject"
     ITest_Suite.AddTest ITest_Manager.ClassName, "TestPathToTestFolder"
     ITest_Suite.AddTest ITest_Manager.ClassName, "TestPathToSourceFolder"
+    ITest_Suite.AddTest ITest_Manager.ClassName, "TestPathfinishbyVBAToolKit"
 End Function
 
 Private Sub ITestCase_RunTest()
@@ -61,6 +68,7 @@ Private Sub ITestCase_RunTest()
         Case "TestPathOfCurrentProject": TestPathOfCurrentProject
         Case "TestPathToTestFolder": TestPathToTestFolder
         Case "TestPathToSourceFolder": TestPathToSourceFolder
+        Case "TestPathfinishbyVBAToolKit": TestPathfinishbyVBAToolKit
         Case Else: mAssert.Should False, "Invalid test name: " & mManager.methodName
     End Select
 End Sub
