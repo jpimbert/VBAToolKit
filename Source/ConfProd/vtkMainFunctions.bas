@@ -51,6 +51,9 @@ Public Function vtkCreateProject(path As String, name As String, Optional displa
             Workbooks(name & ".xlsm").VBProject.name = name & "_DEV"
             'call function who activate references
             VtkActivateReferences (name & ".xlsm")
+            'function that export vbaunit module to created project
+            retval = vtkExportVbaUnitModules(path & "\" & name & "\Source\VbaUnit\", Left(ThisWorkbook.name, Len(ThisWorkbook.name) - 5))
+            
     On Error GoTo 0
     vtkCreateProject = 0
     Exit Function

@@ -41,6 +41,13 @@ Workbooks(workbookname & ".xlsm").Sheets(1).Range("A" & j + 2).Interior.ColorInd
 Next
 End Function
 
+'---------------------------------------------------------------------------------------
+' Procedure : vtkExportVbaUnitModules
+' Author    : user
+' Date      : 13/05/2013
+' Purpose   :- export vbaunit modules from a workbook to a folder
+'---------------------------------------------------------------------------------------
+'
 Public Function vtkExportVbaUnitModules(DestinationPath As String, sourceworkbookname As String) As String
  Dim i As Integer
  Dim j As Integer
@@ -57,16 +64,19 @@ Public Function vtkExportVbaUnitModules(DestinationPath As String, sourceworkboo
    
    Select Case Workbooks(sourceworkbookname).VBProject.VBComponents.Item(i).Type
      Case 1
-        FullPAth = DestinationPath & modulename & ".bas" 'full path of file that will be created
+        'full path of file that will be created with ".bas" extension
+        FullPAth = DestinationPath & modulename & ".bas"
      Case 2
-        FullPAth = DestinationPath & modulename & ".cls" 'full path of file that will be created
+        'full path of file that will be created with ".cls" extention
+        FullPAth = DestinationPath & modulename & ".cls"
    End Select
    
     If fso.FileExists(FullPAth) = False Then 'default function how verify if the file exist
        fso.CreateTextFile (FullPAth)        ' if the file don't exist we will create it
     End If
-                   
-    Workbooks(sourceworkbookname).VBProject.VBComponents.Item(i).Export (FullPAth) 'export module to the right folder
+    'export module to the right folder
+    Workbooks(sourceworkbookname).VBProject.VBComponents.Item(i).Export (FullPAth)
+    'write informations in an excel sheet
     Workbooks(sourceworkbookname & ".xlsm").Sheets(1).Range("b" & j) = "ok"
     Workbooks(sourceworkbookname & ".xlsm").Sheets(1).Range("c" & j) = FullPAth
  End If
@@ -74,4 +84,6 @@ Public Function vtkExportVbaUnitModules(DestinationPath As String, sourceworkboo
  Next
 
 End Function
+
+
 
