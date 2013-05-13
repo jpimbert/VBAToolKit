@@ -44,6 +44,7 @@ Private Sub ITestCase_TearDown()
     Kill vtkTestPath & "\" & vtkTestProjectName & "\Project\" & vtkTestProjectName & ".xlsm"
     RmDir vtkTestPath & "\" & vtkTestProjectName & "\Source\ConfProd"
     RmDir vtkTestPath & "\" & vtkTestProjectName & "\Source\ConfTest"
+    Kill vtkTestPath & "\" & vtkTestProjectName & "\Source\VbaUnit\*"
     RmDir vtkTestPath & "\" & vtkTestProjectName & "\Source\VbaUnit"
     RmDir vtkTestPath & "\" & vtkTestProjectName & "\GitLog"
     RmDir vtkTestPath & "\" & vtkTestProjectName & "\Tests"
@@ -168,6 +169,31 @@ End If
 Next
 mAssert.Equals j, 2, "the references number must be equal to" & i + 2
 End Sub
+Public Sub TestExportVbaUnitModule()
+  'test that exported file was not empty , files was correctly named
+  'the test will compare "vbaunit" file of vbatoolkit and exported file
+  Dim fs As Object
+  Set fs = CreateObject("Scripting.FileSystemObject")
+  
+  'call create project function
+  returnValue = vtkCreateProject(path:=vtkTestPath, name:=vtkTestProjectName, displayError:=False)
+  'vbaunit files of vbatoolkit project
+  sourceVbaUnitFile = Dir(vtkInstallPath & "\source\VbaUnit\*.*", vbDirectory)
+ 
+ 'list of files in the folder
+ Do While sourceVbaUnitFile <> ""
+    'ignore these two name
+    If sourceVbaUnitFile <> "." And sourceVbaUnitFile <> ".." Then
+      'test that exported files was not empty
+       mAssert.Should IsEmpty(vtkTestPath & "\" & vtkTestProjectName & "\source\VbaUnit\" & sourceVbaUnitFile) = False, sourceVbaUnitFile & "should not be empty"
+      'test name, extension, and the existence of the file in the created project
+       mAssert.Should fs.FileExists(vtkTestPath & "\" & vtkTestProjectName & "\source\VbaUnit\" & sourceVbaUnitFile) = True, sourceVbaUnitFile & "must exist"
+    End If
+  'point to the next element
+  sourceVbaUnitFile = Dir
+ Loop
+
+End Sub
 
 Private Function ITest_Suite() As TestSuite
     Set ITest_Suite = New TestSuite
@@ -185,6 +211,7 @@ Private Function ITest_Suite() As TestSuite
     ITest_Suite.AddTest ITest_Manager.ClassName, "TestXlsmFileCreated"
     ITest_Suite.AddTest ITest_Manager.ClassName, "TestXlsmFileIsNamedcorrectly"
     ITest_Suite.AddTest ITest_Manager.ClassName, "TestReferencesWasActivated"
+    ITest_Suite.AddTest ITest_Manager.ClassName, "TestExportVbaUnitModule"
 End Function
 
 Private Sub ITestCase_RunTest()
@@ -203,6 +230,7 @@ Private Sub ITestCase_RunTest()
         Case "TestXlsmFileCreated": TestXlsmFileCreated
         Case "TestXlsmFileIsNamedcorrectly": TestXlsmFileIsNamedcorrectly
         Case "TestReferencesWasActivated": TestReferencesWasActivated
+        Case "TestExportVbaUnitModule": TestExportVbaUnitModule
         Case Else: mAssert.Should False, "Invalid test name: " & mManager.methodName
     End Select
 End Sub
