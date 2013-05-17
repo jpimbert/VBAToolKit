@@ -8,8 +8,9 @@ Attribute VB_Name = "vtkMainFunctions"
 '               - Project containing the main Excel file for the project
 '               - an empty Tests folder
 '               - A Git repository is initialized for the project
-'               - Create Xlsm project
-'               - Rename Project
+'               - Create Xlsm Dev and Delivery project
+'               - Rename 2 Project
+'               - Activate missing References
 ' Return    : Long error number
 '
 '   L'extension "Microsoft Visual Basic For Application Extensibility" doit être activée
@@ -43,17 +44,18 @@ Public Function vtkCreateProject(path As String, name As String, Optional displa
             ' Create VbaUnit folder
             MkDir path & "\" & name & "\" & "Source" & "\" & "VbaUnit"
              
-            Dim Wb As Workbook
-            Set Wb = Workbooks.Add
             'Save created project with xlsm extention
-            Wb.SaveAs Filename:=(path & "\" & name & "\" & "Project" & "\" & name), FileFormat:=(52) '52 is xlsm format
+             Workbooks.Add.SaveAs (path & "\" & name & "\" & "Project" & "\" & name), FileFormat:=(52) '52 is xlsm format
             'Rename Project
             Workbooks(name & ".xlsm").VBProject.name = name & "_DEV"
             'call function who activate references
             VtkActivateReferences (name & ".xlsm")
-            'function that export vbaunit module to created project
-            retval = vtkExportVbaUnitModules(path & "\" & name & "\Source\VbaUnit\", Left(ThisWorkbook.name, Len(ThisWorkbook.name) - 5))
-            
+            'Create delivery workbook
+            Workbooks.Add.SaveAs (path & "\" & name & "\" & "Delivery" & "\" & name & "_Delivery"), FileFormat:=(52) '52 is xlsm format
+            'Rename Project
+            Workbooks(name & "_Delivery" & ".xlsm").VBProject.name = name & "_Delivery"
+            'call function who activate references
+            VtkActivateReferences (name & "_Delivery" & ".xlsm")
     On Error GoTo 0
     vtkCreateProject = 0
     Exit Function
