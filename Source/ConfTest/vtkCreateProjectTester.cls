@@ -223,6 +223,31 @@ Public Sub TestDevWorkbookIsActive()
     returnvalue = vtkCreateProject(path:=vtkTestPath, name:=vtkTestProjectName, displayError:=False)
     mAssert.Equals ActiveWorkbook.name, vtkTestProjectName & ".xlsm", "the dev workbook must be active"
 End Sub
+Public Sub TestExportVbaUnitModule()
+  'test that exported file was not empty , files was correctly named
+  'the test will compare "vbaunit" file of vbatoolkit and exported file
+  Dim fs As Object
+  Set fs = CreateObject("Scripting.FileSystemObject")
+  
+  'call create project function
+  returnvalue = vtkCreateProject(path:=vtkTestPath, name:=vtkTestProjectName, displayError:=False)
+  'vbaunit files of vbatoolkit project
+  sourceVbaUnitFile = Dir(vtkInstallPath & "\source\VbaUnit\*.*", vbDirectory)
+ 
+ 'list of files in the folder
+ Do While sourceVbaUnitFile <> ""
+    'ignore these two name
+    If sourceVbaUnitFile <> "." And sourceVbaUnitFile <> ".." Then
+      'test that exported files was not empty
+       mAssert.Should IsEmpty(vtkTestPath & "\" & vtkTestProjectName & "\source\VbaUnit\" & sourceVbaUnitFile) = False, sourceVbaUnitFile & "should not be empty"
+      'test name, extension, and the existence of the file in the created project
+       mAssert.Should fs.FileExists(vtkTestPath & "\" & vtkTestProjectName & "\source\VbaUnit\" & sourceVbaUnitFile) = True, sourceVbaUnitFile & "must exist"
+    End If
+  'point to the next element
+  sourceVbaUnitFile = Dir
+ Loop
+
+End Sub
 
 Private Function ITest_Suite() As TestSuite
     Set ITest_Suite = New TestSuite
@@ -248,6 +273,7 @@ Private Function ITest_Suite() As TestSuite
     ITest_Suite.AddTest ITest_Manager.ClassName, "TestDeliveryWorkbookPathCorrectlyWritted"
     ITest_Suite.AddTest ITest_Manager.ClassName, "TestDeliveryWorkbookNameCorrectlyWritted"
     ITest_Suite.AddTest ITest_Manager.ClassName, "TestDevWorkbookIsActive"
+    ITest_Suite.AddTest ITest_Manager.ClassName, "TestExportVbaUnitModule"
 End Function
 
 Private Sub ITestCase_RunTest()
@@ -274,6 +300,7 @@ Private Sub ITestCase_RunTest()
         Case "TestDeliveryWorkbookPathCorrectlyWritted": TestDeliveryWorkbookPathCorrectlyWritted
         Case "TestDeliveryWorkbookNameCorrectlyWritted": TestDeliveryWorkbookNameCorrectlyWritted
         Case "TestDevWorkbookIsActive": TestDevWorkbookIsActive
+        Case "TestExportVbaUnitModule": TestExportVbaUnitModule
         Case Else: mAssert.Should False, "Invalid test name: " & mManager.methodName
     End Select
 End Sub

@@ -65,6 +65,8 @@ Public Function vtkCreateProject(path As String, name As String, Optional displa
             Workbooks(name & ".xlsm").Sheets(vtkConfSheet).Range(vtkModuleDeliveryRange & vtkFirstLine - 3) = Workbooks(name & "_Delivery" & ".xlsm").name
             'activate dev workbook
             Workbooks(name & ".xlsm").Activate
+            '
+            a = vtkExportAll(ThisWorkbook.name)
     On Error GoTo 0
     vtkCreateProject = 0
     Exit Function

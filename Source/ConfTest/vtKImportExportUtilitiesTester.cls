@@ -36,9 +36,12 @@ End Sub
 
 Private Sub ITestCase_TearDown()
 Application.DisplayAlerts = False
+On Error Resume Next
     Workbooks(vtkTestProjectName & "_Test" & ".xlsm").Close
     'Delete Created WorkBook
     Kill vtkTestPath & "\" & vtkTestProjectName & "_Test" & ".xlsm"
+    Kill vtkTestPath & "\test.frm"
+On Error GoTo 0
 Application.DisplayAlerts = True
 End Sub
 Public Sub TestConfSheetCorrectlyCreated()
@@ -126,7 +129,12 @@ Dim modulename As String
     'ActiveWorkbook.VBProject.VBComponents.Count +18(vbaunitmodulenumber)
     mAssert.Equals i, ActiveWorkbook.VBProject.VBComponents.Count + 18
 End Sub
+Public Sub TestCreateModuleFileFunction()
+Dim returnvalue As String
 
+returnvalue = vtkCreateModuleFile(vtkTestPath & "\test.frm")
+mAssert.Should Dir(vtkTestPath & "\test.frm") <> "", "vtkCreateModuleFile must create somethings"
+End Sub
 Private Function ITest_Suite() As TestSuite
     Set ITest_Suite = New TestSuite
     ITest_Suite.AddTest ITest_Manager.ClassName, "TestConfSheetCorrectlyCreated"
@@ -136,6 +144,7 @@ Private Function ITest_Suite() As TestSuite
     ITest_Suite.AddTest ITest_Manager.ClassName, "TestVbaUnitModuleNameCorrectlyExported"
     ITest_Suite.AddTest ITest_Manager.ClassName, "TestIsVbaUnitModule"
     ITest_Suite.AddTest ITest_Manager.ClassName, "TestListOfAllModule"
+    ITest_Suite.AddTest ITest_Manager.ClassName, "TestCreateModuleFileFunction"
 End Function
 
 Private Sub ITestCase_RunTest()
@@ -147,6 +156,7 @@ Private Sub ITestCase_RunTest()
         Case "TestVbaUnitModuleNameCorrectlyExported": TestVbaUnitModuleNameCorrectlyExported
         Case "TestIsVbaUnitModule": TestIsVbaUnitModule
         Case "TestListOfAllModule": TestListOfAllModule
+        Case "TestCreateModuleFileFunction": TestCreateModuleFileFunction
         Case Else: mAssert.Should False, "Invalid test name: " & mManager.methodName
     End Select
 End Sub
