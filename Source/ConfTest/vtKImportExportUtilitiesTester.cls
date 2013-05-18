@@ -109,6 +109,23 @@ Public Sub TestIsVbaUnitModule()
     mAssert.Should vtkIsVbaUnit(ActiveWorkbook.Sheets(vtkConfSheet).Range(vtkModuleNameRange & vtkFirstLine + 19)) = False, "this cell don't contain avalid vbaunit module"
  
 End Sub
+Public Sub TestListOfAllModule()
+'compare module number on configuration sheet with workbook module number
+' sheet modules name (workbook module + vbaunit module name(not imported yet))
+Dim returnvalue As Integer
+Dim i As Integer
+Dim modulename As String
+
+    returnvalue = vtkListAllModules()
+    i = 0
+    modulename = ActiveWorkbook.Sheets(vtkConfSheet).Range(vtkModuleNameRange & vtkFirstLine + i)
+    While modulename <> ""
+     i = i + 1
+     modulename = ActiveWorkbook.Sheets(vtkConfSheet).Range(vtkModuleNameRange & vtkFirstLine + i)
+   Wend
+    'ActiveWorkbook.VBProject.VBComponents.Count +18(vbaunitmodulenumber)
+    mAssert.Equals i, ActiveWorkbook.VBProject.VBComponents.Count + 18
+End Sub
 
 Private Function ITest_Suite() As TestSuite
     Set ITest_Suite = New TestSuite
@@ -118,6 +135,7 @@ Private Function ITest_Suite() As TestSuite
     ITest_Suite.AddTest ITest_Manager.ClassName, "TestInformationRangeCorretlyNammed"
     ITest_Suite.AddTest ITest_Manager.ClassName, "TestVbaUnitModuleNameCorrectlyExported"
     ITest_Suite.AddTest ITest_Manager.ClassName, "TestIsVbaUnitModule"
+    ITest_Suite.AddTest ITest_Manager.ClassName, "TestListOfAllModule"
 End Function
 
 Private Sub ITestCase_RunTest()
@@ -128,6 +146,7 @@ Private Sub ITestCase_RunTest()
         Case "TestInformationRangeCorretlyNammed": TestInformationRangeCorretlyNammed
         Case "TestVbaUnitModuleNameCorrectlyExported": TestVbaUnitModuleNameCorrectlyExported
         Case "TestIsVbaUnitModule": TestIsVbaUnitModule
+        Case "TestListOfAllModule": TestListOfAllModule
         Case Else: mAssert.Should False, "Invalid test name: " & mManager.methodName
     End Select
 End Sub

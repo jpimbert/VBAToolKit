@@ -139,3 +139,31 @@ Dim valfin As Integer
   End If
  Next
 End Function
+
+'---------------------------------------------------------------------------------------
+' Procedure : vtkListAllModules
+' Author    : user
+' Date      : 17/05/2013
+' Purpose   : - call VtkInitializeExcelfileWithVbaUnitModuleName and use his return value
+'             - list all module of current project , verify that the module
+'              is not a vbaunit and write his name in the range
+'
+'---------------------------------------------------------------------------------------
+'
+Public Function vtkListAllModules() As Integer
+Dim i As Integer
+Dim j As Integer
+Dim k As Integer
+Dim t As Integer
+
+t = VtkInitializeExcelfileWithVbaUnitModuleName()
+k = 0
+  For i = 1 To ActiveWorkbook.VBProject.VBComponents.Count
+    If vtkIsVbaUnit(ActiveWorkbook.VBProject.VBComponents.Item(i).name) = False Then
+        ActiveWorkbook.Sheets(vtkConfSheet).Range(vtkModuleNameRange & t + k) = ActiveWorkbook.VBProject.VBComponents.Item(i).name
+        ActiveWorkbook.Sheets(vtkConfSheet).Range(vtkModuleNameRange & t + k).Interior.ColorIndex = 8
+        k = k + 1
+    End If
+  Next
+vtkListAllModules = k
+End Function
