@@ -79,3 +79,63 @@ End Function
 Public Function vtkFirstLine() As Integer
 vtkFirstLine = 4
 End Function
+'---------------------------------------------------------------------------------------
+' Procedure : VtkInitializeExcelfileWithVbaUnitModuleName
+' Author    : user
+' Date      : 09/05/2013
+' Purpose   : - initialize ConfSheet with vbaunit module name
+'             - Return the next first empty line number
+'---------------------------------------------------------------------------------------
+'
+Public Function VtkInitializeExcelfileWithVbaUnitModuleName() As Integer
+
+Dim tableofvbaunitname(17) As String
+    
+    tableofvbaunitname(1) = "IAssert"
+    tableofvbaunitname(2) = "IResultUser"
+    tableofvbaunitname(3) = "IRunManager"
+    tableofvbaunitname(4) = "ITest"
+    tableofvbaunitname(5) = "ITestCase"
+    tableofvbaunitname(6) = "ITestManager"
+    tableofvbaunitname(7) = "RunManager"
+    tableofvbaunitname(8) = "TestCaseManager"
+    tableofvbaunitname(9) = "TestClassLister"
+    tableofvbaunitname(10) = "TesterTemplate"
+    tableofvbaunitname(11) = "TestFailure"
+    tableofvbaunitname(12) = "TestResult"
+    tableofvbaunitname(13) = "TestRunner"
+    tableofvbaunitname(14) = "TestSuite"
+    tableofvbaunitname(15) = "TestSuiteManager"
+    tableofvbaunitname(16) = "AutoGen"
+    tableofvbaunitname(17) = "Assert"
+    tableofvbaunitname(0) = "VbaUnitMain"
+Dim j As Integer
+  For j = 0 To UBound(tableofvbaunitname) ' for j to table length
+    ActiveWorkbook.Sheets(vtkConfSheet).Range(vtkModuleNameRange & j + vtkFirstLine) = tableofvbaunitname(j)
+    ActiveWorkbook.Sheets(vtkConfSheet).Range(vtkModuleNameRange & j + vtkFirstLine).Interior.ColorIndex = 6
+  Next
+
+ VtkInitializeExcelfileWithVbaUnitModuleName = j + vtkFirstLine
+End Function
+
+'---------------------------------------------------------------------------------------
+' Procedure : vtkIsVbaUnit
+' Author    : user
+' Date      : 17/05/2013
+' Purpose   : - take name in parameter and verify if the module is a vbaunit module
+'---------------------------------------------------------------------------------------
+'
+Public Function vtkIsVbaUnit(modulename As String) As Boolean
+Dim i As Integer
+Dim valinit As Integer
+Dim valfin As Integer
+    valinit = vtkFirstLine
+    valfin = vtkFirstLine + 17
+    vtkIsVbaUnit = False
+ For i = vtkFirstLine To valfin
+  If modulename = Range(vtkModuleNameRange & i) And modulename <> "" Then
+     vtkIsVbaUnit = True
+  Exit For
+  End If
+ Next
+End Function

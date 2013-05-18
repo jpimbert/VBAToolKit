@@ -42,7 +42,7 @@ Application.DisplayAlerts = False
 Application.DisplayAlerts = True
 End Sub
 Public Sub TestConfSheetCorrectlyCreated()
-
+'test that configuration sheet was created
 Dim found As Boolean
 Dim i As Integer
 found = False
@@ -79,9 +79,36 @@ Public Sub TestInformationRangeCorretlyNammed()
     Dim returnvalue As String
     'return value = range letter
     returnvalue = vtkInformationRange()
-mAssert.Equals ActiveWorkbook.Sheets(vtkConfSheet).Range(returnvalue & vtkFirstLine - 3), "File Informations", "range File Informations must nammed correctly"
+    mAssert.Equals ActiveWorkbook.Sheets(vtkConfSheet).Range(returnvalue & vtkFirstLine - 3), "File Informations", "range File Informations must nammed correctly"
 End Sub
+Public Sub TestVbaUnitModuleNameCorrectlyExported()
+  'test that cell how contain vbaunit module name before and after executing function "VtkInitializeExcelfileWithVbaUnitModuleName()"
+    Dim returnvalue As Integer
 
+    mAssert.Equals ActiveWorkbook.Sheets(vtkConfSheet).Range(vtkModuleNameRange & vtkFirstLine), "", "the cell must be empty , vbaunit module not yet exported"
+    mAssert.Equals ActiveWorkbook.Sheets(vtkConfSheet).Range(vtkModuleNameRange & vtkFirstLine + 17), "", "the range must be empty , vbaunit module not yet exported"
+
+    returnvalue = VtkInitializeExcelfileWithVbaUnitModuleName()
+     
+    mAssert.Should ActiveWorkbook.Sheets(vtkConfSheet).Range(vtkModuleNameRange & vtkFirstLine) <> "", "the cell must be empty , vbaunit module not yet exported"
+    mAssert.Should ActiveWorkbook.Sheets(vtkConfSheet).Range(vtkModuleNameRange & vtkFirstLine + 17) <> "", "the range must be empty , vbaunit module not yet exported"
+
+End Sub
+Public Sub TestIsVbaUnitModule()
+  'test function how return true if it's a vbaunit module and false if not
+    Dim returnvalue As Boolean
+    Dim returnvalue2 As Integer
+ 
+    mAssert.Should vtkIsVbaUnit(ActiveWorkbook.Sheets(vtkConfSheet).Range(vtkModuleNameRange & vtkFirstLine)) = False, "vbaunit list not yet created"
+    mAssert.Should vtkIsVbaUnit(ActiveWorkbook.Sheets(vtkConfSheet).Range(vtkModuleNameRange & vtkFirstLine + 17)) = False, "vbaunit list not yet created"
+ 
+    returnvalue2 = VtkInitializeExcelfileWithVbaUnitModuleName()
+     
+    mAssert.Should vtkIsVbaUnit(ActiveWorkbook.Sheets(vtkConfSheet).Range(vtkModuleNameRange & vtkFirstLine)) = True, "vtkIsVbaUnit must return true the list is already created"
+    mAssert.Should vtkIsVbaUnit(ActiveWorkbook.Sheets(vtkConfSheet).Range(vtkModuleNameRange & vtkFirstLine + 17)) = True, "vtkIsVbaUnit must return true the list is already created"
+    mAssert.Should vtkIsVbaUnit(ActiveWorkbook.Sheets(vtkConfSheet).Range(vtkModuleNameRange & vtkFirstLine + 19)) = False, "this cell don't contain avalid vbaunit module"
+ 
+End Sub
 
 Private Function ITest_Suite() As TestSuite
     Set ITest_Suite = New TestSuite
@@ -89,6 +116,8 @@ Private Function ITest_Suite() As TestSuite
     ITest_Suite.AddTest ITest_Manager.ClassName, "TestofNotExistanceOfConfSheet"
     ITest_Suite.AddTest ITest_Manager.ClassName, "TestModuleNameRangeCorrectlyNammed"
     ITest_Suite.AddTest ITest_Manager.ClassName, "TestInformationRangeCorretlyNammed"
+    ITest_Suite.AddTest ITest_Manager.ClassName, "TestVbaUnitModuleNameCorrectlyExported"
+    ITest_Suite.AddTest ITest_Manager.ClassName, "TestIsVbaUnitModule"
 End Function
 
 Private Sub ITestCase_RunTest()
@@ -97,6 +126,8 @@ Private Sub ITestCase_RunTest()
         Case "TestofNotExistanceOfConfSheet": TestofNotExistanceOfConfSheet
         Case "TestModuleNameRangeCorrectlyNammed": TestModuleNameRangeCorrectlyNammed
         Case "TestInformationRangeCorretlyNammed": TestInformationRangeCorretlyNammed
+        Case "TestVbaUnitModuleNameCorrectlyExported": TestVbaUnitModuleNameCorrectlyExported
+        Case "TestIsVbaUnitModule": TestIsVbaUnitModule
         Case Else: mAssert.Should False, "Invalid test name: " & mManager.methodName
     End Select
 End Sub
