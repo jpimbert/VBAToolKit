@@ -50,12 +50,21 @@ Public Function vtkCreateProject(path As String, name As String, Optional displa
             Workbooks(name & ".xlsm").VBProject.name = name & "_DEV"
             'call function who activate references
             VtkActivateReferences (name & ".xlsm")
+            'initialize confsheet with dev workbook name and path
+            Workbooks(name & ".xlsm").Sheets(vtkConfSheet).Range(vtkModuleDevRange & vtkFirstLine - 2) = Workbooks(name & ".xlsm").FullNameURLEncoded
+            Workbooks(name & ".xlsm").Sheets(vtkConfSheet).Range(vtkModuleDevRange & vtkFirstLine - 3) = Workbooks(name & ".xlsm").name
+            
             'Create delivery workbook
             Workbooks.Add.SaveAs (path & "\" & name & "\" & "Delivery" & "\" & name & "_Delivery"), FileFormat:=(52) '52 is xlsm format
             'Rename Project
             Workbooks(name & "_Delivery" & ".xlsm").VBProject.name = name & "_Delivery"
             'call function who activate references
             VtkActivateReferences (name & "_Delivery" & ".xlsm")
+            'initialize confsheet with delivery workbook name and path
+            Workbooks(name & ".xlsm").Sheets(vtkConfSheet).Range(vtkModuleDeliveryRange & vtkFirstLine - 2) = Workbooks(name & "_Delivery" & ".xlsm").FullNameURLEncoded
+            Workbooks(name & ".xlsm").Sheets(vtkConfSheet).Range(vtkModuleDeliveryRange & vtkFirstLine - 3) = Workbooks(name & "_Delivery" & ".xlsm").name
+            'activate dev workbook
+            Workbooks(name & ".xlsm").Activate
     On Error GoTo 0
     vtkCreateProject = 0
     Exit Function
