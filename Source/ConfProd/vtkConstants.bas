@@ -18,7 +18,6 @@ End Function
 ' Author    : user
 ' Date      : 07/05/2013
 ' Purpose   :-Return the path of the current project  '..\VBAToolKit
-'            -Public Const vtkInstallPath = vtkPathOfCurrentProject : don't work , pas possibled'affecter une var a un const
 '---------------------------------------------------------------------------------------
 '
 Public Function vtkInstallPath() As String

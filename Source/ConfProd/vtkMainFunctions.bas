@@ -66,7 +66,8 @@ Public Function vtkCreateProject(path As String, name As String, Optional displa
             'activate dev workbook
             Workbooks(name & ".xlsm").Activate
             '
-            a = vtkExportAll(ThisWorkbook.name)
+            RetVtkExportAll = vtkExportAll(ThisWorkbook.name)
+            RetValImportTestConf = vtkImportTestConfig()
     On Error GoTo 0
     vtkCreateProject = 0
     Exit Function

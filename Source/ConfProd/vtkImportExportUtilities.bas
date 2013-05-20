@@ -68,6 +68,19 @@ Public Function vtkInformationRange() As String
 vtkInformationRange = "D"
 ActiveWorkbook.Sheets(vtkConfSheet).Range(vtkInformationRange & vtkFirstLine - 3) = "File Informations"
 End Function
+'---------------------------------------------------------------------------------------
+' Procedure : vtkModuleInformationsRange
+' Author    : user
+' Date      : 13/05/2013
+' Purpose   : - return range name that contains modules information
+'             - write range name
+'---------------------------------------------------------------------------------------
+'
+Public Function vtkModuleInformationsRange() As String
+vtkModuleInformationsRange = "E"
+ActiveWorkbook.Sheets(vtkConfSheet).Range(vtkModuleInformationsRange & vtkFirstLine - 3) = "Modules Informations"
+End Function
+
 
 '---------------------------------------------------------------------------------------
 ' Procedure : vtkFirstLine
@@ -324,10 +337,40 @@ Dim a As String
 
 a = vtkListAllModules()
 i = 0
-While ActiveWorkbook.Sheets(vtkConfSheet).Range(vtkModuleNameRange & vtkFirstLine + i) <> ""
-If Range(vtkModuleNameRange & vtkFirstLine + i) <> "" Then
-a = vtkExportModule(Range(vtkModuleNameRange & vtkFirstLine + i), vtkFirstLine + i, sourceworkbookname)
-End If
-i = i + 1
-Wend
+
+    While ActiveWorkbook.Sheets(vtkConfSheet).Range(vtkModuleNameRange & vtkFirstLine + i) <> ""
+        a = vtkExportModule(Range(vtkModuleNameRange & vtkFirstLine + i), vtkFirstLine + i, sourceworkbookname)
+        i = i + 1
+    Wend
+End Function
+
+'---------------------------------------------------------------------------------------
+' Procedure : vtkImportModule
+' Author    : user
+' Date      : 17/05/2013
+' Purpose   : - import module to a workbook
+'             - Return number of imported modules
+'---------------------------------------------------------------------------------------
+'
+Public Function vtkImportTestConfig() As Integer
+Dim i As Integer
+
+    
+        i = 0
+    While ActiveWorkbook.Sheets(vtkConfSheet).Range(vtkModuleNameRange & vtkFirstLine + i) <> ""
+
+        On Error Resume Next
+             ' if the module is a class or module
+             If (ActiveWorkbook.VBProject.VBComponents(ActiveWorkbook.Sheets(vtkConfSheet).Range(vtkModuleNameRange & vtkFirstLine + i)).Type = 1 Or ActiveWorkbook.VBProject.VBComponents(ActiveWorkbook.Sheets(vtkConfSheet).Range(vtkModuleNameRange & vtkFirstLine + i)).Type = 2) Then
+                'if the module exist we will delete it and we will replace it
+                ActiveWorkbook.VBProject.VBComponents.Remove ActiveWorkbook.VBProject.VBComponents(ActiveWorkbook.Sheets(vtkConfSheet).Range(vtkModuleNameRange & vtkFirstLine + i))
+                ActiveWorkbook.VBProject.VBComponents.Import ActiveWorkbook.Sheets(vtkConfSheet).Range(vtkModuleDevRange & vtkFirstLine + i)
+                ActiveWorkbook.Sheets(vtkConfSheet).Range(vtkModuleInformationsRange & vtkFirstLine + i) = "module imported at " & Now
+             
+             End If
+
+        i = i + 1
+    Wend
+vtkImportTestConfig = i
+On Error GoTo 0
 End Function

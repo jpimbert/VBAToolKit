@@ -248,59 +248,27 @@ Public Sub TestExportVbaUnitModule()
  Loop
 
 End Sub
+Public Sub TestImportModules()
+'test that modules was imported to the test workbook
+Dim returnvalue As String
+Dim NbrMod1 As Integer
+
+    returnvalue = vtkCreateProject(path:=vtkTestPath, name:=vtkTestProjectName, displayError:=False)
+    NbrMod1 = Workbooks(vtkTestProjectName & ".xlsm").VBProject.VBComponents.Count
+'18 vbaunitmodule + 4 default module (4sheets + 1 workbook )
+mAssert.Equals NbrMod1, 18 + 4 + 1, "18 modules must be imported"
+End Sub
 
 Private Function ITest_Suite() As TestSuite
     Set ITest_Suite = New TestSuite
-    ITest_Suite.AddTest ITest_Manager.ClassName, "TestCreateProjectDoesNothingWhenPathDoesntExist"
-    ITest_Suite.AddTest ITest_Manager.ClassName, "TestCreateProjectAlreadyExisting"
-    ITest_Suite.AddTest ITest_Manager.ClassName, "TestMainFolderIsCreated"
-    ITest_Suite.AddTest ITest_Manager.ClassName, "TestProjectFolderIsCreated"
-    ITest_Suite.AddTest ITest_Manager.ClassName, "TestSourceFolderIsCreated"
-    ITest_Suite.AddTest ITest_Manager.ClassName, "TestTestsFolderIsCreated"
-    ITest_Suite.AddTest ITest_Manager.ClassName, "TestConfProdFolderIsCreated"
-    ITest_Suite.AddTest ITest_Manager.ClassName, "TestConfTestFolderIsCreated"
-    ITest_Suite.AddTest ITest_Manager.ClassName, "TestVbaUnitFolderIsCreated"
-    ITest_Suite.AddTest ITest_Manager.ClassName, "TestGitLogIsCreated"
-    ITest_Suite.AddTest ITest_Manager.ClassName, "TestDeliveryFolderIsCreated"
-    ITest_Suite.AddTest ITest_Manager.ClassName, "TestDevXlsmFileCreated"
-    ITest_Suite.AddTest ITest_Manager.ClassName, "TestDevXlsmFileIsNamedcorrectly"
-    ITest_Suite.AddTest ITest_Manager.ClassName, "TestDelivXlsmFileCreated"
-    ITest_Suite.AddTest ITest_Manager.ClassName, "TestDelivXlsmFileIsNamedcorrectly"
-    ITest_Suite.AddTest ITest_Manager.ClassName, "TestReferencesOfDevWorkbookWasActivated"
-    ITest_Suite.AddTest ITest_Manager.ClassName, "TestReferencesOfDeliveryWorkbookWasActivated"
-    ITest_Suite.AddTest ITest_Manager.ClassName, "TestDevWorkbookPathCorrectlyWritted"
-    ITest_Suite.AddTest ITest_Manager.ClassName, "TestDevWorkbookNameCorrectlyWritted"
-    ITest_Suite.AddTest ITest_Manager.ClassName, "TestDeliveryWorkbookPathCorrectlyWritted"
-    ITest_Suite.AddTest ITest_Manager.ClassName, "TestDeliveryWorkbookNameCorrectlyWritted"
-    ITest_Suite.AddTest ITest_Manager.ClassName, "TestDevWorkbookIsActive"
-    ITest_Suite.AddTest ITest_Manager.ClassName, "TestExportVbaUnitModule"
+
+    ITest_Suite.AddTest ITest_Manager.ClassName, "TestImportModules"
 End Function
 
 Private Sub ITestCase_RunTest()
     Select Case mManager.methodName
-        Case "TestCreateProjectDoesNothingWhenPathDoesntExist": TestCreateProjectDoesNothingWhenPathDoesntExist
-        Case "TestCreateProjectAlreadyExisting": TestCreateProjectAlreadyExisting
-        Case "TestMainFolderIsCreated": TestMainFolderIsCreated
-        Case "TestProjectFolderIsCreated": TestProjectFolderIsCreated
-        Case "TestSourceFolderIsCreated": TestSourceFolderIsCreated
-        Case "TestTestsFolderIsCreated": TestTestsFolderIsCreated
-        Case "TestConfProdFolderIsCreated": TestConfProdFolderIsCreated
-        Case "TestConfTestFolderIsCreated": TestConfTestFolderIsCreated
-        Case "TestVbaUnitFolderIsCreated": TestVbaUnitFolderIsCreated
-        Case "TestGitLogIsCreated": TestGitLogIsCreated
-        Case "TestDeliveryFolderIsCreated": TestDeliveryFolderIsCreated
-        Case "TestDevXlsmFileCreated": TestDevXlsmFileCreated
-        Case "TestDevXlsmFileIsNamedcorrectly": TestDevXlsmFileIsNamedcorrectly
-        Case "TestDelivXlsmFileCreated": TestDelivXlsmFileCreated
-        Case "TestDelivXlsmFileIsNamedcorrectly": TestDelivXlsmFileIsNamedcorrectly
-        Case "TestReferencesOfDevWorkbookWasActivated": TestReferencesOfDevWorkbookWasActivated
-        Case "TestReferencesOfDeliveryWorkbookWasActivated": TestReferencesOfDeliveryWorkbookWasActivated
-        Case "TestDevWorkbookPathCorrectlyWritted": TestDevWorkbookPathCorrectlyWritted
-        Case "TestDevWorkbookNameCorrectlyWritted": TestDevWorkbookNameCorrectlyWritted
-        Case "TestDeliveryWorkbookPathCorrectlyWritted": TestDeliveryWorkbookPathCorrectlyWritted
-        Case "TestDeliveryWorkbookNameCorrectlyWritted": TestDeliveryWorkbookNameCorrectlyWritted
-        Case "TestDevWorkbookIsActive": TestDevWorkbookIsActive
-        Case "TestExportVbaUnitModule": TestExportVbaUnitModule
+
+        Case "TestImportModules": TestImportModules
         Case Else: mAssert.Should False, "Invalid test name: " & mManager.methodName
     End Select
 End Sub

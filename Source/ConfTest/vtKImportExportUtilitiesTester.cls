@@ -135,6 +135,7 @@ Dim returnvalue As String
 returnvalue = vtkCreateModuleFile(vtkTestPath & "\test.frm")
 mAssert.Should Dir(vtkTestPath & "\test.frm") <> "", "vtkCreateModuleFile must create somethings"
 End Sub
+
 Private Function ITest_Suite() As TestSuite
     Set ITest_Suite = New TestSuite
     ITest_Suite.AddTest ITest_Manager.ClassName, "TestConfSheetCorrectlyCreated"
