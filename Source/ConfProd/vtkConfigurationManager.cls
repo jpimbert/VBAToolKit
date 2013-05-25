@@ -164,3 +164,22 @@ Public Function configuration(n As Integer) As String
     End If
     configuration = sResult
 End Function
+
+'---------------------------------------------------------------------------------------
+' Procedure : getConfigurationPathWithNumber
+' Author    : Jean-Pierre Imbert
+' Date      : 25/05/2013
+' Purpose   : return the n-th ralative configuration path of the project, given n as integer
+'               - return "" if the configuration is inexistant
+'---------------------------------------------------------------------------------------
+'
+Public Function getConfigurationPathWithNumber(n As Integer) As String
+    Dim sResult As String
+    sResult = ""
+    If n >= 1 And n <= configurationCount Then
+        sResult = configurationSheet.Cells(2, n + 1)
+       Else
+        sResult = ""
+    End If
+    getConfigurationPathWithNumber = sResult
+End Function

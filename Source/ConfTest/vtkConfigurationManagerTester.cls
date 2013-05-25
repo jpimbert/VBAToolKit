@@ -129,9 +129,19 @@ Public Sub TestGetConfigurationsFromExistingProject()
     mAssert.Equals existingConfManager.configuration(150), "", "Inexistant configuration number 150"
 End Sub
 
+Public Sub TestGetConfigurationPathWithNumberFromExistingProject()
+'       Verify the capability to get the configuration path by number
+    mAssert.Equals existingConfManager.getConfigurationPathWithNumber(0), "", "Inexistant configuration number 0"
+    mAssert.Equals existingConfManager.getConfigurationPathWithNumber(1), "Delivery\ExistingProject.xlsm", "Path of first configuration given by number"
+    mAssert.Equals existingConfManager.getConfigurationPathWithNumber(2), "Project\ExistingProject_DEV.xlsm", "Path of second configuration given by number"
+    mAssert.Equals existingConfManager.getConfigurationPathWithNumber(3), "", "Inexistant configuration number 3"
+End Sub
+
 ' Test : retrouver le path relatif d'une configuration dans le fichier template
 
 ' Test : modifier le path relatif d'une configuration nouvelle, sauver le fichier, réinitialiser et retrouver la configuration
+
+' pour tous les tests de path, faire avec numéro, puis avec nom de la configuration
 
 Private Function ITest_Suite() As TestSuite
     Set ITest_Suite = New TestSuite
@@ -141,6 +151,7 @@ Private Function ITest_Suite() As TestSuite
     ITest_Suite.AddTest ITest_Manager.ClassName, "TestConfigurationSheetFormatForExistingProjet"
     ITest_Suite.AddTest ITest_Manager.ClassName, "TestGetConfigurationsFromNewProject"
     ITest_Suite.AddTest ITest_Manager.ClassName, "TestGetModulesFromNewProject"
+    ITest_Suite.AddTest ITest_Manager.ClassName, "TestGetConfigurationsFromExistingProject"
 End Function
 
 Private Sub ITestCase_RunTest()
@@ -151,6 +162,7 @@ Private Sub ITestCase_RunTest()
         Case "TestConfigurationSheetFormatForExistingProjet": TestConfigurationSheetFormatForExistingProjet
         Case "TestGetConfigurationsFromNewProject": TestGetConfigurationsFromNewProject
         Case "TestGetModulesFromNewProject": TestGetModulesFromNewProject
+        Case "TestGetConfigurationsFromExistingProject": TestGetConfigurationsFromExistingProject
         Case Else: mAssert.Should False, "Invalid test name: " & mManager.methodName
     End Select
 End Sub
