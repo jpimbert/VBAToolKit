@@ -15,7 +15,30 @@ Option Explicit
 '   collection of instances indexed by project names
 Private configurationManagers As Collection
 
+'---------------------------------------------------------------------------------------
+' Procedure : configurationManagerForProject
+' Author    : Jean-Pierre Imbert
+' Date      : 25/05/2013
+' Purpose   : Return the configuration manager attached to a project given its name
+'               - if the configuration doesn't exist, it is created
+'               - if the configurationManagers collection doesn't exist, it is created
+'---------------------------------------------------------------------------------------
+'
 Public Function configurationManagerForProject(projectName As String) As vtkConfigurationManager
-
+    ' Create the collection if it doesn't exist
+    If configurationManagers Is Nothing Then
+        Set configurationManagers = New Collection
+        End If
+    ' search for the configuration manager in the collection
+    Dim cm As vtkConfigurationManager
+    On Error Resume Next
+    Set cm = configurationManagers(projectName)
+    If Err <> 0 Then
+        Set cm = New vtkConfigurationManager
+        configurationManagers.Add Item:=cm, Key:=projectName
+        End If
+    On Error GoTo 0
+    ' return the configuration manager
+    Set configurationManagerForProject = cm
 End Function
 
