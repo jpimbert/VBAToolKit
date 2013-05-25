@@ -173,6 +173,14 @@ Public Sub TestSetConfigurationPathWithNumberToSavedProject()
     mAssert.Equals newConfManager.getConfigurationPathWithNumber(3), "", "Inexistant configuration number 3"
 End Sub
 
+Public Sub TestGetConfigurationNumbersFromNewProject()
+'       Verify the capability to get the number of a configuration
+    mAssert.Equals newConfManager.configurationCount, 2, "There must be two configurations in a new project"
+    mAssert.Equals newConfManager.getConfigurationNumber(newProjectName), 1, "Number of the main configuration"
+    mAssert.Equals newConfManager.getConfigurationNumber(newProjectName & "_DEV"), 2, "Number of the Development configuration"
+    mAssert.Equals newConfManager.getConfigurationNumber("InexistantConfiguration"), 0, "Inexistant configuration"
+End Sub
+
 ' pour tous les tests de path, faire avec numéro, puis avec nom de la configuration
 ' Test Get configuration by name
 ' Test Get path by name

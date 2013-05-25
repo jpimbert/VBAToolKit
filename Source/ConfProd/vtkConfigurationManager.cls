@@ -198,3 +198,26 @@ Public Sub setConfigurationPathWithNumber(n As Integer, path As String)
         configurationSheet.Cells(2, n + 1) = path
     End If
 End Sub
+
+
+'---------------------------------------------------------------------------------------
+' Procedure : getConfigurationNumber
+' Author    : Jean-Pierre Imbert
+' Date      : 26/05/2013
+' Purpose   : return the number of a configuration given its name
+'               - return 0 of the name is inexistant
+'---------------------------------------------------------------------------------------
+'
+Public Function getConfigurationNumber(configuration As String) As Integer
+    Dim r As Range
+    On Error Resume Next
+    Set r = configurationSheet.Rows(1)
+    Set r = r.Offset(0, 1)
+    Set r = r.Find(what:=configuration)
+    On Error GoTo 0
+    If r Is Nothing Then
+        getConfigurationNumber = 0
+       Else
+        getConfigurationNumber = r.Column - 1
+    End If
+End Function
