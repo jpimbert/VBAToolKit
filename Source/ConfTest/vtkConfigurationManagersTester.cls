@@ -64,10 +64,17 @@ End Sub
 
 Public Sub TestConfigurationManagersAreDifferentForTwoProjects()
 '       Verify that the configuration Managers for two project are different
+    Dim secondWb As Workbook
+    Set secondWb = createExcelProjectNamed("SecondProject")    ' create the default Excel project for tests
+    mAssert.Should Not configurationManagerForProject(projectName) Is configurationManagerForProject("SecondProject"), "Two configuration managers must not be equal"
+    secondWb.Close SaveChanges:=False
 End Sub
 
 Public Sub TestConfigurationManagerIsInvariant()
 '       Verify that the configuration Manager for a project is always the same
+    Dim cm As vtkConfigurationManager
+    Set cm = configurationManagerForProject(projectName)
+    mAssert.Should configurationManagerForProject(projectName) Is cm, "The configuration manager for a project must be always the same"
 End Sub
 
 Private Function ITest_Suite() As TestSuite
