@@ -175,12 +175,30 @@ Public Sub TestGetConfigurationNumbersFromNewProject()
     mAssert.Equals newConfManager.getConfigurationNumber("InexistantConfiguration"), 0, "Inexistant configuration"
 End Sub
 
-Public Sub TestGetConfigurationPathWithNameFromExistingProject()
+Public Sub TestGetConfigurationPathFromExistingProject()
 '       Verify the capability to get a configutaion path given the configuration name
-    mAssert.Equals existingConfManager.getConfigurationPathWithName(existingProjectName), "Delivery\ExistingProject.xlsm", "Path of the main configuration"
-    mAssert.Equals existingConfManager.getConfigurationPathWithName(existingProjectName & "_DEV"), "Project\ExistingProject_DEV.xlsm", "Path of the Development configuration"
-    mAssert.Equals existingConfManager.getConfigurationPathWithName("InexistantConfiguration"), "", "Inexistant configuration"
+    mAssert.Equals existingConfManager.getConfigurationPath(existingProjectName), "Delivery\ExistingProject.xlsm", "Path of the main configuration"
+    mAssert.Equals existingConfManager.getConfigurationPath(existingProjectName & "_DEV"), "Project\ExistingProject_DEV.xlsm", "Path of the Development configuration"
+    mAssert.Equals existingConfManager.getConfigurationPath("InexistantConfiguration"), "", "Inexistant configuration"
 End Sub
+
+Public Sub TestSetConfigurationPathToSavedProject()
+'       Verify the capability to set and retrieve the configuration path by configuration name
+    ' set new pathes
+    newConfManager.setConfigurationPath configuration:="InexistantConfiguration", path:="Path0"
+    newConfManager.setConfigurationPath configuration:=newProjectName, path:="Path1"
+    newConfManager.setConfigurationPath configuration:=newProjectName & "_DEV", path:="Path2"
+    ' save and re-open file
+    newWorkbook.Close SaveChanges:=True, Filename:=vtkPathToTestFolder & "\" & "TestFile.xlsx"
+    vtkResetConfigurationManagers           ' reset all configuration managers
+    Set newWorkbook = Workbooks.Open(Filename:=vtkPathToTestFolder & "\" & "TestFile.xlsx")
+    Set newConfManager = vtkConfigurationManagerForWorkbook("TestFile.xlsx")
+    ' verify pathes
+    mAssert.Equals newConfManager.getConfigurationPath("InexistantConfiguration"), "", "Inexistant configuration"
+    mAssert.Equals newConfManager.getConfigurationPath(newProjectName), "Path1", "Path of first configuration given by name"
+    mAssert.Equals newConfManager.getConfigurationPath(newProjectName & "_DEV"), "Path2", "Path of second configuration given by name"
+End Sub
+
 
 ' pour tous les tests de path, faire avec numéro, puis avec nom de la configuration
 ' Test Get path by name
@@ -205,6 +223,7 @@ Private Function ITest_Suite() As TestSuite
     ITest_Suite.AddTest ITest_Manager.ClassName, "TestSetConfigurationPathWithNumberToNewProject"
     ITest_Suite.AddTest ITest_Manager.ClassName, "TestSetConfigurationPathWithNumberToSavedProject"
     ITest_Suite.AddTest ITest_Manager.ClassName, "TestGetConfigurationNumbersFromNewProject"
+    ITest_Suite.AddTest ITest_Manager.ClassName, "TestGetConfigurationPathWithNameFromExistingProject"
 End Function
 
 Private Sub ITestCase_RunTest()
@@ -220,6 +239,7 @@ Private Sub ITestCase_RunTest()
         Case "TestSetConfigurationPathWithNumberToNewProject": TestSetConfigurationPathWithNumberToNewProject
         Case "TestSetConfigurationPathWithNumberToSavedProject": TestSetConfigurationPathWithNumberToSavedProject
         Case "TestGetConfigurationNumbersFromNewProject": TestGetConfigurationNumbersFromNewProject
+        Case "TestGetConfigurationPathWithNameFromExistingProject": TestGetConfigurationPathWithNameFromExistingProject
         Case Else: mAssert.Should False, "Invalid test name: " & mManager.methodName
     End Select
 End Sub

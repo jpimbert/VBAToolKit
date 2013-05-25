@@ -223,13 +223,24 @@ Public Function getConfigurationNumber(configuration As String) As Integer
 End Function
 
 '---------------------------------------------------------------------------------------
-' Function  : getConfigurationPathWithName
+' Function  : getConfigurationPath
 ' Author    : Jean-Pierre Imbert
 ' Date      : 26/05/2013
 ' Purpose   : return the relative path of a configuration given its name
 '               - return "" of the name is inexistant
 '---------------------------------------------------------------------------------------
 '
-Public Function getConfigurationPathWithName(configuration As String) As String
-    getConfigurationPathWithName = getConfigurationPathWithNumber(getConfigurationNumber(configuration))
+Public Function getConfigurationPath(configuration As String) As String
+    getConfigurationPath = getConfigurationPathWithNumber(getConfigurationNumber(configuration))
 End Function
+
+'---------------------------------------------------------------------------------------
+' Procedure : setConfigurationPath
+' Author    : Jean-Pierre Imbert
+' Date      : 26/05/2013
+' Purpose   : change the path of a configuration given its name
+'---------------------------------------------------------------------------------------
+'
+Public Sub setConfigurationPath(configuration As String, path As String)
+    setConfigurationPathWithNumber n:=getConfigurationNumber(configuration), path:=path
+End Sub
