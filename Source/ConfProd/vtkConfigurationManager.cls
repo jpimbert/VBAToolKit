@@ -32,6 +32,7 @@ Option Explicit
 Private m_workbookName As String
 Private m_configurationSheet As Worksheet
 Private Const sheetName As String = "vtkConfigurations"
+Private Const currentVersion As String = "vtkConfigurations v1.0"
 
 Private Sub Class_Terminate()
     Set m_configurationSheet = Nothing
@@ -74,8 +75,37 @@ Private Sub setConfigurationSheet()
     If ws Is Nothing Then        ' If the Configuration doesn't exist, create one
         Set ws = Workbooks(workbookName).Worksheets.Add(Type:=xlWorksheet)
         ws.name = sheetName
+        '   Initialize the configuration sheet
+        initializeConfigurationSheet ws
+        End If
+    ' Verify that the configuration sheet is a
+    If ws.Range("A1") <> currentVersion Then
+        ' Code to convert from previous version will be implemented here
         End If
     Set m_configurationSheet = ws
+End Sub
+
+'---------------------------------------------------------------------------------------
+' Procedure : initializeConfigurationSheet
+' Author    : Jean-Pierre Imbert
+' Date      : 25/05/2013
+' Purpose   : Initialize a new configuration sheet
+'---------------------------------------------------------------------------------------
+'
+Private Sub initializeConfigurationSheet(ws As Worksheet)
+    ws.Range("A1") = currentVersion
+    ws.Range("A2") = "Module Name"
+    ws.Range("B1") = Workbooks(workbookName).VBProject.name
+    ws.Range("B2") = "Delivery\" & workbookName     ' Default init for test purpose, will be initialized later
+    ws.Range("C1") = Workbooks(workbookName).VBProject.name & "_DEV"
+    ws.Range("C2") = "Project\" & workbookName & "_DEV"   ' Default init for test purpose, will be initialized later
+    
+    ws.Columns("A:C").ColumnWidth = 22
+    ws.Range("A1").Font.Size = 8
+    ws.Range("A2").HorizontalAlignment = xlCenter
+    ws.Range("A2").Font.Bold = True
+    ws.Range("B1:C2").HorizontalAlignment = xlCenter
+    ws.Range("B1:C1").Font.Bold = True
 End Sub
 
 '---------------------------------------------------------------------------------------

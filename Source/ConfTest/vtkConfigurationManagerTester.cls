@@ -53,7 +53,6 @@ Private Sub ITestCase_TearDown()
 End Sub
 
 '   Liste des tests à faire
-'       Une feuille vtkConfigurations est créée dans un nouveau projet Excel
 '       Par défaut deux configurations sont créées dans un projet
 '       Ajout d'un module
 '       Définition du chemin pour un module
@@ -89,11 +88,19 @@ Public Sub TestConfigurationSheetFormatForNewProjet()
     mAssert.Equals ws.Range("B1"), newProjectName, "Expected Title for main project column"
     mAssert.Equals ws.Range("B2"), "Delivery\" & newWorkbookName, "Expected related Path for new main workbook"
     mAssert.Equals ws.Range("C1"), newProjectName & "_DEV", "Expected Title for development project column"
-    mAssert.Equals ws.Range("C2"), "Project\" & newWorkbookName, "Expected related Path for new development workbook"
+    mAssert.Equals ws.Range("C2"), "Project\" & newWorkbookName & "_DEV", "Expected related Path for new development workbook"
 End Sub
 
 Public Sub TestConfigurationSheetFormatForExistingProjet()
-
+'       Verify the retrieved configuration sheet from an existing project
+    Dim ws As Worksheet
+    Set ws = existingConfManager.configurationSheet
+    mAssert.Equals ws.Range("A1"), "vtkConfigurations v1.0", "Expected identification of the configuration sheet"
+    mAssert.Equals ws.Range("A2"), "Module Name", "Expected Title for Modules column"
+    mAssert.Equals ws.Range("B1"), existingProjectName, "Expected Title for main project column"
+    mAssert.Equals ws.Range("B2"), "Delivery\ExistingProject.xlsm", "Expected related Path for new main workbook"
+    mAssert.Equals ws.Range("C1"), existingProjectName & "_DEV", "Expected Title for development project column"
+    mAssert.Equals ws.Range("C2"), "Project\ExistingProject_DEV.xlsm", "Expected related Path for new development workbook"
 End Sub
 
 Private Function ITest_Suite() As TestSuite
