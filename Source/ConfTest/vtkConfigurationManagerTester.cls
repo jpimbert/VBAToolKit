@@ -15,11 +15,10 @@ Private mManager As TestCaseManager
 Private mAssert As IAssert
 
 Private newWorkbook As Workbook         ' New Workbook created for each test
-Private Const newProjectName As String = "NewProject"
+Private newWorkbookName As String
 Private newConfManager As vtkConfigurationManager   ' Configuration Manager for the new workbook
 Private existingWorkbook As Workbook    ' Existing Workbook opened for each test
-Private Const existingProjectName As String = "ExistingProject"
-Private Const existingWorkBookName As String = "WorkBookForConfigurationsTests.xlsm"
+Private Const existingWorkbookName As String = "WorkBookForConfigurationsTests.xlsm"
 Private existingConfManager As vtkConfigurationManager   ' Configuration Manager for the new workbook
 
 Private Sub Class_Initialize()
@@ -36,11 +35,12 @@ End Property
 
 Private Sub ITestCase_SetUp(Assert As IAssert)
     Set mAssert = Assert
-    Set newWorkbook = vtkCreateExcelProjectNamed(newProjectName)    ' create an Excel project for tests
-    Set newConfManager = vtkConfigurationManagerForProject(newProjectName)
-    FileCopy Source:=vtkPathToTemplateFolder & "\" & existingWorkBookName, Destination:=vtkPathToTestFolder & "\" & existingWorkBookName
-    Set existingWorkbook = Workbooks.Open(Filename:=vtkPathToTestFolder & "\" & existingWorkBookName)
-    Set existingConfManager = vtkConfigurationManagerForProject(existingProjectName)
+    Set newWorkbook = vtkCreateExcelWorkbook    ' create an Excel project for tests
+    newWorkbookName = newWorkbook.name
+    Set newConfManager = vtkConfigurationManagerForWorkbook(newWorkbookName)
+    FileCopy Source:=vtkPathToTemplateFolder & "\" & existingWorkbookName, Destination:=vtkPathToTestFolder & "\" & existingWorkbookName
+    Set existingWorkbook = Workbooks.Open(Filename:=vtkPathToTestFolder & "\" & existingWorkbookName)
+    Set existingConfManager = vtkConfigurationManagerForWorkbook(existingWorkbookName)
 End Sub
 
 Private Sub ITestCase_TearDown()

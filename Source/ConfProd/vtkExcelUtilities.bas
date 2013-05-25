@@ -1,17 +1,16 @@
 Attribute VB_Name = "vtkExcelUtilities"
 Option Explicit
 '---------------------------------------------------------------------------------------
-' Procedure : vtkCreateExcelProjectNamed
+' Procedure : vtkCreateExcelWorkbook
 ' Author    : Jean-Pierre Imbert
 ' Date      : 25/05/2013
-' Purpose   : Utility function for Excel project creation with a given project name
+' Purpose   : Utility function for Excel file creation
 '---------------------------------------------------------------------------------------
 '
-Public Function vtkCreateExcelProjectNamed(projectName As String) As Workbook
+Public Function vtkCreateExcelWorkbook() As Workbook
     Dim wb As Workbook
     Set wb = Workbooks.Add(xlWBATWorksheet)
-    wb.VBProject.name = projectName
-    Set vtkCreateExcelProjectNamed = wb
+    Set vtkCreateExcelWorkbook = wb
 End Function
 
 
