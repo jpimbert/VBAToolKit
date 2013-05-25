@@ -13,4 +13,17 @@ Public Function vtkCreateExcelWorkbook() As Workbook
     Set vtkCreateExcelWorkbook = wb
 End Function
 
+'---------------------------------------------------------------------------------------
+' Procedure : vtkCreateExcelWorkbookWithProjectName
+' Author    : Jean-Pierre Imbert
+' Date      : 25/05/2013
+' Purpose   : Utility function for Excel file creation and VBA project name initialization
+'---------------------------------------------------------------------------------------
+'
+Public Function vtkCreateExcelWorkbookWithProjectName(projectName As String) As Workbook
+    Dim wb As Workbook
+    Set wb = vtkCreateExcelWorkbook
+    wb.VBProject.name = projectName
+    Set vtkCreateExcelWorkbook = wb
+End Function
 

@@ -23,6 +23,10 @@ Option Explicit
 '   - a VTK project is implemented by a main Excel file containing a sheet named "vtkConfigurations"
 '       - if such a sheet doesn't exist, it is created
 '
+' To implement later
+'   - automatic recognition of the configuration sheet version, and proposal to the user to convert to the last version
+'       cell $A$1 contains the version identification of the sheet version like "vtkConfigurations v1.0"
+'
 '---------------------------------------------------------------------------------------
 
 Private m_workbookName As String
