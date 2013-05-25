@@ -55,12 +55,6 @@ Private Sub ITestCase_TearDown()
     On Error GoTo 0
 End Sub
 
-'   Liste des tests à faire
-'       Ajout d'un module
-'       Définition du chemin pour un module
-'       Définition du chemin pour une configuration
-'       et les mêmes tests lors de la lecture d'une configuration dans un fichier existant
-
 Public Sub TestConfigurationSheetCreationForNewProject()
 '       Verify that a Configuration Sheet is created in a new project
     Dim ws As Worksheet
@@ -181,10 +175,22 @@ Public Sub TestGetConfigurationNumbersFromNewProject()
     mAssert.Equals newConfManager.getConfigurationNumber("InexistantConfiguration"), 0, "Inexistant configuration"
 End Sub
 
+Public Sub TestGetConfigurationPathWithNameFromExistingProject()
+'       Verify the capability to get a configutaion path given the configuration name
+    mAssert.Equals existingConfManager.getConfigurationPathWithName(existingProjectName), "Delivery\ExistingProject.xlsm", "Path of the main configuration"
+    mAssert.Equals existingConfManager.getConfigurationPathWithName(existingProjectName & "_DEV"), "Project\ExistingProject_DEV.xlsm", "Path of the Development configuration"
+    mAssert.Equals existingConfManager.getConfigurationPathWithName("InexistantConfiguration"), "", "Inexistant configuration"
+End Sub
+
 ' pour tous les tests de path, faire avec numéro, puis avec nom de la configuration
-' Test Get configuration by name
 ' Test Get path by name
 ' Test Set path by name
+
+'   Liste des fonctions à implémenter
+'       Ajout d'un module
+'       Liste des modules
+'       Obtention du chemin pour un module et une configuration
+'       Définition du chemin pour un module et une configuration
 
 Private Function ITest_Suite() As TestSuite
     Set ITest_Suite = New TestSuite
@@ -198,6 +204,7 @@ Private Function ITest_Suite() As TestSuite
     ITest_Suite.AddTest ITest_Manager.ClassName, "TestGetConfigurationPathWithNumberFromExistingProject"
     ITest_Suite.AddTest ITest_Manager.ClassName, "TestSetConfigurationPathWithNumberToNewProject"
     ITest_Suite.AddTest ITest_Manager.ClassName, "TestSetConfigurationPathWithNumberToSavedProject"
+    ITest_Suite.AddTest ITest_Manager.ClassName, "TestGetConfigurationNumbersFromNewProject"
 End Function
 
 Private Sub ITestCase_RunTest()
@@ -212,6 +219,7 @@ Private Sub ITestCase_RunTest()
         Case "TestGetConfigurationPathWithNumberFromExistingProject": TestGetConfigurationPathWithNumberFromExistingProject
         Case "TestSetConfigurationPathWithNumberToNewProject": TestSetConfigurationPathWithNumberToNewProject
         Case "TestSetConfigurationPathWithNumberToSavedProject": TestSetConfigurationPathWithNumberToSavedProject
+        Case "TestGetConfigurationNumbersFromNewProject": TestGetConfigurationNumbersFromNewProject
         Case Else: mAssert.Should False, "Invalid test name: " & mManager.methodName
     End Select
 End Sub

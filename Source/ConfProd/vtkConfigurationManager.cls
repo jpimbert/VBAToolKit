@@ -221,3 +221,15 @@ Public Function getConfigurationNumber(configuration As String) As Integer
         getConfigurationNumber = r.Column - 1
     End If
 End Function
+
+'---------------------------------------------------------------------------------------
+' Function  : getConfigurationPathWithName
+' Author    : Jean-Pierre Imbert
+' Date      : 26/05/2013
+' Purpose   : return the relative path of a configuration given its name
+'               - return "" of the name is inexistant
+'---------------------------------------------------------------------------------------
+'
+Public Function getConfigurationPathWithName(configuration As String) As String
+    getConfigurationPathWithName = getConfigurationPathWithNumber(getConfigurationNumber(configuration))
+End Function
