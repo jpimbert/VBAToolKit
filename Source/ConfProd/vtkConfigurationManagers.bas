@@ -8,7 +8,7 @@ Option Explicit
 '
 ' Usage:
 '   - Each instance of Configuration Manager is attached to a VBA project (supposed to be a VTK project)
-'       - the method configurationManagerForProject give the instance attached to a project, or create it
+'       - the method vtkConfigurationManagerForProject give the instance attached to a project, or create it
 '
 '---------------------------------------------------------------------------------------
 
@@ -16,7 +16,7 @@ Option Explicit
 Private configurationManagers As Collection
 
 '---------------------------------------------------------------------------------------
-' Procedure : configurationManagerForProject
+' Procedure : vtkConfigurationManagerForProject
 ' Author    : Jean-Pierre Imbert
 ' Date      : 25/05/2013
 ' Purpose   : Return the configuration manager attached to a project given its name
@@ -24,7 +24,7 @@ Private configurationManagers As Collection
 '               - if the configurationManagers collection doesn't exist, it is created
 '---------------------------------------------------------------------------------------
 '
-Public Function configurationManagerForProject(projectName As String) As vtkConfigurationManager
+Public Function vtkConfigurationManagerForProject(projectName As String) As vtkConfigurationManager
     ' Create the collection if it doesn't exist
     If configurationManagers Is Nothing Then
         Set configurationManagers = New Collection
@@ -39,6 +39,16 @@ Public Function configurationManagerForProject(projectName As String) As vtkConf
         End If
     On Error GoTo 0
     ' return the configuration manager
-    Set configurationManagerForProject = cm
+    Set vtkConfigurationManagerForProject = cm
 End Function
 
+'---------------------------------------------------------------------------------------
+' Procedure : vtkResetConfigurationManagers
+' Author    : Jean-Pierre Imbert
+' Date      : 25/05/2013
+' Purpose   : Reset all configuration managers (used during tests)
+'---------------------------------------------------------------------------------------
+'
+Public Sub vtkResetConfigurationManagers()
+    Set configurationManagers = Nothing
+End Sub
