@@ -53,7 +53,6 @@ Private Sub ITestCase_TearDown()
 End Sub
 
 '   Liste des tests à faire
-'       Par défaut deux configurations sont créées dans un projet
 '       Ajout d'un module
 '       Définition du chemin pour un module
 '       Définition du chemin pour une configuration
@@ -103,12 +102,45 @@ Public Sub TestConfigurationSheetFormatForExistingProjet()
     mAssert.Equals ws.Range("C2"), "Project\ExistingProject_DEV.xlsm", "Expected related Path for new development workbook"
 End Sub
 
+Public Sub TestGetConfigurationsFromNewProject()
+'       Verify the list of the configurations of a new project
+    mAssert.Equals newConfManager.configurationCount, 2, "There must be two configurations in a new project"
+    mAssert.Equals newConfManager.configuration(0), "", "Inexistant configuration number 0"
+    mAssert.Equals newConfManager.configuration(1), newProjectName, "Name of the first configuration"
+    mAssert.Equals newConfManager.configuration(2), newProjectName & "_DEV", "Name of the second configuration"
+    mAssert.Equals newConfManager.configuration(3), "", "Inexistant configuration number 3"
+    mAssert.Equals newConfManager.configuration(-23), "", "Inexistant configuration number -23"
+    mAssert.Equals newConfManager.configuration(150), "", "Inexistant configuration number 150"
+End Sub
+
+Public Sub TestGetModulesFromNewProject()
+'       Verify the list of the modules of a new project
+    mAssert.Equals newConfManager.moduleCount, 0, "There must be no module in a new project"
+End Sub
+
+Public Sub TestGetConfigurationsFromExistingProject()
+'       Verify the list of the configurations of an existing project
+    mAssert.Equals existingConfManager.configurationCount, 2, "There must be two configurations in the existing template project"
+    mAssert.Equals existingConfManager.configuration(0), "", "Inexistant configuration number 0"
+    mAssert.Equals existingConfManager.configuration(1), existingProjectName, "Name of the first configuration"
+    mAssert.Equals existingConfManager.configuration(2), existingProjectName & "_DEV", "Name of the second configuration"
+    mAssert.Equals existingConfManager.configuration(3), "", "Inexistant configuration number 3"
+    mAssert.Equals existingConfManager.configuration(-23), "", "Inexistant configuration number -23"
+    mAssert.Equals existingConfManager.configuration(150), "", "Inexistant configuration number 150"
+End Sub
+
+' Test : retrouver le path relatif d'une configuration dans le fichier template
+
+' Test : modifier le path relatif d'une configuration nouvelle, sauver le fichier, réinitialiser et retrouver la configuration
+
 Private Function ITest_Suite() As TestSuite
     Set ITest_Suite = New TestSuite
     ITest_Suite.AddTest ITest_Manager.ClassName, "TestConfigurationSheetCreationForNewProject"
     ITest_Suite.AddTest ITest_Manager.ClassName, "TestConfigurationSheetRetrievalForExistingProject"
     ITest_Suite.AddTest ITest_Manager.ClassName, "TestConfigurationSheetFormatForNewProjet"
     ITest_Suite.AddTest ITest_Manager.ClassName, "TestConfigurationSheetFormatForExistingProjet"
+    ITest_Suite.AddTest ITest_Manager.ClassName, "TestGetConfigurationsFromNewProject"
+    ITest_Suite.AddTest ITest_Manager.ClassName, "TestGetModulesFromNewProject"
 End Function
 
 Private Sub ITestCase_RunTest()
@@ -117,6 +149,8 @@ Private Sub ITestCase_RunTest()
         Case "TestConfigurationSheetRetrievalForExistingProject": TestConfigurationSheetRetrievalForExistingProject
         Case "TestConfigurationSheetFormatForNewProjet": TestConfigurationSheetFormatForNewProjet
         Case "TestConfigurationSheetFormatForExistingProjet": TestConfigurationSheetFormatForExistingProjet
+        Case "TestGetConfigurationsFromNewProject": TestGetConfigurationsFromNewProject
+        Case "TestGetModulesFromNewProject": TestGetModulesFromNewProject
         Case Else: mAssert.Should False, "Invalid test name: " & mManager.methodName
     End Select
 End Sub

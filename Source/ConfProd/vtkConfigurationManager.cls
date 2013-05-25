@@ -82,6 +82,7 @@ Private Sub setConfigurationSheet()
     If ws.Range("A1") <> currentVersion Then
         ' Code to convert from previous version will be implemented here
         End If
+    '   Set the initialized worksheet property
     Set m_configurationSheet = ws
 End Sub
 
@@ -118,3 +119,48 @@ End Sub
 Public Property Get configurationSheet() As Worksheet
     Set configurationSheet = m_configurationSheet
 End Property
+
+'---------------------------------------------------------------------------------------
+' Property  : configurationCount as Integer - Read Only - Public
+' Author    : Jean-Pierre Imbert
+' Date      : 25/05/2013
+' Purpose   : Get the number of configurations
+'---------------------------------------------------------------------------------------
+'
+Public Property Get configurationCount() As Integer
+    ' The number of configurations is the number of used columns minus one
+    configurationCount = configurationSheet.UsedRange.Columns.Count - 1
+End Property
+
+'---------------------------------------------------------------------------------------
+' Property  : moduleCount as Integer - Read Only - Public
+' Author    : Jean-Pierre Imbert
+' Date      : 25/05/2013
+' Purpose   : Get the number of modules
+'---------------------------------------------------------------------------------------
+'
+Public Property Get moduleCount() As Integer
+    ' The number of modules is the number of used rows minus two
+    moduleCount = configurationSheet.UsedRange.Rows.Count - 2
+End Property
+
+
+
+'---------------------------------------------------------------------------------------
+' Function  : configuration
+' Author    : Jean-Pierre Imbert
+' Date      : 25/05/2013
+' Purpose   : return the n-th configuration of the project, given n as integer
+'               - return "" if the configuration is inexistant
+'---------------------------------------------------------------------------------------
+'
+Public Function configuration(n As Integer) As String
+    Dim sResult As String
+    sResult = ""
+    If n >= 1 And n <= configurationCount Then
+        sResult = configurationSheet.Cells(1, n + 1)
+       Else
+        sResult = ""
+    End If
+    configuration = sResult
+End Function
