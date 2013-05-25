@@ -2,7 +2,7 @@ VERSION 1.0 CLASS
 BEGIN
   MultiUse = -1  'True
 END
-Attribute VB_Name = "vtkConfigurationManagerTester"
+Attribute VB_Name = "vtkConfigurationManagersTester"
 Attribute VB_GlobalNameSpace = False
 Attribute VB_Creatable = False
 Attribute VB_PredeclaredId = False
@@ -13,6 +13,9 @@ Implements ITestCase
 
 Private mManager As TestCaseManager
 Private mAssert As IAssert
+
+Private wbForTest As Workbook       '   default WorkBook for test
+Private Const projectName As String = "projectTest" ' default project Name for test
 
 Private Sub Class_Initialize()
     Set mManager = New TestCaseManager
@@ -28,10 +31,11 @@ End Property
 
 Private Sub ITestCase_SetUp(Assert As IAssert)
     Set mAssert = Assert
+    Set wbForTest = createExcelProjectNamed(projectName)    ' create the default Excel project for tests
 End Sub
 
 Private Sub ITestCase_TearDown()
-
+    wbForTest.Close SaveChanges:=False      ' close the default Excel project
 End Sub
 
 '---------------------------------------------------------------------------------------
@@ -50,20 +54,36 @@ End Function
 
 Public Sub TestUtilityFunctionCreateExcelProject()
 '       Verify that the utility function createExcelProjectNamed correctly create a new Excel file with proper project name
-    Dim wb As Workbook
-    Set wb = createExcelProjectNamed("Test1")
-    mAssert.Equals wb.VBProject.name, "Test1", "Expected name for Excel project"
-    wb.Close (False)
+    mAssert.Equals wbForTest.VBProject.name, projectName, "Expected name for Excel project"
+End Sub
+
+Public Sub TestConfigurationManagerIsNotNull()
+'       Verify that the configuration Manager is not null
+    mAssert.Should Not configurationManagerForProject(projectName) Is Nothing, "A configuartion manager must not be null"
+End Sub
+
+Public Sub TestConfigurationManagersAreDifferentForTwoProjects()
+'       Verify that the configuration Managers for two project are different
+End Sub
+
+Public Sub TestConfigurationManagerIsInvariant()
+'       Verify that the configuration Manager for a project is always the same
 End Sub
 
 Private Function ITest_Suite() As TestSuite
     Set ITest_Suite = New TestSuite
     ITest_Suite.AddTest ITest_Manager.ClassName, "TestUtilityFunctionCreateExcelProject"
+    ITest_Suite.AddTest ITest_Manager.ClassName, "TestConfigurationManagerIsNotNull"
+    ITest_Suite.AddTest ITest_Manager.ClassName, "TestConfigurationManagersAreDifferentForTwoProjects"
+    ITest_Suite.AddTest ITest_Manager.ClassName, "TestConfigurationManagerIsInvariant"
 End Function
 
 Private Sub ITestCase_RunTest()
     Select Case mManager.methodName
         Case "TestUtilityFunctionCreateExcelProject": TestUtilityFunctionCreateExcelProject
+        Case "TestConfigurationManagerIsNotNull": TestConfigurationManagerIsNotNull
+        Case "TestConfigurationManagersAreDifferentForTwoProjects": TestConfigurationManagersAreDifferentForTwoProjects
+        Case "TestConfigurationManagerIsInvariant": TestConfigurationManagerIsInvariant
         Case Else: mAssert.Should False, "Invalid test name: " & mManager.methodName
     End Select
 End Sub

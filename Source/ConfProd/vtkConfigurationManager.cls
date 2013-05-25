@@ -19,7 +19,7 @@ Option Explicit
 '
 ' Usage:
 '   - Each instance of Configuration Manager is attached to a VBA project (supposed to be a VTK project)
-'       - the method configurationManagerForProject give the instance attached to a project, or create it
+'       - the method configurationManagerForProject of module vtkConfigurationManagers give the instance attached to a project, or create it
 '   - a VTK project is implemented by a main Excel file containing a sheet named "vtkConfigurations"
 '       - if such a sheet doesn't exist, it is created
 '
