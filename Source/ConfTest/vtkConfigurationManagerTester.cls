@@ -50,6 +50,9 @@ Private Sub ITestCase_TearDown()
     newWorkbook.Close SaveChanges:=False      ' close the new Excel project
     existingWorkbook.Close SaveChanges:=False ' close the existing Excel project
     vtkResetConfigurationManagers           ' reset all configuration managers
+    On Error Resume Next
+    Kill PathName:=vtkPathToTestFolder & "\" & "TestFile.xlsx"
+    On Error GoTo 0
 End Sub
 
 '   Liste des tests à faire
@@ -137,11 +140,43 @@ Public Sub TestGetConfigurationPathWithNumberFromExistingProject()
     mAssert.Equals existingConfManager.getConfigurationPathWithNumber(3), "", "Inexistant configuration number 3"
 End Sub
 
-' Test : retrouver le path relatif d'une configuration dans le fichier template
+Public Sub TestSetConfigurationPathWithNumberToNewProject()
+'       Verify the capability to set and retrieve the configuration path by number
+    ' set new pathes
+    newConfManager.setConfigurationPathWithNumber n:=0, path:="Path0"
+    newConfManager.setConfigurationPathWithNumber n:=1, path:="Path1"
+    newConfManager.setConfigurationPathWithNumber n:=2, path:="Path2"
+    newConfManager.setConfigurationPathWithNumber n:=3, path:="Path3"
+    ' verify pathes
+    mAssert.Equals newConfManager.getConfigurationPathWithNumber(0), "", "Inexistant configuration number 0"
+    mAssert.Equals newConfManager.getConfigurationPathWithNumber(1), "Path1", "Path of first configuration given by number"
+    mAssert.Equals newConfManager.getConfigurationPathWithNumber(2), "Path2", "Path of second configuration given by number"
+    mAssert.Equals newConfManager.getConfigurationPathWithNumber(3), "", "Inexistant configuration number 3"
+End Sub
 
-' Test : modifier le path relatif d'une configuration nouvelle, sauver le fichier, réinitialiser et retrouver la configuration
+Public Sub TestSetConfigurationPathWithNumberToSavedProject()
+'       Verify the capability to set and retrieve the configuration path by number
+    ' set new pathes
+    newConfManager.setConfigurationPathWithNumber n:=0, path:="Path0"
+    newConfManager.setConfigurationPathWithNumber n:=1, path:="Path1"
+    newConfManager.setConfigurationPathWithNumber n:=2, path:="Path2"
+    newConfManager.setConfigurationPathWithNumber n:=3, path:="Path3"
+    ' save and re-open file
+    newWorkbook.Close SaveChanges:=True, Filename:=vtkPathToTestFolder & "\" & "TestFile.xlsx"
+    vtkResetConfigurationManagers           ' reset all configuration managers
+    Set newWorkbook = Workbooks.Open(Filename:=vtkPathToTestFolder & "\" & "TestFile.xlsx")
+    Set newConfManager = vtkConfigurationManagerForWorkbook("TestFile.xlsx")
+    ' verify pathes
+    mAssert.Equals newConfManager.getConfigurationPathWithNumber(0), "", "Inexistant configuration number 0"
+    mAssert.Equals newConfManager.getConfigurationPathWithNumber(1), "Path1", "Path of first configuration given by number"
+    mAssert.Equals newConfManager.getConfigurationPathWithNumber(2), "Path2", "Path of second configuration given by number"
+    mAssert.Equals newConfManager.getConfigurationPathWithNumber(3), "", "Inexistant configuration number 3"
+End Sub
 
 ' pour tous les tests de path, faire avec numéro, puis avec nom de la configuration
+' Test Get configuration by name
+' Test Get path by name
+' Test Set path by name
 
 Private Function ITest_Suite() As TestSuite
     Set ITest_Suite = New TestSuite
@@ -152,6 +187,9 @@ Private Function ITest_Suite() As TestSuite
     ITest_Suite.AddTest ITest_Manager.ClassName, "TestGetConfigurationsFromNewProject"
     ITest_Suite.AddTest ITest_Manager.ClassName, "TestGetModulesFromNewProject"
     ITest_Suite.AddTest ITest_Manager.ClassName, "TestGetConfigurationsFromExistingProject"
+    ITest_Suite.AddTest ITest_Manager.ClassName, "TestGetConfigurationPathWithNumberFromExistingProject"
+    ITest_Suite.AddTest ITest_Manager.ClassName, "TestSetConfigurationPathWithNumberToNewProject"
+    ITest_Suite.AddTest ITest_Manager.ClassName, "TestSetConfigurationPathWithNumberToSavedProject"
 End Function
 
 Private Sub ITestCase_RunTest()
@@ -163,6 +201,9 @@ Private Sub ITestCase_RunTest()
         Case "TestGetConfigurationsFromNewProject": TestGetConfigurationsFromNewProject
         Case "TestGetModulesFromNewProject": TestGetModulesFromNewProject
         Case "TestGetConfigurationsFromExistingProject": TestGetConfigurationsFromExistingProject
+        Case "TestGetConfigurationPathWithNumberFromExistingProject": TestGetConfigurationPathWithNumberFromExistingProject
+        Case "TestSetConfigurationPathWithNumberToNewProject": TestSetConfigurationPathWithNumberToNewProject
+        Case "TestSetConfigurationPathWithNumberToSavedProject": TestSetConfigurationPathWithNumberToSavedProject
         Case Else: mAssert.Should False, "Invalid test name: " & mManager.methodName
     End Select
 End Sub

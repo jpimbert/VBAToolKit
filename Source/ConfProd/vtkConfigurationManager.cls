@@ -169,7 +169,7 @@ End Function
 ' Procedure : getConfigurationPathWithNumber
 ' Author    : Jean-Pierre Imbert
 ' Date      : 25/05/2013
-' Purpose   : return the n-th ralative configuration path of the project, given n as integer
+' Purpose   : return the n-th relative configuration path of the project, given n as integer
 '               - return "" if the configuration is inexistant
 '---------------------------------------------------------------------------------------
 '
@@ -183,3 +183,18 @@ Public Function getConfigurationPathWithNumber(n As Integer) As String
     End If
     getConfigurationPathWithNumber = sResult
 End Function
+
+
+'---------------------------------------------------------------------------------------
+' Procedure : setConfigurationPathWithNumber
+' Author    : Jean-Pierre Imbert
+' Date      : 25/05/2013
+' Purpose   : change the n-th relative configuration path of the project, given n as integer
+'               - does nothing if the configuration is inexistant
+'---------------------------------------------------------------------------------------
+'
+Public Sub setConfigurationPathWithNumber(n As Integer, path As String)
+    If n >= 1 And n <= configurationCount Then
+        configurationSheet.Cells(2, n + 1) = path
+    End If
+End Sub
