@@ -152,6 +152,28 @@ Public Function configuration(n As Integer) As String
 End Function
 
 '---------------------------------------------------------------------------------------
+' Procedure : getConfigurationNumber
+' Author    : Jean-Pierre Imbert
+' Date      : 26/05/2013
+' Purpose   : return the number of a configuration given its name
+'               - return 0 of the name is inexistant
+'---------------------------------------------------------------------------------------
+'
+Public Function getConfigurationNumber(configuration As String) As Integer
+    Dim r As Range
+    On Error Resume Next
+    Set r = configurationSheet.Rows(1)      ' Select first column of the sheet
+    Set r = r.Offset(0, 1)                  ' Forget the two first rows
+    Set r = r.Find(what:=configuration, SearchOrder:=xlByRows)
+    On Error GoTo 0
+    If r Is Nothing Then
+        getConfigurationNumber = 0
+       Else
+        getConfigurationNumber = r.Column - 1
+    End If
+End Function
+
+'---------------------------------------------------------------------------------------
 ' Procedure : getConfigurationPathWithNumber
 ' Author    : Jean-Pierre Imbert
 ' Date      : 25/05/2013
@@ -170,7 +192,6 @@ Public Function getConfigurationPathWithNumber(n As Integer) As String
     getConfigurationPathWithNumber = sResult
 End Function
 
-
 '---------------------------------------------------------------------------------------
 ' Procedure : setConfigurationPathWithNumber
 ' Author    : Jean-Pierre Imbert
@@ -184,29 +205,6 @@ Public Sub setConfigurationPathWithNumber(n As Integer, path As String)
         configurationSheet.Cells(2, n + 1) = path
     End If
 End Sub
-
-
-'---------------------------------------------------------------------------------------
-' Procedure : getConfigurationNumber
-' Author    : Jean-Pierre Imbert
-' Date      : 26/05/2013
-' Purpose   : return the number of a configuration given its name
-'               - return 0 of the name is inexistant
-'---------------------------------------------------------------------------------------
-'
-Public Function getConfigurationNumber(configuration As String) As Integer
-    Dim r As Range
-    On Error Resume Next
-    Set r = configurationSheet.Rows(1)
-    Set r = r.Offset(0, 1)
-    Set r = r.Find(what:=configuration)
-    On Error GoTo 0
-    If r Is Nothing Then
-        getConfigurationNumber = 0
-       Else
-        getConfigurationNumber = r.Column - 1
-    End If
-End Function
 
 '---------------------------------------------------------------------------------------
 ' Function  : getConfigurationPath
@@ -260,6 +258,28 @@ Public Function module(n As Integer) As String
         sResult = ""
     End If
     module = sResult
+End Function
+
+'---------------------------------------------------------------------------------------
+' Procedure : getModuleNumber
+' Author    : Jean-Pierre Imbert
+' Date      : 26/05/2013
+' Purpose   : return the number of a module given its name
+'               - return 0 of the name is inexistant
+'---------------------------------------------------------------------------------------
+'
+Public Function getModuleNumber(module As String) As Integer
+    Dim r As Range
+    On Error Resume Next
+    Set r = configurationSheet.Columns(1)   ' Select first column of the sheet
+    Set r = r.Offset(2, 0)                  ' Forget the two first rows
+    Set r = r.Find(what:=module, SearchOrder:=xlByColumns)
+    On Error GoTo 0
+    If r Is Nothing Then
+        getModuleNumber = 0
+       Else
+        getModuleNumber = r.Row - 2
+    End If
 End Function
 
 

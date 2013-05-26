@@ -225,11 +225,24 @@ Public Sub TestGetModulesFromNewProject()
     mAssert.Equals newConfManager.module(150), "", "Inexistant module number 150"
 End Sub
 
+Public Sub TestGetModuleNumbersFromExistingProject()
+'       Verify the capability to get the number of a configuration
+    mAssert.Equals existingConfManager.getModuleNumber("Module0"), 0, "Inexistant module"
+    mAssert.Equals existingConfManager.getModuleNumber("Module1"), 1, "First Module"
+    mAssert.Equals existingConfManager.getModuleNumber("Module2"), 2, "Second Module"
+    mAssert.Equals existingConfManager.getModuleNumber("Module3"), 3, "Third module"
+    mAssert.Equals existingConfManager.getModuleNumber("Module4"), 4, "Fourth module"
+    mAssert.Equals existingConfManager.getModuleNumber("Module5"), 5, "Fifth module"
+    mAssert.Equals existingConfManager.getModuleNumber("InexistantModule"), 0, "Inexistant module"
+End Sub
+
 '   Liste des fonctions à implémenter
 '       Ajout d'un module
+'       Ajouter un module qui existe déjà, ne doit pas marcher
 '       Liste des modules
 '       Obtention du chemin pour un module et une configuration
 '       Définition du chemin pour un module et une configuration
+'
 
 Private Function ITest_Suite() As TestSuite
     Set ITest_Suite = New TestSuite
@@ -247,6 +260,7 @@ Private Function ITest_Suite() As TestSuite
     ITest_Suite.AddTest ITest_Manager.ClassName, "TestSetConfigurationPathToSavedProject"
     ITest_Suite.AddTest ITest_Manager.ClassName, "TestGetModulesFromExistingProject"
     ITest_Suite.AddTest ITest_Manager.ClassName, "TestGetModulesFromNewProject"
+    ITest_Suite.AddTest ITest_Manager.ClassName, "TestGetModuleNumbersFromExistingProject"
 End Function
 
 Private Sub ITestCase_RunTest()
@@ -265,6 +279,7 @@ Private Sub ITestCase_RunTest()
         Case "TestSetConfigurationPathToSavedProject": TestSetConfigurationPathToSavedProject
         Case "TestGetModulesFromExistingProject": TestGetModulesFromExistingProject
         Case "TestGetModulesFromNewProject": TestGetModulesFromNewProject
+        Case "TestGetModuleNumbersFromExistingProject": TestGetModuleNumbersFromExistingProject
         Case Else: mAssert.Should False, "Invalid test name: " & mManager.methodName
     End Select
 End Sub
