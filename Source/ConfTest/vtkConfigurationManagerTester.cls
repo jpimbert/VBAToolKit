@@ -217,7 +217,7 @@ End Sub
 
 Public Sub TestGetModulesFromNewProject()
 '       Verify the capability to retrieve the list of Modules from an existing project
-    mAssert.Equals newConfManager.moduleCount, 0, "There must be two configurations in a new project"
+    mAssert.Equals newConfManager.moduleCount, 0, "There must be no modules in a new project"
     mAssert.Equals newConfManager.module(0), "", "Inexistant module number 0"
     mAssert.Equals newConfManager.module(1), "", "Inexistant module number 1"
     mAssert.Equals newConfManager.module(6), "", "Inexistant module number 6"
@@ -236,9 +236,27 @@ Public Sub TestGetModuleNumbersFromExistingProject()
     mAssert.Equals existingConfManager.getModuleNumber("InexistantModule"), 0, "Inexistant module"
 End Sub
 
+Public Sub TestAddNonExistantModuleToSavedProject()
+'       Verify the capability to add anew module, non existant, and retrieve it
+    Dim n As Integer
+    ' set new modules
+    mAssert.Equals newConfManager.addModule(module:="NewModule1"), 1, "Number of the first module added"
+    mAssert.Equals newConfManager.addModule(module:="NewModule2"), 2, "Number of the second module added"
+    ' save and re-open file
+    SaveThenReOpenNewWorkbook
+    ' verify modules
+    mAssert.Equals newConfManager.moduleCount, 2, "There must be two new modules in the saved project"
+    mAssert.Equals newConfManager.module(0), "", "Inexistant module number 0"
+    mAssert.Equals newConfManager.module(1), "NewModule1", "New module number 1"
+    mAssert.Equals newConfManager.module(2), "NewModule2", "New module number 2"
+    mAssert.Equals newConfManager.module(3), "", "Inexistant module number 3"
+End Sub
+
+
 '   Liste des fonctions à implémenter
 '       Ajout d'un module
 '       Ajouter un module qui existe déjà, ne doit pas marcher
+'       Le path d'un module ajouté doit être null ("-" dans la cellule, "" comme valeur)
 '       Liste des modules
 '       Obtention du chemin pour un module et une configuration
 '       Définition du chemin pour un module et une configuration
@@ -261,6 +279,7 @@ Private Function ITest_Suite() As TestSuite
     ITest_Suite.AddTest ITest_Manager.ClassName, "TestGetModulesFromExistingProject"
     ITest_Suite.AddTest ITest_Manager.ClassName, "TestGetModulesFromNewProject"
     ITest_Suite.AddTest ITest_Manager.ClassName, "TestGetModuleNumbersFromExistingProject"
+    ITest_Suite.AddTest ITest_Manager.ClassName, "TestAddNonExistantModuleToSavedProject"
 End Function
 
 Private Sub ITestCase_RunTest()
@@ -280,6 +299,7 @@ Private Sub ITestCase_RunTest()
         Case "TestGetModulesFromExistingProject": TestGetModulesFromExistingProject
         Case "TestGetModulesFromNewProject": TestGetModulesFromNewProject
         Case "TestGetModuleNumbersFromExistingProject": TestGetModuleNumbersFromExistingProject
+        Case "TestAddNonExistantModuleToSavedProject": TestAddNonExistantModuleToSavedProject
         Case Else: mAssert.Should False, "Invalid test name: " & mManager.methodName
     End Select
 End Sub

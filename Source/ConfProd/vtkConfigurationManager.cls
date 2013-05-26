@@ -33,6 +33,8 @@ Private m_workbookName As String
 Private m_configurationSheet As Worksheet
 Private Const sheetName As String = "vtkConfigurations"
 Private Const currentVersion As String = "vtkConfigurations v1.0"
+Private Const nbTitleColumns As Integer = 1
+Private Const nbTitleRows As Integer = 2
 
 Private Sub Class_Terminate()
     Set m_configurationSheet = Nothing
@@ -144,7 +146,7 @@ Public Function configuration(n As Integer) As String
     Dim sResult As String
     sResult = ""
     If n >= 1 And n <= configurationCount Then
-        sResult = configurationSheet.Cells(1, n + 1)
+        sResult = configurationSheet.Cells(1, n + nbTitleColumns)
        Else
         sResult = ""
     End If
@@ -163,13 +165,13 @@ Public Function getConfigurationNumber(configuration As String) As Integer
     Dim r As Range
     On Error Resume Next
     Set r = configurationSheet.Rows(1)      ' Select first column of the sheet
-    Set r = r.Offset(0, 1)                  ' Forget the two first rows
+    Set r = r.Offset(0, nbTitleColumns)     ' Forget the first column
     Set r = r.Find(what:=configuration, SearchOrder:=xlByRows)
     On Error GoTo 0
     If r Is Nothing Then
         getConfigurationNumber = 0
        Else
-        getConfigurationNumber = r.Column - 1
+        getConfigurationNumber = r.Column - nbTitleColumns
     End If
 End Function
 
@@ -185,7 +187,7 @@ Public Function getConfigurationPathWithNumber(n As Integer) As String
     Dim sResult As String
     sResult = ""
     If n >= 1 And n <= configurationCount Then
-        sResult = configurationSheet.Cells(2, n + 1)
+        sResult = configurationSheet.Cells(2, n + nbTitleColumns)
        Else
         sResult = ""
     End If
@@ -202,7 +204,7 @@ End Function
 '
 Public Sub setConfigurationPathWithNumber(n As Integer, path As String)
     If n >= 1 And n <= configurationCount Then
-        configurationSheet.Cells(2, n + 1) = path
+        configurationSheet.Cells(2, n + nbTitleColumns) = path
     End If
 End Sub
 
@@ -238,7 +240,7 @@ End Sub
 '
 Public Property Get moduleCount() As Integer
     ' The number of modules is the number of used rows minus two
-    moduleCount = configurationSheet.UsedRange.Rows.Count - 2
+    moduleCount = configurationSheet.UsedRange.Rows.Count - nbTitleRows
 End Property
 
 '---------------------------------------------------------------------------------------
@@ -253,7 +255,7 @@ Public Function module(n As Integer) As String
     Dim sResult As String
     sResult = ""
     If n >= 1 And n <= moduleCount Then
-        sResult = configurationSheet.Cells(n + 2, 1)
+        sResult = configurationSheet.Cells(n + nbTitleRows, 1)
        Else
         sResult = ""
     End If
@@ -272,13 +274,34 @@ Public Function getModuleNumber(module As String) As Integer
     Dim r As Range
     On Error Resume Next
     Set r = configurationSheet.Columns(1)   ' Select first column of the sheet
-    Set r = r.Offset(2, 0)                  ' Forget the two first rows
+    Set r = r.Offset(nbTitleRows, 0)                  ' Forget the two first rows
     Set r = r.Find(what:=module, SearchOrder:=xlByColumns)
     On Error GoTo 0
     If r Is Nothing Then
         getModuleNumber = 0
        Else
-        getModuleNumber = r.Row - 2
+        getModuleNumber = r.Row - nbTitleRows
+    End If
+End Function
+
+'---------------------------------------------------------------------------------------
+' Procedure : addModule
+' Author    : Jean-Pierre Imbert
+' Date      : 26/05/2013
+' Purpose   : Add a new module given its name
+'               - return the number of the added module
+'               - if the module is already existant, return minus the number of the existant module
+'---------------------------------------------------------------------------------------
+'
+Public Function addModule(module As String) As Integer
+    Dim n As Integer
+    n = getModuleNumber(module)
+    If n = 0 Then   ' n = 0 means non-existant module
+        n = moduleCount + 1
+        configurationSheet.Cells(n + nbTitleRows, 1) = module
+        addModule = n
+       Else
+        addModule = -n
     End If
 End Function
 
