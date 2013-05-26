@@ -297,8 +297,12 @@ Public Function addModule(module As String) As Integer
     Dim n As Integer
     n = getModuleNumber(module)
     If n = 0 Then   ' n = 0 means non-existant module
-        n = moduleCount + 1
-        configurationSheet.Cells(n + nbTitleRows, 1) = module
+        n = moduleCount + 1                                     ' Set module number
+        configurationSheet.Cells(n + nbTitleRows, 1) = module   ' Write module name
+        Dim i As Integer
+        For i = 1 To configurationCount                         ' For each configuration
+            configurationSheet.Cells(n + nbTitleRows, i + nbTitleColumns) = "-"     ' Set Default path as not initialized
+        Next i
         addModule = n
        Else
         addModule = -n

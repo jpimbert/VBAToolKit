@@ -276,6 +276,13 @@ Public Sub TestGetModulePathWithNumberFromExistingProject()
     mAssert.Equals existingConfManager.getModulePathWithNumber(numModule:=5, numConfiguration:=2), "Path2Module5", "Module path number 5,2"
 End Sub
 
+Public Sub TestGetModulePathWithNumberForNewModule()
+'       Verify the default module path define at module adding
+    mAssert.Equals newConfManager.addModule(module:="NewModule1"), 1, "Number of the first module added"
+    mAssert.Equals newConfManager.getModulePathWithNumber(numModule:=1, numConfiguration:=1), "", "Inexistant module path number 1,1"
+    mAssert.Equals newConfManager.getModulePathWithNumber(numModule:=1, numConfiguration:=2), "", "Inexistant module path number 1,2"
+End Sub
+
 '   Liste des fonctions à implémenter
 '       Obtention du chemin pour un module et une configuration
 '       Le path d'un module ajouté doit être null ("-" dans la cellule, "" comme valeur)
@@ -301,6 +308,7 @@ Private Function ITest_Suite() As TestSuite
     ITest_Suite.AddTest ITest_Manager.ClassName, "TestGetModuleNumbersFromExistingProject"
     ITest_Suite.AddTest ITest_Manager.ClassName, "TestAddNonExistantModuleToSavedProject"
     ITest_Suite.AddTest ITest_Manager.ClassName, "TestAddExistantModuleToExistingProject"
+    ITest_Suite.AddTest ITest_Manager.ClassName, "TestGetModulePathWithNumberFromExistingProject"
 End Function
 
 Private Sub ITestCase_RunTest()
@@ -322,6 +330,7 @@ Private Sub ITestCase_RunTest()
         Case "TestGetModuleNumbersFromExistingProject": TestGetModuleNumbersFromExistingProject
         Case "TestAddNonExistantModuleToSavedProject": TestAddNonExistantModuleToSavedProject
         Case "TestAddExistantModuleToExistingProject": TestAddExistantModuleToExistingProject
+        Case "TestGetModulePathWithNumberFromExistingProject": TestGetModulePathWithNumberFromExistingProject
         Case Else: mAssert.Should False, "Invalid test name: " & mManager.methodName
     End Select
 End Sub
