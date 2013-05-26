@@ -133,20 +133,6 @@ Public Property Get configurationCount() As Integer
 End Property
 
 '---------------------------------------------------------------------------------------
-' Property  : moduleCount as Integer - Read Only - Public
-' Author    : Jean-Pierre Imbert
-' Date      : 25/05/2013
-' Purpose   : Get the number of modules
-'---------------------------------------------------------------------------------------
-'
-Public Property Get moduleCount() As Integer
-    ' The number of modules is the number of used rows minus two
-    moduleCount = configurationSheet.UsedRange.Rows.Count - 2
-End Property
-
-
-
-'---------------------------------------------------------------------------------------
 ' Function  : configuration
 ' Author    : Jean-Pierre Imbert
 ' Date      : 25/05/2013
@@ -244,3 +230,37 @@ End Function
 Public Sub setConfigurationPath(configuration As String, path As String)
     setConfigurationPathWithNumber n:=getConfigurationNumber(configuration), path:=path
 End Sub
+
+'---------------------------------------------------------------------------------------
+' Property  : moduleCount as Integer - Read Only - Public
+' Author    : Jean-Pierre Imbert
+' Date      : 25/05/2013
+' Purpose   : Get the number of modules
+'---------------------------------------------------------------------------------------
+'
+Public Property Get moduleCount() As Integer
+    ' The number of modules is the number of used rows minus two
+    moduleCount = configurationSheet.UsedRange.Rows.Count - 2
+End Property
+
+'---------------------------------------------------------------------------------------
+' Function  : module
+' Author    : Jean-Pierre Imbert
+' Date      : 26/05/2013
+' Purpose   : return the n-th module of the project, given n as integer
+'               - return "" if the module is inexistant
+'---------------------------------------------------------------------------------------
+'
+Public Function module(n As Integer) As String
+    Dim sResult As String
+    sResult = ""
+    If n >= 1 And n <= moduleCount Then
+        sResult = configurationSheet.Cells(n + 2, 1)
+       Else
+        sResult = ""
+    End If
+    module = sResult
+End Function
+
+
+
