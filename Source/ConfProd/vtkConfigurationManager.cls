@@ -328,3 +328,23 @@ Public Function getModulePathWithNumber(numModule As Integer, numConfiguration A
     End If
     getModulePathWithNumber = sResult
 End Function
+
+'---------------------------------------------------------------------------------------
+' Procedure : setModulePathWithNumber
+' Author    : Jean-Pierre Imbert
+' Date      : 26/05/2013
+' Purpose   : Set a module relative path given its module and configuration numbers
+'               - if the path given is "", it is replaced by "-" in the configuration sheet cell
+'---------------------------------------------------------------------------------------
+'
+Public Sub setModulePathWithNumber(path As String, numModule As Integer, numConfiguration As Integer)
+    Dim s As String
+    If numModule >= 1 And numModule <= moduleCount And numConfiguration >= 1 And numConfiguration <= configurationCount Then
+        If path = "" Then
+            s = "-"
+           Else
+            s = path
+        End If
+        configurationSheet.Cells(numModule + nbTitleRows, numConfiguration + nbTitleColumns) = s
+    End If
+End Sub

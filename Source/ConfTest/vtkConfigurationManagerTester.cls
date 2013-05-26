@@ -26,7 +26,11 @@ Private Const existingProjectName As String = "ExistingProject"
 
 Private Sub SaveThenReOpenNewWorkbook()
 ' Utility Function for saving then re-open the new workbook and re-initialize the configuration managers
-    newWorkbook.Close SaveChanges:=True, Filename:=savedNewWorkbookPath
+    If newWorkbook.path = "" Then
+        newWorkbook.Close SaveChanges:=True, Filename:=savedNewWorkbookPath
+       Else
+        newWorkbook.Close SaveChanges:=True
+    End If
     vtkResetConfigurationManagers           ' reset all configuration managers
     Set newWorkbook = Workbooks.Open(Filename:=savedNewWorkbookPath)
     Set newConfManager = vtkConfigurationManagerForWorkbook("TestFile.xlsx")
@@ -283,11 +287,32 @@ Public Sub TestGetModulePathWithNumberForNewModule()
     mAssert.Equals newConfManager.getModulePathWithNumber(numModule:=1, numConfiguration:=2), "", "Inexistant module path number 1,2"
 End Sub
 
-'   Liste des fonctions à implémenter
-'       Obtention du chemin pour un module et une configuration
-'       Le path d'un module ajouté doit être null ("-" dans la cellule, "" comme valeur)
-'       Définition du chemin pour un module et une configuration
-'
+Public Sub TestAddModulePathToSavedProject()
+'       Verify the capability to add a new module, non existant, and retrieve it
+    ' set new modules
+    mAssert.Equals newConfManager.addModule(module:="NewModule1"), 1, "Number of the first module added"
+    mAssert.Equals newConfManager.addModule(module:="NewModule2"), 2, "Number of the second module added"
+    mAssert.Equals newConfManager.addModule(module:="NewModule3"), 3, "Number of the third module added"
+    mAssert.Equals newConfManager.addModule(module:="NewModule4"), 4, "Number of the fourth module added"
+    ' save and re-open file
+    SaveThenReOpenNewWorkbook
+    ' set new pathes
+    newConfManager.setModulePathWithNumber path:="Path1Module1", numModule:=1, numConfiguration:=1
+    newConfManager.setModulePathWithNumber path:="Path2Module1", numModule:=1, numConfiguration:=2
+    newConfManager.setModulePathWithNumber path:="Path1Module2", numModule:=2, numConfiguration:=1
+    newConfManager.setModulePathWithNumber path:="Path2Module3", numModule:=3, numConfiguration:=2
+    ' save and re-open file
+    SaveThenReOpenNewWorkbook
+    ' verify module pathes
+    mAssert.Equals newConfManager.getModulePathWithNumber(numModule:=1, numConfiguration:=1), "Path1Module1", "Module path number 1,1"
+    mAssert.Equals newConfManager.getModulePathWithNumber(numModule:=1, numConfiguration:=2), "Path2Module1", "Module path number 1,2"
+    mAssert.Equals newConfManager.getModulePathWithNumber(numModule:=2, numConfiguration:=1), "Path1Module2", "Module path number 2,1"
+    mAssert.Equals newConfManager.getModulePathWithNumber(numModule:=2, numConfiguration:=2), "", "Module path number 2,2"
+    mAssert.Equals newConfManager.getModulePathWithNumber(numModule:=3, numConfiguration:=1), "", "Module path number 3,1"
+    mAssert.Equals newConfManager.getModulePathWithNumber(numModule:=3, numConfiguration:=2), "Path2Module3", "Module path number 3,2"
+    mAssert.Equals newConfManager.getModulePathWithNumber(numModule:=4, numConfiguration:=1), "", "Module path number 4,1"
+    mAssert.Equals newConfManager.getModulePathWithNumber(numModule:=4, numConfiguration:=2), "", "Module path number 4,2"
+End Sub
 
 Private Function ITest_Suite() As TestSuite
     Set ITest_Suite = New TestSuite
@@ -309,6 +334,8 @@ Private Function ITest_Suite() As TestSuite
     ITest_Suite.AddTest ITest_Manager.ClassName, "TestAddNonExistantModuleToSavedProject"
     ITest_Suite.AddTest ITest_Manager.ClassName, "TestAddExistantModuleToExistingProject"
     ITest_Suite.AddTest ITest_Manager.ClassName, "TestGetModulePathWithNumberFromExistingProject"
+    ITest_Suite.AddTest ITest_Manager.ClassName, "TestGetModulePathWithNumberForNewModule"
+    ITest_Suite.AddTest ITest_Manager.ClassName, "TestAddModulePathToSavedProject"
 End Function
 
 Private Sub ITestCase_RunTest()
@@ -331,6 +358,8 @@ Private Sub ITestCase_RunTest()
         Case "TestAddNonExistantModuleToSavedProject": TestAddNonExistantModuleToSavedProject
         Case "TestAddExistantModuleToExistingProject": TestAddExistantModuleToExistingProject
         Case "TestGetModulePathWithNumberFromExistingProject": TestGetModulePathWithNumberFromExistingProject
+        Case "TestGetModulePathWithNumberForNewModule": TestGetModulePathWithNumberForNewModule
+        Case "TestAddModulePathToSavedProject": TestAddModulePathToSavedProject
         Case Else: mAssert.Should False, "Invalid test name: " & mManager.methodName
     End Select
 End Sub
