@@ -305,5 +305,22 @@ Public Function addModule(module As String) As Integer
     End If
 End Function
 
-
-
+'---------------------------------------------------------------------------------------
+' Procedure : getModulePathWithNumber
+' Author    : Jean-Pierre Imbert
+' Date      : 26/05/2013
+' Purpose   : Get a module relative path given its module and configuration numbers
+'               - return "" if the module or the configuration doesn't exist
+'               - return "" if the path is not initialized ("-" in the cell of the configuration sheet)
+'---------------------------------------------------------------------------------------
+'
+Public Function getModulePathWithNumber(numModule As Integer, numConfiguration As Integer) As String
+    Dim sResult As String
+    If numModule >= 1 And numModule <= moduleCount And numConfiguration >= 1 And numConfiguration <= configurationCount Then
+        sResult = configurationSheet.Cells(numModule + nbTitleRows, numConfiguration + nbTitleColumns)
+        If sResult = "-" Then sResult = ""
+       Else
+        sResult = ""
+    End If
+    getModulePathWithNumber = sResult
+End Function

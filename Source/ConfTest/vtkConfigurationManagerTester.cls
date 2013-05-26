@@ -260,6 +260,21 @@ Public Sub TestAddExistantModuleToExistingProject()
     mAssert.Equals existingConfManager.moduleCount, 5, "There must be five modules, no change, in the existing project"
 End Sub
 
+Public Sub TestGetModulePathWithNumberFromExistingProject()
+'       Verify the capability to get the module path by number
+    mAssert.Equals existingConfManager.getModulePathWithNumber(numModule:=0, numConfiguration:=2), "", "Inexistant module path number 0,2"
+    mAssert.Equals existingConfManager.getModulePathWithNumber(numModule:=3, numConfiguration:=3), "", "Inexistant module path number 3,3"
+    mAssert.Equals existingConfManager.getModulePathWithNumber(numModule:=1, numConfiguration:=1), "Path1Module1", "Module path number 1,1"
+    mAssert.Equals existingConfManager.getModulePathWithNumber(numModule:=1, numConfiguration:=2), "", "Module path number 1,2"
+    mAssert.Equals existingConfManager.getModulePathWithNumber(numModule:=2, numConfiguration:=1), "", "Module path number 2,1"
+    mAssert.Equals existingConfManager.getModulePathWithNumber(numModule:=2, numConfiguration:=2), "Path2Module2", "Module path number 2,2"
+    mAssert.Equals existingConfManager.getModulePathWithNumber(numModule:=3, numConfiguration:=1), "", "Module path number 3,1"
+    mAssert.Equals existingConfManager.getModulePathWithNumber(numModule:=3, numConfiguration:=2), "", "Module path number 3,2"
+    mAssert.Equals existingConfManager.getModulePathWithNumber(numModule:=4, numConfiguration:=1), "Path1Module4", "Module path number 4,1"
+    mAssert.Equals existingConfManager.getModulePathWithNumber(numModule:=4, numConfiguration:=2), "Path2Module4", "Module path number 4,2"
+    mAssert.Equals existingConfManager.getModulePathWithNumber(numModule:=5, numConfiguration:=1), "", "Module path number 5,1"
+    mAssert.Equals existingConfManager.getModulePathWithNumber(numModule:=5, numConfiguration:=2), "Path2Module5", "Module path number 5,2"
+End Sub
 
 '   Liste des fonctions à implémenter
 '       Obtention du chemin pour un module et une configuration
@@ -285,6 +300,7 @@ Private Function ITest_Suite() As TestSuite
     ITest_Suite.AddTest ITest_Manager.ClassName, "TestGetModulesFromNewProject"
     ITest_Suite.AddTest ITest_Manager.ClassName, "TestGetModuleNumbersFromExistingProject"
     ITest_Suite.AddTest ITest_Manager.ClassName, "TestAddNonExistantModuleToSavedProject"
+    ITest_Suite.AddTest ITest_Manager.ClassName, "TestAddExistantModuleToExistingProject"
 End Function
 
 Private Sub ITestCase_RunTest()
@@ -305,6 +321,7 @@ Private Sub ITestCase_RunTest()
         Case "TestGetModulesFromNewProject": TestGetModulesFromNewProject
         Case "TestGetModuleNumbersFromExistingProject": TestGetModuleNumbersFromExistingProject
         Case "TestAddNonExistantModuleToSavedProject": TestAddNonExistantModuleToSavedProject
+        Case "TestAddExistantModuleToExistingProject": TestAddExistantModuleToExistingProject
         Case Else: mAssert.Should False, "Invalid test name: " & mManager.methodName
     End Select
 End Sub
