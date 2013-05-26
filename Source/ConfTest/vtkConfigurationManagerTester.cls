@@ -237,8 +237,7 @@ Public Sub TestGetModuleNumbersFromExistingProject()
 End Sub
 
 Public Sub TestAddNonExistantModuleToSavedProject()
-'       Verify the capability to add anew module, non existant, and retrieve it
-    Dim n As Integer
+'       Verify the capability to add a new module, non existant, and retrieve it
     ' set new modules
     mAssert.Equals newConfManager.addModule(module:="NewModule1"), 1, "Number of the first module added"
     mAssert.Equals newConfManager.addModule(module:="NewModule2"), 2, "Number of the second module added"
@@ -252,13 +251,19 @@ Public Sub TestAddNonExistantModuleToSavedProject()
     mAssert.Equals newConfManager.module(3), "", "Inexistant module number 3"
 End Sub
 
+Public Sub TestAddExistantModuleToExistingProject()
+'       Verify the capability to not add an existing module in an existing project
+    Dim n As Integer
+    ' set new modules
+    mAssert.Equals existingConfManager.addModule(module:="Module1"), -1, "Number of the first existing module"
+    mAssert.Equals existingConfManager.addModule(module:="Module5"), -5, "Number of the fifth existing module"
+    mAssert.Equals existingConfManager.moduleCount, 5, "There must be five modules, no change, in the existing project"
+End Sub
+
 
 '   Liste des fonctions à implémenter
-'       Ajout d'un module
-'       Ajouter un module qui existe déjà, ne doit pas marcher
-'       Le path d'un module ajouté doit être null ("-" dans la cellule, "" comme valeur)
-'       Liste des modules
 '       Obtention du chemin pour un module et une configuration
+'       Le path d'un module ajouté doit être null ("-" dans la cellule, "" comme valeur)
 '       Définition du chemin pour un module et une configuration
 '
 
