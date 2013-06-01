@@ -45,29 +45,32 @@ Public Function vtkCreateProject(path As String, name As String, Optional displa
             MkDir path & "\" & name & "\" & "Source" & "\" & "VbaUnit"
              
             'Save created project with xlsm extention
-             Workbooks.Add.SaveAs (path & "\" & name & "\" & "Project" & "\" & name), FileFormat:=(52) '52 is xlsm format
+            Workbooks.Add.SaveAs (path & "\" & name & "\" & "Project" & "\" & name & "_Dev"), FileFormat:=(52) '52 is xlsm format
             'Rename Project
-            Workbooks(name & ".xlsm").VBProject.name = name & "_DEV"
+            Workbooks(name & "_Dev" & ".xlsm").VBProject.name = name & "_DEV"
             'call function who activate references
-            VtkActivateReferences (name & ".xlsm")
+            VtkActivateReferences (name & "_Dev" & ".xlsm")
             'initialize confsheet with dev workbook name and path
-            Workbooks(name & ".xlsm").Sheets(vtkConfSheet).Range(vtkModuleDevRange & vtkFirstLine - 2) = Workbooks(name & ".xlsm").FullNameURLEncoded
-            Workbooks(name & ".xlsm").Sheets(vtkConfSheet).Range(vtkModuleDevRange & vtkFirstLine - 3) = Workbooks(name & ".xlsm").name
+            Workbooks(name & "_Dev" & ".xlsm").Sheets(vtkConfSheet).Range(vtkModuleDevRange & vtkFirstLine - 2) = Workbooks(name & "_Dev" & ".xlsm").FullNameURLEncoded
+            Workbooks(name & "_Dev" & ".xlsm").Sheets(vtkConfSheet).Range(vtkModuleDevRange & vtkFirstLine - 3) = Workbooks(name & "_Dev" & ".xlsm").name
             
             'Create delivery workbook
-            Workbooks.Add.SaveAs (path & "\" & name & "\" & "Delivery" & "\" & name & "_Delivery"), FileFormat:=(52) '52 is xlsm format
+            Workbooks.Add.SaveAs (path & "\" & name & "\" & "Delivery" & "\" & name), FileFormat:=(52) '52 is xlsm format
             'Rename Project
-            Workbooks(name & "_Delivery" & ".xlsm").VBProject.name = name & "_Delivery"
-            'call function who activate references
-            VtkActivateReferences (name & "_Delivery" & ".xlsm")
+            Workbooks(name & ".xlsm").VBProject.name = name
             'initialize confsheet with delivery workbook name and path
-            Workbooks(name & ".xlsm").Sheets(vtkConfSheet).Range(vtkModuleDeliveryRange & vtkFirstLine - 2) = Workbooks(name & "_Delivery" & ".xlsm").FullNameURLEncoded
-            Workbooks(name & ".xlsm").Sheets(vtkConfSheet).Range(vtkModuleDeliveryRange & vtkFirstLine - 3) = Workbooks(name & "_Delivery" & ".xlsm").name
+            Workbooks(name & "_Dev" & ".xlsm").Sheets(vtkConfSheet).Range(vtkModuleDeliveryRange & vtkFirstLine - 2) = Workbooks(name & ".xlsm").FullNameURLEncoded
+            Workbooks(name & "_Dev" & ".xlsm").Sheets(vtkConfSheet).Range(vtkModuleDeliveryRange & vtkFirstLine - 3) = Workbooks(name & ".xlsm").name
+            
+            'close delivery workbook
+            'Workbooks(name & ".xlsm").Close
+            
             'activate dev workbook
-            Workbooks(name & ".xlsm").Activate
+            Workbooks(name & "_Dev" & ".xlsm").Activate
             '
             RetVtkExportAll = vtkExportAll(ThisWorkbook.name)
             RetValImportTestConf = vtkImportTestConfig()
+            'retvalgit = vtkInitializeGit()
     On Error GoTo 0
     vtkCreateProject = 0
     Exit Function
@@ -75,3 +78,4 @@ vtkCreateProject_Error:
     vtkCreateProject = Err.Number
 If displayError Then MsgBox "Error " & Err.Number & " (" & Err.Description & ") in procedure vtkCreateProject of Module MainFunctions"
 End Function
+
