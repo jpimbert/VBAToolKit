@@ -1,35 +1,17 @@
 Attribute VB_Name = "vtkImportExportUtilities"
 Option Explicit
-'---------------------------------------------------------------------------------------
-' Procedure : vtkConfSheet
-' Author    : user
-' Date      : 14/05/2013
-' Purpose   : - create new sheet (if it not exist) that will contain table of parameters
-'---------------------------------------------------------------------------------------
-'
-Public Function vtkConfSheet() As String
-Dim sheetname
-sheetname = "configurations"
-On Error Resume Next
- Worksheets(sheetname).Select
- If Err <> 0 Then
- Worksheets.Add.name = sheetname
- End If
-vtkConfSheet = sheetname
-On Error GoTo 0
-End Function
+
 
 '---------------------------------------------------------------------------------------
 ' Procedure : vtkModuleNameRange
 ' Author    : user
 ' Date      : 13/05/2013
 ' Purpose   : - return range name that contains list of modules
-'             - write range name
+'
 '---------------------------------------------------------------------------------------
 '
 Public Function vtkModuleNameRange() As String
 vtkModuleNameRange = "A"
-ActiveWorkbook.Sheets(vtkConfSheet).Range(vtkModuleNameRange & vtkFirstLine - 2) = "Module Name"
 End Function
 
 '---------------------------------------------------------------------------------------
@@ -66,19 +48,17 @@ End Function
 '
 Public Function vtkInformationRange() As String
 vtkInformationRange = "D"
-ActiveWorkbook.Sheets(vtkConfSheet).Range(vtkInformationRange & vtkFirstLine - 3) = "File Informations"
 End Function
 '---------------------------------------------------------------------------------------
 ' Procedure : vtkModuleInformationsRange
 ' Author    : user
 ' Date      : 13/05/2013
 ' Purpose   : - return range name that contains modules information
-'             - write range name
+'
 '---------------------------------------------------------------------------------------
 '
 Public Function vtkModuleInformationsRange() As String
 vtkModuleInformationsRange = "E"
-ActiveWorkbook.Sheets(vtkConfSheet).Range(vtkModuleInformationsRange & vtkFirstLine - 3) = "Modules Informations"
 End Function
 
 
@@ -90,7 +70,7 @@ End Function
 '---------------------------------------------------------------------------------------
 '
 Public Function vtkFirstLine() As Integer
-vtkFirstLine = 4
+vtkFirstLine = 3
 End Function
 '---------------------------------------------------------------------------------------
 ' Procedure : VtkInitializeExcelfileWithVbaUnitModuleName
@@ -98,6 +78,7 @@ End Function
 ' Date      : 09/05/2013
 ' Purpose   : - initialize ConfSheet with vbaunit module name
 '             - Return the next first empty line number
+'             - vbaunit path line will be colored differently , to export it only one time when we initilize worksheet
 '---------------------------------------------------------------------------------------
 '
 Public Function VtkInitializeExcelfileWithVbaUnitModuleName() As Integer
@@ -125,10 +106,9 @@ Dim tableofvbaunitname(17) As String
 Dim j As Integer
   For j = 0 To UBound(tableofvbaunitname) ' for j to table length
     ActiveWorkbook.Sheets(vtkConfSheet).Range(vtkModuleNameRange & j + vtkFirstLine) = tableofvbaunitname(j)
-    ActiveWorkbook.Sheets(vtkConfSheet).Range(vtkModuleNameRange & j + vtkFirstLine).Interior.ColorIndex = 6
+    ActiveWorkbook.Sheets(vtkConfSheet).Range(vtkModuleNameRange & j + vtkFirstLine).Interior.ColorIndex = 3
   Next
-
- VtkInitializeExcelfileWithVbaUnitModuleName = j + vtkFirstLine
+  VtkInitializeExcelfileWithVbaUnitModuleName = vtkFirstLine + j
 End Function
 
 '---------------------------------------------------------------------------------------
@@ -235,7 +215,7 @@ Public Function vtkExportModule(modulename As String, lineNumber As Integer, sou
  Dim fullpath As String
  Dim path As String
  Dim MsgCreationFile As String
- Dim test As String
+ Dim Test As String
  Dim DevPath As String
  Dim DelivPath As String
  Dim color As Integer
