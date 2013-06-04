@@ -57,21 +57,6 @@ found = False
     
 mAssert.Should found = True, "configurations sheet must be created"
 End Sub
-Public Sub TestofNotExistanceOfConfSheet()
-'test that configuration sheet is correctly created
-Dim found As Boolean
-Dim i As Integer
-    
-    Sheets("configurations").Delete
-    found = False
-      For i = 1 To Sheets.Count
-        If Sheets(i).name = "configurations" Then
-            found = True
-        End If
-      Next
-    
- mAssert.Should found = False, "configurations sheet must be deleted"
-End Sub
 Public Sub TestModuleNameRangeCorrectlyNammed()
     Dim returnvalue As String
     'return value = range letter
@@ -139,7 +124,6 @@ End Sub
 Private Function ITest_Suite() As TestSuite
     Set ITest_Suite = New TestSuite
     ITest_Suite.AddTest ITest_Manager.ClassName, "TestConfSheetCorrectlyCreated"
-    ITest_Suite.AddTest ITest_Manager.ClassName, "TestofNotExistanceOfConfSheet"
     ITest_Suite.AddTest ITest_Manager.ClassName, "TestModuleNameRangeCorrectlyNammed"
     ITest_Suite.AddTest ITest_Manager.ClassName, "TestInformationRangeCorretlyNammed"
     ITest_Suite.AddTest ITest_Manager.ClassName, "TestVbaUnitModuleNameCorrectlyExported"
@@ -151,7 +135,6 @@ End Function
 Private Sub ITestCase_RunTest()
     Select Case mManager.methodName
         Case "TestConfSheetCorrectlyCreated": TestConfSheetCorrectlyCreated
-        Case "TestofNotExistanceOfConfSheet": TestofNotExistanceOfConfSheet
         Case "TestModuleNameRangeCorrectlyNammed": TestModuleNameRangeCorrectlyNammed
         Case "TestInformationRangeCorretlyNammed": TestInformationRangeCorretlyNammed
         Case "TestVbaUnitModuleNameCorrectlyExported": TestVbaUnitModuleNameCorrectlyExported

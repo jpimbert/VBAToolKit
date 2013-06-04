@@ -52,7 +52,10 @@ Public Sub TestPathfinishbyVBAToolKit()
     ' Verify that the path finish by "\VBAToolKit"
     mAssert.Equals Right(vtkPathOfCurrentProject, 11), "\VBAToolKit", "the install path must finish by \VBAToolKit"
     ' Verify that the path contain ":\Users\"
-    mAssert.Equals Mid(vtkPathOfCurrentProject, 2, 8), ":\Users\", "the install path must contain :\Users\ "
+    Dim bUser As Boolean, bDocument As Boolean
+    bUser = (Mid(vtkPathOfCurrentProject, 2, 8) = ":\Users\")
+    bDocument = (Mid(vtkPathOfCurrentProject, 2, 25) = ":\Documents and Settings\")
+    mAssert.Should bUser Or bDocument, "the install path must contain :\Users\ or :\Documents\"
 End Sub
 
 Private Function ITest_Suite() As TestSuite
