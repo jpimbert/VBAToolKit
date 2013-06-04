@@ -20,7 +20,7 @@ Private m_projectName As String
 
 '---------------------------------------------------------------------------------------
 ' Property  : projectName As String
-' Author    : Demonn
+' Author    : Jean-Pierre Imbert
 ' Date      : 04/06/2013
 ' Purpose   : This property must be set for the object
 '---------------------------------------------------------------------------------------
@@ -35,4 +35,20 @@ Public Property Let projectName(ByVal sprojectName As String)
 
     m_projectName = sprojectName
 
+End Property
+
+
+'---------------------------------------------------------------------------------------
+' Property  : projectDEVName AS String (ead only)
+' Author    : Jean-Pierre Imbert
+' Date      : 04/06/2013
+' Purpose   :
+'---------------------------------------------------------------------------------------
+'
+Public Property Get projectDEVName() As String
+    If m_projectName = "" Then
+        projectDEVName = ""
+       Else
+        projectDEVName = m_projectName & "_DEV"
+    End If
 End Property
