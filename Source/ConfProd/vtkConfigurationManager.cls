@@ -98,10 +98,10 @@ End Sub
 Private Sub initializeConfigurationSheet(ws As Worksheet)
     ws.Range("A1") = currentVersion
     ws.Range("A2") = "Module Name"
-    ws.Range("B1") = Workbooks(workbookName).VBProject.name
-    ws.Range("B2") = "Delivery\" & workbookName     ' Default init for test purpose, will be initialized later
-    ws.Range("C1") = Workbooks(workbookName).VBProject.name & "_DEV"
-    ws.Range("C2") = "Project\" & workbookName & "_DEV"   ' Default init for test purpose, will be initialized later
+    ws.Range("B1") = vtkProjectForName(workbookName).projectName
+    ws.Range("B2") = vtkProjectForName(workbookName).projectStandardRelativePath
+    ws.Range("C1") = vtkProjectForName(workbookName).projectDEVName
+    ws.Range("C2") = vtkProjectForName(workbookName).projectDEVStandardRelativePath
     
     ws.Columns("A:C").ColumnWidth = 22
     ws.Range("A1").Font.Size = 8

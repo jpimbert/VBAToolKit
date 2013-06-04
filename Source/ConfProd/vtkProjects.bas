@@ -50,7 +50,7 @@ End Function
 ' Purpose   : Reset all vtkProjects (used during tests)
 '---------------------------------------------------------------------------------------
 '
-Public Sub vtkResetConfigurationManagers()
+Public Sub vtkResetProjects()
     Set projects = Nothing
 End Sub
 

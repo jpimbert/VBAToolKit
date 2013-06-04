@@ -40,7 +40,7 @@ Private Sub ITestCase_TearDown()
     On Error Resume Next
     'Close Created WorkBook
     Workbooks(vtkTestProjectName & ".xlsm").Close
-    Workbooks(vtkTestProjectName & "_delivery" & ".xlsm").Close
+    Workbooks(vtkTestProjectName & "_DEV" & ".xlsm").Close
     'Delete Created WorkBook
     Kill vtkTestPath & "\" & vtkTestProjectName & "\Project\" & vtkTestProjectName & ".xlsm"
     Kill vtkTestPath & "\" & vtkTestProjectName & "\Delivery\" & vtkTestProjectName & "_Delivery" & ".xlsm"
@@ -152,7 +152,7 @@ Public Sub TestDevXlsmFileIsNamedcorrectly()
 'test that xlsm is correctly renamed
     Dim returnvalue As Long
     returnvalue = vtkCreateProject(path:=vtkTestPath, name:=vtkTestProjectName, displayError:=False)
-    mAssert.Should Workbooks(vtkTestProjectName & ".xlsm").VBProject.name = vtkTestProjectName & "_DEV", "the workbook name must be like " & vtkTestProjectName & "_DEV"
+    mAssert.Should Workbooks(vtkTestProjectName & "_DEV.xlsm").VBProject.name = vtkTestProjectName & "_DEV", "the workbook name must be like " & vtkTestProjectName & "_DEV"
 End Sub
 Public Sub TestDelivXlsmFileCreated()
 'test that xlsm file is created in the right path
@@ -164,7 +164,7 @@ Public Sub TestDelivXlsmFileIsNamedcorrectly()
 'test that xlsm is correctly renamed
     Dim returnvalue As Long
     returnvalue = vtkCreateProject(path:=vtkTestPath, name:=vtkTestProjectName, displayError:=False)
-    mAssert.Should Workbooks(vtkTestProjectName & "_Delivery" & ".xlsm").VBProject.name = vtkTestProjectName & "_Delivery", "the workbook name must be like " & vtkTestProjectName & "_DEV"
+    mAssert.Should Workbooks(vtkTestProjectName & "_DEV.xlsm").VBProject.name = vtkTestProjectName & "_DEV", "the workbook name must be like " & vtkTestProjectName & "_DEV"
 End Sub
 Public Sub TestReferencesOfDevWorkbookWasActivated()
  Dim returnvalue As Long
@@ -175,8 +175,8 @@ Public Sub TestReferencesOfDevWorkbookWasActivated()
 'and extentions number must be equal to(initial extention number + added extention number )
 returnvalue = vtkCreateProject(path:=vtkTestPath, name:=vtkTestProjectName, displayError:=False)
  
-    For i = 1 To Workbooks(vtkTestProjectName & ".xlsm").VBProject.References.Count
-        If ((Workbooks(vtkTestProjectName & ".xlsm").VBProject.References(i).GUID) = "{420B2830-E718-11CF-893D-00A0C9054228}") Or (Workbooks(vtkTestProjectName & ".xlsm").VBProject.References(i).GUID = "{0002E157-0000-0000-C000-000000000046}") Then
+    For i = 1 To Workbooks(vtkTestProjectName & "_DEV.xlsm").VBProject.References.Count
+        If ((Workbooks(vtkTestProjectName & "_DEV.xlsm").VBProject.References(i).GUID) = "{420B2830-E718-11CF-893D-00A0C9054228}") Or (Workbooks(vtkTestProjectName & "_DEV.xlsm").VBProject.References(i).GUID = "{0002E157-0000-0000-C000-000000000046}") Then
         j = j + 1
         End If
     Next
@@ -191,8 +191,8 @@ Public Sub TestReferencesOfDeliveryWorkbookWasActivated()
 'and extentions number must be equal to(initial extention number + added extention number )
 returnvalue = vtkCreateProject(path:=vtkTestPath, name:=vtkTestProjectName, displayError:=False)
  
-    For i = 1 To Workbooks(vtkTestProjectName & "_Delivery" & ".xlsm").VBProject.References.Count
-        If ((Workbooks(vtkTestProjectName & "_Delivery" & ".xlsm").VBProject.References(i).GUID) = "{420B2830-E718-11CF-893D-00A0C9054228}") Or (Workbooks(vtkTestProjectName & "_Delivery" & ".xlsm").VBProject.References(i).GUID = "{0002E157-0000-0000-C000-000000000046}") Then
+    For i = 1 To Workbooks(vtkTestProjectName & ".xlsm").VBProject.References.Count
+        If ((Workbooks(vtkTestProjectName & ".xlsm").VBProject.References(i).GUID) = "{420B2830-E718-11CF-893D-00A0C9054228}") Or (Workbooks(vtkTestProjectName & "_Delivery" & ".xlsm").VBProject.References(i).GUID = "{0002E157-0000-0000-C000-000000000046}") Then
         j = j + 1
         End If
     Next
@@ -261,14 +261,58 @@ End Sub
 
 Private Function ITest_Suite() As TestSuite
     Set ITest_Suite = New TestSuite
-
+    ITest_Suite.AddTest ITest_Manager.ClassName, "TestCreateProjectDoesNothingWhenPathDoesntExist"
+    ITest_Suite.AddTest ITest_Manager.ClassName, "TestCreateProjectAlreadyExisting"
+    ITest_Suite.AddTest ITest_Manager.ClassName, "TestMainFolderIsCreated"
+    ITest_Suite.AddTest ITest_Manager.ClassName, "TestProjectFolderIsCreated"
+    ITest_Suite.AddTest ITest_Manager.ClassName, "TestSourceFolderIsCreated"
+    ITest_Suite.AddTest ITest_Manager.ClassName, "TestTestsFolderIsCreated"
+    ITest_Suite.AddTest ITest_Manager.ClassName, "TestConfProdFolderIsCreated"
+    ITest_Suite.AddTest ITest_Manager.ClassName, "TestConfTestFolderIsCreated"
+    ITest_Suite.AddTest ITest_Manager.ClassName, "TestVbaUnitFolderIsCreated"
+    ITest_Suite.AddTest ITest_Manager.ClassName, "TestGitLogIsCreated"
+    ITest_Suite.AddTest ITest_Manager.ClassName, "TestDeliveryFolderIsCreated"
+    ITest_Suite.AddTest ITest_Manager.ClassName, "TestDevXlsmFileCreated"
+    ITest_Suite.AddTest ITest_Manager.ClassName, "TestDevXlsmFileIsNamedcorrectly"
+    ITest_Suite.AddTest ITest_Manager.ClassName, "TestDelivXlsmFileCreated"
+    ITest_Suite.AddTest ITest_Manager.ClassName, "TestDelivXlsmFileIsNamedcorrectly"
+    ITest_Suite.AddTest ITest_Manager.ClassName, "TestReferencesOfDevWorkbookWasActivated"
+    ITest_Suite.AddTest ITest_Manager.ClassName, "TestReferencesOfDeliveryWorkbookWasActivated"
+    ITest_Suite.AddTest ITest_Manager.ClassName, "TestDevWorkbookPathCorrectlyWritted"
+    ITest_Suite.AddTest ITest_Manager.ClassName, "TestDevWorkbookNameCorrectlyWritted"
+    ITest_Suite.AddTest ITest_Manager.ClassName, "TestDeliveryWorkbookPathCorrectlyWritted"
+    ITest_Suite.AddTest ITest_Manager.ClassName, "TestDeliveryWorkbookNameCorrectlyWritted"
+    ITest_Suite.AddTest ITest_Manager.ClassName, "TestDevWorkbookIsActive"
+    ITest_Suite.AddTest ITest_Manager.ClassName, "TestExportVbaUnitModule"
     ITest_Suite.AddTest ITest_Manager.ClassName, "TestImportModules"
 End Function
 
 Private Sub ITestCase_RunTest()
     Select Case mManager.methodName
-
-        Case "TestImportModules": TestImportModules
+'        Case "TestCreateProjectDoesNothingWhenPathDoesntExist": TestCreateProjectDoesNothingWhenPathDoesntExist
+'        Case "TestCreateProjectAlreadyExisting": TestCreateProjectAlreadyExisting
+'        Case "TestMainFolderIsCreated": TestMainFolderIsCreated
+'        Case "TestProjectFolderIsCreated": TestProjectFolderIsCreated
+'        Case "TestSourceFolderIsCreated": TestSourceFolderIsCreated
+'        Case "TestTestsFolderIsCreated": TestTestsFolderIsCreated
+'        Case "TestConfProdFolderIsCreated": TestConfProdFolderIsCreated
+'        Case "TestConfTestFolderIsCreated": TestConfTestFolderIsCreated
+'        Case "TestVbaUnitFolderIsCreated": TestVbaUnitFolderIsCreated
+'        Case "TestGitLogIsCreated": TestGitLogIsCreated
+'        Case "TestDeliveryFolderIsCreated": TestDeliveryFolderIsCreated
+'        Case "TestDevXlsmFileCreated": TestDevXlsmFileCreated
+'        Case "TestDevXlsmFileIsNamedcorrectly": TestDevXlsmFileIsNamedcorrectly
+'        Case "TestDelivXlsmFileCreated": TestDelivXlsmFileCreated
+'        Case "TestDelivXlsmFileIsNamedcorrectly": TestDelivXlsmFileIsNamedcorrectly
+'        Case "TestReferencesOfDevWorkbookWasActivated": TestReferencesOfDevWorkbookWasActivated
+        Case "TestReferencesOfDeliveryWorkbookWasActivated": TestReferencesOfDeliveryWorkbookWasActivated
+'        Case "TestDevWorkbookPathCorrectlyWritted": TestDevWorkbookPathCorrectlyWritted
+'        Case "TestDevWorkbookNameCorrectlyWritted": TestDevWorkbookNameCorrectlyWritted
+'        Case "TestDeliveryWorkbookPathCorrectlyWritted": TestDeliveryWorkbookPathCorrectlyWritted
+'        Case "TestDeliveryWorkbookNameCorrectlyWritted": TestDeliveryWorkbookNameCorrectlyWritted
+'        Case "TestDevWorkbookIsActive": TestDevWorkbookIsActive
+'        Case "TestExportVbaUnitModule": TestExportVbaUnitModule
+'        Case "TestImportModules": TestImportModules
         Case Else: mAssert.Should False, "Invalid test name: " & mManager.methodName
     End Select
 End Sub

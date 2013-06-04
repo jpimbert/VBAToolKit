@@ -17,7 +17,7 @@ Private mAssert As IAssert
 Private newWorkbook As Workbook         ' New Workbook created for each test
 Private newWorkbookName As String
 Private newConfManager As vtkConfigurationManager   ' Configuration Manager for the new workbook
-Private Const newProjectName As String = "NewProject"
+Private newProjectName As String
 
 Private existingWorkbook As Workbook    ' Existing Workbook opened for each test
 Private Const existingWorkbookName As String = "WorkBookForConfigurationsTests.xlsm"
@@ -55,8 +55,10 @@ End Property
 
 Private Sub ITestCase_SetUp(Assert As IAssert)
     Set mAssert = Assert
-    Set newWorkbook = vtkCreateExcelWorkbookWithProjectName(newProjectName)    ' create an Excel project for tests
+    Set newWorkbook = vtkCreateExcelWorkbook    ' create an Excel project for tests
     newWorkbookName = newWorkbook.name
+    newProjectName = newWorkbookName
+    newWorkbook.VBProject.name = newProjectName
     Set newConfManager = vtkConfigurationManagerForWorkbook(newWorkbookName)
     FileCopy Source:=vtkPathToTemplateFolder & "\" & existingWorkbookName, Destination:=vtkPathToTestFolder & "\" & existingWorkbookName
     Set existingWorkbook = Workbooks.Open(Filename:=vtkPathToTestFolder & "\" & existingWorkbookName)
@@ -99,9 +101,9 @@ Public Sub TestConfigurationSheetFormatForNewProjet()
     mAssert.Equals ws.Range("A1"), "vtkConfigurations v1.0", "Expected identification of the configuration sheet"
     mAssert.Equals ws.Range("A2"), "Module Name", "Expected Title for Modules column"
     mAssert.Equals ws.Range("B1"), newProjectName, "Expected Title for main project column"
-    mAssert.Equals ws.Range("B2"), "Delivery\" & newWorkbookName, "Expected related Path for new main workbook"
+    mAssert.Equals ws.Range("B2"), "Delivery\" & newWorkbookName & ".xlsm", "Expected related Path for new main workbook"
     mAssert.Equals ws.Range("C1"), newProjectName & "_DEV", "Expected Title for development project column"
-    mAssert.Equals ws.Range("C2"), "Project\" & newWorkbookName & "_DEV", "Expected related Path for new development workbook"
+    mAssert.Equals ws.Range("C2"), "Project\" & newWorkbookName & "_DEV.xlsm", "Expected related Path for new development workbook"
 End Sub
 
 Public Sub TestConfigurationSheetFormatForExistingProjet()

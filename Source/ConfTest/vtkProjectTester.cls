@@ -44,21 +44,33 @@ Public Sub TestProjectNameForDevelopment()
 End Sub
 
 Public Sub TestProjectNameForDevelopmentWithNullProjectName()
-'       Verify that the project name for devlopment is null when project name is null
+'       Verify that the project name for development is null when project name is null
     Dim p As New vtkProject
     mAssert.Equals p.projectDEVName, "", "The project development name mus be null"
+End Sub
+
+Public Sub TestProjectDevelopmentRelativePath()
+'       Verify the project path for development
+    mAssert.Equals project.projectDEVStandardRelativePath, "Project\" & "TestProject_DEV.xlsm", "The project development standard path"
+End Sub
+
+Public Sub TestProjectRelativePath()
+'       Verify the project path
+    mAssert.Equals project.projectStandardRelativePath, "Project\" & "TestProject.xlsm", "The project development standard path"
 End Sub
 
 Private Function ITest_Suite() As TestSuite
     Set ITest_Suite = New TestSuite
     ITest_Suite.AddTest ITest_Manager.ClassName, "TestProjectNameForDevelopment"
     ITest_Suite.AddTest ITest_Manager.ClassName, "TestProjectNameForDevelopmentWithNullProjectName"
+    ITest_Suite.AddTest ITest_Manager.ClassName, "TestProjectDevelopmentRelativePath"
 End Function
 
 Private Sub ITestCase_RunTest()
     Select Case mManager.methodName
         Case "TestProjectNameForDevelopment": TestProjectNameForDevelopment
         Case "TestProjectNameForDevelopmentWithNullProjectName": TestProjectNameForDevelopmentWithNullProjectName
+        Case "TestProjectDevelopmentRelativePath": TestProjectDevelopmentRelativePath
         Case Else: mAssert.Should False, "Invalid test name: " & mManager.methodName
     End Select
 End Sub
