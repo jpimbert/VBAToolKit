@@ -53,7 +53,7 @@ Public Function vtkCreateProject(path As String, name As String, Optional displa
             'Rename Project
             Workbooks(project.projectDEVName & ".xlsm").VBProject.name = project.projectDEVName
             'call function who activate references
-            VtkActivateReferences (project.projectDEVName)
+            VtkActivateReferences (project.projectDEVName & ".xlsm")
             'initialize confsheet with dev workbook name and path
 '            Workbooks(project.projectDEVName & ".xlsm").Sheets(vtkConfSheet).Range(vtkModuleDevRange & vtkFirstLine - 2) = Workbooks(name & ".xlsm").FullNameURLEncoded
 '            Workbooks(project.projectDEVName & ".xlsm").Sheets(vtkConfSheet).Range(vtkModuleDevRange & vtkFirstLine - 3) = Workbooks(name & ".xlsm").name
@@ -63,12 +63,12 @@ Public Function vtkCreateProject(path As String, name As String, Optional displa
             'Rename Project
             Workbooks(project.projectName & ".xlsm").VBProject.name = project.projectName
             'call function who activate references
-            VtkActivateReferences (project.projectName)
+            VtkActivateReferences (project.projectName & ".xlsm")
             'initialize confsheet with delivery workbook name and path
 '            Workbooks(project.projectName & ".xlsm").Sheets(vtkConfSheet).Range(vtkModuleDeliveryRange & vtkFirstLine - 2) = Workbooks(name & "_Delivery" & ".xlsm").FullNameURLEncoded
 '            Workbooks(project.projectName & ".xlsm").Sheets(vtkConfSheet).Range(vtkModuleDeliveryRange & vtkFirstLine - 3) = Workbooks(name & "_Delivery" & ".xlsm").name
             'activate dev workbook
-            Workbooks(project.projectDEVName).Activate
+            Workbooks(project.projectDEVName & ".xlsm").Activate
             '
 '            RetVtkExportAll = vtkExportAll(ThisWorkbook.name)
 '            RetValImportTestConf = vtkImportTestConfig()

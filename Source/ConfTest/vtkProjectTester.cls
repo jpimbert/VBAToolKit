@@ -56,7 +56,7 @@ End Sub
 
 Public Sub TestProjectRelativePath()
 '       Verify the project path
-    mAssert.Equals project.projectStandardRelativePath, "Project\" & "TestProject.xlsm", "The project development standard path"
+    mAssert.Equals project.projectStandardRelativePath, "Delivery\" & "TestProject.xlsm", "The project development standard path"
 End Sub
 
 Private Function ITest_Suite() As TestSuite
@@ -64,6 +64,7 @@ Private Function ITest_Suite() As TestSuite
     ITest_Suite.AddTest ITest_Manager.ClassName, "TestProjectNameForDevelopment"
     ITest_Suite.AddTest ITest_Manager.ClassName, "TestProjectNameForDevelopmentWithNullProjectName"
     ITest_Suite.AddTest ITest_Manager.ClassName, "TestProjectDevelopmentRelativePath"
+    ITest_Suite.AddTest ITest_Manager.ClassName, "TestProjectRelativePath"
 End Function
 
 Private Sub ITestCase_RunTest()
@@ -71,6 +72,7 @@ Private Sub ITestCase_RunTest()
         Case "TestProjectNameForDevelopment": TestProjectNameForDevelopment
         Case "TestProjectNameForDevelopmentWithNullProjectName": TestProjectNameForDevelopmentWithNullProjectName
         Case "TestProjectDevelopmentRelativePath": TestProjectDevelopmentRelativePath
+        Case "TestProjectRelativePath": TestProjectRelativePath
         Case Else: mAssert.Should False, "Invalid test name: " & mManager.methodName
     End Select
 End Sub
