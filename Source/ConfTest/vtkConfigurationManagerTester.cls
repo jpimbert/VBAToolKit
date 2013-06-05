@@ -266,6 +266,14 @@ Public Sub TestAddExistantModuleToExistingProject()
     mAssert.Equals existingConfManager.moduleCount, 5, "There must be five modules, no change, in the existing project"
 End Sub
 
+Public Sub TestAddModuleWithExistingStringToExistingProject()
+'       Verify the capability to add a new module whose name is included in existing module in an existing project
+    Dim n As Integer
+    ' set new modules
+    mAssert.Equals existingConfManager.addModule(module:="Module"), 6, "Number for the new module"
+    mAssert.Equals existingConfManager.moduleCount, 6, "There must be six modules, one more module, in the existing project"
+End Sub
+
 Public Sub TestGetModulePathWithNumberFromExistingProject()
 '       Verify the capability to get the module path by number
     mAssert.Equals existingConfManager.getModulePathWithNumber(numModule:=0, numConfiguration:=2), "", "Inexistant module path number 0,2"

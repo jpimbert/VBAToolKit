@@ -166,7 +166,7 @@ Public Function getConfigurationNumber(configuration As String) As Integer
     On Error Resume Next
     Set r = configurationSheet.Rows(1)      ' Select first column of the sheet
     Set r = r.Offset(0, nbTitleColumns)     ' Forget the first column
-    Set r = r.Find(what:=configuration, SearchOrder:=xlByRows)
+    Set r = r.Find(what:=configuration, SearchOrder:=xlByRows, LookAt:=xlWhole)
     On Error GoTo 0
     If r Is Nothing Then
         getConfigurationNumber = 0
@@ -275,7 +275,7 @@ Public Function getModuleNumber(module As String) As Integer
     On Error Resume Next
     Set r = configurationSheet.Columns(1)   ' Select first column of the sheet
     Set r = r.Offset(nbTitleRows, 0)                  ' Forget the two first rows
-    Set r = r.Find(what:=module, SearchOrder:=xlByColumns)
+    Set r = r.Find(what:=module, SearchOrder:=xlByColumns, LookAt:=xlWhole)
     On Error GoTo 0
     If r Is Nothing Then
         getModuleNumber = 0
