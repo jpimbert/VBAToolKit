@@ -31,7 +31,7 @@ Option Explicit
 
 Private m_workbookName As String
 Private m_configurationSheet As Worksheet
-Private Const sheetName As String = "vtkConfigurations"
+Private Const sheetname As String = "vtkConfigurations"
 Private Const currentVersion As String = "vtkConfigurations v1.0"
 Private Const nbTitleColumns As Integer = 1
 Private Const nbTitleRows As Integer = 2
@@ -72,11 +72,11 @@ End Property
 Private Sub setConfigurationSheet()
     Dim ws As Worksheet
     On Error Resume Next
-    Set ws = Workbooks(workbookName).Worksheets(sheetName)
+    Set ws = Workbooks(workbookName).Worksheets(sheetname)
     On Error GoTo 0
     If ws Is Nothing Then        ' If the Configuration doesn't exist, create one
         Set ws = Workbooks(workbookName).Worksheets.Add(Type:=xlWorksheet)
-        ws.name = sheetName
+        ws.name = sheetname
         '   Initialize the configuration sheet
         initializeConfigurationSheet ws
         End If
@@ -202,9 +202,9 @@ End Function
 '               - does nothing if the configuration is inexistant
 '---------------------------------------------------------------------------------------
 '
-Public Sub setConfigurationPathWithNumber(n As Integer, path As String)
+Public Sub setConfigurationPathWithNumber(n As Integer, Path As String)
     If n >= 1 And n <= configurationCount Then
-        configurationSheet.Cells(2, n + nbTitleColumns) = path
+        configurationSheet.Cells(2, n + nbTitleColumns) = Path
     End If
 End Sub
 
@@ -227,8 +227,8 @@ End Function
 ' Purpose   : change the path of a configuration given its name
 '---------------------------------------------------------------------------------------
 '
-Public Sub setConfigurationPath(configuration As String, path As String)
-    setConfigurationPathWithNumber n:=getConfigurationNumber(configuration), path:=path
+Public Sub setConfigurationPath(configuration As String, Path As String)
+    setConfigurationPathWithNumber n:=getConfigurationNumber(configuration), Path:=Path
 End Sub
 
 '---------------------------------------------------------------------------------------
@@ -251,7 +251,7 @@ End Property
 '               - return "" if the module is inexistant
 '---------------------------------------------------------------------------------------
 '
-Public Function module(n As Integer) As String
+Public Function Module(n As Integer) As String
     Dim sResult As String
     sResult = ""
     If n >= 1 And n <= moduleCount Then
@@ -259,7 +259,7 @@ Public Function module(n As Integer) As String
        Else
         sResult = ""
     End If
-    module = sResult
+    Module = sResult
 End Function
 
 '---------------------------------------------------------------------------------------
@@ -270,12 +270,12 @@ End Function
 '               - return 0 of the name is inexistant
 '---------------------------------------------------------------------------------------
 '
-Public Function getModuleNumber(module As String) As Integer
+Public Function getModuleNumber(Module As String) As Integer
     Dim r As Range
     On Error Resume Next
     Set r = configurationSheet.Columns(1)   ' Select first column of the sheet
     Set r = r.Offset(nbTitleRows, 0)                  ' Forget the two first rows
-    Set r = r.Find(what:=module, SearchOrder:=xlByColumns)
+    Set r = r.Find(what:=Module, SearchOrder:=xlByColumns, lookat:=xlWhole)
     On Error GoTo 0
     If r Is Nothing Then
         getModuleNumber = 0
@@ -293,12 +293,12 @@ End Function
 '               - if the module is already existant, return minus the number of the existant module
 '---------------------------------------------------------------------------------------
 '
-Public Function addModule(module As String) As Integer
+Public Function addModule(Module As String) As Integer
     Dim n As Integer
-    n = getModuleNumber(module)
+    n = getModuleNumber(Module)
     If n = 0 Then   ' n = 0 means non-existant module
         n = moduleCount + 1                                     ' Set module number
-        configurationSheet.Cells(n + nbTitleRows, 1) = module   ' Write module name
+        configurationSheet.Cells(n + nbTitleRows, 1) = Module   ' Write module name
         Dim i As Integer
         For i = 1 To configurationCount                         ' For each configuration
             configurationSheet.Cells(n + nbTitleRows, i + nbTitleColumns) = "-"     ' Set Default path as not initialized
@@ -337,13 +337,13 @@ End Function
 '               - if the path given is "", it is replaced by "-" in the configuration sheet cell
 '---------------------------------------------------------------------------------------
 '
-Public Sub setModulePathWithNumber(path As String, numModule As Integer, numConfiguration As Integer)
+Public Sub setModulePathWithNumber(Path As String, numModule As Integer, numConfiguration As Integer)
     Dim s As String
     If numModule >= 1 And numModule <= moduleCount And numConfiguration >= 1 And numConfiguration <= configurationCount Then
-        If path = "" Then
+        If Path = "" Then
             s = "-"
            Else
-            s = path
+            s = Path
         End If
         configurationSheet.Cells(numModule + nbTitleRows, numConfiguration + nbTitleColumns) = s
     End If
