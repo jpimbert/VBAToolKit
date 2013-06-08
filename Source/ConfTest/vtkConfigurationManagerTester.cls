@@ -26,20 +26,18 @@ Private Const existingProjectName As String = "ExistingProject"
 
 Private Sub SaveThenReOpenNewWorkbook()
 ' Utility Function for saving then re-open the new workbook and re-initialize the configuration managers
-    If newWorkbook.path = "" Then
-        newWorkbook.Close SaveChanges:=True, Filename:=savedNewWorkbookPath
-       Else
-        newWorkbook.Close SaveChanges:=True
-    End If
+    Dim savedNewWorkbookPath As String
+    savedNewWorkbookPath = newWorkbook.FullName
+'    If newWorkbook.path = "" Then
+'        newWorkbook.Close SaveChanges:=True, Filename:=savedNewWorkbookPath
+'       Else
+'        newWorkbook.Close SaveChanges:=True
+'    End If
+    newWorkbook.Close SaveChanges:=True
     vtkResetConfigurationManagers           ' reset all configuration managers
     Set newWorkbook = Workbooks.Open(Filename:=savedNewWorkbookPath)
-    Set newConfManager = vtkConfigurationManagerForWorkbook("TestFile.xlsx")
+    Set newConfManager = vtkConfigurationManagerForProject("NewProject")
 End Sub
-
-Private Function savedNewWorkbookPath() As String
-' Utility Function giving the complete path of Test Workbook
-    savedNewWorkbookPath = vtkPathToTestFolder & "\" & "TestFile.xlsx"
-End Function
 
 Private Sub Class_Initialize()
     Set mManager = New TestCaseManager
@@ -55,23 +53,20 @@ End Property
 
 Private Sub ITestCase_SetUp(Assert As IAssert)
     Set mAssert = Assert
-    Set newWorkbook = vtkCreateExcelWorkbook    ' create an Excel project for tests
+    Set newWorkbook = vtkCreateExcelWorkbookForTestWithProjectName("NewProject")    ' create an Excel project for tests
     newWorkbookName = newWorkbook.name
-    newProjectName = newWorkbookName
-    newWorkbook.VBProject.name = newProjectName
-    Set newConfManager = vtkConfigurationManagerForWorkbook(newWorkbookName)
-    FileCopy Source:=vtkPathToTemplateFolder & "\" & existingWorkbookName, Destination:=vtkPathToTestFolder & "\" & existingWorkbookName
-    Set existingWorkbook = Workbooks.Open(Filename:=vtkPathToTestFolder & "\" & existingWorkbookName)
-    Set existingConfManager = vtkConfigurationManagerForWorkbook(existingWorkbookName)
+    newProjectName = newWorkbook.VBProject.name
+    Set newConfManager = vtkConfigurationManagerForProject(newProjectName)
+    Dim source As String, destination As String
+    FileCopy source:=vtkPathToTemplateFolder & "\" & existingWorkbookName, destination:=vtkPathToTestFolder & "\" & existingProjectName & "_DEV.xlsm"
+    Set existingWorkbook = Workbooks.Open(Filename:=vtkPathToTestFolder & "\" & existingProjectName & "_DEV.xlsm")
+    Set existingConfManager = vtkConfigurationManagerForProject(existingProjectName)
 End Sub
 
 Private Sub ITestCase_TearDown()
-    newWorkbook.Close SaveChanges:=False      ' close the new Excel project
-    existingWorkbook.Close SaveChanges:=False ' close the existing Excel project
+    vtkCloseAndKillWorkbook wb:=newWorkbook     ' close the new Excel project
+    vtkCloseAndKillWorkbook wb:=existingWorkbook ' close the existing Excel project
     vtkResetConfigurationManagers             ' reset all configuration managers
-    On Error Resume Next
-    Kill PathName:=savedNewWorkbookPath       ' Delete Test Workbook if it exists
-    On Error GoTo 0
 End Sub
 
 Public Sub TestConfigurationSheetCreationForNewProject()
@@ -101,9 +96,9 @@ Public Sub TestConfigurationSheetFormatForNewProjet()
     mAssert.Equals ws.Range("A1"), "vtkConfigurations v1.0", "Expected identification of the configuration sheet"
     mAssert.Equals ws.Range("A2"), "Module Name", "Expected Title for Modules column"
     mAssert.Equals ws.Range("B1"), newProjectName, "Expected Title for main project column"
-    mAssert.Equals ws.Range("B2"), "Delivery\" & newWorkbookName & ".xlsm", "Expected related Path for new main workbook"
+    mAssert.Equals ws.Range("B2"), "Delivery\" & newProjectName & ".xlsm", "Expected related Path for new main workbook"
     mAssert.Equals ws.Range("C1"), newProjectName & "_DEV", "Expected Title for development project column"
-    mAssert.Equals ws.Range("C2"), "Project\" & newWorkbookName & "_DEV.xlsm", "Expected related Path for new development workbook"
+    mAssert.Equals ws.Range("C2"), "Project\" & newWorkbookName, "Expected related Path for new development workbook"
 End Sub
 
 Public Sub TestConfigurationSheetFormatForExistingProjet()
@@ -343,6 +338,7 @@ Private Function ITest_Suite() As TestSuite
     ITest_Suite.AddTest ITest_Manager.ClassName, "TestGetModuleNumbersFromExistingProject"
     ITest_Suite.AddTest ITest_Manager.ClassName, "TestAddNonExistantModuleToSavedProject"
     ITest_Suite.AddTest ITest_Manager.ClassName, "TestAddExistantModuleToExistingProject"
+    ITest_Suite.AddTest ITest_Manager.ClassName, "TestAddModuleWithExistingStringToExistingProject"
     ITest_Suite.AddTest ITest_Manager.ClassName, "TestGetModulePathWithNumberFromExistingProject"
     ITest_Suite.AddTest ITest_Manager.ClassName, "TestGetModulePathWithNumberForNewModule"
     ITest_Suite.AddTest ITest_Manager.ClassName, "TestAddModulePathToSavedProject"
@@ -367,6 +363,7 @@ Private Sub ITestCase_RunTest()
         Case "TestGetModuleNumbersFromExistingProject": TestGetModuleNumbersFromExistingProject
         Case "TestAddNonExistantModuleToSavedProject": TestAddNonExistantModuleToSavedProject
         Case "TestAddExistantModuleToExistingProject": TestAddExistantModuleToExistingProject
+        Case "TestAddModuleWithExistingStringToExistingProject": TestAddModuleWithExistingStringToExistingProject
         Case "TestGetModulePathWithNumberFromExistingProject": TestGetModulePathWithNumberFromExistingProject
         Case "TestGetModulePathWithNumberForNewModule": TestGetModulePathWithNumberForNewModule
         Case "TestAddModulePathToSavedProject": TestAddModulePathToSavedProject

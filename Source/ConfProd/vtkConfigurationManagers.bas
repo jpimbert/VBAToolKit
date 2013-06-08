@@ -7,8 +7,8 @@ Option Explicit
 ' Purpose   : Manage the configuration managers (class vtkConfigurationManager) for open projects
 '
 ' Usage:
-'   - Each instance of Configuration Manager is attached to an Excel Workbook
-'       - the method vtkConfigurationManagerForWorkbook give the instance attached to a workbook, or create it
+'   - Each instance of Configuration Manager is attached to the DEV Excel Workbook of a project
+'       - the method vtkConfigurationManagerForProject give the instance attached to a workbook, or create it
 '
 '---------------------------------------------------------------------------------------
 
@@ -16,15 +16,15 @@ Option Explicit
 Private configurationManagers As Collection
 
 '---------------------------------------------------------------------------------------
-' Procedure : vtkConfigurationManagerForWorkbook
+' Procedure : vtkConfigurationManagerForProject
 ' Author    : Jean-Pierre Imbert
 ' Date      : 25/05/2013
-' Purpose   : Return the configuration manager attached to an Excel file given its name
+' Purpose   : Return the configuration manager attached to the DEV Excel file given its project name
 '               - if the configuration doesn't exist, it is created
 '               - if the configurationManagers collection doesn't exist, it is created
 '---------------------------------------------------------------------------------------
 '
-Public Function vtkConfigurationManagerForWorkbook(workbookName As String) As vtkConfigurationManager
+Public Function vtkConfigurationManagerForProject(workbookName As String) As vtkConfigurationManager
     ' Create the collection if it doesn't exist
     If configurationManagers Is Nothing Then
         Set configurationManagers = New Collection
@@ -35,12 +35,12 @@ Public Function vtkConfigurationManagerForWorkbook(workbookName As String) As vt
     Set cm = configurationManagers(workbookName)
     If Err <> 0 Then
         Set cm = New vtkConfigurationManager
-        cm.workbookName = workbookName
+        cm.projectName = workbookName
         configurationManagers.Add Item:=cm, Key:=workbookName
         End If
     On Error GoTo 0
     ' return the configuration manager
-    Set vtkConfigurationManagerForWorkbook = cm
+    Set vtkConfigurationManagerForProject = cm
 End Function
 
 '---------------------------------------------------------------------------------------

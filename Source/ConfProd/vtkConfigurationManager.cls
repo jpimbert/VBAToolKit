@@ -18,8 +18,8 @@ Option Explicit
 '               - each configuration is a VBA project included in a specific Excel file whose path is relative to the VTK Project directory
 '
 ' Usage:
-'   - Each instance of Configuration Manager is attached to an Excel Worksheet (supposed to be a VTK project)
-'       - the method vtkConfigurationManagerForWorkbook of module vtkConfigurationManagers give the instance attached to a workbook, or create it
+'   - Each instance of Configuration Manager is attached to the DEV Excel Worksheet of a VTK project)
+'       - the method vtkConfigurationManagerForProject of module vtkConfigurationManagers give the instance attached to a project, or create it
 '   - a VTK project is implemented by a main Excel file containing a sheet named "vtkConfigurations"
 '       - if such a sheet doesn't exist, it is created
 '
@@ -29,7 +29,7 @@ Option Explicit
 '
 '---------------------------------------------------------------------------------------
 
-Private m_workbookName As String
+Private m_projectName As String             ' The configuration of a project is attached to the DEV Excel file
 Private m_configurationSheet As Worksheet
 Private Const sheetName As String = "vtkConfigurations"
 Private Const currentVersion As String = "vtkConfigurations v1.0"
@@ -42,20 +42,20 @@ End Sub
 
 
 '---------------------------------------------------------------------------------------
-' Property  : workbookName as String - Read/Write - Public
+' Property  : projectName as String - Read/Write - Public
 ' Author    : Jean-Pierre Imbert
 ' Date      : 25/05/2013
 ' Purpose   : name of the project attached to this configuration manager
 '               - when changed, the configurationWorkSheet private property is seset
 '---------------------------------------------------------------------------------------
 '
-Public Property Get workbookName() As String
-    workbookName = m_workbookName
+Public Property Get projectName() As String
+    projectName = m_projectName
 End Property
 
-Public Property Let workbookName(ByVal sworkbookName As String)
-    If m_workbookName <> sworkbookName Then
-        m_workbookName = sworkbookName
+Public Property Let projectName(ByVal sprojectName As String)
+    If m_projectName <> sprojectName Then
+        m_projectName = sprojectName
         setConfigurationSheet      ' Reset the configuration sheet when the attached project is changed
     End If
 End Property
@@ -72,10 +72,10 @@ End Property
 Private Sub setConfigurationSheet()
     Dim ws As Worksheet
     On Error Resume Next
-    Set ws = Workbooks(workbookName).Worksheets(sheetName)
+    Set ws = Workbooks(vtkProjectForName(projectName).workbookDEVName).Worksheets(sheetName)
     On Error GoTo 0
     If ws Is Nothing Then        ' If the Configuration doesn't exist, create one
-        Set ws = Workbooks(workbookName).Worksheets.Add(Type:=xlWorksheet)
+        Set ws = Workbooks(vtkProjectForName(projectName).workbookDEVName).Worksheets.Add(Type:=xlWorksheet)
         ws.name = sheetName
         '   Initialize the configuration sheet
         initializeConfigurationSheet ws
@@ -98,10 +98,10 @@ End Sub
 Private Sub initializeConfigurationSheet(ws As Worksheet)
     ws.Range("A1") = currentVersion
     ws.Range("A2") = "Module Name"
-    ws.Range("B1") = vtkProjectForName(workbookName).projectName
-    ws.Range("B2") = vtkProjectForName(workbookName).projectStandardRelativePath
-    ws.Range("C1") = vtkProjectForName(workbookName).projectDEVName
-    ws.Range("C2") = vtkProjectForName(workbookName).projectDEVStandardRelativePath
+    ws.Range("B1") = vtkProjectForName(projectName).projectName
+    ws.Range("B2") = vtkProjectForName(projectName).projectStandardRelativePath
+    ws.Range("C1") = vtkProjectForName(projectName).projectDEVName
+    ws.Range("C2") = vtkProjectForName(projectName).projectDEVStandardRelativePath
     
     ws.Columns("A:C").ColumnWidth = 22
     ws.Range("A1").Font.Size = 8

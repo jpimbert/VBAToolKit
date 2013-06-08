@@ -16,6 +16,7 @@ Private mAssert As IAssert
 
 Private wbForTest As Workbook       ' default WorkBook for test
 Private workbookName As String      ' default workbook Name for test
+Private Const projectName As String = "TestProject"     ' default project Name for test
 
 Private Sub Class_Initialize()
     Set mManager = New TestCaseManager
@@ -31,13 +32,14 @@ End Property
 
 Private Sub ITestCase_SetUp(Assert As IAssert)
     Set mAssert = Assert
-    Set wbForTest = vtkCreateExcelWorkbook    ' create the default Excel project for tests
+    Set wbForTest = vtkCreateExcelWorkbookForTestWithProjectName(projectName)   ' create the default Excel project for tests
     workbookName = wbForTest.name
 End Sub
 
 Private Sub ITestCase_TearDown()
-    wbForTest.Close SaveChanges:=False      ' close the default Excel project
-    vtkResetConfigurationManagers           ' reset all configuration managers
+    Dim name As String
+    vtkCloseAndKillWorkbook wb:=wbForTest
+    vtkResetConfigurationManagers               ' reset all configuration managers
 End Sub
 
 Public Sub TestUtilityFunctionCreateExcelProject()
@@ -47,24 +49,22 @@ End Sub
 
 Public Sub TestConfigurationManagerIsNotNull()
 '       Verify that the configuration Manager is not null
-    mAssert.Should Not vtkConfigurationManagerForWorkbook(workbookName) Is Nothing, "A configuartion manager must not be null"
+    mAssert.Should Not vtkConfigurationManagerForProject(projectName) Is Nothing, "A configuartion manager must not be null"
 End Sub
 
 Public Sub TestConfigurationManagersAreDifferentForTwoProjects()
 '       Verify that the configuration Managers for two project are different
     Dim secondWb As Workbook
-    Set secondWb = vtkCreateExcelWorkbook    ' create the default Excel project for tests
-    Dim secondWorkbookName As String
-    secondWorkbookName = secondWb.name
-    mAssert.Should Not vtkConfigurationManagerForWorkbook(workbookName) Is vtkConfigurationManagerForWorkbook(secondWorkbookName), "Two configuration managers must not be equal"
-    secondWb.Close SaveChanges:=False
+    Set secondWb = vtkCreateExcelWorkbookForTestWithProjectName("SecondTest")    ' create a second Excel project for test
+    mAssert.Should Not vtkConfigurationManagerForProject(projectName) Is vtkConfigurationManagerForProject("SecondTest"), "Two configuration managers must not be equal"
+    vtkCloseAndKillWorkbook wb:=secondWb
 End Sub
 
 Public Sub TestConfigurationManagerIsInvariant()
 '       Verify that the configuration Manager for a project is always the same
     Dim cm As vtkConfigurationManager
-    Set cm = vtkConfigurationManagerForWorkbook(workbookName)
-    mAssert.Should vtkConfigurationManagerForWorkbook(workbookName) Is cm, "The configuration manager for a project must be always the same"
+    Set cm = vtkConfigurationManagerForProject(projectName)
+    mAssert.Should vtkConfigurationManagerForProject(projectName) Is cm, "The configuration manager for a project must be always the same"
 End Sub
 
 Private Function ITest_Suite() As TestSuite

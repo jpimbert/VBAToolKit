@@ -8,6 +8,7 @@ Attribute VB_Creatable = False
 Attribute VB_PredeclaredId = False
 Attribute VB_Exposed = False
 Option Explicit
+
 Private m_projectName As String
 
 '---------------------------------------------------------------------------------------
@@ -18,7 +19,7 @@ Private m_projectName As String
 '---------------------------------------------------------------------------------------
 
 '
-'   Fonctions à imlémenter
+'   Fonctions à implémenter
 '
 ' - Trouver le fichier Excel ouvert qui contient ce nom de projet (et le mettre en cache)
 ' - Attacher les fonctions de chemin à cet objet
@@ -68,7 +69,7 @@ End Property
 '---------------------------------------------------------------------------------------
 '
 Public Property Get projectDEVStandardRelativePath() As String
-    projectDEVStandardRelativePath = "Project\" & projectDEVName & ".xlsm"
+    projectDEVStandardRelativePath = "Project\" & workbookDEVName
 End Property
 
 '---------------------------------------------------------------------------------------
@@ -79,6 +80,29 @@ End Property
 '---------------------------------------------------------------------------------------
 '
 Public Property Get projectStandardRelativePath() As String
-    projectStandardRelativePath = "Delivery\" & projectName & ".xlsm"
+    projectStandardRelativePath = "Delivery\" & workbookName
 End Property
+
+'---------------------------------------------------------------------------------------
+' Property  : workbookDEVName
+' Author    : Jean-Pierre Imbert
+' Date      : 05/06/2013
+' Purpose   :
+'---------------------------------------------------------------------------------------
+'
+Public Property Get workbookDEVName() As String
+    workbookDEVName = projectDEVName & ".xlsm"
+End Property
+
+'---------------------------------------------------------------------------------------
+' Property  : workbookName
+' Author    : Jean-Pierre Imbert
+' Date      : 05/06/2013
+' Purpose   :
+'---------------------------------------------------------------------------------------
+'
+Public Property Get workbookName() As String
+    workbookName = projectName & ".xlsm"
+End Property
+
 
