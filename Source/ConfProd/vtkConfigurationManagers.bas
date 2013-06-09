@@ -24,7 +24,7 @@ Private configurationManagers As Collection
 '               - if the configurationManagers collection doesn't exist, it is created
 '---------------------------------------------------------------------------------------
 '
-Public Function vtkConfigurationManagerForProject(workbookName As String) As vtkConfigurationManager
+Public Function vtkConfigurationManagerForProject(projectName As String) As vtkConfigurationManager
     ' Create the collection if it doesn't exist
     If configurationManagers Is Nothing Then
         Set configurationManagers = New Collection
@@ -32,11 +32,11 @@ Public Function vtkConfigurationManagerForProject(workbookName As String) As vtk
     ' search for the configuration manager in the collection
     Dim cm As vtkConfigurationManager
     On Error Resume Next
-    Set cm = configurationManagers(workbookName)
+    Set cm = configurationManagers(projectName)
     If Err <> 0 Then
         Set cm = New vtkConfigurationManager
-        cm.projectName = workbookName
-        configurationManagers.Add Item:=cm, Key:=workbookName
+        cm.projectName = projectName
+        configurationManagers.Add Item:=cm, Key:=projectName
         End If
     On Error GoTo 0
     ' return the configuration manager

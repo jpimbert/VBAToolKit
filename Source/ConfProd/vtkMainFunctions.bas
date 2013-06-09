@@ -1,4 +1,6 @@
 Attribute VB_Name = "vtkMainFunctions"
+Option Explicit
+
 '---------------------------------------------------------------------------------------
 ' Procedure : vtkCreateProject
 ' Author    : JPI-Conseil
@@ -51,24 +53,26 @@ Public Function vtkCreateProject(path As String, name As String, Optional displa
             'Save created project with xlsm extention
              Workbooks.Add.SaveAs (path & "\" & project.projectName & "\" & project.projectDEVStandardRelativePath), FileFormat:=(52) '52 is xlsm format
             'Rename Project
-            Workbooks(project.projectDEVName & ".xlsm").VBProject.name = project.projectDEVName
+            Workbooks(project.workbookDEVName).VBProject.name = project.projectDEVName
             'call function who activate references
-            VtkActivateReferences (project.projectDEVName & ".xlsm")
-            'initialize confsheet with dev workbook name and path
-'            Workbooks(project.projectDEVName & ".xlsm").Sheets(vtkConfSheet).Range(vtkModuleDevRange & vtkFirstLine - 2) = Workbooks(name & ".xlsm").FullNameURLEncoded
-'            Workbooks(project.projectDEVName & ".xlsm").Sheets(vtkConfSheet).Range(vtkModuleDevRange & vtkFirstLine - 3) = Workbooks(name & ".xlsm").name
+            VtkActivateReferences (project.workbookDEVName)
+            'initialize configuration Sheet with VBAUnit modules
+            vtkInitializeVbaUnitNamesAndPathes project:=project.projectName
+            ' Save Development Project Workbook
+            Workbooks(project.workbookDEVName).Save
             
             'Create delivery workbook
             Workbooks.Add.SaveAs (path & "\" & name & "\" & project.projectStandardRelativePath), FileFormat:=(52) '52 is xlsm format
             'Rename Project
-            Workbooks(project.projectName & ".xlsm").VBProject.name = project.projectName
+            Workbooks(project.workbookName).VBProject.name = project.projectName
             'call function who activate references
-            VtkActivateReferences (project.projectName & ".xlsm")
-            'initialize confsheet with delivery workbook name and path
-'            Workbooks(project.projectName & ".xlsm").Sheets(vtkConfSheet).Range(vtkModuleDeliveryRange & vtkFirstLine - 2) = Workbooks(name & "_Delivery" & ".xlsm").FullNameURLEncoded
-'            Workbooks(project.projectName & ".xlsm").Sheets(vtkConfSheet).Range(vtkModuleDeliveryRange & vtkFirstLine - 3) = Workbooks(name & "_Delivery" & ".xlsm").name
-            'activate dev workbook
-            Workbooks(project.projectDEVName & ".xlsm").Activate
+            VtkActivateReferences (project.workbookName)
+            ' A module must be added in the Excel File for the project parameters to be saved
+            Workbooks(project.workbookName).VBProject.VBComponents.Add ComponentType:=vbext_ct_StdModule
+            ' Save and Close Delivery Project WorkBook
+            Workbooks(project.workbookName).Close SaveChanges:=True
+            
+            Workbooks(project.workbookDEVName).Activate
             '
 '            RetVtkExportAll = vtkExportAll(ThisWorkbook.name)
 '            RetValImportTestConf = vtkImportTestConfig()
@@ -79,3 +83,50 @@ vtkCreateProject_Error:
     vtkCreateProject = Err.Number
 If displayError Then MsgBox "Error " & Err.Number & " (" & Err.Description & ") in procedure vtkCreateProject of Module MainFunctions"
 End Function
+
+'---------------------------------------------------------------------------------------
+' Procedure : vtkInitializeVbaUnitNamesAndPathes
+' Author    : Abdelfattah Lahbib
+' Date      : 09/05/2013
+' Purpose   : - Initialize DEV project ConfSheet with vbaunit module names and pathes
+'             - Return True if module names and paths are initialized without error
+'---------------------------------------------------------------------------------------
+'
+Public Function vtkInitializeVbaUnitNamesAndPathes(project As String) As Boolean
+    Dim tableofvbaunitname(17) As String
+        tableofvbaunitname(0) = "VbaUnitMain"
+        tableofvbaunitname(1) = "Assert"
+        tableofvbaunitname(2) = "AutoGen"
+        tableofvbaunitname(3) = "IAssert"
+        tableofvbaunitname(4) = "IResultUser"
+        tableofvbaunitname(5) = "IRunManager"
+        tableofvbaunitname(6) = "ITest"
+        tableofvbaunitname(7) = "ITestCase"
+        tableofvbaunitname(8) = "ITestManager"
+        tableofvbaunitname(9) = "RunManager"
+        tableofvbaunitname(10) = "TestCaseManager"
+        tableofvbaunitname(11) = "TestClassLister"
+        tableofvbaunitname(12) = "TesterTemplate"
+        tableofvbaunitname(13) = "TestFailure"
+        tableofvbaunitname(14) = "TestResult"
+        tableofvbaunitname(15) = "TestRunner"
+        tableofvbaunitname(16) = "TestSuite"
+        tableofvbaunitname(17) = "TestSuiteManager"
+    Dim i As Integer, cm As vtkConfigurationManager, ret As Boolean, nm As Integer, nc As Integer, ext As String
+    Set cm = vtkConfigurationManagerForProject(project)
+    nc = cm.getConfigurationNumber(vtkProjectForName(project).projectDEVName)
+    ret = (nc > 0)
+    For i = LBound(tableofvbaunitname) To UBound(tableofvbaunitname)
+        nm = cm.addModule(tableofvbaunitname(i))
+        ret = ret And (nm > 0)
+        If i <= 0 Then      ' It's a Standard Module
+            ext = ".bas"
+           Else
+            ext = ".cls"    ' It's a Class Module
+        End If
+        cm.setModulePathWithNumber path:="Source\VbaUnit\" & tableofvbaunitname(i) & ext, numModule:=nm, numConfiguration:=nc
+    Next i
+    vtkInitializeVbaUnitNamesAndPathes = ret
+End Function
+
+

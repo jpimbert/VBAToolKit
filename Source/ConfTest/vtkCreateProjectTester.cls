@@ -33,6 +33,7 @@ End Sub
 
 Private Sub ITestCase_TearDown()
 
+    vtkResetConfigurationManagers             ' reset all configuration managers
     'Make sure to be out of the folder to clean
     Dir (vtkTestPath)
     'to not display messagebox how ask to save project
@@ -55,6 +56,13 @@ Private Sub ITestCase_TearDown()
     RmDir vtkTestPath & "\" & vtkTestProjectName & "\Project"
     RmDir vtkTestPath & "\" & vtkTestProjectName
     Application.DisplayAlerts = True
+End Sub
+
+Private Sub OpenDeliveryProject()
+    Dim path As String
+    Dim fso As New FileSystemObject
+    path = fso.GetParentFolderName(ActiveWorkbook.path) & "\" & vtkConfigurationManagerForProject(vtkTestProjectName).getConfigurationPath(vtkTestProjectName)
+    Workbooks.Open Filename:=path
 End Sub
 
 Public Sub TestCreateProjectDoesNothingWhenPathDoesntExist()
@@ -170,7 +178,8 @@ Public Sub TestDelivProjectIsNamedcorrectly()
 'test that xlsm is correctly renamed
     Dim returnvalue As Long
     returnvalue = vtkCreateProject(path:=vtkTestPath, name:=vtkTestProjectName, displayError:=False)
-    mAssert.Should Workbooks(vtkTestProjectName & ".xlsm").VBProject.name = vtkTestProjectName, "the workbook name must be like " & vtkTestProjectName & "_DEV"
+    OpenDeliveryProject
+    mAssert.Equals Workbooks(vtkTestProjectName & ".xlsm").VBProject.name, vtkTestProjectName, "the workbook name must be like " & vtkTestProjectName & "_DEV"
 End Sub
 Public Sub TestReferencesOfDevWorkbookWasActivated()
  Dim returnvalue As Long
@@ -180,6 +189,7 @@ Public Sub TestReferencesOfDevWorkbookWasActivated()
 'this function will count extention number before executing function ,
 'and extentions number must be equal to(initial extention number + added extention number )
 returnvalue = vtkCreateProject(path:=vtkTestPath, name:=vtkTestProjectName, displayError:=False)
+    OpenDeliveryProject
  
     For i = 1 To Workbooks(vtkTestProjectName & "_DEV.xlsm").VBProject.References.Count
         If ((Workbooks(vtkTestProjectName & "_DEV.xlsm").VBProject.References(i).GUID) = "{420B2830-E718-11CF-893D-00A0C9054228}") Or (Workbooks(vtkTestProjectName & "_DEV.xlsm").VBProject.References(i).GUID = "{0002E157-0000-0000-C000-000000000046}") Then
@@ -196,7 +206,8 @@ Public Sub TestReferencesOfDeliveryWorkbookWasActivated()
 'this function will count extention number before executing function ,
 'and extentions number must be equal to(initial extention number + added extention number )
 returnvalue = vtkCreateProject(path:=vtkTestPath, name:=vtkTestProjectName, displayError:=False)
- 
+    OpenDeliveryProject
+    
     For i = 1 To Workbooks(vtkTestProjectName & ".xlsm").VBProject.References.Count
         If ((Workbooks(vtkTestProjectName & ".xlsm").VBProject.References(i).GUID) = "{420B2830-E718-11CF-893D-00A0C9054228}") Or (Workbooks(vtkTestProjectName & ".xlsm").VBProject.References(i).GUID = "{0002E157-0000-0000-C000-000000000046}") Then
         j = j + 1
