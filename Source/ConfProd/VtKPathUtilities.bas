@@ -12,6 +12,9 @@ Public Function vtkPathOfCurrentProject() As String
     Dim fso As New FileSystemObject
     vtkPathOfCurrentProject = fso.GetParentFolderName(ThisWorkbook.path)
 End Function
+Public Function testtest(projectName) As String
+  
+End Function
 
 '---------------------------------------------------------------------------------------
 ' Procedure : vtkPathToTestFolder
@@ -36,6 +39,18 @@ End Function
 Public Function vtkPathToSourceFolder() As String 'VBAToolKit\Source
 
    vtkPathToSourceFolder = vtkPathOfCurrentProject & "\Source"
+End Function
+
+'---------------------------------------------------------------------------------------
+' Procedure : vtkPathToTemplateFolder
+' Author    : Jean-Pierre Imbert
+' Date      : 25/05/2013
+' Purpose   : Return the path of the Template Folder of the current project
+'---------------------------------------------------------------------------------------
+'
+Public Function vtkPathToTemplateFolder() As String 'VBAToolKit\Source
+
+   vtkPathToTemplateFolder = vtkPathOfCurrentProject & "\Templates"
 End Function
 
 

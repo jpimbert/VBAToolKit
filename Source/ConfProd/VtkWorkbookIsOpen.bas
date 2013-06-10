@@ -1,4 +1,5 @@
 Attribute VB_Name = "VtkWorkbookIsOpen"
+
 Option Explicit
 
 
@@ -21,4 +22,5 @@ Err_function:
         VtkWorkbookIsOpenFunction = False
     End If
 End Function
+
 

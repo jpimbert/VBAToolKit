@@ -64,18 +64,17 @@ Public Function vtkCreateProject(path As String, name As String, Optional displa
             'Create delivery workbook
             Workbooks.Add.SaveAs (path & "\" & name & "\" & project.projectStandardRelativePath), FileFormat:=(52) '52 is xlsm format
             'Rename Project
-            Workbooks(project.workbookName).VBProject.name = project.projectName
+            Workbooks(project.workbookname).VBProject.name = project.projectName
             'call function who activate references
-            VtkActivateReferences (project.workbookName)
+            VtkActivateReferences (project.workbookname)
             ' A module must be added in the Excel File for the project parameters to be saved
-            Workbooks(project.workbookName).VBProject.VBComponents.Add ComponentType:=vbext_ct_StdModule
+            Workbooks(project.workbookname).VBProject.VBComponents.Add ComponentType:=vbext_ct_StdModule
             ' Save and Close Delivery Project WorkBook
-            Workbooks(project.workbookName).Close SaveChanges:=True
+            Workbooks(project.workbookname).Close SaveChanges:=True
             
             Workbooks(project.workbookDEVName).Activate
             '
-'            RetVtkExportAll = vtkExportAll(ThisWorkbook.name)
-'            RetValImportTestConf = vtkImportTestConfig()
+
     On Error GoTo 0
     vtkCreateProject = 0
     Exit Function
@@ -112,8 +111,12 @@ Public Function vtkInitializeVbaUnitNamesAndPathes(project As String) As Boolean
         tableofvbaunitname(15) = "TestRunner"
         tableofvbaunitname(16) = "TestSuite"
         tableofvbaunitname(17) = "TestSuiteManager"
-    Dim i As Integer, cm As vtkConfigurationManager, ret As Boolean, nm As Integer, nc As Integer, ext As String
+        
+    Dim i As Integer, cm As vtkConfigurationManager, proj As vtkProject, ret As Boolean, nm As Integer, nc As Integer, ext As String
+    
     Set cm = vtkConfigurationManagerForProject(project)
+    Set proj = vtkProjectForName(projectName:=project)
+    
     nc = cm.getConfigurationNumber(vtkProjectForName(project).projectDEVName)
     ret = (nc > 0)
     For i = LBound(tableofvbaunitname) To UBound(tableofvbaunitname)
@@ -125,6 +128,11 @@ Public Function vtkInitializeVbaUnitNamesAndPathes(project As String) As Boolean
             ext = ".cls"    ' It's a Class Module
         End If
         cm.setModulePathWithNumber path:="Source\VbaUnit\" & tableofvbaunitname(i) & ext, numModule:=nm, numConfiguration:=nc
+      
+        'export module from source workbook to the created project folder
+        Workbooks(ThisWorkbook.name).VBProject.VBComponents(tableofvbaunitname(i)).Export (proj.ProjectFullPath & "\Source\VbaUnit\" & tableofvbaunitname(i) & ext)
+        'import module from the new project folder to the new workbook
+        Workbooks(proj.projectDEVName).VBProject.VBComponents.Import (proj.ProjectFullPath & "\Source\VbaUnit\" & tableofvbaunitname(i) & ext)
     Next i
     vtkInitializeVbaUnitNamesAndPathes = ret
 End Function

@@ -80,7 +80,7 @@ End Property
 '---------------------------------------------------------------------------------------
 '
 Public Property Get projectStandardRelativePath() As String
-    projectStandardRelativePath = "Delivery\" & workbookName
+    projectStandardRelativePath = "Delivery\" & workbookname
 End Property
 
 '---------------------------------------------------------------------------------------
@@ -94,6 +94,7 @@ Public Property Get workbookDEVName() As String
     workbookDEVName = projectDEVName & ".xlsm"
 End Property
 
+
 '---------------------------------------------------------------------------------------
 ' Property  : workbookName
 ' Author    : Jean-Pierre Imbert
@@ -101,8 +102,18 @@ End Property
 ' Purpose   :
 '---------------------------------------------------------------------------------------
 '
-Public Property Get workbookName() As String
-    workbookName = projectName & ".xlsm"
+Public Property Get workbookname() As String
+    workbookname = projectName & ".xlsm"
 End Property
 
-
+'---------------------------------------------------------------------------------------
+' Procedure : DEVProjectPath
+' Author    : user
+' Date      : 09/06/2013
+' Purpose   :
+'---------------------------------------------------------------------------------------
+'
+Public Property Get ProjectFullPath() As String
+Dim fso As New FileSystemObject
+    ProjectFullPath = fso.GetParentFolderName(Workbooks(workbookDEVName()).path)
+End Property

@@ -30,7 +30,7 @@ Public Function IsClassModule(ComponentType As vbext_ComponentType) As Boolean
 End Function
 
 Public Function NewTestClass(TestClassName As String) As ITest
-    Dim test As ITest
+    Dim Test As ITest
     Set NewTestClass = SelectTestClass(TestClassName)
     If NewTestClass Is Nothing Then Exit Function
     NewTestClass.Manager.ClassName = TestClassName
@@ -38,12 +38,14 @@ End Function
 
 Public Function SelectTestClass(TestClassName As String) As ITest
     Select Case TestClassName
-        Case "fftAssertContentTester": Set SelectTestClass = New fftAssertContentTester
-        Case "fftEnvironmentForTestTester": Set SelectTestClass = New fftEnvironmentForTestTester
-        Case "fftMappingTester": Set SelectTestClass = New fftMappingTester
-        Case "fftSQLStrategyTester": Set SelectTestClass = New fftSQLStrategyTester
-        Case "fftSynchroWorkBookTester": Set SelectTestClass = New fftSynchroWorkBookTester
-        Case "fftTableSheetTester": Set SelectTestClass = New fftTableSheetTester
+        Case "vtkCreateProjectTester": Set SelectTestClass = New vtkCreateProjectTester
+        Case "VtkPathUtilitiesTester": Set SelectTestClass = New VtkPathUtilitiesTester
+        Case "VtkWorkbookIsOpenTester": Set SelectTestClass = New VtkWorkbookIsOpenTester
+        Case "vtkConfigurationManagerTester": Set SelectTestClass = New vtkConfigurationManagerTester
+        Case "vtkConfigurationManagersTester": Set SelectTestClass = New vtkConfigurationManagersTester
+        Case "vtkProjectsTester": Set SelectTestClass = New vtkProjectsTester
+        Case "vtkProjectTester": Set SelectTestClass = New vtkProjectTester
+        Case "vtkInitializeVbaUnitTester": Set SelectTestClass = New vtkInitializeVbaUnitTester
         Case Else:
     End Select
 End Function

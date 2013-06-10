@@ -15,7 +15,7 @@ Private mManager As TestCaseManager
 Private mAssert As IAssert
 
 Private wbForTest As Workbook       ' default WorkBook for test
-Private workbookName As String      ' default workbook Name for test
+Private workbookname As String      ' default workbook Name for test
 Private Const projectName As String = "TestProject"     ' default project Name for test
 
 Private Sub Class_Initialize()
@@ -33,7 +33,7 @@ End Property
 Private Sub ITestCase_SetUp(Assert As IAssert)
     Set mAssert = Assert
     Set wbForTest = vtkCreateExcelWorkbookForTestWithProjectName(projectName)   ' create the default Excel project for tests
-    workbookName = wbForTest.name
+    workbookname = wbForTest.name
 End Sub
 
 Private Sub ITestCase_TearDown()
@@ -44,7 +44,7 @@ End Sub
 
 Public Sub TestUtilityFunctionCreateExcelProject()
 '       Verify that the utility function createExcelProjectNamed correctly create a new Excel file with proper project name
-    mAssert.Equals wbForTest.name, workbookName, "Expected name for Excel project"
+    mAssert.Equals wbForTest.name, workbookname, "Expected name for Excel project"
 End Sub
 
 Public Sub TestConfigurationManagerIsNotNull()

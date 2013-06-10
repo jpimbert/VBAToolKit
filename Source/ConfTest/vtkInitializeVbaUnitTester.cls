@@ -91,12 +91,16 @@ Private Function ITest_Suite() As TestSuite
     Set ITest_Suite = New TestSuite
     ITest_Suite.AddTest ITest_Manager.ClassName, "TestAddVBAUnitInNewProject"
     ITest_Suite.AddTest ITest_Manager.ClassName, "TestPathOfModuleVBAUnitInNewProject"
+    ITest_Suite.AddTest ITest_Manager.ClassName, "TestPathOfModuleAssertInNewProject"
+    ITest_Suite.AddTest ITest_Manager.ClassName, "TestPathOfModuleIAssertInNewProject"
 End Function
 
 Private Sub ITestCase_RunTest()
     Select Case mManager.methodName
         Case "TestAddVBAUnitInNewProject": TestAddVBAUnitInNewProject
         Case "TestPathOfModuleVBAUnitInNewProject": TestPathOfModuleVBAUnitInNewProject
+        Case "TestPathOfModuleAssertInNewProject": TestPathOfModuleAssertInNewProject
+        Case "TestPathOfModuleIAssertInNewProject": TestPathOfModuleIAssertInNewProject
         Case Else: mAssert.Should False, "Invalid test name: " & mManager.methodName
     End Select
 End Sub

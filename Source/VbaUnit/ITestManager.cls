@@ -12,6 +12,6 @@ Option Explicit
 ' Name, Run, Count
 Public Property Let ClassName(RHS As String)
 Public Property Get ClassName() As String
-Public Function Run(test As ITest, Optional RunManager As IRunManager) As IRunManager
-Public Function CountTestCases(test As ITest) As Long
+Public Function Run(Test As ITest, Optional RunManager As IRunManager) As IRunManager
+Public Function CountTestCases(Test As ITest) As Long
 
