@@ -38,15 +38,15 @@ End Function
 
 Public Function SelectTestClass(TestClassName As String) As ITest
     Select Case TestClassName
-        Case "vtkCreateProjectTester": Set SelectTestClass = New vtkCreateProjectTester
-        Case "VtkPathUtilitiesTester": Set SelectTestClass = New VtkPathUtilitiesTester
-        Case "VtkWorkbookIsOpenTester": Set SelectTestClass = New VtkWorkbookIsOpenTester
-        Case "vtkConfigurationManagerTester": Set SelectTestClass = New vtkConfigurationManagerTester
-        Case "vtkConfigurationManagersTester": Set SelectTestClass = New vtkConfigurationManagersTester
         Case "vtkProjectsTester": Set SelectTestClass = New vtkProjectsTester
         Case "vtkProjectTester": Set SelectTestClass = New vtkProjectTester
-        Case "vtkInitializeVbaUnitTester": Set SelectTestClass = New vtkInitializeVbaUnitTester
         Case "vtkToolsBarsTester": Set SelectTestClass = New vtkToolsBarsTester
+        Case "VtkWorkbookIsOpenTester": Set SelectTestClass = New VtkWorkbookIsOpenTester
+        Case "vtkConfigurationManagersTester": Set SelectTestClass = New vtkConfigurationManagersTester
+        Case "vtkConfigurationManagerTester": Set SelectTestClass = New vtkConfigurationManagerTester
+        Case "vtkCreateProjectTester": Set SelectTestClass = New vtkCreateProjectTester
+        Case "vtkInitializeVbaUnitTester": Set SelectTestClass = New vtkInitializeVbaUnitTester
+        Case "VtkPathUtilitiesTester": Set SelectTestClass = New VtkPathUtilitiesTester
         Case Else:
     End Select
 End Function

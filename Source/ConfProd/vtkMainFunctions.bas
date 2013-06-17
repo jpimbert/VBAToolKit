@@ -132,7 +132,9 @@ Public Function vtkInitializeVbaUnitNamesAndPathes(project As String) As Boolean
         'export module from source workbook to the created project folder
         Workbooks(ThisWorkbook.name).VBProject.VBComponents(tableofvbaunitname(i)).Export (proj.ProjectFullPath & "\Source\VbaUnit\" & tableofvbaunitname(i) & ext)
         'import module from the new project folder to the new workbook
-        Workbooks(proj.projectDEVName).VBProject.VBComponents.Import (proj.ProjectFullPath & "\Source\VbaUnit\" & tableofvbaunitname(i) & ext)
+        Workbooks(proj.projectDEVName & ".xlsm").VBProject.VBComponents.Import (proj.ProjectFullPath & "\Source\VbaUnit\" & tableofvbaunitname(i) & ext)
+  Debug.Print ThisWorkbook.name
+  Debug.Print proj.projectDEVName
     Next i
     vtkInitializeVbaUnitNamesAndPathes = ret
 End Function
