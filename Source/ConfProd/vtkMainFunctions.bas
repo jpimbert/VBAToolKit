@@ -13,6 +13,7 @@ Option Explicit
 '               - Create Xlsm Dev and Delivery project
 '               - Rename 2 Project
 '               - Activate missing References
+'               - Initialize local repository for active project
 ' Return    : Long error number
 '
 '   L'extension "Microsoft Visual Basic For Application Extensibility" doit être activée
@@ -73,8 +74,8 @@ Public Function vtkCreateProject(path As String, name As String, Optional displa
             Workbooks(project.workbookname).Close SaveChanges:=True
             
             Workbooks(project.workbookDEVName).Activate
-            '
-
+            Dim GitRetval As String
+            GitRetval = vtkInitializeGit()
     On Error GoTo 0
     vtkCreateProject = 0
     Exit Function
@@ -115,6 +116,7 @@ Public Function vtkInitializeVbaUnitNamesAndPathes(project As String) As Boolean
     Dim i As Integer, cm As vtkConfigurationManager, proj As vtkProject, ret As Boolean, nm As Integer, nc As Integer, ext As String
     
     Set cm = vtkConfigurationManagerForProject(project)
+    
     Set proj = vtkProjectForName(projectName:=project)
     
     nc = cm.getConfigurationNumber(vtkProjectForName(project).projectDEVName)
@@ -133,10 +135,85 @@ Public Function vtkInitializeVbaUnitNamesAndPathes(project As String) As Boolean
         Workbooks(ThisWorkbook.name).VBProject.VBComponents(tableofvbaunitname(i)).Export (proj.ProjectFullPath & "\Source\VbaUnit\" & tableofvbaunitname(i) & ext)
         'import module from the new project folder to the new workbook
         Workbooks(proj.projectDEVName & ".xlsm").VBProject.VBComponents.Import (proj.ProjectFullPath & "\Source\VbaUnit\" & tableofvbaunitname(i) & ext)
-  Debug.Print ThisWorkbook.name
-  Debug.Print proj.projectDEVName
     Next i
     vtkInitializeVbaUnitNamesAndPathes = ret
 End Function
 
+'---------------------------------------------------------------------------------------
+' Procedure : vtkAddModule
+' Author    : user
+' Date      : 20/06/2013
+' Purpose   : -add a new module to a workbook
+'             - take modulename and extention on parameter ( form ,std module or classe)
+'---------------------------------------------------------------------------------------
+'
+Public Function VtkAddModule(moduleName As String, ext As Integer) As String
+    
+    Dim cm As vtkConfigurationManager
+    Dim RetValCreateStandarMod As String
+    Dim proj As vtkProject
+    Dim nm As Integer
+    Dim nc As Integer
+    Dim ret As Boolean
+    Dim fso As New FileSystemObject
+    Dim ProjectPath As String
+    
+    Set proj = vtkProjectForName(projectName:=ActiveWorkbook.VBProject.name)
+    Set cm = vtkConfigurationManagerForProject("test")
+    
+    nm = cm.addModule(moduleName)
+    nc = cm.getConfigurationNumber(proj.projectName)
+    ProjectPath = fso.GetParentFolderName(ActiveWorkbook.path)
+
+    ret = (nc > 0)
+      
+      Select Case ext
+        
+        Case 1 '1module : export to confprod
+          
+          cm.setModulePathWithNumber path:="\Source\ConfProd\" & moduleName & ".BAS", numModule:=nm, numConfiguration:=nc
+          CreateAndExportNewModule ActiveWorkbook, 1, moduleName, ProjectPath & "\Source\ConfProd\" & moduleName & ".BAS"
+       Case 2 '2 class module : export to ConfTest or ConfProd
+         
+            If Right(moduleName, 6) Like "Tester" Then ' verify if modulename end is like Tester
+     '
+                ' This Document is a test module export to confTest
+          cm.setModulePathWithNumber path:="\Source\ConfTest\" & moduleName & ".CLS", numModule:=nm, numConfiguration:=nc
+          CreateAndExportNewModule ActiveWorkbook, 2, moduleName, ProjectPath & "\Source\ConfTest\" & moduleName & ".CLS"
+               Else
+    
+                'the document is a classmodule export to confprod
+         cm.setModulePathWithNumber path:="\Source\ConfProd\" & moduleName & ".CLS", numModule:=nm, numConfiguration:=nc
+         CreateAndExportNewModule ActiveWorkbook, 2, moduleName, ProjectPath & "\Source\ConfProd\" & moduleName & ".CLS"
+            End If
+        Case 3 '3 forms
+        
+       '         'the document is a classmodule export to confprod
+
+        cm.setModulePathWithNumber path:="\Source\ConfProd\" & moduleName & ".FRM", numModule:=nm, numConfiguration:=nc
+        CreateAndExportNewModule ActiveWorkbook, 3, moduleName, ProjectPath & "\Source\ConfProd\" & moduleName & ".FRM"
+   '    Exit Function
+          
+       End Select
+
+     
+End Function
+
+'---------------------------------------------------------------------------------------
+' Procedure : CreateAndImportModule
+' Author    : user
+' Date      : 21/06/2013
+' Purpose   : - create and export modules
+'---------------------------------------------------------------------------------------
+'
+
+Sub CreateAndExportNewModule(ByVal wb As Workbook, _
+    ByVal ModuleTypeIndex As Integer, ByVal NewModuleName As String, ByVal path)
+ 
+    Dim VBC As VBComponent
+    Set VBC = Nothing
+    Set VBC = wb.VBProject.VBComponents.Add(ModuleTypeIndex)
+    VBC.name = NewModuleName
+    VBC.Export path
+End Sub
 
