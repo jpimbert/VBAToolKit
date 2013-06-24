@@ -8,39 +8,7 @@ Attribute VB_Name = "vtkGitHubFunctions"
 '---------------------------------------------------------------------------------------
 
 Option Explicit
-Public Function vtkGitFolderSetter() As String
-    
-    Dim retval As Variant
-    Dim fldname As String
-    Dim fd As FileDialog, fl As Variant
-    'path picker
-    Set fd = Application.FileDialog(msoFileDialogFolderPicker)
-        With fd
-            .AllowMultiSelect = False
-            .Title = "Please select ..\Git\cmd folder"
-            .Show
-        End With
-    
-        For Each fl In fd.SelectedItems
-        fldname = fl
-        Next
-     'if user will choose a bad or an empty path function will return null
-    vtkGitFolderSetter = ""
-    
-    If InStr(UCase(fldname), UCase("Git\cmd")) Then
-        
-        vtkGitFolderSetter = fldname
-        MsgBox "ok", vbInformation
-        
-    ElseIf fldname = "" Then
-        
-        MsgBox "Folder Not selected ,try to set envirenement var manually ,  ", vbInformation, "Note:"
-    
-    Else
-        MsgBox "wrong folder is selected ", vbInformation, "Note:"
-        retval = vtkGitFolderSetter()
-   End If
-End Function
+
 
 
 '---------------------------------------------------------------------------------------
@@ -62,17 +30,10 @@ Dim retval As String
    If (InStr(UCase(EnvString), UCase("Git\cmd"))) Then
        'var already defined  return ""
        vtkVerifyEnvirGitVar = ""
-   Else
-    ' var don't exist , allow to user to try to define it
-    retval = vtkGitFolderSetter()
-       'treat user choice :
-        If retval <> "" Then
-           'user was define the good location
-           vtkVerifyEnvirGitVar = retval
-        Else
-           'user was define a false location
-           vtkVerifyEnvirGitVar = "problem"
-        End If
+  Else
+      'var was not defined , return problem
+       vtkVerifyEnvirGitVar = "problem"
+       MsgBox " Local Repository will not be initialized , try to set Git envirenement Variable see more on https://github.com/jpimbert/VBAToolKit/wiki/VbaToolKit-SetUp ", vbInformation
    End If
 End Function
 
@@ -86,37 +47,45 @@ End Function
 '            - HKEY_CLASSES_ROOT\github-windows\shell\open\command
 '---------------------------------------------------------------------------------------
 '
-Public Function vtkInitializeGit(project As String) As String
-    Dim proje As vtkProject
-    Set proje = vtkProjectForName(projectName:=project)
-    
-    Dim InitFileName As String
-    
-    Dim vtkGitFiles As String
+Public Function vtkInitializeGit() As String
+       
+    Dim GitLogFileName As String
+    Dim GitLogDirPath As String
     Dim FileInitPath As String
-    Dim RetVal1 As Variant
-    Dim retval As String
-    Dim pathactiveproj As String
+    Dim RetShell1 As String
+    Dim RetShell2 As String
+    Dim RetFnVerifyEnvVar As String
+    Dim ActiveProjPath As String
+    Dim RetShellMessage As String
+    Dim FullFileLogPath As String
+    Dim fso As New FileSystemObject
  
- PathActiveProj = proje.
+    'function how will verify envirenemnt var
+    RetFnVerifyEnvVar = vtkVerifyEnvirGitVar()
  
- 'function how will verify envirenemnt var
-    retval = vtkVerifyEnvirGitVar()
- 
- If retval <> "problem" Then
- 
-  vtkGitFiles = fso.GetParentFolderName(ActiveWorkbook.path) & "\GitLog"
-  InitFileName = "\logGitInitialize.log"
-  'create log file
-   FileInitPath = vtkcreatefilegit(InitFileName, vtkGitFiles)
+ If RetFnVerifyEnvVar <> "problem" Then
+    'make paths
+    ActiveProjPath = fso.GetParentFolderName(ActiveWorkbook.path)
+    GitLogDirPath = ActiveProjPath & "\GitLog"
+    GitLogFileName = "\logGitInitialize.log"
+  
+    'call function how create log file
+    FullFileLogPath = vtkcreatefilegit(GitLogFileName, GitLogDirPath)
+    'execute shell commands
+    RetShell1 = Shell("cmd.exe /k cd " & ActiveProjPath & " & git init   >" & GitLogDirPath & GitLogFileName & " ", vbHide)
+    'make a break to execute shell commands
+    Application.Wait (Now + TimeValue("0:00:01"))
+    'kill related processus
+    RetShell2 = Shell("cmd.exe /k  TASKKILL /IM cmd.exe")
+    'make a break to execute shell commands
+    Application.Wait (Now + TimeValue("0:00:01"))
+    'read log file
+    RetShellMessage = VtkFileReader(GitLogFileName, GitLogDirPath)
 
-  RetVal1 = Shell("cmd.exe /k cd " & pathactiveproj & " && path =" & retval & ";%path% & git init   >" & FileInitPath & " ", vbNormalFocus)
- 
- 
- vtkInitializeGit = VtkFileReader(InitFileName, vtkGitFiles)
- 
  End If
+ 
 End Function
+
 
 '---------------------------------------------------------------------------------------
 ' Procedure : vtkStatusGit
@@ -130,17 +99,33 @@ End Function
 '
 Public Function vtkStatusGit() As String
   
-  Dim StatusFileName As String
-  StatusFileName = "\logStatus.txt"
+  Dim GitStatusFileName As String
 
- PathOfFileStatus = vtkcreatefilegit(StatusFileName, vtkprojectpathtestgit)
-
- RetVal2 = Shell("cmd.exe /k cd " & vtkprojectpathtestgit & " & git status   >" & PathOfFileStatus & " ", vbHide)
-
-'Debug.Print strresult
- vtkStatusGit = VtkFileReader(StatusFileName, vtkprojectpathtestgit)
+  Dim PathOfGitStatusFile As String
+  Dim ActiveProjPath As String
+  Dim GitLogFilePath As String
+  Dim GitDir As String
+  Dim RetShell As String
+  Dim RetShell2 As String
+  Dim fso As New FileSystemObject
+  
+  'make paths
+  ActiveProjPath = fso.GetParentFolderName(ActiveWorkbook.path)
+  GitStatusFileName = "\logStatus.log"
+  GitDir = ActiveProjPath & "\GitLog"
+  'create status log file
+  PathOfGitStatusFile = vtkcreatefilegit(GitStatusFileName, GitDir)
+  'execute shell command
+  RetShell = Shell("cmd.exe /k cd " & ActiveProjPath & " & git status   >" & GitDir & GitStatusFileName & " ", vbHide)
+  'make a break to execute shell commands
+  Application.Wait (Now + TimeValue("0:00:01"))
+  'kill related processus
+  RetShell2 = Shell("cmd.exe /k  TASKKILL /IM cmd.exe")
+  'make a break to execute shell commands
+  Application.Wait (Now + TimeValue("0:00:01"))
+  'read log file , and return it in function name
+  vtkStatusGit = VtkFileReader(GitStatusFileName, GitDir)
 End Function
-
 
 '---------------------------------------------------------------------------------------
 ' Procedure : vtkcreatefilegit
@@ -150,18 +135,17 @@ End Function
 '             - tested
 '---------------------------------------------------------------------------------------
 '
-Public Function vtkcreatefilegit(FileName As String, ProjectGitPath As String) As String
+Public Function vtkcreatefilegit(FileName As String, GitFolderPath As String) As String
 
  Dim fso As New FileSystemObject
  Dim FullFilePath As String
-
-  FullFilePath = ProjectGitPath & FileName
-
+  'make full file path
+  FullFilePath = GitFolderPath & FileName
+  'if log file don't exist we will create it
   If fso.FileExists(FullFilePath) = False Then
         fso.CreateTextFile (FullFilePath)
   End If
-    
-    
+  'return full created file path
   vtkcreatefilegit = FullFilePath
 End Function
 
@@ -174,17 +158,23 @@ End Function
 '---------------------------------------------------------------------------------------
 '
 Public Function VtkFileReader(FileName As String, ProjectGitPath As String) As String
-Dim Textfile As Variant
-Dim strresult As String
 
-Dim fso As New FileSystemObject
-Dim FullFilePath As String
-FullFilePath = (ProjectGitPath & FileName)
-Set Textfile = fso.OpenTextFile(FullFilePath, ForReading)
+    Dim Textfile As Variant
+    Dim strresult As String
+    Dim fso As New FileSystemObject
+    Dim FullFilePath As String
+
+    FullFilePath = (ProjectGitPath & FileName)
+
+    Set Textfile = fso.OpenTextFile(FullFilePath, ForReading)
+'while not end of file
 Do Until Textfile.AtEndOfStream
-    strresult = strresult & Textfile.ReadLine
+'read line per line
+    strresult = strresult & Chr(10) & Textfile.ReadLine
 Loop
+'return file text
 VtkFileReader = strresult
-'Debug.Print strresult
+
 End Function
+
 
