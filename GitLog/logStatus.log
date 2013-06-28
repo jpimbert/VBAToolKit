@@ -1,0 +1,25 @@
+# On branch regroupwork
+# Changes not staged for commit:
+#   (use "git add <file>..." to update what will be committed)
+#   (use "git checkout -- <file>..." to discard changes in working directory)
+#
+#	modified:   Project/VBAToolKit.xlsm
+#	modified:   Source/VbaUnit/AutoGen.cls
+#	modified:   Source/VbaUnit/ITestManager.cls
+#	modified:   Source/VbaUnit/RunManager.cls
+#	modified:   Source/VbaUnit/TestCaseManager.cls
+#	modified:   Source/VbaUnit/TestClassLister.cls
+#	modified:   Source/VbaUnit/TestRunner.cls
+#	modified:   Source/VbaUnit/TestSuite.cls
+#	modified:   Source/VbaUnit/TestSuiteManager.cls
+#
+# Untracked files:
+#   (use "git add <file>..." to include in what will be committed)
+#
+#	Delivery/
+#	GitLog/logStatus.log
+#	Project/VBAToolKit_DEV.xlsm
+#	Project/vbatoolkit2.xlsm
+#	Project/vbatoolkit33.xlsm
+#	Tests/
+no changes added to commit (use "git add" and/or "git commit -a")

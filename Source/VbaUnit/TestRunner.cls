@@ -11,16 +11,16 @@ Option Explicit
 
 Public Sub Run(Optional TestClassName As String)
     Dim s As TestSuite, t As ITest, RM As IRunManager, TL As TestClassLister
-    Dim C As Collection, VName As Variant
+    Dim c As Collection, VName As Variant
     Set TL = New TestClassLister
     If TestClassName <> "" Then
-        Set C = New Collection
-        C.Add TestClassName
+        Set c = New Collection
+        c.Add TestClassName
     Else
-        Set C = TL.TestClasses()
+        Set c = TL.TestClasses()
     End If
     Set s = New TestSuite
-    For Each VName In C
+    For Each VName In c
         s.AddTest CStr(VName)
     Next
     Set t = s

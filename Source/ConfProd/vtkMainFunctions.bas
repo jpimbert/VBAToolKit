@@ -30,42 +30,42 @@ Public Function vtkCreateProject(path As String, name As String, Optional displa
 
             ' Create the vtkProject attached to the new project
             Dim project As vtkProject
-            Set project = vtkProjectForName(projectName:=name)
+            Set project = vtkProjectForName(projectname:=name)
             
             ' Create main folder
-            MkDir path & "\" & project.projectName
+            MkDir path & "\" & project.projectname
             ' Create Delivery folder
-            MkDir path & "\" & project.projectName & "\" & "Delivery"
+            MkDir path & "\" & project.projectname & "\" & "Delivery"
             ' Create Project folder
-            MkDir path & "\" & project.projectName & "\" & "Project"
+            MkDir path & "\" & project.projectname & "\" & "Project"
             ' Create Tests folder
-            MkDir path & "\" & project.projectName & "\" & "Tests"
+            MkDir path & "\" & project.projectname & "\" & "Tests"
             ' Create GitLog Folder
-            MkDir path & "\" & project.projectName & "\" & "GitLog"
+            MkDir path & "\" & project.projectname & "\" & "GitLog"
             ' Create Source folder
-            MkDir path & "\" & project.projectName & "\" & "Source"
+            MkDir path & "\" & project.projectname & "\" & "Source"
             ' Create ConfProd folder
-            MkDir path & "\" & project.projectName & "\" & "Source" & "\" & "ConfProd"
+            MkDir path & "\" & project.projectname & "\" & "Source" & "\" & "ConfProd"
             ' Create ConfTest folder
-            MkDir path & "\" & project.projectName & "\" & "Source" & "\" & "ConfTest"
+            MkDir path & "\" & project.projectname & "\" & "Source" & "\" & "ConfTest"
             ' Create VbaUnit folder
-            MkDir path & "\" & project.projectName & "\" & "Source" & "\" & "VbaUnit"
+            MkDir path & "\" & project.projectname & "\" & "Source" & "\" & "VbaUnit"
              
             'Save created project with xlsm extention
-             Workbooks.Add.SaveAs (path & "\" & project.projectName & "\" & project.projectDEVStandardRelativePath), FileFormat:=(52) '52 is xlsm format
+             Workbooks.Add.SaveAs (path & "\" & project.projectname & "\" & project.projectDEVStandardRelativePath), FileFormat:=(52) '52 is xlsm format
             'Rename Project
             Workbooks(project.workbookDEVName).VBProject.name = project.projectDEVName
             'call function who activate references
             VtkActivateReferences (project.workbookDEVName)
             'initialize configuration Sheet with VBAUnit modules
-            vtkInitializeVbaUnitNamesAndPathes project:=project.projectName
+            vtkInitializeVbaUnitNamesAndPathes project:=project.projectname
             ' Save Development Project Workbook
             Workbooks(project.workbookDEVName).Save
             
             'Create delivery workbook
             Workbooks.Add.SaveAs (path & "\" & name & "\" & project.projectStandardRelativePath), FileFormat:=(52) '52 is xlsm format
             'Rename Project
-            Workbooks(project.workbookname).VBProject.name = project.projectName
+            Workbooks(project.workbookname).VBProject.name = project.projectname
             'call function who activate references
             VtkActivateReferences (project.workbookname)
             ' A module must be added in the Excel File for the project parameters to be saved
@@ -117,12 +117,12 @@ Public Function vtkInitializeVbaUnitNamesAndPathes(project As String) As Boolean
     
     Set cm = vtkConfigurationManagerForProject(project)
     
-    Set proj = vtkProjectForName(projectName:=project)
+    Set proj = vtkProjectForName(projectname:=project)
     
     nc = cm.getConfigurationNumber(vtkProjectForName(project).projectDEVName)
     ret = (nc > 0)
     For i = LBound(tableofvbaunitname) To UBound(tableofvbaunitname)
-        nm = cm.addModule(tableofvbaunitname(i))
+        nm = cm.AddModule(tableofvbaunitname(i))
         ret = ret And (nm > 0)
         If i <= 0 Then      ' It's a Standard Module
             ext = ".bas"
@@ -147,7 +147,7 @@ End Function
 '             - take modulename and extention on parameter ( form ,std module or classe)
 '---------------------------------------------------------------------------------------
 '
-Public Function VtkAddModule(moduleName As String, ext As Integer) As String
+Public Function VtkAddOneModule(moduleName As String, ext As Integer) As String
     
     Dim cm As vtkConfigurationManager
     Dim RetValCreateStandarMod As String
@@ -157,12 +157,16 @@ Public Function VtkAddModule(moduleName As String, ext As Integer) As String
     Dim ret As Boolean
     Dim fso As New FileSystemObject
     Dim ProjectPath As String
+    Dim projname As String
     
-    Set proj = vtkProjectForName(projectName:=ActiveWorkbook.VBProject.name)
-    Set cm = vtkConfigurationManagerForProject("test")
+    projname = Left(ActiveWorkbook.VBProject.name, (Len(ActiveWorkbook.VBProject.name) - 4))
+
+    Set cm = vtkConfigurationManagerForProject(projname)
+    Set proj = vtkProjectForName(projectname:=projname)
+   ' Debug.Print proj.projectname
     
-    nm = cm.addModule(moduleName)
-    nc = cm.getConfigurationNumber(proj.projectName)
+    nm = cm.AddModule(moduleName)
+    nc = cm.getConfigurationNumber(vtkProjectForName(projname).projectDEVName)
     ProjectPath = fso.GetParentFolderName(ActiveWorkbook.path)
 
     ret = (nc > 0)

@@ -9,11 +9,11 @@ Attribute VB_PredeclaredId = False
 Attribute VB_Exposed = False
 Option Explicit
 
-Public Function CountOfLines(module As codemodule) As Long
+Public Function CountOfLines(module As CodeModule) As Long
     CountOfLines = module.CountOfLines
 End Function
 
-Public Function Lines(module As codemodule, StartLine As Long, Count As Long) As String
+Public Function Lines(module As CodeModule, StartLine As Long, Count As Long) As String
     Lines = module.Lines(StartLine, Count)
 End Function
 
@@ -42,7 +42,7 @@ Public Function EndFunction() As String
 End Function
 
 Public Function GetMethodBody(ClassName As String, methodName As String) As String
-    Dim module As codemodule, StartLine As Long, LineCount As Long, BodyLine As Long
+    Dim module As CodeModule, StartLine As Long, LineCount As Long, BodyLine As Long
     Set module = GetCodeModule(ClassName)
     If module Is Nothing Then Exit Function
     'On Error GoTo NO_METHOD
@@ -54,7 +54,7 @@ Public Function GetMethodBody(ClassName As String, methodName As String) As Stri
 '    Exit Function
 End Function
 
-Private Function BodyStartLine(module As codemodule, methodName As String) As Long
+Private Function BodyStartLine(module As CodeModule, methodName As String) As Long
     Dim BodyLine As Long, NumFuncLines As Long
     NumFuncLines = 1
     If module Is Nothing Then Exit Function
@@ -65,7 +65,7 @@ NO_METHOD:
     Exit Function
 End Function
 
-Public Function BodyLineCount(module As codemodule, methodName As String) As Long
+Public Function BodyLineCount(module As CodeModule, methodName As String) As Long
     Dim StartLine As Long, LineCount As Long, BodyLine As Long, NumFuncLines As Long, NumEndFuncLines As Long, BStartLine As Long
     NumFuncLines = 1
     NumEndFuncLines = 1
@@ -84,19 +84,19 @@ NO_METHOD:
 End Function
 
 
-Public Function GetCodeModule(ClassName) As codemodule
+Public Function GetCodeModule(ClassName) As CodeModule
     Dim Components As VBComponents, Component As VBComponent
     Set Components = Application.VBE.ActiveVBProject.VBComponents
     For Each Component In Components
         If Component.name = ClassName Then
-            Set GetCodeModule = Component.codemodule
+            Set GetCodeModule = Component.CodeModule
             Exit Function
         End If
     Next
 End Function
 
 Public Sub ReplaceMethodBody(ClassName As String, methodName As String, NewMethodBody As String)
-    Dim module As codemodule, LineStart As Long, LineCount As Long, BodyLine As Long
+    Dim module As CodeModule, LineStart As Long, LineCount As Long, BodyLine As Long
     Set module = GetCodeModule(ClassName)
     If module Is Nothing Then Exit Sub
     'On Error GoTo NO_METHOD
@@ -106,7 +106,7 @@ NO_METHOD:
     Exit Sub
 End Sub
 
-Public Sub DeleteMethodBody(module As codemodule, methodName As String)
+Public Sub DeleteMethodBody(module As CodeModule, methodName As String)
     Dim StartLine As Long, LineCount As Long
     If module Is Nothing Then Exit Sub
     'On Error GoTo NO_METHOD
@@ -118,7 +118,7 @@ Public Sub DeleteMethodBody(module As codemodule, methodName As String)
 '    Exit Sub
 End Sub
 
-Private Sub InsertMethodBody(module As codemodule, methodName As String, MethodBody As String)
+Private Sub InsertMethodBody(module As CodeModule, methodName As String, MethodBody As String)
     Dim StartLine As Long
     If module Is Nothing Then Exit Sub
     'On Error GoTo NO_METHOD
@@ -130,7 +130,7 @@ Private Sub InsertMethodBody(module As codemodule, methodName As String, MethodB
 End Sub
 
 Public Function GetTestMethods(ClassName As String) As Collection
-    Dim module As codemodule, LineNum As Long
+    Dim module As CodeModule, LineNum As Long
     Set GetTestMethods = New Collection
     Set module = GetCodeModule(ClassName)
     If module Is Nothing Then Exit Function
