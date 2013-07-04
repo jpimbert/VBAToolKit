@@ -38,15 +38,20 @@ End Sub
 Private Sub ITestCase_TearDown()
 End Sub
 
+Public Sub TestNullProject()
+'       Verify that all properties are null when the object is not initialized
+    Dim p As New vtkProject
+    mAssert.Equals p.projectName, "", "The project must be null"
+    mAssert.Equals p.projectDEVName, "", "The project development must be null"
+    mAssert.Equals p.projectDEVStandardRelativePath, "", "The path for development must be null"
+    mAssert.Equals p.projectStandardRelativePath, "", "The path for delivery must be null"
+    mAssert.Equals p.workbookDEVName, "", "The workbook for development must be null"
+    mAssert.Equals p.workbookName, "", "The workbook for delivery must be null"
+End Sub
+
 Public Sub TestProjectNameForDevelopment()
 '       Verify the project name for development
     mAssert.Equals project.projectDEVName, "TestProject_DEV", "The project development is suffixed by _DEV"
-End Sub
-
-Public Sub TestProjectNameForDevelopmentWithNullProjectName()
-'       Verify that the project name for development is null when project name is null
-    Dim p As New vtkProject
-    mAssert.Equals p.projectDEVName, "", "The project development name mus be null"
 End Sub
 
 Public Sub TestProjectDevelopmentRelativePath()
@@ -71,8 +76,8 @@ End Sub
 
 Private Function ITest_Suite() As TestSuite
     Set ITest_Suite = New TestSuite
+    ITest_Suite.AddTest ITest_Manager.ClassName, "TestNullProject"
     ITest_Suite.AddTest ITest_Manager.ClassName, "TestProjectNameForDevelopment"
-    ITest_Suite.AddTest ITest_Manager.ClassName, "TestProjectNameForDevelopmentWithNullProjectName"
     ITest_Suite.AddTest ITest_Manager.ClassName, "TestProjectDevelopmentRelativePath"
     ITest_Suite.AddTest ITest_Manager.ClassName, "TestProjectRelativePath"
     ITest_Suite.AddTest ITest_Manager.ClassName, "TestProjectDevelopmentWorkbookName"
@@ -81,8 +86,8 @@ End Function
 
 Private Sub ITestCase_RunTest()
     Select Case mManager.methodName
+        Case "TestNullProject": TestNullProject
         Case "TestProjectNameForDevelopment": TestProjectNameForDevelopment
-        Case "TestProjectNameForDevelopmentWithNullProjectName": TestProjectNameForDevelopmentWithNullProjectName
         Case "TestProjectDevelopmentRelativePath": TestProjectDevelopmentRelativePath
         Case "TestProjectRelativePath": TestProjectRelativePath
         Case "TestProjectDevelopmentWorkbookName": TestProjectDevelopmentWorkbookName

@@ -7,8 +7,8 @@ Option Explicit
 ' Purpose   : Manage the vtkProject objects (class vtkProject) for open projects
 '
 ' Usage:
-'   - Each instance of vtkProject is attached to an VB Tool Kit Project
-'       - the method vtkProjectForName give the instance attached to VTK project, or create it
+'   - Each instance of vtkProject is attached to a VBA Tool Kit Project
+'       - the method vtkProjectForName give the instance attached to a VTK project, or create it
 '
 '---------------------------------------------------------------------------------------
 
