@@ -4,7 +4,7 @@ Public Const vtkTestProjectNameWithExtention = "TestProject.xlsm"
 
 '---------------------------------------------------------------------------------------
 ' Procedure : vtkTestPath
-' Author    : user
+' Author    : Jean-Pierre Imbert (please confirm)
 ' Date      : 07/05/2013
 ' Purpose   : -Return the path of the Test Folder of the current project  '..\VBAToolKit\Tests
 '---------------------------------------------------------------------------------------
@@ -15,7 +15,7 @@ End Function
 
 '---------------------------------------------------------------------------------------
 ' Procedure : vtkInstallPath
-' Author    : user
+' Author    : Jean-Pierre Imbert (please confirm)
 ' Date      : 07/05/2013
 ' Purpose   :-Return the path of the current project  '..\VBAToolKit
 '---------------------------------------------------------------------------------------

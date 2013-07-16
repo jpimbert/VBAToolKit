@@ -4,15 +4,18 @@ Option Explicit
 
 '---------------------------------------------------------------------------------------
 ' Procedure : VtkWorkbookIsOpen
-' Author    : user
+' Author    : Abdelfattah Lahbib
 ' Date      : 24/04/2013
-' Purpose   :- this function return true if the workbook is already open , and false if it's close
+' Purpose   : - Return true if the Workbook is already open , false if it's closed
 '---------------------------------------------------------------------------------------
 '
-Public Function VtkWorkbookIsOpenFunction(workbookname As String) As Boolean 'to test it debug.Print a=VtkWorkbokIsOpen("VBAToolKit")
+Public Function VtkWorkbookIsOpenFunction(workbookName As String) As Boolean
+'to test it : debug.Print a=VtkWorkbokIsOpen("VBAToolKit")
 
  On Error GoTo Err_function
- Workbooks(workbookname).Activate 'if we have a problem to activate workbook = the workbook is closed , if we can activate it without problem = the workbook is open
+ Workbooks(workbookName).Activate
+ 'if we have a problem to activate the workbook = it is closed,
+ 'if we can activate it without problem = the workbook is open
     
 Err_function:
     If Err = 0 Then

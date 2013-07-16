@@ -1,102 +1,113 @@
 Attribute VB_Name = "vtkImportExportUtilities"
 Option Explicit
+
 '---------------------------------------------------------------------------------------
 ' Procedure : vtkConfSheet
-' Author    : user
+' Author    : Abdelfattah Lahbib
 ' Date      : 14/05/2013
-' Purpose   : - create new sheet (if it not exist) that will contain table of parameters
+' Purpose   : - Create new sheet (if it does not already exist) that will contain
+'               the table of parameters
 '---------------------------------------------------------------------------------------
 '
 Public Function vtkConfSheet() As String
-Dim sheetname
-sheetname = "configurations"
-On Error Resume Next
- Worksheets(sheetname).Select
- If Err <> 0 Then
- Worksheets.Add.name = sheetname
- End If
-vtkConfSheet = sheetname
-On Error GoTo 0
+    
+    Dim sheetName
+    sheetName = "configurations"
+    
+    On Error Resume Next
+        Worksheets(sheetName).Select
+    If Err <> 0 Then
+        Worksheets.Add.name = sheetName
+    End If
+    
+    vtkConfSheet = sheetName
+    On Error GoTo 0
+
 End Function
 
 '---------------------------------------------------------------------------------------
 ' Procedure : vtkModuleNameRange
-' Author    : user
+' Author    : Abdelfattah Lahbib
 ' Date      : 13/05/2013
-' Purpose   : - return range name that contains list of modules
-'             - write range name
+' Purpose   : - Return name of the range (column of the vtkConfigurations worksheet in the Project_DEV
+'               Excel file) that contains the names of the modules
+'             - Write range name
 '---------------------------------------------------------------------------------------
 '
 Public Function vtkModuleNameRange() As String
-vtkModuleNameRange = "A"
-ActiveWorkbook.Sheets(vtkConfSheet).Range(vtkModuleNameRange & vtkFirstLine - 2) = "Module Name"
+    vtkModuleNameRange = "A"
+    ActiveWorkbook.Sheets(vtkConfSheet).Range(vtkModuleNameRange & vtkFirstLine - 2) = "Module Name"
 End Function
 
 '---------------------------------------------------------------------------------------
 ' Procedure : vtkModuleDevRange
-' Author    : user
+' Author    : Abdelfattah Lahbib
 ' Date      : 13/05/2013
-' Purpose   : - return range name that contains list of path of developemnt configuration
-'             - write range name
+' Purpose   : - Return name of the range (column of the vtkConfigurations worksheet in the Project_DEV
+'               Excel file) that contains the list of the paths of the developement configuration
+'             - Write range name
 '---------------------------------------------------------------------------------------
 '
 Public Function vtkModuleDevRange() As String
-vtkModuleDevRange = "B"
+    vtkModuleDevRange = "B"
 End Function
 
 '---------------------------------------------------------------------------------------
 ' Procedure : vtkModuleDeliveryRange
-' Author    : user
+' Author    : Abdelfattah Lahbib
 ' Date      : 13/05/2013
-' Purpose   : - return range name that contains list of path of devivery configuration
-'             - write range name
+' Purpose   : - Return name of the range (column of the vtkConfigurations worksheet in the Project_DEV
+'               Excel file) that contains the list of the paths of the delivery configuration
+'             - Write range name
 '---------------------------------------------------------------------------------------
 '
 Public Function vtkModuleDeliveryRange() As String
-vtkModuleDeliveryRange = "C"
+    vtkModuleDeliveryRange = "C"
 End Function
 
 '---------------------------------------------------------------------------------------
 ' Procedure : vtkInformationRange
-' Author    : user
+' Author    : Abdelfattah Lahbib
 ' Date      : 13/05/2013
-' Purpose   : - return range name that contains modules information
-'             - write range name
+' Purpose   : - Return name of the range (column of the vtkConfigurations worksheet in the Project_DEV
+'               Excel file) that contains information
+'             - Write range name
 '---------------------------------------------------------------------------------------
 '
 Public Function vtkInformationRange() As String
-vtkInformationRange = "D"
-ActiveWorkbook.Sheets(vtkConfSheet).Range(vtkInformationRange & vtkFirstLine - 3) = "File Informations"
+    vtkInformationRange = "D"
+    ActiveWorkbook.Sheets(vtkConfSheet).Range(vtkInformationRange & vtkFirstLine - 3) = "File Informations"
 End Function
 '---------------------------------------------------------------------------------------
 ' Procedure : vtkModuleInformationsRange
-' Author    : user
+' Author    : Abdelfattah Lahbib
 ' Date      : 13/05/2013
-' Purpose   : - return range name that contains modules information
-'             - write range name
+' Purpose   : - Return name of the range (column of the vtkConfigurations worksheet in the Project_DEV
+'               Excel file) that contains information about the modules
+'             - Write range name
 '---------------------------------------------------------------------------------------
 '
 Public Function vtkModuleInformationsRange() As String
-vtkModuleInformationsRange = "E"
-ActiveWorkbook.Sheets(vtkConfSheet).Range(vtkModuleInformationsRange & vtkFirstLine - 3) = "Modules Informations"
+    vtkModuleInformationsRange = "E"
+    ActiveWorkbook.Sheets(vtkConfSheet).Range(vtkModuleInformationsRange & vtkFirstLine - 3) = "Modules Informations"
 End Function
 
 
 '---------------------------------------------------------------------------------------
 ' Procedure : vtkFirstLine
-' Author    : user
+' Author    : Abdelfattah Lahbib
 ' Date      : 13/05/2013
-' Purpose   : - define the start line
+' Purpose   : - Define the start line
 '---------------------------------------------------------------------------------------
 '
 Public Function vtkFirstLine() As Integer
-vtkFirstLine = 4
+    vtkFirstLine = 4
 End Function
 '---------------------------------------------------------------------------------------
 ' Procedure : VtkInitializeExcelfileWithVbaUnitModuleName
-' Author    : user
+' Author    : Abdelfattha Lahbib
 ' Date      : 09/05/2013
-' Purpose   : - initialize ConfSheet with vbaunit module name
+' Purpose   : - Initialize the vtkConfigurations worksheet with the modules of VBA Unit
 '             - Return the next first empty line number
 '---------------------------------------------------------------------------------------
 '
@@ -133,85 +144,86 @@ End Function
 
 '---------------------------------------------------------------------------------------
 ' Procedure : vtkIsVbaUnit
-' Author    : user
+' Author    : Abdelfattah Lahbib
 ' Date      : 17/05/2013
-' Purpose   : - take name in parameter and verify if the module is a vbaunit module
+' Purpose   : - Take module name in parameter and check if it belongs to VBA Unit
 '---------------------------------------------------------------------------------------
 '
 Public Function vtkIsVbaUnit(modulename As String) As Boolean
-Dim i As Integer
-Dim valinit As Integer
-Dim valfin As Integer
-    valinit = vtkFirstLine
-    valfin = vtkFirstLine + 17
-    vtkIsVbaUnit = False
- For i = vtkFirstLine To valfin
-  If modulename = Range(vtkModuleNameRange & i) And modulename <> "" Then
-     vtkIsVbaUnit = True
-  Exit For
-  End If
- Next
+    Dim i As Integer
+    Dim valinit As Integer
+    Dim valfin As Integer
+        valinit = vtkFirstLine
+        valfin = vtkFirstLine + 17
+        vtkIsVbaUnit = False
+     For i = vtkFirstLine To valfin
+      If modulename = Range(vtkModuleNameRange & i) And modulename <> "" Then
+         vtkIsVbaUnit = True
+      Exit For
+      End If
+     Next
 End Function
 
 '---------------------------------------------------------------------------------------
 ' Procedure : vtkListAllModules
-' Author    : user
+' Author    : Abdelfattah Lahbib
 ' Date      : 17/05/2013
-' Purpose   : - call VtkInitializeExcelfileWithVbaUnitModuleName and use his return value
-'             - list all module of current project , verify that the module
-'              is not a vbaunit and write his name in the range
-'
+' Purpose   : - Call VtkInitializeExcelfileWithVbaUnitModuleName and use his return value
+'             - List all modules of the current project, check if they don't belong to VBA Unit,
+'               and write their name in the range.
 '---------------------------------------------------------------------------------------
 '
 Public Function vtkListAllModules() As Integer
-Dim i As Integer
-Dim j As Integer
-Dim k As Integer
-Dim t As Integer
-
-t = VtkInitializeExcelfileWithVbaUnitModuleName()
-k = 0
-  For i = 1 To ActiveWorkbook.VBProject.VBComponents.Count
-    If vtkIsVbaUnit(ActiveWorkbook.VBProject.VBComponents.Item(i).name) = False Then
-        ActiveWorkbook.Sheets(vtkConfSheet).Range(vtkModuleNameRange & t + k) = ActiveWorkbook.VBProject.VBComponents.Item(i).name
-        ActiveWorkbook.Sheets(vtkConfSheet).Range(vtkModuleNameRange & t + k).Interior.ColorIndex = 8
-        k = k + 1
-    End If
-  Next
-vtkListAllModules = k
+    Dim i As Integer
+    Dim j As Integer
+    Dim k As Integer
+    Dim t As Integer
+    
+    t = VtkInitializeExcelfileWithVbaUnitModuleName()
+    k = 0
+      For i = 1 To ActiveWorkbook.VBProject.VBComponents.Count
+        If vtkIsVbaUnit(ActiveWorkbook.VBProject.VBComponents.Item(i).name) = False Then
+            ActiveWorkbook.Sheets(vtkConfSheet).Range(vtkModuleNameRange & t + k) = ActiveWorkbook.VBProject.VBComponents.Item(i).name
+            ActiveWorkbook.Sheets(vtkConfSheet).Range(vtkModuleNameRange & t + k).Interior.ColorIndex = 8
+            k = k + 1
+        End If
+      Next
+    vtkListAllModules = k
 End Function
 
 '---------------------------------------------------------------------------------------
 ' Procedure : vtkCreateModuleFile
-' Author    : user
+' Author    : Abdelfattah Lahbib
 ' Date      : 17/05/2013
-' Purpose   : - this function allow to create a file
-'             - return message contain informations: time , file created or replaced
+' Purpose   : - Create a module file
+'             - Return message that contains information : time of the operation, file created
+'               or updated.
 '---------------------------------------------------------------------------------------
 '
-Public Function vtkCreateModuleFile(fullpath As String) As String
+Public Function vtkCreateModuleFile(fullPath As String) As String
 
-Dim fso As New FileSystemObject
-
-If fso.FileExists(fullpath) = False Then
-    fso.CreateTextFile (fullpath)
-vtkCreateModuleFile = "File created successfully at" & Now
-Else
-vtkCreateModuleFile = "File last update at" & Now
-End If
+    Dim fso As New FileSystemObject
+    
+    If fso.FileExists(fullPath) = False Then
+        fso.CreateTextFile (fullPath)
+        vtkCreateModuleFile = "File created successfully at" & Now
+    Else
+        vtkCreateModuleFile = "File last update at" & Now
+    End If
+    
 End Function
 
 
 
 '---------------------------------------------------------------------------------------
 ' Procedure : vtkExportModule
-' Author    : user
+' Author    : Abdelfattah Lahbib
 ' Date      : 14/05/2013
-' Purpose   : - function take modulename , and line number , and workbookSource Name
-'             - create files of modules if they don't exist ,or update it
-'             - export module to the right folders  (documents , worksheets)
-'             - write creation file informations
-'             - write exported file location
+' Purpose   : - Parameters : module name, line number, and workbookSource name
+'             - Create module file if it doesn't exist, or update it
+'             - Export module file to the right folders  (documents , worksheets)
+'             - Write information about the file operation (creation, update, time)
+'             - Write exported file location
 '
 '  if "vbaunitclass" then
 '       if vbaUnitMain then ===================>path= vbaunit ".bas"
@@ -232,10 +244,10 @@ End Function
 '
 Public Function vtkExportModule(modulename As String, lineNumber As Integer, sourceworkbook As String) As String
 
- Dim fullpath As String
+ Dim fullPath As String
  Dim path As String
  Dim MsgCreationFile As String
- Dim test As String
+ Dim Test As String
  Dim DevPath As String
  Dim DelivPath As String
  Dim color As Integer
@@ -246,13 +258,13 @@ Public Function vtkExportModule(modulename As String, lineNumber As Integer, sou
  
     If vtkIsVbaUnit(modulename) = True Then
           If modulename = "VbaUnitMain" Then
-                fullpath = path & "\Source\VbaUnit\" & modulename & ".bas"  'full path of file that will be created
-                DevPath = fullpath
+                fullPath = path & "\Source\VbaUnit\" & modulename & ".bas"  'full path of file that will be created
+                DevPath = fullPath
                 DelivPath = ""
                 color = 3
           Else
-                fullpath = path & "\Source\VbaUnit\" & modulename & ".cls"  'full path of file that will be created
-                DevPath = fullpath
+                fullPath = path & "\Source\VbaUnit\" & modulename & ".cls"  'full path of file that will be created
+                DevPath = fullPath
                 DelivPath = ""
                 color = 3
           End If
@@ -263,11 +275,11 @@ Public Function vtkExportModule(modulename As String, lineNumber As Integer, sou
     
     Select Case Workbooks(sourceworkbook).VBProject.VBComponents(modulename).Type
           
-        Case 1 '1module : export to confprod
+        Case 1 '1 module : export to confprod
          
-           fullpath = path & "\Source\ConfProd\" & modulename & ".bas"  'full path of file that will be created
-            DevPath = fullpath
-            DelivPath = fullpath
+           fullPath = path & "\Source\ConfProd\" & modulename & ".bas"  'full path of file that will be created
+            DevPath = fullPath
+            DelivPath = fullPath
           
          
         Case 2 '2 class module : export to ConfTest or ConfProd
@@ -275,23 +287,23 @@ Public Function vtkExportModule(modulename As String, lineNumber As Integer, sou
             If Right(modulename, 6) Like "Tester" Then ' verify if modulename end is like Tester
                     
                 ' This Document is a test module export to confTest
-                fullpath = path & "\Source\ConfTest\" & modulename & ".CLS"
-                DevPath = fullpath
+                fullPath = path & "\Source\ConfTest\" & modulename & ".CLS"
+                DevPath = fullPath
                 DelivPath = ""
                 color = 3
             Else
     
                 'the document is a classmodule export to confprod
-                fullpath = path & "\Source\ConfProd\" & modulename & ".CLS"
-                DevPath = fullpath
-                DelivPath = fullpath
+                fullPath = path & "\Source\ConfProd\" & modulename & ".CLS"
+                DevPath = fullPath
+                DelivPath = fullPath
             End If
         Case 3 '3 forms
         
                 'the document is a classmodule export to confprod
-                fullpath = path & "\Source\ConfProd\" & modulename & ".FRM"
-                DevPath = fullpath
-                DelivPath = fullpath
+                fullPath = path & "\Source\ConfProd\" & modulename & ".FRM"
+                DevPath = fullPath
+                DelivPath = fullPath
                 
         Case 100 'excel sheets , we will not export them for the moment
                 DevPath = ""
@@ -309,8 +321,8 @@ Public Function vtkExportModule(modulename As String, lineNumber As Integer, sou
       End Select
     End If
 
-   MsgCreationFile = vtkCreateModuleFile(fullpath)
-   Workbooks(sourceworkbook).VBProject.VBComponents(modulename).Export (fullpath) 'export module to the right folder
+   MsgCreationFile = vtkCreateModuleFile(fullPath)
+   Workbooks(sourceworkbook).VBProject.VBComponents(modulename).Export (fullPath) 'export module to the right folder
 
    ActiveWorkbook.Sheets(vtkConfSheet).Range(vtkModuleDevRange & lineNumber) = DevPath
    
@@ -324,45 +336,45 @@ End Function
 
 '---------------------------------------------------------------------------------------
 ' Procedure : vtkExportAll
-' Author    : user
+' Author    : Abdelfattah Lahbib
 ' Date      : 16/05/2013
-' Purpose   : - call function how list all module
-'             -
+' Purpose   : - Call function to list all modules
+'             - Call function to export each module
 '---------------------------------------------------------------------------------------
 '
 Public Function vtkExportAll(sourceworkbookname As String)
-Dim i As Integer
-Dim ttt As String
-Dim a As String
-
-a = vtkListAllModules()
-i = 0
-
-    While ActiveWorkbook.Sheets(vtkConfSheet).Range(vtkModuleNameRange & vtkFirstLine + i) <> ""
-        a = vtkExportModule(Range(vtkModuleNameRange & vtkFirstLine + i), vtkFirstLine + i, sourceworkbookname)
-        i = i + 1
-    Wend
+    Dim i As Integer
+    Dim ttt As String
+    Dim a As String
+    
+    a = vtkListAllModules()
+    i = 0
+    
+        While ActiveWorkbook.Sheets(vtkConfSheet).Range(vtkModuleNameRange & vtkFirstLine + i) <> ""
+            a = vtkExportModule(Range(vtkModuleNameRange & vtkFirstLine + i), vtkFirstLine + i, sourceworkbookname)
+            i = i + 1
+        Wend
 End Function
 
 '---------------------------------------------------------------------------------------
 ' Procedure : vtkImportModule
-' Author    : user
+' Author    : Abdelfattah Lahbib
 ' Date      : 17/05/2013
-' Purpose   : - import module to a workbook
+' Purpose   : - Import module to a workbook
 '             - Return number of imported modules
 '---------------------------------------------------------------------------------------
 '
 Public Function vtkImportTestConfig() As Integer
-Dim i As Integer
-
     
-        i = 0
+    Dim i As Integer
+    i = 0
+    
     While ActiveWorkbook.Sheets(vtkConfSheet).Range(vtkModuleNameRange & vtkFirstLine + i) <> ""
 
         On Error Resume Next
              ' if the module is a class or module
              If (ActiveWorkbook.VBProject.VBComponents(ActiveWorkbook.Sheets(vtkConfSheet).Range(vtkModuleNameRange & vtkFirstLine + i)).Type = 1 Or ActiveWorkbook.VBProject.VBComponents(ActiveWorkbook.Sheets(vtkConfSheet).Range(vtkModuleNameRange & vtkFirstLine + i)).Type = 2) Then
-                'if the module exist we will delete it and we will replace it
+                'if the module exists, delete it and replace it
                 ActiveWorkbook.VBProject.VBComponents.Remove ActiveWorkbook.VBProject.VBComponents(ActiveWorkbook.Sheets(vtkConfSheet).Range(vtkModuleNameRange & vtkFirstLine + i))
                 ActiveWorkbook.VBProject.VBComponents.Import ActiveWorkbook.Sheets(vtkConfSheet).Range(vtkModuleDevRange & vtkFirstLine + i)
                 ActiveWorkbook.Sheets(vtkConfSheet).Range(vtkModuleInformationsRange & vtkFirstLine + i) = "module imported at " & Now
@@ -371,6 +383,8 @@ Dim i As Integer
 
         i = i + 1
     Wend
-vtkImportTestConfig = i
-On Error GoTo 0
+
+    vtkImportTestConfig = i
+    On Error GoTo 0
+    
 End Function
