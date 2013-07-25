@@ -25,15 +25,15 @@ Private Property Get IRunManager_Assert() As IAssert
 End Property
 
 Private Sub IRunManager_Report()
-    Dim Failure As TestFailure, RM As IRunManager, test As ITest, TestCase As ITestCase
+    Dim Failure As TestFailure, RM As IRunManager, Test As ITest, TestCase As ITestCase
     If Result.WasSuccessful Then
         Debug.Print "OK (" & Result.TestCasesRun & ")"
     Else
         Debug.Print "Tests run: " & Result.TestCasesRun & " Failures: " & Result.Failures.Count
         For Each Failure In Result.Failures
             Set TestCase = Failure.TestCase
-            Set test = TestCase
-            Debug.Print test.Manager.ClassName & "." & TestCase.Manager.methodName & ": " & Failure.Comment
+            Set Test = TestCase
+            Debug.Print Test.Manager.ClassName & "." & TestCase.Manager.methodName & ": " & Failure.Comment
         Next
     End If
 End Sub

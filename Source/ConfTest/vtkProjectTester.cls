@@ -39,7 +39,7 @@ Private Sub ITestCase_TearDown()
 End Sub
 
 Public Sub TestNullProject()
-'       Verify that all properties are null when the object is not initialized
+    ' Verify that all properties are null when the object is not initialized
     Dim p As New vtkProject
     mAssert.Equals p.projectName, "", "The project must be null"
     mAssert.Equals p.projectDEVName, "", "The project development must be null"
@@ -50,27 +50,27 @@ Public Sub TestNullProject()
 End Sub
 
 Public Sub TestProjectNameForDevelopment()
-'       Verify the project name for development
+    ' Verify the project name for the development
     mAssert.Equals project.projectDEVName, "TestProject_DEV", "The project development is suffixed by _DEV"
 End Sub
 
 Public Sub TestProjectDevelopmentRelativePath()
-'       Verify the project path for development
+    ' Verify the relative project path for the development
     mAssert.Equals project.projectDEVStandardRelativePath, "Project\" & "TestProject_DEV.xlsm", "The project development standard path"
 End Sub
 
 Public Sub TestProjectRelativePath()
-'       Verify the project path
+    ' Verify the relative project path
     mAssert.Equals project.projectStandardRelativePath, "Delivery\" & "TestProject.xlsm", "The project development standard path"
 End Sub
 
 Public Sub TestProjectDevelopmentWorkbookName()
-'       Verify the project path for development
+    ' Verify the name of the DEV workbook.
     mAssert.Equals project.workbookDEVName, "TestProject_DEV.xlsm", "The project development standard path"
 End Sub
 
 Public Sub TestProjectWorkbookName()
-'       Verify the project path
+    ' Verify the name of the workbook
     mAssert.Equals project.workbookName, "TestProject.xlsm", "The project development standard path"
 End Sub
 
@@ -95,7 +95,5 @@ Private Sub ITestCase_RunTest()
         Case Else: mAssert.Should False, "Invalid test name: " & mManager.methodName
     End Select
 End Sub
-
-
 
 
