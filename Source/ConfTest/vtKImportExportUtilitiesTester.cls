@@ -38,14 +38,14 @@ Private Sub ITestCase_TearDown()
 Application.DisplayAlerts = False
 On Error Resume Next
     Workbooks(vtkTestProjectName & "_Test" & ".xlsm").Close
-    'Delete Created WorkBook
+    ' Delete Created WorkBook
     Kill vtkTestPath & "\" & vtkTestProjectName & "_Test" & ".xlsm"
     Kill vtkTestPath & "\test.frm"
 On Error GoTo 0
 Application.DisplayAlerts = True
 End Sub
 Public Sub TestConfSheetCorrectlyCreated()
-'test that configuration sheet was created
+' Test that the configuration sheet was created
 Dim found As Boolean
 Dim i As Integer
 found = False
@@ -70,7 +70,7 @@ Public Sub TestInformationRangeCorretlyNammed()
     mAssert.Equals ActiveWorkbook.Sheets(vtkConfSheet).Range(returnvalue & vtkFirstLine - 3), "File Informations", "range File Informations must nammed correctly"
 End Sub
 Public Sub TestVbaUnitModuleNameCorrectlyExported()
-  'test that cell how contain vbaunit module name before and after executing function "VtkInitializeExcelfileWithVbaUnitModuleName()"
+    ' Test that a cell contains a VbaUnit module name before and after executing function "VtkInitializeExcelfileWithVbaUnitModuleName()"
     Dim returnvalue As Integer
 
     mAssert.Equals ActiveWorkbook.Sheets(vtkConfSheet).Range(vtkModuleNameRange & vtkFirstLine), "", "the cell must be empty , vbaunit module not yet exported"
@@ -83,7 +83,7 @@ Public Sub TestVbaUnitModuleNameCorrectlyExported()
 
 End Sub
 Public Sub TestIsVbaUnitModule()
-  'test function how return true if it's a vbaunit module and false if not
+    ' Return true if a module belongs to VbaUnit, false if it doesn't
     Dim returnvalue As Boolean
     Dim returnvalue2 As Integer
  
@@ -98,20 +98,20 @@ Public Sub TestIsVbaUnitModule()
  
 End Sub
 Public Sub TestListOfAllModule()
-'compare module number on configuration sheet with workbook module number
-' sheet modules name (workbook module + vbaunit module name(not imported yet))
-Dim returnvalue As Integer
-Dim i As Integer
-Dim modulename As String
-
+    ' Compare the number of modules in the configuration sheet with the number of modules in the workbook
+    ' Sheet modules name (workbook module + vbaunit module name(not imported yet))
+    Dim returnvalue As Integer
+    Dim i As Integer
+    Dim modulename As String
+    
     returnvalue = vtkListAllModules()
     i = 0
     modulename = ActiveWorkbook.Sheets(vtkConfSheet).Range(vtkModuleNameRange & vtkFirstLine + i)
     While modulename <> ""
-     i = i + 1
-     modulename = ActiveWorkbook.Sheets(vtkConfSheet).Range(vtkModuleNameRange & vtkFirstLine + i)
-   Wend
-    'ActiveWorkbook.VBProject.VBComponents.Count +18(vbaunitmodulenumber)
+        i = i + 1
+        modulename = ActiveWorkbook.Sheets(vtkConfSheet).Range(vtkModuleNameRange & vtkFirstLine + i)
+    Wend
+    ' ActiveWorkbook.VBProject.VBComponents.Count +18(vbaunitmodulenumber)
     mAssert.Equals i, ActiveWorkbook.VBProject.VBComponents.Count + 18
 End Sub
 Public Sub TestCreateModuleFileFunction()

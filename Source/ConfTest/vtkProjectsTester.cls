@@ -37,17 +37,17 @@ Private Sub ITestCase_TearDown()
 End Sub
 
 Public Sub TestProjectIsNotNull()
-'       Verify that the configuration Manager is not null
+    ' Verify that the configuration lanager is not null
     mAssert.Should Not vtkProjectForName(projectName) Is Nothing, "A project must not be null"
 End Sub
 
 Public Sub TestProjectsAreDifferentForTwoNames()
-'       Verify that the configuration Managers for two project are different
+    ' Verify that the configuration managers for two projects are different
     mAssert.Should Not vtkProjectForName(projectName) Is vtkProjectForName("SecondProject"), "Two projects must not be equal"
 End Sub
 
 Public Sub TestProjectIsInvariant()
-'       Verify that the configuration Manager for a project is always the same
+    ' Verify that the configuration manager for a project is always the same
     Dim cm As vtkProject
     Set cm = vtkProjectForName(projectName)
     mAssert.Should vtkProjectForName(projectName) Is cm, "The project for a project name must be always the same"

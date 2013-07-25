@@ -43,18 +43,18 @@ Private Sub ITestCase_TearDown()
 End Sub
 
 Public Sub TestAddVBAUnitInNewProject()
-'       Verify the count of added VBAUnit modules
+    ' Verify the count of added VBAUnit modules
     mAssert.Equals newConfManager.moduleCount, 0, "There is no module in the new project"
     vtkInitializeVbaUnitNamesAndPathes project:=projectName
     mAssert.Equals newConfManager.moduleCount, 18, "Number of VBAUnit modules included in new project"
 End Sub
 
 Public Sub TestPathOfModuleVBAUnitInNewProject()
-'       Verify the path of VbaUnitMain
+    ' Verify the path of the "VbaUnitMain" module
     vtkInitializeVbaUnitNamesAndPathes project:=projectName
     Dim nm As Integer
     nm = newConfManager.getModuleNumber("VbaUnitMain")
-    mAssert.Should nm > 0, "The module VBA Unit must be added in the new project"
+    mAssert.Should nm > 0, "The module VbaUnitMain of VbaUnit must be added in the new project"
     Dim nc As Integer
     nc = newConfManager.getConfigurationNumber(vtkProjectForName(projectName).projectDEVName)
     mAssert.Should nc > 0, "The New Project configuration must be added in the new project"
@@ -62,11 +62,11 @@ Public Sub TestPathOfModuleVBAUnitInNewProject()
 End Sub
 
 Public Sub TestPathOfModuleAssertInNewProject()
-'       Verify the path of VbaUnitMain
+    ' Verify the path of the "Assert" module
     vtkInitializeVbaUnitNamesAndPathes project:=projectName
     Dim nm As Integer
     nm = newConfManager.getModuleNumber("Assert")
-    mAssert.Should nm > 0, "The module VBA Unit must be added in the new project"
+    mAssert.Should nm > 0, "The module Assert of VbaUnit must be added in the new project"
     Dim nc As Integer
     nc = newConfManager.getConfigurationNumber(vtkProjectForName(projectName).projectDEVName)
     mAssert.Should nc > 0, "The New Project configuration must be added in the new project"
@@ -74,29 +74,33 @@ Public Sub TestPathOfModuleAssertInNewProject()
 End Sub
 
 Public Sub TestPathOfModuleIAssertInNewProject()
-'       Verify the path of VbaUnitMain
+    ' Verify the path of the "IAssert" module
     vtkInitializeVbaUnitNamesAndPathes project:=projectName
     Dim nm As Integer
     nm = newConfManager.getModuleNumber("IAssert")
-    mAssert.Should nm > 0, "The module VBA Unit must be added in the new project"
+    mAssert.Should nm > 0, "The module IAssert of VbaUnit must be added in the new project"
     Dim nc As Integer
     nc = newConfManager.getConfigurationNumber(vtkProjectForName(projectName).projectDEVName)
     mAssert.Should nc > 0, "The New Project configuration must be added in the new project"
     mAssert.Equals newConfManager.getModulePathWithNumber(nm, nc), "Source\VbaUnit\IAssert.cls", "Relative path of IAssert module"
 End Sub
 
-' Ajouter des tests pour Module absent, configuration absente, ...
+' TODO : Ajouter des tests pour Module absent, configuration absente, ...
 
 Private Function ITest_Suite() As TestSuite
     Set ITest_Suite = New TestSuite
     ITest_Suite.AddTest ITest_Manager.ClassName, "TestAddVBAUnitInNewProject"
     ITest_Suite.AddTest ITest_Manager.ClassName, "TestPathOfModuleVBAUnitInNewProject"
+    ITest_Suite.AddTest ITest_Manager.ClassName, "TestPathOfModuleAssertInNewProject"
+    ITest_Suite.AddTest ITest_Manager.ClassName, "TestPathOfModuleIAssertInNewProject"
 End Function
 
 Private Sub ITestCase_RunTest()
     Select Case mManager.methodName
         Case "TestAddVBAUnitInNewProject": TestAddVBAUnitInNewProject
         Case "TestPathOfModuleVBAUnitInNewProject": TestPathOfModuleVBAUnitInNewProject
+        Case "TestPathOfModuleAssertInNewProject": TestPathOfModuleAssertInNewProject
+        Case "TestPathOfModuleIAssertInNewProject": TestPathOfModuleIAssertInNewProject
         Case Else: mAssert.Should False, "Invalid test name: " & mManager.methodName
     End Select
 End Sub

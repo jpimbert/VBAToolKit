@@ -36,12 +36,12 @@ Public Function vtkCreateProject(path As String, name As String, Optional displa
     
   On Error GoTo vtkCreateProject_Error
 
-    Dim rootPath As String
-    rootPath = path & "\" & project.projectName
-    
     ' Create the vtkProject object attached to the new project
     Dim project As vtkProject
     Set project = vtkProjectForName(projectName:=name)
+
+    Dim rootPath As String
+    rootPath = path & "\" & project.projectName
     
     ' Create main folder
     MkDir rootPath
