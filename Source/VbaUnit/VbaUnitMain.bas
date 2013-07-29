@@ -2,23 +2,13 @@ Attribute VB_Name = "VbaUnitMain"
 Option Explicit
 
 Public Sub VbaUnitMain()
-    
     Run '"AutoGenTester"
 End Sub
 
 Public Sub Run(Optional TestClassName As String)
-    Dim r As TestRunner
-    Set r = New TestRunner
-    
-    Dim hdebut As Single
-    Dim hfin As Single
-   
-    hdebut = Timer 'debut
-    
-    r.Run TestClassName
-    
-    hfin = Timer 'fin
-    Debug.Print Format(hfin - hdebut, "Fixed"); "  second"
+    Dim R As TestRunner
+    Set R = New TestRunner
+    R.Run TestClassName
 End Sub
 
 Public Sub Prep(Optional ClassName As String)

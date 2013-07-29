@@ -28,14 +28,14 @@ Private Property Get ITestManager_ClassName() As String
     ITestManager_ClassName = mClassName
 End Property
 
-Private Function ITestManager_CountTestCases(Test As ITest) As Long
+Private Function ITestManager_CountTestCases(test As ITest) As Long
     ITestManager_CountTestCases = 1
 End Function
 
-Private Function ITestManager_Run(Test As ITest, Optional RunManager As IRunManager) As IRunManager
+Private Function ITestManager_Run(test As ITest, Optional RunManager As IRunManager) As IRunManager
     Dim TestCase As ITestCase
     If RunManager Is Nothing Then Set RunManager = New RunManager
-    Set TestCase = Test
+    Set TestCase = test
     RunManager.Result.StartTest TestCase
     TestCase.SetUp RunManager.Assert
     TestCase.RunTest

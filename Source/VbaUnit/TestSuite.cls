@@ -13,22 +13,22 @@ Implements ITest
 Private mTests As Collection
 Private mManager As TestSuiteManager
 
-Public Function tests() As Collection
-    Set tests = mTests
+Public Function Tests() As Collection
+    Set Tests = mTests
 End Function
 
 Public Sub AddTest(TestClassName As String, Optional methodName As String)
-    Dim Test As ITest
+    Dim test As ITest
     Dim TestCase As ITestCase
     Dim TL As TestClassLister
     Set TL = New TestClassLister
-    Set Test = TL.NewTestClass(TestClassName)
+    Set test = TL.NewTestClass(TestClassName)
     If methodName <> "" Then
-        Set TestCase = Test
+        Set TestCase = test
         TestCase.Manager.Init methodName
-        mTests.Add Test
+        mTests.Add test
     Else
-        mTests.Add Test.Suite
+        mTests.Add test.Suite
     End If
 End Sub
 
