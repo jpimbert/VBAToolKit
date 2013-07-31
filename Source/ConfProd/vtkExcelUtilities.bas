@@ -55,3 +55,19 @@ Public Sub vtkCloseAndKillWorkbook(wb As Workbook)
     Kill PathName:=fullPath
 End Sub
 
+'---------------------------------------------------------------------------------------
+' Procedure : VtkWorkbookIsOpen
+' Author    : Abdelfattah Lahbib
+' Date      : 24/04/2013
+' Purpose   : - Return true if the Workbook is already open , false if it's closed
+'---------------------------------------------------------------------------------------
+'
+Public Function VtkWorkbookIsOpenFunction(workbookName As String) As Boolean
+    On Error Resume Next
+    Workbooks(workbookName).Activate
+    'if problem when activating the workbook : it is closed
+    'if not : it is open
+    VtkWorkbookIsOpenFunction = (Err = 0)
+End Function
+
+
