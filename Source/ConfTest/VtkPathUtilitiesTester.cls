@@ -35,7 +35,7 @@ Private Sub ITestCase_TearDown()
 End Sub
 
 Public Sub TestPathOfCurrentProject()
-    ' Verify the path of the current project is where VBATollKit is installed
+    ' Verify that the path of the current project is where VBAToolKit is installed
     mAssert.Equals vtkPathOfCurrentProject, vtkInstallPath
 End Sub
 
@@ -49,7 +49,7 @@ Public Sub TestPathToSourceFolder()
     mAssert.Equals vtkPathToSourceFolder, vtkInstallPath & "\Source"
 End Sub
 Public Sub TestPathfinishbyVBAToolKit()
-    ' Verify that the path finish by "\VBAToolKit"
+    ' Verify that the path finishes by "\VBAToolKit"
     mAssert.Equals Right(vtkPathOfCurrentProject, 11), "\VBAToolKit", "the install path must finish by \VBAToolKit"
     ' Verify that the path contain ":\Users\"
     Dim bUser As Boolean, bDocument As Boolean

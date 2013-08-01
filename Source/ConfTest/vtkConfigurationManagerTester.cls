@@ -14,7 +14,7 @@ Implements ITestCase
 Private mManager As TestCaseManager
 Private mAssert As IAssert
 
-Private newWorkbook As Workbook         ' New Workbook created for each test
+Private newWorkBook As Workbook         ' New Workbook created for each test
 Private newWorkbookName As String
 Private newConfManager As vtkConfigurationManager   ' Configuration Manager for the new workbook
 Private newProjectName As String
@@ -27,15 +27,15 @@ Private Const existingProjectName As String = "ExistingProject"
 Private Sub SaveThenReOpenNewWorkbook()
 ' Utility Function for saving then re-open the new workbook and re-initialize the configuration managers
     Dim savedNewWorkbookPath As String
-    savedNewWorkbookPath = newWorkbook.FullName
+    savedNewWorkbookPath = newWorkBook.FullName
 '    If newWorkbook.path = "" Then
 '        newWorkbook.Close SaveChanges:=True, Filename:=savedNewWorkbookPath
 '       Else
 '        newWorkbook.Close SaveChanges:=True
 '    End If
-    newWorkbook.Close SaveChanges:=True
+    newWorkBook.Close SaveChanges:=True
     vtkResetConfigurationManagers           ' reset all configuration managers
-    Set newWorkbook = Workbooks.Open(Filename:=savedNewWorkbookPath)
+    Set newWorkBook = Workbooks.Open(Filename:=savedNewWorkbookPath)
     Set newConfManager = vtkConfigurationManagerForProject("NewProject")
 End Sub
 
@@ -53,9 +53,9 @@ End Property
 
 Private Sub ITestCase_SetUp(Assert As IAssert)
     Set mAssert = Assert
-    Set newWorkbook = vtkCreateExcelWorkbookForTestWithProjectName("NewProject")    ' create an Excel project for tests
-    newWorkbookName = newWorkbook.name
-    newProjectName = newWorkbook.VBProject.name
+    Set newWorkBook = vtkCreateExcelWorkbookForTestWithProjectName("NewProject")    ' create an Excel project for tests
+    newWorkbookName = newWorkBook.name
+    newProjectName = newWorkBook.VBProject.name
     Set newConfManager = vtkConfigurationManagerForProject(newProjectName)
     Dim source As String, destination As String
     FileCopy source:=vtkPathToTemplateFolder & "\" & existingWorkbookName, destination:=vtkPathToTestFolder & "\" & existingProjectName & "_DEV.xlsm"
@@ -64,23 +64,23 @@ Private Sub ITestCase_SetUp(Assert As IAssert)
 End Sub
 
 Private Sub ITestCase_TearDown()
-    vtkCloseAndKillWorkbook wb:=newWorkbook     ' close the new Excel project
+    vtkCloseAndKillWorkbook wb:=newWorkBook     ' close the new Excel project
     vtkCloseAndKillWorkbook wb:=existingWorkbook ' close the existing Excel project
     vtkResetConfigurationManagers             ' reset all configuration managers
 End Sub
 
 Public Sub TestConfigurationSheetCreationForNewProject()
-'       Verify that a Configuration Sheet is created in a new project
+    ' Verify that a configuration sheet is created in a new project
     Dim ws As Worksheet
     On Error Resume Next
-    Set ws = newWorkbook.Sheets("vtkConfigurations")
+    Set ws = newWorkBook.Sheets("vtkConfigurations")
     mAssert.Equals Err, 0, "A configuration manager must create a Configuration sheet"
     On Error GoTo 0
-    mAssert.Should newWorkbook.Sheets("vtkConfigurations") Is newConfManager.configurationSheet, "The configurationSheet property of the conf manager must be equal to the configuration sheet of the workbook"
+    mAssert.Should newWorkBook.Sheets("vtkConfigurations") Is newConfManager.configurationSheet, "The configurationSheet property of the conf manager must be equal to the configuration sheet of the workbook"
 End Sub
 
 Public Sub TestConfigurationSheetRetrievalForExistingProject()
-'       Verify that a Configuration Sheet is retreived in an existing project
+    ' Verify that a configuration sheet is retreived in an existing project
     Dim ws As Worksheet
     On Error Resume Next
     Set ws = existingWorkbook.Sheets("vtkConfigurations")
@@ -90,7 +90,7 @@ Public Sub TestConfigurationSheetRetrievalForExistingProject()
 End Sub
 
 Public Sub TestConfigurationSheetFormatForNewProjet()
-'       Verify the newly created configuration sheet of a new project
+    ' Verify the newly created configuration sheet of a new project
     Dim ws As Worksheet
     Set ws = newConfManager.configurationSheet
     mAssert.Equals ws.Range("A1"), "vtkConfigurations v1.0", "Expected identification of the configuration sheet"
@@ -102,7 +102,7 @@ Public Sub TestConfigurationSheetFormatForNewProjet()
 End Sub
 
 Public Sub TestConfigurationSheetFormatForExistingProjet()
-'       Verify the retrieved configuration sheet from an existing project
+    ' Verify the retrieved configuration sheet of an existing project
     Dim ws As Worksheet
     Set ws = existingConfManager.configurationSheet
     mAssert.Equals ws.Range("A1"), "vtkConfigurations v1.0", "Expected identification of the configuration sheet"
@@ -114,7 +114,7 @@ Public Sub TestConfigurationSheetFormatForExistingProjet()
 End Sub
 
 Public Sub TestGetConfigurationsFromNewProject()
-'       Verify the list of the configurations of a new project
+    ' Verify the list of the configurations of a new project
     mAssert.Equals newConfManager.configurationCount, 2, "There must be two configurations in a new project"
     mAssert.Equals newConfManager.configuration(0), "", "Inexistant configuration number 0"
     mAssert.Equals newConfManager.configuration(1), newProjectName, "Name of the first configuration"
@@ -125,7 +125,7 @@ Public Sub TestGetConfigurationsFromNewProject()
 End Sub
 
 Public Sub TestGetConfigurationsFromExistingProject()
-'       Verify the list of the configurations of an existing project
+    ' Verify the list of the configurations of an existing project
     mAssert.Equals existingConfManager.configurationCount, 2, "There must be two configurations in the existing template project"
     mAssert.Equals existingConfManager.configuration(0), "", "Inexistant configuration number 0"
     mAssert.Equals existingConfManager.configuration(1), existingProjectName, "Name of the first configuration"
@@ -136,7 +136,7 @@ Public Sub TestGetConfigurationsFromExistingProject()
 End Sub
 
 Public Sub TestGetConfigurationPathWithNumberFromExistingProject()
-'       Verify the capability to get the configuration path by number
+    ' Verify the capability to get the configuration path by number
     mAssert.Equals existingConfManager.getConfigurationPathWithNumber(0), "", "Inexistant configuration number 0"
     mAssert.Equals existingConfManager.getConfigurationPathWithNumber(1), "Delivery\ExistingProject.xlsm", "Path of first configuration given by number"
     mAssert.Equals existingConfManager.getConfigurationPathWithNumber(2), "Project\ExistingProject_DEV.xlsm", "Path of second configuration given by number"
@@ -144,13 +144,15 @@ Public Sub TestGetConfigurationPathWithNumberFromExistingProject()
 End Sub
 
 Public Sub TestSetConfigurationPathWithNumberToNewProject()
-'       Verify the capability to set and retrieve the configuration path by number
-    ' set new pathes
+    ' Verify the capability to set and retrieve the configuration path by number
+    ' in a newly created project
+    
+    ' Set new pathes
     newConfManager.setConfigurationPathWithNumber n:=0, path:="Path0"
     newConfManager.setConfigurationPathWithNumber n:=1, path:="Path1"
     newConfManager.setConfigurationPathWithNumber n:=2, path:="Path2"
     newConfManager.setConfigurationPathWithNumber n:=3, path:="Path3"
-    ' verify pathes
+    ' Verify pathes
     mAssert.Equals newConfManager.getConfigurationPathWithNumber(0), "", "Inexistant configuration number 0"
     mAssert.Equals newConfManager.getConfigurationPathWithNumber(1), "Path1", "Path of first configuration given by number"
     mAssert.Equals newConfManager.getConfigurationPathWithNumber(2), "Path2", "Path of second configuration given by number"
@@ -158,15 +160,17 @@ Public Sub TestSetConfigurationPathWithNumberToNewProject()
 End Sub
 
 Public Sub TestSetConfigurationPathWithNumberToSavedProject()
-'       Verify the capability to set and retrieve the configuration path by number
-    ' set new pathes
+    ' Verify the capability to set and retrieve the configuration path by number
+    ' in a saved project
+    
+    ' Set new pathes
     newConfManager.setConfigurationPathWithNumber n:=0, path:="Path0"
     newConfManager.setConfigurationPathWithNumber n:=1, path:="Path1"
     newConfManager.setConfigurationPathWithNumber n:=2, path:="Path2"
     newConfManager.setConfigurationPathWithNumber n:=3, path:="Path3"
-    ' save and re-open file
+    ' Save and re-open file
     SaveThenReOpenNewWorkbook
-    ' verify pathes
+    ' Verify pathes
     mAssert.Equals newConfManager.getConfigurationPathWithNumber(0), "", "Inexistant configuration number 0"
     mAssert.Equals newConfManager.getConfigurationPathWithNumber(1), "Path1", "Path of first configuration given by number"
     mAssert.Equals newConfManager.getConfigurationPathWithNumber(2), "Path2", "Path of second configuration given by number"
@@ -174,7 +178,7 @@ Public Sub TestSetConfigurationPathWithNumberToSavedProject()
 End Sub
 
 Public Sub TestGetConfigurationNumbersFromNewProject()
-'       Verify the capability to get the number of a configuration
+    ' Verify the capability to get the number of a configuration
     mAssert.Equals newConfManager.configurationCount, 2, "There must be two configurations in a new project"
     mAssert.Equals newConfManager.getConfigurationNumber(newProjectName), 1, "Number of the main configuration"
     mAssert.Equals newConfManager.getConfigurationNumber(newProjectName & "_DEV"), 2, "Number of the Development configuration"
@@ -182,28 +186,29 @@ Public Sub TestGetConfigurationNumbersFromNewProject()
 End Sub
 
 Public Sub TestGetConfigurationPathFromExistingProject()
-'       Verify the capability to get a configutaion path given the configuration name
+    ' Verify the capability to get a configuration path given the configuration name
     mAssert.Equals existingConfManager.getConfigurationPath(existingProjectName), "Delivery\ExistingProject.xlsm", "Path of the main configuration"
     mAssert.Equals existingConfManager.getConfigurationPath(existingProjectName & "_DEV"), "Project\ExistingProject_DEV.xlsm", "Path of the Development configuration"
     mAssert.Equals existingConfManager.getConfigurationPath("InexistantConfiguration"), "", "Inexistant configuration"
 End Sub
 
 Public Sub TestSetConfigurationPathToSavedProject()
-'       Verify the capability to set and retrieve the configuration path by configuration name
-    ' set new pathes
+    ' Verify the capability to set and retrieve the configuration path by configuration name
+    
+    ' Set new pathes
     newConfManager.setConfigurationPath configuration:="InexistantConfiguration", path:="Path0"
     newConfManager.setConfigurationPath configuration:=newProjectName, path:="Path1"
     newConfManager.setConfigurationPath configuration:=newProjectName & "_DEV", path:="Path2"
-    ' save and re-open file
+    ' Save and re-open file
     SaveThenReOpenNewWorkbook
-    ' verify pathes
+    ' Verify pathes
     mAssert.Equals newConfManager.getConfigurationPath("InexistantConfiguration"), "", "Inexistant configuration"
     mAssert.Equals newConfManager.getConfigurationPath(newProjectName), "Path1", "Path of first configuration given by name"
     mAssert.Equals newConfManager.getConfigurationPath(newProjectName & "_DEV"), "Path2", "Path of second configuration given by name"
 End Sub
 
 Public Sub TestGetModulesFromExistingProject()
-'       Verify the capability to retrieve the list of Modules from an existing project
+    ' Verify the capability to retrieve the list of modules from an existing project
     mAssert.Equals existingConfManager.moduleCount, 5, "There must be five configurations in the existing project"
     mAssert.Equals existingConfManager.module(0), "", "Inexistant module number 0"
     mAssert.Equals existingConfManager.module(1), "Module1", "Name of the first module"
@@ -217,7 +222,7 @@ Public Sub TestGetModulesFromExistingProject()
 End Sub
 
 Public Sub TestGetModulesFromNewProject()
-'       Verify the capability to retrieve the list of Modules from an existing project
+    ' Verify the capability to retrieve the list of Modules from an existing project
     mAssert.Equals newConfManager.moduleCount, 0, "There must be no modules in a new project"
     mAssert.Equals newConfManager.module(0), "", "Inexistant module number 0"
     mAssert.Equals newConfManager.module(1), "", "Inexistant module number 1"
@@ -227,7 +232,7 @@ Public Sub TestGetModulesFromNewProject()
 End Sub
 
 Public Sub TestGetModuleNumbersFromExistingProject()
-'       Verify the capability to get the number of a configuration
+    ' Verify the capability to get the number of a configuration
     mAssert.Equals existingConfManager.getModuleNumber("Module0"), 0, "Inexistant module"
     mAssert.Equals existingConfManager.getModuleNumber("Module1"), 1, "First Module"
     mAssert.Equals existingConfManager.getModuleNumber("Module2"), 2, "Second Module"
@@ -238,13 +243,14 @@ Public Sub TestGetModuleNumbersFromExistingProject()
 End Sub
 
 Public Sub TestAddNonExistantModuleToSavedProject()
-'       Verify the capability to add a new module, non existant, and retrieve it
-    ' set new modules
+    ' Verify the capability to add a new module, non existant, and retrieve it
+    
+    ' Set new modules
     mAssert.Equals newConfManager.addModule(module:="NewModule1"), 1, "Number of the first module added"
     mAssert.Equals newConfManager.addModule(module:="NewModule2"), 2, "Number of the second module added"
-    ' save and re-open file
+    ' Save and re-open file
     SaveThenReOpenNewWorkbook
-    ' verify modules
+    ' Verify modules
     mAssert.Equals newConfManager.moduleCount, 2, "There must be two new modules in the saved project"
     mAssert.Equals newConfManager.module(0), "", "Inexistant module number 0"
     mAssert.Equals newConfManager.module(1), "NewModule1", "New module number 1"
@@ -253,24 +259,25 @@ Public Sub TestAddNonExistantModuleToSavedProject()
 End Sub
 
 Public Sub TestAddExistantModuleToExistingProject()
-'       Verify the capability to not add an existing module in an existing project
+    ' Verify the capability to refuse to add an existing module in an existing project
     Dim n As Integer
-    ' set new modules
+    ' Set new modules
     mAssert.Equals existingConfManager.addModule(module:="Module1"), -1, "Number of the first existing module"
     mAssert.Equals existingConfManager.addModule(module:="Module5"), -5, "Number of the fifth existing module"
     mAssert.Equals existingConfManager.moduleCount, 5, "There must be five modules, no change, in the existing project"
 End Sub
 
 Public Sub TestAddModuleWithExistingStringToExistingProject()
-'       Verify the capability to add a new module whose name is included in existing module in an existing project
+    ' Verify the capability to add in an existing project a new module,
+    ' whose name is included in the existing module
     Dim n As Integer
-    ' set new modules
+    ' Set new modules
     mAssert.Equals existingConfManager.addModule(module:="Module"), 6, "Number for the new module"
     mAssert.Equals existingConfManager.moduleCount, 6, "There must be six modules, one more module, in the existing project"
 End Sub
 
 Public Sub TestGetModulePathWithNumberFromExistingProject()
-'       Verify the capability to get the module path by number
+    ' Verify the capability to get the module path by number
     mAssert.Equals existingConfManager.getModulePathWithNumber(numModule:=0, numConfiguration:=2), "", "Inexistant module path number 0,2"
     mAssert.Equals existingConfManager.getModulePathWithNumber(numModule:=3, numConfiguration:=3), "", "Inexistant module path number 3,3"
     mAssert.Equals existingConfManager.getModulePathWithNumber(numModule:=1, numConfiguration:=1), "Path1Module1", "Module path number 1,1"
@@ -286,29 +293,30 @@ Public Sub TestGetModulePathWithNumberFromExistingProject()
 End Sub
 
 Public Sub TestGetModulePathWithNumberForNewModule()
-'       Verify the default module path define at module adding
+    ' Verify the default module path define at module adding
     mAssert.Equals newConfManager.addModule(module:="NewModule1"), 1, "Number of the first module added"
     mAssert.Equals newConfManager.getModulePathWithNumber(numModule:=1, numConfiguration:=1), "", "Inexistant module path number 1,1"
     mAssert.Equals newConfManager.getModulePathWithNumber(numModule:=1, numConfiguration:=2), "", "Inexistant module path number 1,2"
 End Sub
 
 Public Sub TestAddModulePathToSavedProject()
-'       Verify the capability to add a new module, non existant, and retrieve it
-    ' set new modules
+    ' Verify the capability to add a new module, non existant, and retrieve it
+    
+    ' Set new modules
     mAssert.Equals newConfManager.addModule(module:="NewModule1"), 1, "Number of the first module added"
     mAssert.Equals newConfManager.addModule(module:="NewModule2"), 2, "Number of the second module added"
     mAssert.Equals newConfManager.addModule(module:="NewModule3"), 3, "Number of the third module added"
     mAssert.Equals newConfManager.addModule(module:="NewModule4"), 4, "Number of the fourth module added"
-    ' save and re-open file
+    ' Save and re-open file
     SaveThenReOpenNewWorkbook
-    ' set new pathes
+    ' Set new pathes
     newConfManager.setModulePathWithNumber path:="Path1Module1", numModule:=1, numConfiguration:=1
     newConfManager.setModulePathWithNumber path:="Path2Module1", numModule:=1, numConfiguration:=2
     newConfManager.setModulePathWithNumber path:="Path1Module2", numModule:=2, numConfiguration:=1
     newConfManager.setModulePathWithNumber path:="Path2Module3", numModule:=3, numConfiguration:=2
-    ' save and re-open file
+    ' Save and re-open file
     SaveThenReOpenNewWorkbook
-    ' verify module pathes
+    ' Verify module pathes
     mAssert.Equals newConfManager.getModulePathWithNumber(numModule:=1, numConfiguration:=1), "Path1Module1", "Module path number 1,1"
     mAssert.Equals newConfManager.getModulePathWithNumber(numModule:=1, numConfiguration:=2), "Path2Module1", "Module path number 1,2"
     mAssert.Equals newConfManager.getModulePathWithNumber(numModule:=2, numConfiguration:=1), "Path1Module2", "Module path number 2,1"

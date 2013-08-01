@@ -14,9 +14,9 @@ Implements ITestCase
 Private mManager As TestCaseManager
 Private mAssert As IAssert
 
-Private wbForTest As Workbook       ' default WorkBook for test
-Private workbookName As String      ' default workbook Name for test
-Private Const projectName As String = "TestProject"     ' default project Name for test
+Private wbForTest As Workbook       ' Default test workbook
+Private workbookName As String      ' Default name of the test workbook
+Private Const projectName As String = "TestProject"     ' Default name of the test project
 
 Private Sub Class_Initialize()
     Set mManager = New TestCaseManager
@@ -32,36 +32,40 @@ End Property
 
 Private Sub ITestCase_SetUp(Assert As IAssert)
     Set mAssert = Assert
-    Set wbForTest = vtkCreateExcelWorkbookForTestWithProjectName(projectName)   ' create the default Excel project for tests
+    ' Create the default Excel project for tests
+    Set wbForTest = vtkCreateExcelWorkbookForTestWithProjectName(projectName)
     workbookName = wbForTest.name
 End Sub
 
 Private Sub ITestCase_TearDown()
     Dim name As String
     vtkCloseAndKillWorkbook wb:=wbForTest
-    vtkResetConfigurationManagers               ' reset all configuration managers
+    ' Reset all configuration managers
+    vtkResetConfigurationManagers
 End Sub
 
 Public Sub TestUtilityFunctionCreateExcelProject()
-'       Verify that the utility function createExcelProjectNamed correctly create a new Excel file with proper project name
+    ' Verify that the utility function createExcelProjectNamed correctly creates a new Excel file
+    ' with proper project name
     mAssert.Equals wbForTest.name, workbookName, "Expected name for Excel project"
 End Sub
 
 Public Sub TestConfigurationManagerIsNotNull()
-'       Verify that the configuration Manager is not null
+    ' Verify that the configuration Manager is not null
     mAssert.Should Not vtkConfigurationManagerForProject(projectName) Is Nothing, "A configuartion manager must not be null"
 End Sub
 
 Public Sub TestConfigurationManagersAreDifferentForTwoProjects()
-'       Verify that the configuration Managers for two project are different
+    ' Verify that the configuration managers for two projects are different
     Dim secondWb As Workbook
-    Set secondWb = vtkCreateExcelWorkbookForTestWithProjectName("SecondTest")    ' create a second Excel project for test
+    ' Create a second Excel project for test
+    Set secondWb = vtkCreateExcelWorkbookForTestWithProjectName("SecondTest")
     mAssert.Should Not vtkConfigurationManagerForProject(projectName) Is vtkConfigurationManagerForProject("SecondTest"), "Two configuration managers must not be equal"
     vtkCloseAndKillWorkbook wb:=secondWb
 End Sub
 
 Public Sub TestConfigurationManagerIsInvariant()
-'       Verify that the configuration Manager for a project is always the same
+    ' Verify that the configuration manager for a project is always the same
     Dim cm As vtkConfigurationManager
     Set cm = vtkConfigurationManagerForProject(projectName)
     mAssert.Should vtkConfigurationManagerForProject(projectName) Is cm, "The configuration manager for a project must be always the same"
