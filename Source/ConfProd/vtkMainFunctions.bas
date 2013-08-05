@@ -39,7 +39,6 @@ Public Function vtkCreateProject(path As String, name As String, Optional displa
     ' Create the vtkProject object attached to the new project
     Dim project As vtkProject
     Set project = vtkProjectForName(projectName:=name)
-
     Dim rootPath As String
     rootPath = path & "\" & project.projectName
     
@@ -95,4 +94,3 @@ vtkCreateProject_Error:
     vtkCreateProject = Err.Number
     If displayError Then MsgBox "Error " & Err.Number & " (" & Err.Description & ") in procedure vtkCreateProject of Module MainFunctions"
 End Function
-
