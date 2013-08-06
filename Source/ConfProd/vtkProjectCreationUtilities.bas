@@ -46,7 +46,6 @@ Public Function vtkInitializeVbaUnitNamesAndPathes(project As String) As Boolean
     vtkInitializeVbaUnitNamesAndPathes = ret
 End Function
 
-
 '---------------------------------------------------------------------------------------
 ' Procedure : VtkAvtivateReferences
 ' Author    : Abdelfattah Lahbib
