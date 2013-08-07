@@ -10,39 +10,24 @@ Option Explicit
 '---------------------------------------------------------------------------------------
 '
 Public Function vtkInitializeVbaUnitNamesAndPathes(project As String) As Boolean
-    Dim tableofvbaunitname(17) As String
-        tableofvbaunitname(0) = "VbaUnitMain"
-        tableofvbaunitname(1) = "Assert"
-        tableofvbaunitname(2) = "AutoGen"
-        tableofvbaunitname(3) = "IAssert"
-        tableofvbaunitname(4) = "IResultUser"
-        tableofvbaunitname(5) = "IRunManager"
-        tableofvbaunitname(6) = "ITest"
-        tableofvbaunitname(7) = "ITestCase"
-        tableofvbaunitname(8) = "ITestManager"
-        tableofvbaunitname(9) = "RunManager"
-        tableofvbaunitname(10) = "TestCaseManager"
-        tableofvbaunitname(11) = "TestClassLister"
-        tableofvbaunitname(12) = "TesterTemplate"
-        tableofvbaunitname(13) = "TestFailure"
-        tableofvbaunitname(14) = "TestResult"
-        tableofvbaunitname(15) = "TestRunner"
-        tableofvbaunitname(16) = "TestSuite"
-        tableofvbaunitname(17) = "TestSuiteManager"
     Dim i As Integer, cm As vtkConfigurationManager, ret As Boolean, nm As Integer, nc As Integer, ext As String
+    Dim moduleName As String, module As VBComponent
+    
     Set cm = vtkConfigurationManagerForProject(project)
     nc = cm.getConfigurationNumber(vtkProjectForName(project).projectDEVName)
     ret = (nc > 0)
-    For i = LBound(tableofvbaunitname) To UBound(tableofvbaunitname)
-        nm = cm.addModule(tableofvbaunitname(i))
+    
+    For i = 1 To vtkVBAUnitModulesList.Count
+        moduleName = vtkVBAUnitModulesList.Item(i)
+        Set module = ThisWorkbook.VBProject.VBComponents(moduleName)
+        
+        nm = cm.addModule(moduleName)
         ret = ret And (nm > 0)
-        If i <= 0 Then      ' It's a Standard Module (WARNING, magical number)
-            ext = ".bas"
-           Else
-            ext = ".cls"    ' It's a Class Module
-        End If
-        cm.setModulePathWithNumber path:="Source\VbaUnit\" & tableofvbaunitname(i) & ext, numModule:=nm, numConfiguration:=nc
+        
+        cm.setModulePathWithNumber path:=vtkStandardPathForModule(module), numModule:=nm, numConfiguration:=nc
+        
     Next i
+    
     vtkInitializeVbaUnitNamesAndPathes = ret
 End Function
 

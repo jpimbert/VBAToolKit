@@ -28,119 +28,61 @@ End Property
 
 Private Sub ITestCase_SetUp(Assert As IAssert)
     Set mAssert = Assert
-    Dim returnvalue As String
-    
-    Workbooks.Add.SaveAs (vtkTestPath & "\" & vtkTestProjectName & "_Test"), FileFormat:=(52) '52 is xlsm format
-    returnvalue = vtkConfSheet()
 End Sub
 
 Private Sub ITestCase_TearDown()
-Application.DisplayAlerts = False
-On Error Resume Next
-    Workbooks(vtkTestProjectName & "_Test" & ".xlsm").Close
-    ' Delete Created WorkBook
-    Kill vtkTestPath & "\" & vtkTestProjectName & "_Test" & ".xlsm"
-    Kill vtkTestPath & "\test.frm"
-On Error GoTo 0
-Application.DisplayAlerts = True
 End Sub
-Public Sub TestConfSheetCorrectlyCreated()
-' Test that the configuration sheet was created
-Dim found As Boolean
-Dim i As Integer
-found = False
-    For i = 1 To Sheets.Count
-        If Sheets(i).name = "configurations" Then
-            found = True
-        End If
-    Next
-    
-mAssert.Should found = True, "configurations sheet must be created"
-End Sub
-Public Sub TestModuleNameRangeCorrectlyNammed()
-    Dim returnvalue As String
-    'return value = range letter
-    returnvalue = vtkModuleNameRange()
-mAssert.Equals ActiveWorkbook.Sheets(vtkConfSheet).Range(returnvalue & vtkFirstLine - 2), "Module Name", "range ModuleName must nammed correctly"
-End Sub
-Public Sub TestInformationRangeCorretlyNammed()
-    Dim returnvalue As String
-    'return value = range letter
-    returnvalue = vtkInformationRange()
-    mAssert.Equals ActiveWorkbook.Sheets(vtkConfSheet).Range(returnvalue & vtkFirstLine - 3), "File Informations", "range File Informations must nammed correctly"
-End Sub
-Public Sub TestVbaUnitModuleNameCorrectlyExported()
-    ' Test that a cell contains a VbaUnit module name before and after executing function "VtkInitializeExcelfileWithVbaUnitModuleName()"
-    Dim returnvalue As Integer
 
-    mAssert.Equals ActiveWorkbook.Sheets(vtkConfSheet).Range(vtkModuleNameRange & vtkFirstLine), "", "the cell must be empty , vbaunit module not yet exported"
-    mAssert.Equals ActiveWorkbook.Sheets(vtkConfSheet).Range(vtkModuleNameRange & vtkFirstLine + 17), "", "the range must be empty , vbaunit module not yet exported"
-
-    returnvalue = VtkInitializeExcelfileWithVbaUnitModuleName()
-     
-    mAssert.Should ActiveWorkbook.Sheets(vtkConfSheet).Range(vtkModuleNameRange & vtkFirstLine) <> "", "the cell must be empty , vbaunit module not yet exported"
-    mAssert.Should ActiveWorkbook.Sheets(vtkConfSheet).Range(vtkModuleNameRange & vtkFirstLine + 17) <> "", "the range must be empty , vbaunit module not yet exported"
-
+Public Sub TestNumberOfVBAUnitModules()
+    ' Verify the correct number of VBAUnit Modules in the list
+    mAssert.Equals vtkVBAUnitModulesList.Count, 18, "There are 18 VBAUnit Modules"
 End Sub
-Public Sub TestIsVbaUnitModule()
-    ' Return true if a module belongs to VbaUnit, false if it doesn't
-    Dim returnvalue As Boolean
-    Dim returnvalue2 As Integer
- 
-    mAssert.Should vtkIsVbaUnit(ActiveWorkbook.Sheets(vtkConfSheet).Range(vtkModuleNameRange & vtkFirstLine)) = False, "vbaunit list not yet created"
-    mAssert.Should vtkIsVbaUnit(ActiveWorkbook.Sheets(vtkConfSheet).Range(vtkModuleNameRange & vtkFirstLine + 17)) = False, "vbaunit list not yet created"
- 
-    returnvalue2 = VtkInitializeExcelfileWithVbaUnitModuleName()
-     
-    mAssert.Should vtkIsVbaUnit(ActiveWorkbook.Sheets(vtkConfSheet).Range(vtkModuleNameRange & vtkFirstLine)) = True, "vtkIsVbaUnit must return true the list is already created"
-    mAssert.Should vtkIsVbaUnit(ActiveWorkbook.Sheets(vtkConfSheet).Range(vtkModuleNameRange & vtkFirstLine + 17)) = True, "vtkIsVbaUnit must return true the list is already created"
-    mAssert.Should vtkIsVbaUnit(ActiveWorkbook.Sheets(vtkConfSheet).Range(vtkModuleNameRange & vtkFirstLine + 19)) = False, "this cell don't contain avalid vbaunit module"
- 
-End Sub
-Public Sub TestListOfAllModule()
-    ' Compare the number of modules in the configuration sheet with the number of modules in the workbook
-    ' Sheet modules name (workbook module + vbaunit module name(not imported yet))
-    Dim returnvalue As Integer
-    Dim i As Integer
-    Dim modulename As String
-    
-    returnvalue = vtkListAllModules()
-    i = 0
-    modulename = ActiveWorkbook.Sheets(vtkConfSheet).Range(vtkModuleNameRange & vtkFirstLine + i)
-    While modulename <> ""
-        i = i + 1
-        modulename = ActiveWorkbook.Sheets(vtkConfSheet).Range(vtkModuleNameRange & vtkFirstLine + i)
-    Wend
-    ' ActiveWorkbook.VBProject.VBComponents.Count +18(vbaunitmodulenumber)
-    mAssert.Equals i, ActiveWorkbook.VBProject.VBComponents.Count + 18
-End Sub
-Public Sub TestCreateModuleFileFunction()
-Dim returnvalue As String
 
-returnvalue = vtkCreateModuleFile(vtkTestPath & "\test.frm")
-mAssert.Should Dir(vtkTestPath & "\test.frm") <> "", "vtkCreateModuleFile must create somethings"
+Public Sub TestVBAUnitMainIsTheFirstVBAUnitModule()
+    ' Verify that VBAUnitMain is the first VBAUnit Module in the list
+    '   The purpose is just to access the list by Item number
+    mAssert.Equals vtkVBAUnitModulesList.Item(1), "VbaUnitMain", "VBAUnitMain must be the first VBAUnit Module"
+End Sub
+
+Public Sub TestIAssertIsInVBAUnitModulesList()
+    ' Verify that IAssert is included in the VBAUnit Module list
+    '   The purpose is just to access the list by Item name
+    mAssert.Equals vtkVBAUnitModulesList.Item("IAssert"), "IAssert", "IAssert must be included in the list"
+End Sub
+
+Public Sub TestVBAUnitStandardCategory()
+    ' Verify that the category of a VBAUnit Module is "VBAUnit"
+    mAssert.Equals vtkStandardCategoryForModuleName("TesterTemplate"), "VBAUnit", "TesterTemplate is a VBAUnit Module"
+End Sub
+
+Public Sub TestTestStandardCategory()
+    ' Verify that the category of a Module ending with Tester is "Test"
+    mAssert.Equals vtkStandardCategoryForModuleName("TemplateTester"), "Test", "TemplateTester is a Test Module"
+End Sub
+
+Public Sub TestProdStandardCategory()
+    ' Verify that the category of a standard Module is "Prod"
+    mAssert.Equals vtkStandardCategoryForModuleName("Template"), "Prod", "Template is a standard Module"
 End Sub
 
 Private Function ITest_Suite() As TestSuite
     Set ITest_Suite = New TestSuite
-    ITest_Suite.AddTest ITest_Manager.ClassName, "TestConfSheetCorrectlyCreated"
-    ITest_Suite.AddTest ITest_Manager.ClassName, "TestModuleNameRangeCorrectlyNammed"
-    ITest_Suite.AddTest ITest_Manager.ClassName, "TestInformationRangeCorretlyNammed"
-    ITest_Suite.AddTest ITest_Manager.ClassName, "TestVbaUnitModuleNameCorrectlyExported"
-    ITest_Suite.AddTest ITest_Manager.ClassName, "TestIsVbaUnitModule"
-    ITest_Suite.AddTest ITest_Manager.ClassName, "TestListOfAllModule"
-    ITest_Suite.AddTest ITest_Manager.ClassName, "TestCreateModuleFileFunction"
+    ITest_Suite.AddTest ITest_Manager.ClassName, "TestNumberOfVBAUnitModules"
+    ITest_Suite.AddTest ITest_Manager.ClassName, "TestVBAUnitMainIsTheFirstVBAUnitModule"
+    ITest_Suite.AddTest ITest_Manager.ClassName, "TestIAssertIsInVBAUnitModulesList"
+    ITest_Suite.AddTest ITest_Manager.ClassName, "TestVBAUnitStandardCategory"
+    ITest_Suite.AddTest ITest_Manager.ClassName, "TestTestStandardCategory"
+    ITest_Suite.AddTest ITest_Manager.ClassName, "TestProdStandardCategory"
 End Function
 
 Private Sub ITestCase_RunTest()
     Select Case mManager.methodName
-        Case "TestConfSheetCorrectlyCreated": TestConfSheetCorrectlyCreated
-        Case "TestModuleNameRangeCorrectlyNammed": TestModuleNameRangeCorrectlyNammed
-        Case "TestInformationRangeCorretlyNammed": TestInformationRangeCorretlyNammed
-        Case "TestVbaUnitModuleNameCorrectlyExported": TestVbaUnitModuleNameCorrectlyExported
-        Case "TestIsVbaUnitModule": TestIsVbaUnitModule
-        Case "TestListOfAllModule": TestListOfAllModule
-        Case "TestCreateModuleFileFunction": TestCreateModuleFileFunction
+        Case "TestNumberOfVBAUnitModules": TestNumberOfVBAUnitModules
+        Case "TestVBAUnitMainIsTheFirstVBAUnitModule": TestVBAUnitMainIsTheFirstVBAUnitModule
+        Case "TestIAssertIsInVBAUnitModulesList": TestIAssertIsInVBAUnitModulesList
+        Case "TestVBAUnitStandardCategory": TestVBAUnitStandardCategory
+        Case "TestTestStandardCategory": TestTestStandardCategory
+        Case "TestProdStandardCategory": TestProdStandardCategory
         Case Else: mAssert.Should False, "Invalid test name: " & mManager.methodName
     End Select
 End Sub
