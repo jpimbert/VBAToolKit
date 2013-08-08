@@ -23,7 +23,7 @@ Private existingWorkbook As Workbook    ' Existing Workbook opened for each test
 Private Const existingWorkbookNameForTest As String = "WorkBookForConfigurationsTests.xlsm"
 Private existingConfManager As vtkConfigurationManager   ' Configuration Manager for the new workbook
 Private Const existingProjectName As String = "ExistingProject"
-Private existingWorkBookName As String
+Private existingWorkbookName As String
 
 Private Sub SaveThenReOpenNewWorkbook()
 ' Utility Function for saving then re-open the new workbook and re-initialize the configuration managers
@@ -61,7 +61,7 @@ Private Sub ITestCase_SetUp(Assert As IAssert)
     Dim source As String, destination As String
     FileCopy source:=vtkPathToTemplateFolder & "\" & existingWorkbookNameForTest, destination:=vtkPathToTestFolder & "\" & existingProjectName & "_DEV.xlsm"
     Set existingWorkbook = Workbooks.Open(Filename:=vtkPathToTestFolder & "\" & existingProjectName & "_DEV.xlsm")
-    existingWorkBookName = existingWorkbook.name
+    existingWorkbookName = existingWorkbook.name
     Set existingConfManager = vtkConfigurationManagerForProject(existingProjectName)
 End Sub
 
@@ -75,16 +75,18 @@ Public Sub TestConfigurationSheetExistsInExistingWorkbook()
     '   Verify that the configuration sheet presence is detected in existing workbook
     '   using a fresh configuration Manager (with no default sheet initialized)
     Dim cm As New vtkConfigurationManager
-    mAssert.Should cm.isConfigurationInitializedForWorkbook(ExcelName:=existingWorkBookName), "The Configuration sheet must exist in existing workbook"
+    mAssert.Should cm.isConfigurationInitializedForWorkbook(ExcelName:=existingWorkbookName), "The Configuration sheet must exist in existing workbook"
 End Sub
 
 Public Sub TestConfigurationSheetDoesntExistInNewWorkbook()
     '   Verify that the configuration sheet missing is detected in new workbook
     '   using a fresh configuration Manager (with no default sheet initialized)
-    Dim cm As New vtkConfigurationManager, wb As Workbook
+    Dim cm As New vtkConfigurationManager, wb As Workbook, wbFullName As String
     Set wb = vtkCreateExcelWorkbookForTestWithProjectName("NewWorkbook")    ' create a fresh new Excel workbook
+    wbFullName = wb.FullName
     mAssert.Should Not cm.isConfigurationInitializedForWorkbook(ExcelName:=wb.name), "The Configuration sheet must not exist in new workbook"
     wb.Close SaveChanges:=False
+    Kill PathName:=wbFullName
 End Sub
 
 Public Sub TestConfigurationSheetCreationForNewProject()
