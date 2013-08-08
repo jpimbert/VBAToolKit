@@ -14,7 +14,7 @@ Implements ITestCase
 Private mManager As TestCaseManager
 Private mAssert As IAssert
 
-Private wbForTest As workbook       ' default WorkBook for test
+Private wbForTest As Workbook       ' default WorkBook for test
 Private workbookName As String      ' default workbook Name for test
 Private Const projectName As String = "TestProject"     ' default project Name for test
 Private Const uninitializedWorkbookName As String = "UninitializedProject.xlsm"     ' unititialized workbook Name for test
@@ -61,7 +61,7 @@ End Sub
 
 Public Sub TestConfigurationManagersAreDifferentForTwoProjects()
 '       Verify that the configuration Managers for two project are different
-    Dim secondWb As workbook
+    Dim secondWb As Workbook
     Set secondWb = vtkCreateExcelWorkbookForTestWithProjectName("SecondTest")    ' create a second Excel project for test
     mAssert.Should Not vtkConfigurationManagerForProject(projectName) Is vtkConfigurationManagerForProject("SecondTest"), "Two configuration managers must not be equal"
     vtkCloseAndKillWorkbook wb:=secondWb
@@ -126,7 +126,7 @@ Public Sub TestConfigurationAfterProjectConfigurationSheetInitialization()
     '   This specific test verifies the project name modification of the active workbook
     
     ' Open uninitialized workbook
-    Dim pName As String, cm As vtkConfigurationManager
+    Dim pName As String
     vtkCloseAndKillWorkbook wb:=wbForTest
     Set wbForTest = Workbooks.Open(Filename:=vtkPathToTestFolder & "\" & uninitializedWorkbookName)
     pName = wbForTest.VBProject.name
@@ -135,7 +135,27 @@ Public Sub TestConfigurationAfterProjectConfigurationSheetInitialization()
     vtkInitializeConfigurationForActiveWorkBook
     
     ' Verify the configuration
+    Dim cm As vtkConfigurationManager, p As vtkProject
+    Set p = vtkProjectForName(projectName:=pName)
     Set cm = vtkConfigurationManagerForProject(projectName:=pName)
+    Dim nc_dev As Integer, nc_prod As Integer
+    nc_dev = cm.getConfigurationNumber(configuration:=p.projectDEVName)
+    nc_prod = cm.getConfigurationNumber(configuration:=p.projectName)
+    
+    mAssert.Equals cm.moduleCount, 5, "There are 5 modules to export, the Document modules are not exported"
+    
+    mAssert.Equals cm.getModulePathWithNumber(numModule:=cm.getModuleNumber("IAssert"), numConfiguration:=nc_dev), "Source\VbaUnit\IAssert.cls", "Path for IAssert module for Test configuration"
+    mAssert.Equals cm.getModulePathWithNumber(numModule:=cm.getModuleNumber("UserForm"), numConfiguration:=nc_dev), "Source\ConfProd\UserForm.frm", "Path for UserForm module for Test configuration"
+    mAssert.Equals cm.getModulePathWithNumber(numModule:=cm.getModuleNumber("Module"), numConfiguration:=nc_dev), "Source\ConfProd\Module.bas", "Path for Module module for Test configuration"
+    mAssert.Equals cm.getModulePathWithNumber(numModule:=cm.getModuleNumber("Class"), numConfiguration:=nc_dev), "Source\ConfProd\Class.cls", "Path for Class module for Test configuration"
+    mAssert.Equals cm.getModulePathWithNumber(numModule:=cm.getModuleNumber("ClassTester"), numConfiguration:=nc_dev), "Source\ConfTest\ClassTester.cls", "Path for ClassTester module for Test configuration"
+    
+    mAssert.Equals cm.getModulePathWithNumber(numModule:=cm.getModuleNumber("IAssert"), numConfiguration:=nc_prod), "", "Path for IAssert module for Prod configuration"
+    mAssert.Equals cm.getModulePathWithNumber(numModule:=cm.getModuleNumber("UserForm"), numConfiguration:=nc_prod), "Source\ConfProd\UserForm.frm", "Path for UserForm module for Prod configuration"
+    mAssert.Equals cm.getModulePathWithNumber(numModule:=cm.getModuleNumber("Module"), numConfiguration:=nc_prod), "Source\ConfProd\Module.bas", "Path for Module module for Prod configuration"
+    mAssert.Equals cm.getModulePathWithNumber(numModule:=cm.getModuleNumber("Class"), numConfiguration:=nc_prod), "Source\ConfProd\Class.cls", "Path for Class module for Prod configuration"
+    mAssert.Equals cm.getModulePathWithNumber(numModule:=cm.getModuleNumber("ClassTester"), numConfiguration:=nc_prod), "", "Path for ClassTester module for Prod configuration"
+    
 End Sub
 
 Private Function ITest_Suite() As TestSuite

@@ -86,26 +86,25 @@ Public Sub vtkInitializeConfigurationForActiveWorkBook()
     ' Change the workbook name
     ActiveWorkbook.SaveAs Filename:=ActiveWorkbook.path & "\" & project.workbookDEVName
     
+    ' Prepare configuration manager
+    Dim i As Integer, c As VBComponent, cn_dev As Integer, cn_prod As Integer, nm As Integer
+    Set cm = vtkConfigurationManagerForProject(projectName:=project.projectName)
+    cn_dev = cm.getConfigurationNumber(configuration:=project.projectDEVName)
+    cn_prod = cm.getConfigurationNumber(configuration:=project.projectName)
+    
     ' List all modules
-'    Dim i As Integer, c As VBComponent
-'    For i = 1 To ActiveWorkbook.VBProject.VBComponents.Count
-'        Set c = ActiveWorkbook.VBProject.VBComponents.Item(i)
-'        Debug.Print c.name, VBComponentTypeAsString(c.Type)
-'    Next
+    For i = 1 To ActiveWorkbook.VBProject.VBComponents.Count
+        Set c = ActiveWorkbook.VBProject.VBComponents.Item(i)
+        If c.Type <> vbext_ct_Document Then
+            nm = cm.addModule(c.name)
+            cm.setModulePathWithNumber path:=vtkStandardPathForModule(module:=c), numModule:=nm, numConfiguration:=cn_dev
+            If vtkStandardCategoryForModuleName(moduleName:=c.name) Like "Prod" Then
+                cm.setModulePathWithNumber path:=vtkStandardPathForModule(module:=c), numModule:=nm, numConfiguration:=cn_prod
+            End If
+        End If
+    Next
+    
+    ' Save the new workbook
+    ActiveWorkbook.save
+    
 End Sub
-
-Private Function VBComponentTypeAsString(ctype As Integer)
-    Select Case ctype
-        Case vbext_ct_ActiveXDesigner
-            VBComponentTypeAsString = "ActiveX"
-        Case vbext_ct_ClassModule
-            VBComponentTypeAsString = "Class"
-        Case vbext_ct_Document
-            VBComponentTypeAsString = "Document"
-        Case vbext_ct_MSForm
-            VBComponentTypeAsString = "Form"
-        Case vbext_ct_StdModule
-            VBComponentTypeAsString = "Standard"
-    End Select
-End Function
-
