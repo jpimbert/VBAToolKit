@@ -60,6 +60,24 @@ Public Property Let projectName(ByVal sprojectName As String)
     End If
 End Property
 
+'---------------------------------------------------------------------------------------
+' Function  : isConfigurationInitializedForWorkbook
+' Author    : Jean-Pierre Imbert
+' Date      : 08/08/2013
+' Purpose   : return True if a configuration sheet is already initialized in the workbook
+'             - the parameter is an Excel Workbook name
+'             - the Excel Workbook must be opened
+' WARNING   : the configuration manager must not be initialized with a project name
+'             because the project name setting implies the configuration sheet initialization
+'---------------------------------------------------------------------------------------
+'
+Public Function isConfigurationInitializedForWorkbook(ExcelName As String) As Boolean
+    Dim ws As Worksheet
+   On Error Resume Next
+    Set ws = Workbooks(ExcelName).Worksheets(sheetName)
+   On Error GoTo 0
+    isConfigurationInitializedForWorkbook = Not (ws Is Nothing)
+End Function
 
 '---------------------------------------------------------------------------------------
 ' Procedure : setConfigurationSheet
@@ -80,7 +98,7 @@ Private Sub setConfigurationSheet()
         '   Initialize the configuration sheet
         initializeConfigurationSheet ws
         End If
-    ' Verify that the configuration sheet is a
+    ' Verify that the configuration sheet is in last known version
     If ws.Range("A1") <> currentVersion Then
         ' Code to convert from previous version will be implemented here
         End If
