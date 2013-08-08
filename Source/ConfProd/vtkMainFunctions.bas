@@ -42,24 +42,10 @@ Public Function vtkCreateProject(path As String, name As String, Optional displa
     Dim rootPath As String
     rootPath = path & "\" & project.projectName
     
-    ' Create main folder
-    MkDir rootPath
-    ' Create Delivery folder
-    MkDir rootPath & "\" & "Delivery"
-    ' Create Project folder
-    MkDir rootPath & "\" & "Project"
-    ' Create Tests folder
-    MkDir rootPath & "\" & "Tests"
-    ' Create GitLog Folder
-    MkDir rootPath & "\" & "GitLog"
-    ' Create Source folder
-    MkDir rootPath & "\" & "Source"
-    ' Create ConfProd folder
-    MkDir rootPath & "\" & "Source" & "\" & "ConfProd"
-    ' Create ConfTest folder
-    MkDir rootPath & "\" & "Source" & "\" & "ConfTest"
-    ' Create VbaUnit folder
-    MkDir rootPath & "\" & "Source" & "\" & "VbaUnit"
+    ' Create tree folder
+    Dim internalError As Long
+    internalError = vtkCreateTreeFolder(rootPath)
+    If internalError <> 0 Then GoTo vtkCreateProject_ErrorTreeFolder
      
     'Save created project with xlsm extention
     Workbooks.Add.SaveAs (rootPath & "\" & project.projectDEVStandardRelativePath), FileFormat:=xlOpenXMLWorkbookMacroEnabled
@@ -90,7 +76,11 @@ Public Function vtkCreateProject(path As String, name As String, Optional displa
     On Error GoTo 0
     vtkCreateProject = 0
     Exit Function
+vtkCreateProject_ErrorTreeFolder:
+    vtkCreateProject = internalError
+    If displayError Then MsgBox "Error " & err.Number & " (" & err.Description & ") in procedure vtkCreateProject of Module MainFunctions"
+    Exit Function
 vtkCreateProject_Error:
-    vtkCreateProject = Err.Number
-    If displayError Then MsgBox "Error " & Err.Number & " (" & Err.Description & ") in procedure vtkCreateProject of Module MainFunctions"
+    vtkCreateProject = err.Number
+    If displayError Then MsgBox "Error " & err.Number & " (" & err.Description & ") in procedure vtkCreateProject of Module MainFunctions"
 End Function
