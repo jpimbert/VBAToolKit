@@ -61,6 +61,23 @@ Public Function vtkPathToTemplateFolder() As String 'VBAToolKit\Source
    vtkPathToTemplateFolder = vtkPathOfCurrentProject & "\Templates"
 End Function
 
+'---------------------------------------------------------------------------------------
+' Procedure : vtkGetFileExtension
+' Author    : Jean-Pierre Imbert
+' Date      : 09/08/2013
+' Purpose   : Return the extension of the file whose path is given as parameter
+'             - return "" is the filepath has no extension
+'---------------------------------------------------------------------------------------
+'
+Public Function vtkGetFileExtension(filePath As String) As String
+    Dim dotPosition As Integer
+    dotPosition = InStrRev(filePath, ".")
+    If dotPosition = 0 Then
+        vtkGetFileExtension = ""
+       Else
+        vtkGetFileExtension = Mid(filePath, dotPosition + 1)
+    End If
+End Function
 
 '---------------------------------------------------------------------------------------
 ' Function  : vtkCreateTreeFolder
