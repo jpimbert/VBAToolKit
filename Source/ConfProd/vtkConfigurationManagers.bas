@@ -36,9 +36,13 @@ Public Function vtkConfigurationManagerForProject(projectName As String) As vtkC
     If err <> 0 Then
         Set cm = New vtkConfigurationManager
         cm.projectName = projectName
-        configurationManagers.Add Item:=cm, Key:=projectName
+        If cm.projectName Like projectName Then     ' The initialization could fail (if the Workbook is closed)
+            configurationManagers.Add Item:=cm, Key:=projectName
+           Else
+            Set cm = Nothing
         End If
-    On Error GoTo 0
+    End If
+   On Error GoTo 0
     ' return the configuration manager
     Set vtkConfigurationManagerForProject = cm
 End Function
@@ -96,7 +100,7 @@ Public Sub vtkInitializeConfigurationForActiveWorkBook()
     For i = 1 To ActiveWorkbook.VBProject.VBComponents.Count
         Set c = ActiveWorkbook.VBProject.VBComponents.Item(i)
         If c.Type <> vbext_ct_Document Then
-            nm = cm.addModule(c.name)
+            nm = cm.AddModule(c.name)
             cm.setModulePathWithNumber path:=vtkStandardPathForModule(module:=c), numModule:=nm, numConfiguration:=cn_dev
             If vtkStandardCategoryForModuleName(moduleName:=c.name) Like "Prod" Then
                 cm.setModulePathWithNumber path:=vtkStandardPathForModule(module:=c), numModule:=nm, numConfiguration:=cn_prod
