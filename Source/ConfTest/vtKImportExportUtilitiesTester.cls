@@ -119,7 +119,7 @@ Public Sub TestImportExistantFileInExistingModule()
     
     vtkImportOneModule project:=wbForTest.VBProject, moduleName:="TestModule", filePath:=vtkPathToTestFolder & "\" & moduleToImport
     
-    mAssert.Equals wbForTest.VBProject.VBComponents("TestModule").CodeModule.CountOfLines, 8, "The TestModule of the Test Workbook must not have been modified. It contains now 8 code lines"
+    mAssert.Equals wbForTest.VBProject.VBComponents("TestModule").CodeModule.CountOfLines, 9, "The TestModule of the Test Workbook must not have been modified. It contains now 9 code lines"
     vtkCloseAndKillWorkbook wb:=wbForTest
 End Sub
 
@@ -142,7 +142,29 @@ Public Sub TestImportExistantFileInExistingClassModule()
     
     vtkImportOneModule project:=wbForTest.VBProject, moduleName:="TestClass", filePath:=vtkPathToTestFolder & "\" & classToImport
     
-    mAssert.Equals wbForTest.VBProject.VBComponents("TestClass").CodeModule.CountOfLines, 122, "The TestClass of the Test Workbook must have been modified. It must contain 122 code lines"
+    mAssert.Equals wbForTest.VBProject.VBComponents("TestClass").CodeModule.CountOfLines, 123, "The TestClass of the Test Workbook must have been modified. It must contain 123 code lines"
+    vtkCloseAndKillWorkbook wb:=wbForTest
+End Sub
+
+Public Sub TestImportExistantFileInExistingSheetModule()
+    '   Verify that the existing Module replaced by the new one (A3-B3)
+    Dim wbForTest As Workbook
+    Set wbForTest = Workbooks.Open(Filename:=vtkPathToTestFolder & "\" & existingWorkbookName)
+    
+    vtkImportOneModule project:=wbForTest.VBProject, moduleName:="Feuil1", filePath:=vtkPathToTestFolder & "\" & sheetToImport
+    
+    mAssert.Equals wbForTest.VBProject.VBComponents("Feuil1").CodeModule.CountOfLines, 13, "The Sheet1 code of the Test Workbook must have been modified. It must contain 13 code lines"
+    vtkCloseAndKillWorkbook wb:=wbForTest
+End Sub
+
+Public Sub TestImportExistantFileInExistingWorkbookModule()
+    '   Verify that the existing Module replaced by the new one (A3-B3)
+    Dim wbForTest As Workbook
+    Set wbForTest = Workbooks.Open(Filename:=vtkPathToTestFolder & "\" & existingWorkbookName)
+    
+    vtkImportOneModule project:=wbForTest.VBProject, moduleName:="ThisWorkbook", filePath:=vtkPathToTestFolder & "\" & workbookToImport
+    
+    mAssert.Equals wbForTest.VBProject.VBComponents("ThisWorkbook").CodeModule.CountOfLines, 20, "The ThisWorkbook code of the Test Workbook must have been modified. It must contain 20 code lines"
     vtkCloseAndKillWorkbook wb:=wbForTest
 End Sub
 
@@ -158,6 +180,8 @@ Private Function ITest_Suite() As TestSuite
     ITest_Suite.AddTest ITest_Manager.ClassName, "TestImportExistantFileInExistingModule"
     ITest_Suite.AddTest ITest_Manager.ClassName, "TestImportExistantFileInExistingModuleWithNewName"
     ITest_Suite.AddTest ITest_Manager.ClassName, "TestImportExistantFileInExistingClassModule"
+    ITest_Suite.AddTest ITest_Manager.ClassName, "TestImportExistantFileInExistingSheetModule"
+    ITest_Suite.AddTest ITest_Manager.ClassName, "TestImportExistantFileInExistingWorkbookModule"
 End Function
 
 Private Sub ITestCase_RunTest()
@@ -172,6 +196,8 @@ Private Sub ITestCase_RunTest()
         Case "TestImportExistantFileInExistingModule": TestImportExistantFileInExistingModule
         Case "TestImportExistantFileInExistingModuleWithNewName": TestImportExistantFileInExistingModuleWithNewName
         Case "TestImportExistantFileInExistingClassModule": TestImportExistantFileInExistingClassModule
+        Case "TestImportExistantFileInExistingSheetModule": TestImportExistantFileInExistingSheetModule
+        Case "TestImportExistantFileInExistingWorkbookModule": TestImportExistantFileInExistingWorkbookModule
         Case Else: mAssert.Should False, "Invalid test name: " & mManager.methodName
     End Select
 End Sub

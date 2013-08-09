@@ -198,13 +198,13 @@ Public Sub vtkImportOneModule(project As VBProject, moduleName As String, filePa
             ' Discards the first lines before the first "Attribute" line
             Do
                 code = buf.ReadLine
-                Loop While Left$(code, 9) Like "Attribute"
+                Loop While Not Left$(code, 9) Like "Attribute"
             ' Discards the "Attribute" lines
-            Do While Not Left$(code, 9) Like "Attribute"
+            Do While Left$(code, 9) Like "Attribute"
                 code = buf.ReadLine
                 Loop
             ' Read all remaining lines
-            code = code & buf.ReadAll
+            code = code & vbCrLf & buf.ReadAll
             
             ' Replace the code
             oldModule.CodeModule.DeleteLines StartLine:=1, Count:=oldModule.CodeModule.CountOfLines
