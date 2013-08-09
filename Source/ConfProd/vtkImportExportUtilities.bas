@@ -219,6 +219,44 @@ Public Sub vtkImportOneModule(project As VBProject, moduleName As String, filePa
     
 End Sub
 
+'---------------------------------------------------------------------------------------
+' Procedure : vtkRecreateConfiguration
+' Author    : Jean-Pierre Imbert
+' Date      : 09/08/2013
+' Purpose   : recreate a complete configuration based on
+'             - the vtkConfiguration sheet of the project
+'             - the exported modules located in the Source folder
+' Params    - projectName
+'           - configurationName
+' WARNING : We use vtkImportOneModule because the document module importation is
+'           not efficient with VBComponents.Import (creation of a double class module
+'           instead of import the Document code)
+' TEST :
+'   execute 'vtkRecreateConfiguration projectName :="VBAToolKit",configurationName:="VBAToolKit"'
+'---------------------------------------------------------------------------------------
+'
+Public Sub vtkRecreateConfiguration(projectName As String, configurationName As String)
+    Dim cm As vtkConfigurationManager, rootPath As String
+    Dim cn As Integer, filePath As String, wbPath As String, wb As Workbook, i As Integer
+    ' Get the project and the rootPath of the project
+    Set cm = vtkConfigurationManagerForProject(projectName)
+    rootPath = cm.rootPath
+    ' Get the configuration number in the project and the path of the file
+    cn = cm.getConfigurationNumber(configuration:=configurationName)
+    wbPath = cm.getConfigurationPathWithNumber(cn)
+    ' Create a new Excel file
+    Set wb = vtkCreateExcelWorkbook()
+    ' Set the projectName
+    wb.VBProject.name = configurationName
+    ' Import all modules for this configuration from the source directory
+    For i = 1 To cm.moduleCount
+        filePath = cm.getModulePathWithNumber(numModule:=i, numConfiguration:=cn)
+        If Not filePath Like "" Then vtkImportOneModule project:=wb.VBProject, moduleName:=cm.module(i), filePath:=rootPath & "\" & filePath
+    Next i
+    ' Save the Excel file with the good type and erase the previous one
+    wb.SaveAs Filename:=rootPath & "\" & wbPath, FileFormat:=vtkDefaultFileFormat(wbPath)
+End Sub
+
 '
 ''---------------------------------------------------------------------------------------
 '' Procedure : vtkListAllModules
