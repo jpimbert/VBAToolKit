@@ -34,6 +34,7 @@ Option Explicit
 Private m_projectName As String             ' The configuration of a project is attached to the DEV Excel file
 Private m_workbook As Workbook
 Private m_configurationSheet As Worksheet
+Private m_rootPath As String
 Private Const sheetName As String = "vtkConfigurations"
 Private Const currentVersion As String = "vtkConfigurations v1.0"
 Private Const nbTitleColumns As Integer = 1
@@ -41,8 +42,8 @@ Private Const nbTitleRows As Integer = 2
 
 Private Sub Class_Terminate()
     Set m_configurationSheet = Nothing
+    Set m_workbook = Nothing
 End Sub
-
 
 '---------------------------------------------------------------------------------------
 ' Property  : projectName as String - Read/Write - Public
@@ -62,6 +63,7 @@ Public Property Let projectName(ByVal sprojectName As String)
     If m_projectName <> sprojectName And VtkWorkbookIsOpen(wbName) Then
         m_projectName = sprojectName
         Set m_workbook = Workbooks(wbName)
+        m_rootPath = ""
         setConfigurationSheet      ' Reset the configuration sheet when the attached project is changed
     End If
 End Property
@@ -71,11 +73,37 @@ End Property
 ' Author    : Jean-Pierre Imbert
 ' Date      : 09/08/2013
 ' Purpose   : return the workbook containing the project
-'             - the workbook is cached when identified the first time
 '---------------------------------------------------------------------------------------
 '
 Private Property Get Workbook() As Workbook
     Set Workbook = m_workbook
+End Property
+
+'---------------------------------------------------------------------------------------
+' Property  : rootPath as String - Read Only - Public
+' Author    : Jean-Pierre Imbert
+' Date      : 09/08/2013
+' Purpose   : return the rootPath of the project if the Excel file was already saved
+'             - or return "" if the rootPath can't be determined
+'             - the rootPath is cached when identified the first time
+'---------------------------------------------------------------------------------------
+'
+Public Property Get rootPath() As String
+    Dim ret As String
+    If Not m_rootPath Like "" Then
+        ret = m_rootPath
+       Else
+        ret = ""
+        If Not Workbook Is Nothing Then
+            ret = Workbook.path
+            If Not ret Like "" Then
+                Dim fso As New FileSystemObject
+                ret = fso.GetParentFolderName(ret)
+                m_rootPath = ret
+            End If
+        End If
+    End If
+    rootPath = ret
 End Property
 
 '---------------------------------------------------------------------------------------
