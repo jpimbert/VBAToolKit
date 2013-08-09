@@ -9,24 +9,46 @@ Attribute VB_Name = "vtkGitFunctions"
 Option Explicit
 
 
+'---------------------------------------------------------------------------------------
+' Procedure : vtkIsGitCmdInString
+' Author    : Lucas Vitorino
+' Purpose   : Test if a string contains the "Git\cmd" substring.
+'---------------------------------------------------------------------------------------
+'
+Public Function vtkIsGitCmdInString(myString As String)
+    
+On Error GoTo vtkIsGitCmdInString_Error
+
+    vtkIsGitCmdInString = False
+    If (InStr(UCase(myString), UCase("Git\cmd"))) Then vtkIsGitCmdInString = True
+
+   On Error GoTo 0
+   Exit Function
+
+vtkIsGitCmdInString_Error:
+    MsgBox "Error " & err.Number & " (" & err.Description & ") in procedure vtkIsGitCmdInString of Module vtkGitFunctions"
+
+End Function
+
+
+
 
 '---------------------------------------------------------------------------------------
 ' Procedure : vtkVerifyEnvirGitVar
 ' Author    : Abdelfattah Lahbib
 ' Date      : 09/06/2013
-' Purpose   : Check if the Git "cmd.exe" is accessible via the PATH.
+' Purpose   : - Check if the Git "cmd.exe" is accessible via the PATH.
+'             - If not, pop a MsgBox.
 '---------------------------------------------------------------------------------------
 '
 Public Function vtkVerifyEnvirGitVar() As String
     
-    On Error GoTo vtkVerifyEnvirGitVar_Err
-    
-    Dim EnvString As String
     Dim retVal As String
+    
+On Error GoTo vtkVerifyEnvirGitVar_Error
       
-    EnvString = Environ("PATH")
     'Test if the "Git\cmd" substring is in the PATH string
-    If (InStr(UCase(EnvString), UCase("Git\cmd"))) Then
+    If vtkIsGitCmdInString(Environ("PATH")) Then
         vtkVerifyEnvirGitVar = ""
     Else
         vtkVerifyEnvirGitVar = "problem"
@@ -38,7 +60,7 @@ Public Function vtkVerifyEnvirGitVar() As String
     On Error GoTo 0
     Exit Function
 
-vtkVerifyEnvirGitVar_Err:
+vtkVerifyEnvirGitVar_Error:
     Debug.Print "Error " & err.Number & " in vtkVerifyEnvirGitVar : " & err.Description
     vtkVerifyEnvirGitVar = err.Number
     
@@ -48,15 +70,13 @@ End Function
 ' Procedure : vtkInitializeGit
 ' Author    : Abdelfattah Lahbib
 ' Date      : 27/04/2013
-' Purpose   :- create file to contain command result
-'            - verify git path
-'            - return git path
-'            - HKEY_CLASSES_ROOT\github-windows\shell\open\command
+' Purpose   : - Initialize Git in the project root folder using the "git init" command.
+'             - Log the output of the "git init" command in $projectDirectory\GitLog\logGitInitialize.log
 '---------------------------------------------------------------------------------------
 '
 Public Function vtkInitializeGit()
        
-    Dim GitLogFileName As String
+    Dim logFileName As String
     Dim GitLogAbsoluteDirPath As String
     Dim GitLogRelativeDirPath As String
     Dim FileInitPath As String
@@ -65,38 +85,36 @@ Public Function vtkInitializeGit()
     Dim RetFnVerifyEnvVar As String
     Dim ActiveProjPath As String
     Dim RetShellMessage As String
-    Dim FullFileLogPath As String
+    Dim logFileFullPath As String
     Dim fso As New FileSystemObject
  
     On Error GoTo vtkInitializeGit_Err
  
     RetFnVerifyEnvVar = vtkVerifyEnvirGitVar()
- 
+     
  If RetFnVerifyEnvVar <> "problem" Then
+ 
     ' Make paths
     ActiveProjPath = fso.GetParentFolderName(ActiveWorkbook.path)
     GitLogRelativeDirPath = "GitLog"
     GitLogAbsoluteDirPath = ActiveProjPath & "\" & GitLogRelativeDirPath
-    GitLogFileName = "logGitInitialize.log"
+    logFileName = "logGitInitialize.log"
   
     ' Create log file
-    FullFileLogPath = vtkcreatefilegit(GitLogFileName, GitLogAbsoluteDirPath)
-    ' Execute shell commands
+    logFileFullPath = vtkCreateFileInDirectory(logFileName, GitLogAbsoluteDirPath)
+    ' Execute git init in the project directory and log the output in the relevant file
     ' NB : You have to redirect the log using the *relative* path.
-    RetShell1 = Shell("cmd.exe /k cd " & ActiveProjPath & " & git init   >" & GitLogRelativeDirPath & "\" & GitLogFileName & " ")
+    RetShell1 = Shell("cmd.exe /k cd " & ActiveProjPath & " & git init   >" & GitLogRelativeDirPath & "\" & logFileName & " ")
     ' Make a break to execute shell commands
     Application.Wait (Now + TimeValue("0:00:01"))
     ' Kill related processus
     RetShell2 = Shell("cmd.exe /k  TASKKILL /IM cmd.exe")
     ' Make a break to execute shell commands
     Application.Wait (Now + TimeValue("0:00:01"))
-    ' Read log file
-    RetShellMessage = VtkFileReader(GitLogFileName, GitLogAbsoluteDirPath)
 
  End If
  
  On Error GoTo 0
- vtkInitializeGit = 0
  Exit Function
  
 vtkInitializeGit_Err:
@@ -108,93 +126,119 @@ End Function
 
 '---------------------------------------------------------------------------------------
 ' Procedure : vtkStatusGit
-' Author    : user
+' Author    : Abdelfattah Lahbib
 ' Date      : 30/04/2013
-' Purpose   : -this function execute shell command to take git status
-'             -write a text file contain the command result
-'             -return message on the functiuon name
-'
+' Purpose   : - Log the output of the "git status" command in $projectDirectory\GitLog\logStatus.log
+'             - Pop a MsgBox with the content of this file.
 '---------------------------------------------------------------------------------------
 '
 Public Function vtkStatusGit() As String
   
-    Dim GitStatusFileName As String
-    
-    Dim PathOfGitStatusFile As String
     Dim ActiveProjPath As String
-    Dim GitLogFilePath As String
-    Dim GitDir As String
+    Dim logFileName As String
+    Dim GitLogRelativeDirPath As String
+    Dim GitLogAbsoluteDirPath As String
+    Dim logFileFullPath As String
     Dim RetShell As String
     Dim RetShell2 As String
     Dim fso As New FileSystemObject
       
+    On Error GoTo vtkStatusGit_Error
+    
     ' make paths
     ActiveProjPath = fso.GetParentFolderName(ActiveWorkbook.path)
-    GitStatusFileName = "\logStatus.log"
-    GitDir = ActiveProjPath & "\GitLog"
+    logFileName = "logStatus.log"
+    GitLogRelativeDirPath = "GitLog"
+    GitLogAbsoluteDirPath = ActiveProjPath & "\" & GitLogRelativeDirPath
+    logFileFullPath = GitLogAbsoluteDirPath & "\" & logFileName
+    
     ' create status log file
-    PathOfGitStatusFile = vtkcreatefilegit(GitStatusFileName, GitDir)
-    ' execute shell command
-    RetShell = Shell("cmd.exe /k cd " & ActiveProjPath & " & git status   >" & GitDir & GitStatusFileName & " ", vbHide)
+    vtkCreateFileInDirectory logFileName, GitLogAbsoluteDirPath
+    ' Execute git status in the project directory  and log the output in the relevant file
+    RetShell = Shell("cmd.exe /k cd " & ActiveProjPath & " & git status   >" & logFileFullPath & " ", vbHide)
     ' make a break to execute shell commands
     Application.Wait (Now + TimeValue("0:00:01"))
     ' kill related processus
     RetShell2 = Shell("cmd.exe /k  TASKKILL /IM cmd.exe")
     ' make a break to execute shell commands
     Application.Wait (Now + TimeValue("0:00:01"))
-    ' read log file , and return it in function name
-    vtkStatusGit = VtkFileReader(GitStatusFileName, GitDir)
-    
+    ' read log file , and return its content
+    vtkStatusGit = vtkTextFileReader(logFileFullPath)
+
+   On Error GoTo 0
+   Exit Function
+
+vtkStatusGit_Error:
+    MsgBox "Error " & err.Number & " (" & err.Description & ") in procedure vtkStatusGit of Module vtkGitFunctions"
+    vtkStatusGit = err.Number
 End Function
 
 '---------------------------------------------------------------------------------------
-' Procedure : vtkcreatefilegit
-' Author    : user
-' Date      : 30/04/2013
-' Purpose   : - this function will create files that will be contain console command result
-'             - tested
-'---------------------------------------------------------------------------------------
-'
-Public Function vtkcreatefilegit(FileName As String, GitFolderPath As String) As String
-
- Dim fso As New FileSystemObject
- Dim FullFilePath As String
-  'make full file path
-  FullFilePath = GitFolderPath & FileName
-  'if log file don't exist we will create it
-  If fso.FileExists(FullFilePath) = False Then
-        fso.CreateTextFile (FullFilePath)
-  End If
-  'return full created file path
-  vtkcreatefilegit = FullFilePath
-End Function
-
-'---------------------------------------------------------------------------------------
-' Procedure : vtkfilereader
+' Procedure : vtkCreateFileInDirectory
 ' Author    : Abdelfattah Lahbib
 ' Date      : 30/04/2013
-' Purpose   : - take file name and projectpath on parameters
-'             - return the text on the file on function name
+' Purpose   : Create a file named $fileName in the directory $directory
+' Notes     : Notably used for creating Git log files
 '---------------------------------------------------------------------------------------
 '
-Public Function VtkFileReader(FileName As String, ProjectGitPath As String) As String
+Public Function vtkCreateFileInDirectory(fileName As String, directory As String) As String
+
+    Dim fso As New FileSystemObject
+    Dim fullFilePath As String
+      
+On Error GoTo vtkCreateFileInDirectory_Error
+    
+    fullFilePath = directory & "\" & fileName
+      
+    ' If the file doesn't exist, we create it
+    If fso.FileExists(fullFilePath) = False Then
+            fso.CreateTextFile (fullFilePath)
+    End If
+      
+    'return full created file path
+    vtkCreateFileInDirectory = fullFilePath
+
+    On Error GoTo 0
+    Exit Function
+
+vtkCreateFileInDirectory_Error:
+    MsgBox "Error " & err.Number & " (" & err.Description & ") in procedure vtkCreateFileInDirectory of Module vtkGitFunctions"
+    vtkCreateFileInDirectory = err.Number
+
+End Function
+
+'---------------------------------------------------------------------------------------
+' Procedure : vtkTextFileReader
+' Author    : Abdelfattah Lahbib
+' Date      : 30/04/2013
+' Purpose   : Returns the content of a text file
+' Notes     : Notably used to read Git log files.
+'---------------------------------------------------------------------------------------
+'
+Public Function vtkTextFileReader(fullFilePath As String) As String
 
     Dim Textfile As Variant
     Dim strresult As String
     Dim fso As New FileSystemObject
-    Dim FullFilePath As String
 
-    FullFilePath = (ProjectGitPath & FileName)
+On Error GoTo vtkTextFileReader_Error
 
-    Set Textfile = fso.OpenTextFile(FullFilePath, ForReading)
+    Set Textfile = fso.OpenTextFile(fullFilePath, ForReading)
     'while not end of file
     Do Until Textfile.AtEndOfStream
     'read line per line
         strresult = strresult & Chr(10) & Textfile.ReadLine
     Loop
     'return file text
-    VtkFileReader = strresult
+    vtkTextFileReader = strresult
 
+   On Error GoTo 0
+   Exit Function
+
+vtkTextFileReader_Error:
+    MsgBox "Error " & err.Number & " (" & err.Description & ") in procedure VtkTextFileReader of Module vtkGitFunctions"
+    vtkTextFileReader = err.Number
+    
 End Function
 
 

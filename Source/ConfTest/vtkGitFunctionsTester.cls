@@ -68,7 +68,7 @@ Public Sub TestvtkInitializeGitFunction()
     Dim RetValInitializeGit As String
     Dim RetValFileReader As String
    RetValInitializeGit = vtkInitializeGit()
-   RetValFileReader = VtkFileReader("\logGitInitialize.log", vtkTestPath & "\" & vtkTestProjectName & "\GitLog")
+   RetValFileReader = vtkTextFileReader(vtkTestPath & "\" & vtkTestProjectName & "\GitLog" & "\logGitInitialize.log")
    mAssert.Equals Left(RetValFileReader, 12), Chr(10) & "Initialized", "repository must be initilized"
 
 End Sub
@@ -81,7 +81,7 @@ Public Sub TestReInitializeLocalRepository()
    RetValInitializeGit = vtkInitializeGit()
    RetValInitializeGit2 = vtkInitializeGit()
    
-   RetValFileReader = VtkFileReader("\logGitInitialize.log", vtkTestPath & "\" & vtkTestProjectName & "\GitLog")
+   RetValFileReader = vtkTextFileReader(vtkTestPath & "\" & vtkTestProjectName & "\GitLog" & "\logGitInitialize.log")
     mAssert.Equals Left(RetValFileReader, 14), Chr(10) & "Reinitialized", "repository must be reinitilized"
 End Sub
 Public Sub TestInitializeGitFileIsCreated()
@@ -119,21 +119,21 @@ Public Sub TestStatusGitFileNotEmpty()
  
  mAssert.Should IsEmpty(vtkTestPath & "\" & vtkTestProjectName & "\GitLog\logStatus.log") = False, "log file must not be empty"
 End Sub
-Public Sub TestvtkcreatefilegitFunction()
+Public Sub TestvtkCreateFileInDirectoryFunction()
 'test the function that create log files
-    Dim RetValCreateFileGit As String
+    Dim retVal As String
     Dim fso As New FileSystemObject
    
-   RetValCreateFileGit = vtkcreatefilegit(vtkTestProjectName & ".txt", vtkTestPath & "\" & vtkTestProjectName & "\GitLog\")
+   retVal = vtkCreateFileInDirectory(vtkTestProjectName & ".txt", vtkTestPath & "\" & vtkTestProjectName & "\GitLog\")
  
    mAssert.Should fso.FileExists(vtkTestPath & "\" & vtkTestProjectName & "\GitLog\" & vtkTestProjectName & ".txt") = True, "log file must be created"
 End Sub
 Public Sub TestVtkFileReaderFunction()
  'test functions that read files
-    Dim RetValCreateFileGit As String
+    Dim retVal As String
     Dim fso As New FileSystemObject
    
-   RetValCreateFileGit = vtkcreatefilegit(vtkTestProjectName & ".txt", vtkTestPath & "\" & vtkTestProjectName & "\GitLog\")
+   retVal = vtkCreateFileInDirectory(vtkTestProjectName & ".txt", vtkTestPath & "\" & vtkTestProjectName & "\GitLog\")
     
    mAssert.Should IsEmpty(vtkTestPath & "\" & vtkTestProjectName & "\GitLog\" & vtkTestProjectName & ".txt") = False, "reader must work"
 End Sub
@@ -147,7 +147,7 @@ Private Function ITest_Suite() As TestSuite
     ITest_Suite.AddTest ITest_Manager.ClassName, "TestInitializeGitFileNotEmpty"
     ITest_Suite.AddTest ITest_Manager.ClassName, "TestStatusGitIsCreated"
     ITest_Suite.AddTest ITest_Manager.ClassName, "TestStatusGitFileNotEmpty"
-    ITest_Suite.AddTest ITest_Manager.ClassName, "TestvtkcreatefilegitFunction"
+    ITest_Suite.AddTest ITest_Manager.ClassName, "TestvtkCreateFileInDirectoryFunction"
     ITest_Suite.AddTest ITest_Manager.ClassName, "TestVtkFileReaderFunction"
 End Function
 
@@ -160,7 +160,7 @@ Private Sub ITestCase_RunTest()
         Case "TestInitializeGitFileNotEmpty": TestInitializeGitFileNotEmpty
         Case "TestStatusGitIsCreated": TestStatusGitIsCreated
         Case "TestStatusGitFileNotEmpty": TestStatusGitFileNotEmpty
-        Case "TestvtkcreatefilegitFunction": TestvtkcreatefilegitFunction
+        Case "TestvtkCreateFileInDirectoryFunction": TestvtkCreateFileInDirectoryFunction
         Case "TestVtkFileReaderFunction": TestVtkFileReaderFunction
         Case Else: mAssert.Should False, "Invalid test name: " & mManager.methodName
     End Select
