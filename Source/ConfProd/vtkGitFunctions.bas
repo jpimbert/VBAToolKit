@@ -57,7 +57,8 @@ End Function
 Public Function vtkInitializeGit()
        
     Dim GitLogFileName As String
-    Dim GitLogDirPath As String
+    Dim GitLogAbsoluteDirPath As String
+    Dim GitLogRelativeDirPath As String
     Dim FileInitPath As String
     Dim RetShell1 As String
     Dim RetShell2 As String
@@ -72,23 +73,25 @@ Public Function vtkInitializeGit()
     RetFnVerifyEnvVar = vtkVerifyEnvirGitVar()
  
  If RetFnVerifyEnvVar <> "problem" Then
-    'make paths
+    ' Make paths
     ActiveProjPath = fso.GetParentFolderName(ActiveWorkbook.path)
-    GitLogDirPath = ActiveProjPath & "\GitLog"
-    GitLogFileName = "\logGitInitialize.log"
+    GitLogRelativeDirPath = "GitLog"
+    GitLogAbsoluteDirPath = ActiveProjPath & "\" & GitLogRelativeDirPath
+    GitLogFileName = "logGitInitialize.log"
   
-    'call function how create log file
-    FullFileLogPath = vtkcreatefilegit(GitLogFileName, GitLogDirPath)
-    'execute shell commands
-    RetShell1 = Shell("cmd.exe /k cd " & ActiveProjPath & " & git init   >" & GitLogDirPath & GitLogFileName & " ", vbHide)
-    'make a break to execute shell commands
+    ' Create log file
+    FullFileLogPath = vtkcreatefilegit(GitLogFileName, GitLogAbsoluteDirPath)
+    ' Execute shell commands
+    ' NB : You have to redirect the log using the *relative* path.
+    RetShell1 = Shell("cmd.exe /k cd " & ActiveProjPath & " & git init   >" & GitLogRelativeDirPath & "\" & GitLogFileName & " ")
+    ' Make a break to execute shell commands
     Application.Wait (Now + TimeValue("0:00:01"))
-    'kill related processus
+    ' Kill related processus
     RetShell2 = Shell("cmd.exe /k  TASKKILL /IM cmd.exe")
-    'make a break to execute shell commands
+    ' Make a break to execute shell commands
     Application.Wait (Now + TimeValue("0:00:01"))
-    'read log file
-    RetShellMessage = VtkFileReader(GitLogFileName, GitLogDirPath)
+    ' Read log file
+    RetShellMessage = VtkFileReader(GitLogFileName, GitLogAbsoluteDirPath)
 
  End If
  
