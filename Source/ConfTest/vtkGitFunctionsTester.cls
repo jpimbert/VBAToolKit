@@ -27,16 +27,18 @@ Private Property Get ITest_Manager() As ITestManager
 End Property
 
 Private Sub ITestCase_SetUp(Assert As IAssert)
+    
     Set mAssert = Assert
      MkDir vtkTestPath & "\" & vtkTestProjectName
      MkDir vtkTestPath & "\" & vtkTestProjectName & "\Project"
      MkDir vtkTestPath & "\" & vtkTestProjectName & "\GitLog"
+
      Workbooks.Add.SaveAs (vtkTestPath & "\" & vtkTestProjectName & "\Project\" & vtkTestProjectName), FileFormat:=(52) '52 is xlsm format
+
 End Sub
 
 Private Sub ITestCase_TearDown()
     Dim fso As New FileSystemObject
-
     Application.DisplayAlerts = False
     On Error Resume Next
     'Close Created WorkBook
@@ -47,6 +49,7 @@ Private Sub ITestCase_TearDown()
     fso.DeleteFolder (vtkTestPath & "\" & vtkTestProjectName & "\.git")
     Kill vtkTestPath & "\" & vtkTestProjectName & "\GitLog\*"
     RmDir vtkTestPath & "\" & vtkTestProjectName & "\GitLog"
+    Kill vtkTestPath & "\" & vtkTestProjectName & "\*"
     RmDir vtkTestPath & "\" & vtkTestProjectName
     Application.DisplayAlerts = True
 End Sub
@@ -56,6 +59,7 @@ Public Sub TestvtkVerifyEnvirGitVarFunction()
     Dim RetValVerifEnvVar As String
     RetValVerifEnvVar = vtkVerifyEnvirGitVar()
     mAssert.Equals RetValVerifEnvVar, "", "envirenement variable must be setted"
+
 End Sub
 
 
@@ -66,6 +70,7 @@ Public Sub TestvtkInitializeGitFunction()
    RetValInitializeGit = vtkInitializeGit()
    RetValFileReader = VtkFileReader("\logGitInitialize.log", vtkTestPath & "\" & vtkTestProjectName & "\GitLog")
    mAssert.Equals Left(RetValFileReader, 12), Chr(10) & "Initialized", "repository must be initilized"
+
 End Sub
 Public Sub TestReInitializeLocalRepository()
 'test that repository is initilized tow time
@@ -77,7 +82,7 @@ Public Sub TestReInitializeLocalRepository()
    RetValInitializeGit2 = vtkInitializeGit()
    
    RetValFileReader = VtkFileReader("\logGitInitialize.log", vtkTestPath & "\" & vtkTestProjectName & "\GitLog")
-   mAssert.Equals Left(RetValFileReader, 14), Chr(10) & "Reinitialized", "repository must be reinitilized"
+    mAssert.Equals Left(RetValFileReader, 14), Chr(10) & "Reinitialized", "repository must be reinitilized"
 End Sub
 Public Sub TestInitializeGitFileIsCreated()
 'test that the log file exist
@@ -94,7 +99,6 @@ Public Sub TestInitializeGitFileNotEmpty()
    RetValInitializeGit = vtkInitializeGit()
  
  mAssert.Should IsEmpty(vtkTestPath & "\" & vtkTestProjectName & "\GitLog\logGitInitialize.log") = False, "log file must not be empty"
-  
 End Sub
 
 
@@ -106,7 +110,6 @@ Public Sub TestStatusGitIsCreated()
    RetValStatusGit = vtkStatusGit()
  
    mAssert.Should fso.FileExists(vtkTestPath & "\" & vtkTestProjectName & "\GitLog\logStatus.log") = True, "status file must be created"
-
 End Sub
 Public Sub TestStatusGitFileNotEmpty()
 'test that status file is not empty
@@ -115,7 +118,6 @@ Public Sub TestStatusGitFileNotEmpty()
     RetValStatusGit = vtkStatusGit()
  
  mAssert.Should IsEmpty(vtkTestPath & "\" & vtkTestProjectName & "\GitLog\logStatus.log") = False, "log file must not be empty"
-
 End Sub
 Public Sub TestvtkcreatefilegitFunction()
 'test the function that create log files
@@ -125,7 +127,6 @@ Public Sub TestvtkcreatefilegitFunction()
    RetValCreateFileGit = vtkcreatefilegit(vtkTestProjectName & ".txt", vtkTestPath & "\" & vtkTestProjectName & "\GitLog\")
  
    mAssert.Should fso.FileExists(vtkTestPath & "\" & vtkTestProjectName & "\GitLog\" & vtkTestProjectName & ".txt") = True, "log file must be created"
-
 End Sub
 Public Sub TestVtkFileReaderFunction()
  'test functions that read files
@@ -135,7 +136,6 @@ Public Sub TestVtkFileReaderFunction()
    RetValCreateFileGit = vtkcreatefilegit(vtkTestProjectName & ".txt", vtkTestPath & "\" & vtkTestProjectName & "\GitLog\")
     
    mAssert.Should IsEmpty(vtkTestPath & "\" & vtkTestProjectName & "\GitLog\" & vtkTestProjectName & ".txt") = False, "reader must work"
-
 End Sub
 
 Private Function ITest_Suite() As TestSuite

@@ -22,7 +22,7 @@ Public Function vtkVerifyEnvirGitVar() As String
     On Error GoTo vtkVerifyEnvirGitVar_Err
     
     Dim EnvString As String
-    Dim retval As String
+    Dim retVal As String
       
     EnvString = Environ("PATH")
     'Test if the "Git\cmd" substring is in the PATH string
