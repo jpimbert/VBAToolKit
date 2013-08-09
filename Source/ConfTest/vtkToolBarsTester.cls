@@ -90,12 +90,45 @@ Public Sub TestVBEToolBarDeletion()
     mAssert.Should bar Is Nothing, "The VBE Toolbar must not exist"
 End Sub
 
+Public Sub TestAddInInstall()
+    '   Verify that the Add-In installation creates the ToolBars
+    Dim barE As CommandBar, BarV As CommandBar
+    
+    Application.Run Macro:="VBAToolKit_DEV.ThisWorkBook.Workbook_AddinInstall"
+    
+    On Error Resume Next
+    Set barE = Application.CommandBars(toolBarName)
+    Set BarV = Application.VBE.CommandBars(toolBarName)
+    On Error GoTo 0
+    
+    mAssert.Should Not barE Is Nothing, "The Excel Toolbar must exist"
+    mAssert.Should Not BarV Is Nothing, "The VBE Toolbar must exist"
+End Sub
+
+Public Sub TestAddInUnInstall()
+    '   Verify that the Add-In Uninstallation deletes the ToolBars
+    Dim barE As CommandBar, BarV As CommandBar
+    
+    vtkCreateToolbars
+    Application.Run Macro:="VBAToolKit_DEV.ThisWorkBook.Workbook_AddinUninstall"
+    
+    On Error Resume Next
+    Set barE = Application.CommandBars(toolBarName)
+    Set BarV = Application.VBE.CommandBars(toolBarName)
+    On Error GoTo 0
+    
+    mAssert.Should barE Is Nothing, "The Excel Toolbar must not exist"
+    mAssert.Should BarV Is Nothing, "The VBE Toolbar must not exist"
+End Sub
+
 Private Function ITest_Suite() As TestSuite
     Set ITest_Suite = New TestSuite
     ITest_Suite.AddTest ITest_Manager.ClassName, "TestExcelToolBarCreation"
     ITest_Suite.AddTest ITest_Manager.ClassName, "TestVBEToolBarCreation"
     ITest_Suite.AddTest ITest_Manager.ClassName, "TestExcelToolBarDeletion"
     ITest_Suite.AddTest ITest_Manager.ClassName, "TestVBEToolBarDeletion"
+    ITest_Suite.AddTest ITest_Manager.ClassName, "TestAddInInstall"
+    ITest_Suite.AddTest ITest_Manager.ClassName, "TestAddInUnInstall"
 End Function
 
 Private Sub ITestCase_RunTest()
@@ -104,6 +137,8 @@ Private Sub ITestCase_RunTest()
         Case "TestVBEToolBarCreation": TestVBEToolBarCreation
         Case "TestExcelToolBarDeletion": TestExcelToolBarDeletion
         Case "TestVBEToolBarDeletion": TestVBEToolBarDeletion
+        Case "TestAddInInstall": TestAddInInstall
+        Case "TestAddInUnInstall": TestAddInUnInstall
         Case Else: mAssert.Should False, "Invalid test name: " & mManager.methodName
     End Select
 End Sub
