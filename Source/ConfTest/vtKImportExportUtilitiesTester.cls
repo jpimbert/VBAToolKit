@@ -19,6 +19,7 @@ Private Const moduleToImport As String = "TestModule.bas"                       
 Private Const classToImport As String = "TestClass.cls"                             ' Class to import for test
 Private Const sheetToImport As String = "Feuil1.cls"                             ' Sheet to import for test
 Private Const workbookToImport As String = "ThisWorkbook.cls"                             ' Workbook to import for test
+Private Const formToImport As String = "TestForm.frm"                             ' UserForm to import for test
 
 Private Sub Class_Initialize()
     Set mManager = New TestCaseManager
@@ -40,6 +41,7 @@ Private Sub ITestCase_SetUp(Assert As IAssert)
     FileCopy source:=vtkPathToTemplateFolder & "\" & classToImport, destination:=vtkPathToTestFolder & "\" & classToImport
     FileCopy source:=vtkPathToTemplateFolder & "\" & sheetToImport, destination:=vtkPathToTestFolder & "\" & sheetToImport
     FileCopy source:=vtkPathToTemplateFolder & "\" & workbookToImport, destination:=vtkPathToTestFolder & "\" & workbookToImport
+    FileCopy source:=vtkPathToTemplateFolder & "\" & formToImport, destination:=vtkPathToTestFolder & "\" & formToImport
 End Sub
 
 Private Sub ITestCase_TearDown()
@@ -49,6 +51,7 @@ Private Sub ITestCase_TearDown()
     Kill PathName:=vtkPathToTestFolder & "\" & classToImport
     Kill PathName:=vtkPathToTestFolder & "\" & sheetToImport
     Kill PathName:=vtkPathToTestFolder & "\" & workbookToImport
+    Kill PathName:=vtkPathToTestFolder & "\" & formToImport
     On Error GoTo 0
 End Sub
 
@@ -168,6 +171,17 @@ Public Sub TestImportExistantFileInExistingWorkbookModule()
     vtkCloseAndKillWorkbook wb:=wbForTest
 End Sub
 
+Public Sub TestImportExistantFileInExistingUserFormCode()
+    '   Verify that the existing Module replaced by the new one (A3-B3)
+    Dim wbForTest As Workbook
+    Set wbForTest = Workbooks.Open(Filename:=vtkPathToTestFolder & "\" & existingWorkbookName)
+    
+    vtkImportOneModule project:=wbForTest.VBProject, moduleName:="TestForm", filePath:=vtkPathToTestFolder & "\" & formToImport
+    
+    mAssert.Equals wbForTest.VBProject.VBComponents("TestForm").CodeModule.CountOfLines, 4, "The TestForm code of the Test Workbook must have been modified. It must contain 4 code lines"
+    vtkCloseAndKillWorkbook wb:=wbForTest
+End Sub
+
 Private Function ITest_Suite() As TestSuite
     Set ITest_Suite = New TestSuite
     ITest_Suite.AddTest ITest_Manager.ClassName, "TestNumberOfVBAUnitModules"
@@ -182,6 +196,7 @@ Private Function ITest_Suite() As TestSuite
     ITest_Suite.AddTest ITest_Manager.ClassName, "TestImportExistantFileInExistingClassModule"
     ITest_Suite.AddTest ITest_Manager.ClassName, "TestImportExistantFileInExistingSheetModule"
     ITest_Suite.AddTest ITest_Manager.ClassName, "TestImportExistantFileInExistingWorkbookModule"
+    ITest_Suite.AddTest ITest_Manager.ClassName, "TestImportExistantFileInExistingUserFormCode"
 End Function
 
 Private Sub ITestCase_RunTest()
@@ -198,6 +213,7 @@ Private Sub ITestCase_RunTest()
         Case "TestImportExistantFileInExistingClassModule": TestImportExistantFileInExistingClassModule
         Case "TestImportExistantFileInExistingSheetModule": TestImportExistantFileInExistingSheetModule
         Case "TestImportExistantFileInExistingWorkbookModule": TestImportExistantFileInExistingWorkbookModule
+        Case "TestImportExistantFileInExistingUserFormCode": TestImportExistantFileInExistingUserFormCode
         Case Else: mAssert.Should False, "Invalid test name: " & mManager.methodName
     End Select
 End Sub

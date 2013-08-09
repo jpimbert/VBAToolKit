@@ -170,6 +170,9 @@ End Function
 '       It's impossible to remove an existing module by VBA code, so the import is done
 '       by a/ really import the module if it doesn't exist
 '          b/ erase then rewrite the lines of code if it already exists
+'
+' WARNING : The code of User Form can be imported with this method
+'           but the form layout can't be imported if it already exist in the project
 '---------------------------------------------------------------------------------------
 '
 Public Sub vtkImportOneModule(project As VBProject, moduleName As String, filePath As String)
