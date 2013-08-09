@@ -155,27 +155,67 @@ Public Function vtkVBAUnitModulesList() As Collection
     Set vtkVBAUnitModulesList = vbaUnitModules
 End Function
 
-''---------------------------------------------------------------------------------------
-'' Procedure : vtkIsVbaUnit
-'' Author    : user
-'' Date      : 17/05/2013
-'' Purpose   : - take name in parameter and verify if the module is a vbaunit module
-''---------------------------------------------------------------------------------------
-''
-'Public Function vtkIsVbaUnit(modulename As String) As Boolean
-'Dim i As Integer
-'Dim valinit As Integer
-'Dim valfin As Integer
-'    valinit = vtkFirstLine
-'    valfin = vtkFirstLine + 17
-'    vtkIsVbaUnit = False
-' For i = vtkFirstLine To valfin
-'  If modulename = Range(vtkModuleNameRange & i) And modulename <> "" Then
-'     vtkIsVbaUnit = True
-'  Exit For
-'  End If
-' Next
-'End Function
+'---------------------------------------------------------------------------------------
+' Procedure : vtkImportOneModule
+' Author    : Jean-Pierre Imbert
+' Date      : 09/08/2013
+' Purpose   : Import a module from a file into a project
+' Parameters :
+'           - project, a VBProject into which import the module
+'           - moduleName, the name of module to import
+'           - filePath, path of the file to import as new module
+'             if the import succeed, the imported module replace the old one if any
+'
+' Programming Tip
+'       It's impossible to remove an existing module by VBA code, so the import is done
+'       by a/ really import the module if it doesn't exist
+'          b/ erase then rewrite the lines of code if it already exists
+'---------------------------------------------------------------------------------------
+'
+Public Sub vtkImportOneModule(project As VBProject, moduleName As String, filePath As String)
+    Dim newModule As VBComponent, oldModule As VBComponent
+    
+   
+   On Error Resume Next
+    Set oldModule = project.VBComponents(moduleName)
+    
+    ' If the oldModule doesn't exist, we can directly import the file
+    If oldModule Is Nothing Then
+        Set newModule = project.VBComponents.Import(filePath)
+        If Not newModule Is Nothing Then newModule.name = moduleName
+       Else
+    ' If the oldModule exists, we have to copy lines of code from the file
+        ' Read File
+        Dim fso, buf As TextStream, code As String
+        Set fso = CreateObject("Scripting.FileSystemObject")
+        Const ForReading = 1, ForWriting = 2, ForAppending = 3
+        Const TristateUseDefault = -2, TristateTrue = -1, TristateFalse = 0
+
+        Set buf = fso.OpenTextFile(filePath, ForReading, False, TristateUseDefault)
+        
+        ' If file open OK, read the code
+        If Not buf Is Nothing Then
+            ' Discards the first lines before the first "Attribute" line
+            Do
+                code = buf.ReadLine
+                Loop While Left$(code, 9) Like "Attribute"
+            ' Discards the "Attribute" lines
+            Do While Not Left$(code, 9) Like "Attribute"
+                code = buf.ReadLine
+                Loop
+            ' Read all remaining lines
+            code = code & buf.ReadAll
+            
+            ' Replace the code
+            oldModule.CodeModule.DeleteLines StartLine:=1, Count:=oldModule.CodeModule.CountOfLines
+            oldModule.CodeModule.InsertLines 1, code
+        End If
+        Set fso = Nothing
+    End If
+   On Error GoTo 0
+    
+End Sub
+
 '
 ''---------------------------------------------------------------------------------------
 '' Procedure : vtkListAllModules
@@ -368,33 +408,3 @@ End Function
 '    Wend
 'End Function
 '
-''---------------------------------------------------------------------------------------
-'' Procedure : vtkImportModule
-'' Author    : user
-'' Date      : 17/05/2013
-'' Purpose   : - import module to a workbook
-''             - Return number of imported modules
-''---------------------------------------------------------------------------------------
-''
-'Public Function vtkImportTestConfig() As Integer
-'Dim i As Integer
-'
-'
-'        i = 0
-'    While ActiveWorkbook.Sheets(vtkConfSheet).Range(vtkModuleNameRange & vtkFirstLine + i) <> ""
-'
-'        On Error Resume Next
-'             ' if the module is a class or module
-'             If (ActiveWorkbook.VBProject.VBComponents(ActiveWorkbook.Sheets(vtkConfSheet).Range(vtkModuleNameRange & vtkFirstLine + i)).Type = 1 Or ActiveWorkbook.VBProject.VBComponents(ActiveWorkbook.Sheets(vtkConfSheet).Range(vtkModuleNameRange & vtkFirstLine + i)).Type = 2) Then
-'                'if the module exist we will delete it and we will replace it
-'                ActiveWorkbook.VBProject.VBComponents.Remove ActiveWorkbook.VBProject.VBComponents(ActiveWorkbook.Sheets(vtkConfSheet).Range(vtkModuleNameRange & vtkFirstLine + i))
-'                ActiveWorkbook.VBProject.VBComponents.Import ActiveWorkbook.Sheets(vtkConfSheet).Range(vtkModuleDevRange & vtkFirstLine + i)
-'                ActiveWorkbook.Sheets(vtkConfSheet).Range(vtkModuleInformationsRange & vtkFirstLine + i) = "module imported at " & Now
-'
-'             End If
-'
-'        i = i + 1
-'    Wend
-'vtkImportTestConfig = i
-'On Error GoTo 0
-'End Function
