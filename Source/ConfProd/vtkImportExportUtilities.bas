@@ -233,6 +233,12 @@ End Sub
 '           instead of import the Document code)
 ' TEST :
 '   execute 'vtkRecreateConfiguration projectName :="VBAToolKit",configurationName:="VBAToolKit"'
+'
+' IMPORTANT TO DO :
+'   il faut aussi récupérer les propriétés du projet existant (description dans AddIn)
+'   il faut récupérer la feuille vtkConfigurations existante pour le projet de DEV
+'   il faudrait aussi récupérer les modules non exportés du projet DEV (tmptest)
+'   il faut tester avec un miniprojet où les deux fichiers Excel sont dans Tests
 '---------------------------------------------------------------------------------------
 '
 Public Sub vtkRecreateConfiguration(projectName As String, configurationName As String)

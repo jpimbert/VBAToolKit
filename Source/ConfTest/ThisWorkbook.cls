@@ -12,9 +12,14 @@ Attribute VB_Exposed = True
 ' Author    : Jean-Pierre Imbert
 ' Date      : 09/08/2013
 ' Purpose   : Manage the toolbars during install/uninstall of addin
-'             - This module exists in slightly different Prod and Test versions
-'               - explicit call to VBAToolKit project for Prod version
-'               - explicit call to VBAToolKit_DEV project for Test version
+'
+' WARNING :
+'      This module exists in slightly different Prod and Test versions
+'          - explicit call to VBAToolKit project for Prod version
+'          - explicit call to VBAToolKit_DEV project for Test version
+' TO DO
+'   Dans la version PROD, recréer la barre VBE à l'ouverture du fichier (la VBE est temporaire)
+'   Dans la version DEV, exporter les modules modifiés lors de la sauvegarde
 '---------------------------------------------------------------------------------------
 
 Option Explicit

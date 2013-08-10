@@ -14,9 +14,14 @@ Public Sub Run(Optional TestClassName As String)
     Dim hfin As Single
    
     hdebut = Timer 'debut
-    
+    Application.ScreenUpdating = False
+'    Dim objShell As New Shell
+'    objShell.MinimizeAll        ' Minimize all windows
+'    Set objShell = Nothing
+
     r.Run TestClassName
     
+    Application.ScreenUpdating = True
     hfin = Timer 'fin
     Debug.Print Format(hfin - hdebut, "Fixed"); "  second"
 End Sub

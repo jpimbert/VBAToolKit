@@ -14,7 +14,7 @@ Implements ITestCase
 Private mManager As TestCaseManager
 Private mAssert As IAssert
 
-Private Const toolBarName = "VBAToolKit_DEV_Toolbar"
+Private Const toolBarName = "VBAToolKit_DEV"
 
 Private Sub Class_Initialize()
     Set mManager = New TestCaseManager

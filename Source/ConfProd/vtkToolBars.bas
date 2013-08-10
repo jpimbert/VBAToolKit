@@ -17,7 +17,7 @@ Option Explicit
 '---------------------------------------------------------------------------------------
 '
 Private Function toolBarName() As String
-    toolBarName = ThisWorkbook.VBProject.name & "_Toolbar"
+    toolBarName = ThisWorkbook.VBProject.name
 End Function
 
 '---------------------------------------------------------------------------------------
@@ -42,7 +42,7 @@ End Function
 '---------------------------------------------------------------------------------------
 '
 Public Sub vtkCreateToolbars()
-    Dim barE As CommandBar, barV As CommandBar
+    Dim barE As CommandBar, BarV As CommandBar
     
     ' Create Excel Commandbar if necessary
     On Error Resume Next
@@ -53,10 +53,10 @@ Public Sub vtkCreateToolbars()
     
         ' Create VBE Commandbar if necessary
     On Error Resume Next
-    Set barV = Application.VBE.CommandBars(toolBarName)
+    Set BarV = Application.VBE.CommandBars(toolBarName)
     On Error GoTo 0
-    If barV Is Nothing Then Set barV = Application.VBE.CommandBars.Add(name:=toolBarName, Position:=msoBarTop, Temporary:=True)
-    barV.Visible = True
+    If BarV Is Nothing Then Set BarV = Application.VBE.CommandBars.Add(name:=toolBarName, Position:=msoBarTop)
+    BarV.Visible = True
     
 End Sub
 
