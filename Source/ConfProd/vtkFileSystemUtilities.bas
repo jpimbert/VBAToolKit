@@ -152,32 +152,42 @@ End Sub
 ' Purpose   : Recursively delete all the content of a folder, leaving it empty.
 '---------------------------------------------------------------------------------------
 '
-Public Sub vtkCleanFolder(folderPath As String)
+Public Function vtkCleanFolder(folderPath As String) As Long
     
     On Error GoTo vtkCleanFolder_Error
     
-    Dim fso As New Scripting.FileSystemObject
-    Dim sourceFolder As Scripting.Folder
-    Dim subFolder As Scripting.Folder
+    Debug.Print "Folder name : " & folderPath
     
-    Set sourceFolder = fso.GetFolder(folderPath)
+    Dim subFolder As String
     
     ' Erase the files in the folder
-    Kill sourceFolder.path & "\*"
-    
-    ' Call the function on all the SubFolders
-    For Each subFolder In sourceFolder.SubFolders
-        vtkCleanFolder (subFolder.path)
-        RmDir subFolder.path
-    Next subFolder
+    Kill folderPath & "\*"
+    subFolder = Dir(folderPath & "\*", vbDirectory)
+    Debug.Print "Subfolder : " & folderPath
+
+    ' Until there is not subfolder left
+    Do Until subFolder = ""
+        Debug.Print subFolder
+        If (GetAttr(folderPath & "\" & subFolder) And vbDirectory) Then
+            vtkCleanFolder (folderPath & subFolder)
+        End If
+        RmDir folderPath & "\" & subFolder
+        subFolder = Dir()
+    Loop
     
     On Error GoTo 0
+    vtkCleanFolder = VTK_RETVAL_OK
     
 vtkCleanFolder_Error:
     ' Kill sourceFolder.path & "\*" will throw an error 53 if the folder is empty.
-    If err.Number = 53 Then Resume Next
+    If err.Number = 53 Then
+        Resume Next
+    Else
+        vtkCleanFolder = VTK_RETVAL_UNEXPECTED_ERROR
+        Exit Function
+    End If
     
-End Sub
+End Function
 
 
 '---------------------------------------------------------------------------------------
@@ -194,7 +204,7 @@ End Sub
 
 '---------------------------------------------------------------------------------------
 ' Procedure : vtkIsFolderEmpty
-' Author    : Lucas Vitorino
+' Author    : Jean-Pierre Imbert
 ' Purpose   : Checks if a folder is empty (no subfolders, no files)
 ' Return    : Boolean
 '---------------------------------------------------------------------------------------
@@ -205,15 +215,21 @@ Public Function vtkIsFolderEmpty(folderPath As String)
     Dim sourceFolder As Scripting.Folder
     Set sourceFolder = fso.GetFolder(folderPath)
     
-    If sourceFolder.SubFolders.Count = 0 Then
-        If Dir(folderPath & "\*.*") = "" Then
-            vtkIsFolderEmpty = True
-        Else
-            vtkIsFolderEmpty = False
-        End If
-    Else
-        vtkIsFolderEmpty = False
-    End If
+    vtkIsFolderEmpty = ((sourceFolder.SubFolders.Count = 0) And Dir(folderPath & "\*.*") = "")
     
+End Function
+
+'---------------------------------------------------------------------------------------
+' Procedure : vtkDoesFolderExist
+' Author    : Lucas Vitorino
+' Purpose   : Checks if a folder exists.
+'---------------------------------------------------------------------------------------
+'
+Public Function vtkDoesFolderExist(folderPath As String) As Boolean
+    If Dir(folderPath, vbDirectory) = "" Then
+        vtkDoesFolderExist = False
+    Else
+        vtkDoesFolderExist = True
+    End If
 End Function
 
