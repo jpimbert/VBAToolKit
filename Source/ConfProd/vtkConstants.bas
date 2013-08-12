@@ -1,10 +1,11 @@
 Attribute VB_Name = "vtkConstants"
 Public Const vtkTestProjectName = "TestProject"
 Public Const vtkTestProjectNameWithExtention = "TestProject.xlsm"
+Public Const VTK_RETVAL_OK = 0
 
 '---------------------------------------------------------------------------------------
 ' Procedure : vtkTestPath
-' Author    : Abdelfattah Lahbib
+' Author    : user
 ' Date      : 07/05/2013
 ' Purpose   : -Return the path of the Test Folder of the current project  '..\VBAToolKit\Tests
 '---------------------------------------------------------------------------------------
@@ -15,7 +16,7 @@ End Function
 
 '---------------------------------------------------------------------------------------
 ' Procedure : vtkInstallPath
-' Author    : Abdelfattah Lahbib
+' Author    : user
 ' Date      : 07/05/2013
 ' Purpose   :-Return the path of the current project  '..\VBAToolKit
 '---------------------------------------------------------------------------------------

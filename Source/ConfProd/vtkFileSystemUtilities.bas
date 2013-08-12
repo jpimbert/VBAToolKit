@@ -146,5 +146,74 @@ Public Sub vtkDeleteTreeFolder(rootPath As String)
     RmDir rootPath
 End Sub
 
+'---------------------------------------------------------------------------------------
+' Procedure : vtkCleanFolder
+' Author    : Lucas Vitorino
+' Purpose   : Recursively delete all the content of a folder, leaving it empty.
+'---------------------------------------------------------------------------------------
+'
+Public Sub vtkCleanFolder(folderPath As String)
+    
+    On Error GoTo vtkCleanFolder_Error
+    
+    Dim fso As New Scripting.FileSystemObject
+    Dim sourceFolder As Scripting.Folder
+    Dim subFolder As Scripting.Folder
+    
+    Set sourceFolder = fso.GetFolder(folderPath)
+    
+    ' Erase the files in the folder
+    Kill sourceFolder.path & "\*"
+    
+    ' Call the function on all the SubFolders
+    For Each subFolder In sourceFolder.SubFolders
+        vtkCleanFolder (subFolder.path)
+        RmDir subFolder.path
+    Next subFolder
+    
+    On Error GoTo 0
+    
+vtkCleanFolder_Error:
+    ' Kill sourceFolder.path & "\*" will throw an error 53 if the folder is empty.
+    If err.Number = 53 Then Resume Next
+    
+End Sub
 
+
+'---------------------------------------------------------------------------------------
+' Procedure : vtkDeleteFolder
+' Author    : Lucas Vitorino
+' Purpose   : Delete a folder and its content.
+'---------------------------------------------------------------------------------------
+'
+Public Sub vtkDeleteFolder(folderPath As String)
+    vtkCleanFolder folderPath
+    RmDir folderPath
+End Sub
+
+
+'---------------------------------------------------------------------------------------
+' Procedure : vtkIsFolderEmpty
+' Author    : Lucas Vitorino
+' Purpose   : Checks if a folder is empty (no subfolders, no files)
+' Return    : Boolean
+'---------------------------------------------------------------------------------------
+'
+Public Function vtkIsFolderEmpty(folderPath As String)
+    
+    Dim fso As New Scripting.FileSystemObject
+    Dim sourceFolder As Scripting.Folder
+    Set sourceFolder = fso.GetFolder(folderPath)
+    
+    If sourceFolder.SubFolders.Count = 0 Then
+        If Dir(folderPath & "\*.*") = "" Then
+            vtkIsFolderEmpty = True
+        Else
+            vtkIsFolderEmpty = False
+        End If
+    Else
+        vtkIsFolderEmpty = False
+    End If
+    
+End Function
 
