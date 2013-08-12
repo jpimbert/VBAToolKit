@@ -167,38 +167,6 @@ Public Sub TestStatusGitFileNotEmpty()
 End Sub
 
 
-'---------------------------------------------------------------------------------------
-' Procedure : TestvtkCreateFileInDirectoryFunction
-' Author    : Abdelfattah Lahbib
-' Purpose   : Test the vtkCreateFileInDirectory function
-'               - After calling this function with a functionnal path, the file must be created.
-'---------------------------------------------------------------------------------------
-'
-Public Sub TestvtkCreateFileInDirectory()
-    Dim retVal As String
-    Dim fso As New FileSystemObject
-   
-    retVal = vtkCreateFileInDirectory(vtkTestProjectName & ".txt", vtkTestPath & "\" & vtkTestProjectName & "\GitLog\")
- 
-    mAssert.Should fso.FileExists(vtkTestPath & "\" & vtkTestProjectName & "\GitLog\" & vtkTestProjectName & ".txt") = True, "log file must be created"
-End Sub
-
-'---------------------------------------------------------------------------------------
-' Procedure : TestVtkTextFileReaderFunction
-' Author    : Abdelfattah Lahbib
-' Purpose   : Test the vtkTextFileReader function
-' Notes     : Doesn't do anything right now
-'---------------------------------------------------------------------------------------
-'
-Public Sub TestVtkTextFileReader()
-    Dim retVal As String
-    Dim fso As New FileSystemObject
-   
-    retVal = vtkCreateFileInDirectory(vtkTestProjectName & ".txt", vtkTestPath & "\" & vtkTestProjectName & "\GitLog\")
-    
-    mAssert.Should IsEmpty(vtkTestPath & "\" & vtkTestProjectName & "\GitLog\" & vtkTestProjectName & ".txt") = False, "reader must work"
-End Sub
-
 Private Function ITest_Suite() As TestSuite
     Set ITest_Suite = New TestSuite
     ITest_Suite.AddTest ITest_Manager.ClassName, "TestvtkIsGitCmdInString"
