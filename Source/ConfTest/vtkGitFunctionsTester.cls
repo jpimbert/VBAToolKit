@@ -29,37 +29,19 @@ End Property
 Private Sub ITestCase_SetUp(Assert As IAssert)
     
     Set mAssert = Assert
-     MkDir vtkTestPath & "\" & vtkTestProjectName
-     MkDir vtkTestPath & "\" & vtkTestProjectName & "\Project"
-     MkDir vtkTestPath & "\" & vtkTestProjectName & "\GitLog"
-
-     Workbooks.Add.SaveAs (vtkTestPath & "\" & vtkTestProjectName & "\Project\" & vtkTestProjectName), FileFormat:=(52) '52 is xlsm format
 
 End Sub
 
 Private Sub ITestCase_TearDown()
-    Dim fso As New FileSystemObject
-    Application.DisplayAlerts = False
-    On Error Resume Next
-    'Close Created WorkBook
-    Workbooks(vtkTestProjectName & ".xlsm").Close
-   'Delete Created WorkBook
-    Kill vtkTestPath & "\" & vtkTestProjectName & "\Project\" & vtkTestProjectName & ".xlsm"
-    RmDir vtkTestPath & "\" & vtkTestProjectName & "\Project"
-    fso.DeleteFolder (vtkTestPath & "\" & vtkTestProjectName & "\.git")
-    Kill vtkTestPath & "\" & vtkTestProjectName & "\GitLog\*"
-    RmDir vtkTestPath & "\" & vtkTestProjectName & "\GitLog"
-    Kill vtkTestPath & "\" & vtkTestProjectName & "\*"
-    RmDir vtkTestPath & "\" & vtkTestProjectName
-    Application.DisplayAlerts = True
+    vtkCleanFolder vtkTestPath
 End Sub
 
 
 '---------------------------------------------------------------------------------------
-' Procedure : TestvtkInitializeGitFunction
+' Procedure : Test_vtkInitializeGit
 ' Author    : Abdelfattah Lahbib
-' Purpose   : Test the initialization of a repository in the project root folder
-'               - $projectRootFolder\GitLog\logGitInitialize.log must start by "Chr(10) & Initialized"
+' Purpose   : Test the initialization of a repository.
+'               -
 '---------------------------------------------------------------------------------------
 '
 Public Sub TestvtkInitializeRepository()
