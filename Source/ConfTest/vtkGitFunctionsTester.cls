@@ -54,19 +54,6 @@ Private Sub ITestCase_TearDown()
     Application.DisplayAlerts = True
 End Sub
 
-'---------------------------------------------------------------------------------------
-' Procedure : TestvtkIsGitCmdInString
-' Author    : Lucas Vitorino
-' Purpose   : Test the function that checks if "Git\cmd" is in a string
-'---------------------------------------------------------------------------------------
-'
-Public Sub TestvtkIsGitCmdInString()
-    mAssert.Equals vtkIsGitCmdInString("Git\cmd"), True, "Git\cmd IS in Git\cmd"
-    mAssert.Equals vtkIsGitCmdInString("fooGit\cmd"), True, "Git\cmd IS in fooGit\cmd"
-    mAssert.Equals vtkIsGitCmdInString(""), False, "Git\cmd IS NOT in the blank string"
-    mAssert.Equals vtkIsGitCmdInString("Git\cmdfoo"), True, "Git\cmd IS in Git\cmdfoo"
-    mAssert.Equals vtkIsGitCmdInString("fooGit\cmdbar"), True, "Git\cmd IS in Gitcmd"
-End Sub
 
 '---------------------------------------------------------------------------------------
 ' Procedure : TestvtkInitializeGitFunction
@@ -169,28 +156,22 @@ End Sub
 
 Private Function ITest_Suite() As TestSuite
     Set ITest_Suite = New TestSuite
-    ITest_Suite.AddTest ITest_Manager.ClassName, "TestvtkIsGitCmdInString"
     ITest_Suite.AddTest ITest_Manager.ClassName, "TestvtkInitializeRepository"
     ITest_Suite.AddTest ITest_Manager.ClassName, "TestReInitializeLocalRepository"
     ITest_Suite.AddTest ITest_Manager.ClassName, "TestInitializeGitFileIsCreated"
     ITest_Suite.AddTest ITest_Manager.ClassName, "TestInitializeGitFileIsNotEmpty"
     ITest_Suite.AddTest ITest_Manager.ClassName, "TestStatusGitIsCreated"
     ITest_Suite.AddTest ITest_Manager.ClassName, "TestStatusGitFileNotEmpty"
-    ITest_Suite.AddTest ITest_Manager.ClassName, "TestvtkCreateFileInDirectory"
-    ITest_Suite.AddTest ITest_Manager.ClassName, "TestVtkTextFileReader"
 End Function
 
 Private Sub ITestCase_RunTest()
     Select Case mManager.methodName
-        Case "TestvtkIsGitCmdInString": TestvtkIsGitCmdInString
         Case "TestvtkInitializeRepository": TestvtkInitializeRepository
         Case "TestReInitializeLocalRepository": TestReInitializeLocalRepository
         Case "TestInitializeGitFileIsCreated": TestInitializeGitFileIsCreated
         Case "TestInitializeGitFileIsNotEmpty": TestInitializeGitFileIsNotEmpty
         Case "TestStatusGitIsCreated": TestStatusGitIsCreated
         Case "TestStatusGitFileNotEmpty": TestStatusGitFileNotEmpty
-        Case "TestvtkCreateFileInDirectory": TestvtkCreateFileInDirectory
-        Case "TestVtkTextFileReader": TestVtkTextFileReader
         Case Else: mAssert.Should False, "Invalid test name: " & mManager.methodName
     End Select
 End Sub

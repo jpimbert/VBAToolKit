@@ -10,59 +10,27 @@ Option Explicit
 
 
 '---------------------------------------------------------------------------------------
-' Procedure : vtkIsGitCmdInString
+' Procedure : isGitCmdInString
 ' Author    : Lucas Vitorino
 ' Purpose   : Test if a string contains the "Git\cmd" substring.
 '---------------------------------------------------------------------------------------
 '
-Public Function vtkIsGitCmdInString(myString As String)
-    
-On Error GoTo vtkIsGitCmdInString_Error
-
-    vtkIsGitCmdInString = False
-    If (InStr(UCase(myString), UCase("Git\cmd"))) Then vtkIsGitCmdInString = True
-
-   On Error GoTo 0
-   Exit Function
-
-vtkIsGitCmdInString_Error:
-    MsgBox "Error " & err.Number & " (" & err.Description & ") in procedure vtkIsGitCmdInString of Module vtkGitFunctions"
-
+Private Function isGitCmdInString(myString As String) As Boolean
+    isGitCmdInString = (InStr(UCase(myString), UCase("Git\cmd")))
 End Function
 
 
-
-
 '---------------------------------------------------------------------------------------
-' Procedure : vtkVerifyEnvirGitVar
+' Procedure : isGitInstalled
 ' Author    : Abdelfattah Lahbib
 ' Date      : 09/06/2013
 ' Purpose   : - Check if the Git "cmd.exe" is accessible via the PATH.
-'             - If not, pop a MsgBox.
 '---------------------------------------------------------------------------------------
 '
-Public Function vtkVerifyEnvirGitVar() As String
+Private Function isGitInstalled() As Boolean
     
-    Dim retval As String
-    
-On Error GoTo vtkVerifyEnvirGitVar_Error
-      
     'Test if the "Git\cmd" substring is in the PATH string
-    If vtkIsGitCmdInString(Environ("PATH")) Then
-        vtkVerifyEnvirGitVar = ""
-    Else
-        vtkVerifyEnvirGitVar = "problem"
-        MsgBox "Error : Git is not accessible via your path." & vbCrLf & vbCrLf & _
-        "To correct the problem, see the tutorial on : https://github.com/jpimbert/VBAToolKit/wiki/VbaToolKit-SetUp " & vbCrLf & vbCrLf & _
-        "You local repository has not been initialized", vbInformation
-    End If
-
-    On Error GoTo 0
-    Exit Function
-
-vtkVerifyEnvirGitVar_Error:
-    Debug.Print "Error " & err.Number & " in vtkVerifyEnvirGitVar : " & err.Description
-    vtkVerifyEnvirGitVar = err.Number
+    isGitInstalled = InStr(UCase(Environ("PATH")), UCase("Git\cmd"))
     
 End Function
 
@@ -89,10 +57,8 @@ Public Function vtkInitializeGit()
     Dim fso As New FileSystemObject
  
     On Error GoTo vtkInitializeGit_Err
- 
-    RetFnVerifyEnvVar = vtkVerifyEnvirGitVar()
      
- If RetFnVerifyEnvVar <> "problem" Then
+ If isGitInstalled Then
  
     ' Make paths
     ActiveProjPath = fso.GetParentFolderName(ActiveWorkbook.path)
