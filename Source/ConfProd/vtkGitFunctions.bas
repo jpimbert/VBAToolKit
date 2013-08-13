@@ -43,7 +43,7 @@ End Function
 '
 Public Function vtkVerifyEnvirGitVar() As String
     
-    Dim retVal As String
+    Dim retval As String
     
 On Error GoTo vtkVerifyEnvirGitVar_Error
       

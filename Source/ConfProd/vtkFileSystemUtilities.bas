@@ -147,36 +147,94 @@ Public Sub vtkDeleteTreeFolder(rootPath As String)
 End Sub
 
 '---------------------------------------------------------------------------------------
-' Procedure : vtkCleanFolder
+' Procedure : vtkCleanFolder_Dir
 ' Author    : Lucas Vitorino
 ' Purpose   : Recursively delete all the content of a folder, leaving it empty.
+' Notes     : - uses only the Dir function rather than FileSystemObject
+'             - WIP. Doesn't currently work
 '---------------------------------------------------------------------------------------
 '
-Public Function vtkCleanFolder(folderPath As String) As Long
+Public Function vtkCleanFolder_Dir(folderPath As String) As Long
     
     On Error GoTo vtkCleanFolder_Error
     
-    Debug.Print "Folder name : " & folderPath
+    Do Until vtkIsFolderEmpty(folderPath) = True
+    
+    If Right(folderPath, 1) <> "\" Then folderPath = folderPath & "\"
+    Debug.Print "IN FOLDER : " & folderPath
     
     Dim subFolder As String
     
     ' Erase the files in the folder
     Kill folderPath & "\*"
-    subFolder = Dir(folderPath & "\*", vbDirectory)
-    Debug.Print "Subfolder : " & folderPath
-
-    ' Until there is not subfolder left
-    Do Until subFolder = ""
-        Debug.Print subFolder
-        If (GetAttr(folderPath & "\" & subFolder) And vbDirectory) Then
-            vtkCleanFolder (folderPath & subFolder)
-        End If
-        RmDir folderPath & "\" & subFolder
-        subFolder = Dir()
+    
+    subFolder = Dir(folderPath, vbDirectory)
+    
+        ' Until there is not subfolder left
+        Do Until subFolder = ""
+            If (GetAttr(folderPath & subFolder) And vbDirectory) Then
+                If subFolder <> "." And subFolder <> ".." Then
+                    vtkCleanFolder (folderPath & subFolder)
+                    Debug.Print "Erasing folder : " & folderPath & subFolder
+                    RmDir folderPath & subFolder
+                End If
+            End If
+            Debug.Print "DEBUG <<"
+            Debug.Print "Current folder = " & folderPath
+            Debug.Print "Current subfolder = " & subFolder
+            subFolder = Dir()
+            Debug.Print ">> DEBUG "
+        Loop
+    
     Loop
+    Debug.Print "Folder " & folderPath & " empty"
     
     On Error GoTo 0
     vtkCleanFolder = VTK_RETVAL_OK
+    Exit Function
+    
+vtkCleanFolder_Dir_Error:
+    ' Kill sourceFolder.path & "\*" will throw an error 53 if the folder is empty.
+    If err.Number = 53 Then
+        Resume Next
+    Else
+        vtkCleanFolder = VTK_RETVAL_UNEXPECTED_ERROR
+        Debug.Print "ERROR " & err.Number & " : " & err.Description
+        Exit Function
+    End If
+    
+End Function
+
+
+'---------------------------------------------------------------------------------------
+' Procedure : vtkCleanFolder
+' Author    : Lucas Vitorino
+' Purpose   : Recursively delete all the content of a folder, leaving it empty.
+' Notes     : - uses Scripting.FileSystemObject
+'---------------------------------------------------------------------------------------
+'
+Public Function vtkCleanFolder(folderPath As String) As Integer
+    
+    On Error GoTo vtkCleanFolder_Error
+    
+    Dim fso As New Scripting.FileSystemObject
+    Dim sourceFolder As Scripting.Folder
+    Dim subFolder As Scripting.Folder
+    
+    Set sourceFolder = fso.GetFolder(folderPath)
+    
+    ' Erase the files in the folder
+    Kill sourceFolder.path & "\*"
+    
+    ' Call the function on all the SubFolders
+    For Each subFolder In sourceFolder.SubFolders
+        vtkCleanFolder (subFolder.path)
+        RmDir subFolder.path
+    Next subFolder
+    
+    On Error GoTo 0
+    vtkCleanFolder = VTK_RETVAL_OK
+    Exit Function
     
 vtkCleanFolder_Error:
     ' Kill sourceFolder.path & "\*" will throw an error 53 if the folder is empty.
@@ -188,6 +246,7 @@ vtkCleanFolder_Error:
     End If
     
 End Function
+
 
 
 '---------------------------------------------------------------------------------------
