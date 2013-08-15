@@ -8,20 +8,6 @@ Attribute VB_Name = "vtkGitFunctions"
 
 Option Explicit
 
-
-'---------------------------------------------------------------------------------------
-' Procedure : isGitInstalled
-' Author    : Abdelfattah Lahbib
-' Date      : 09/06/2013
-' Purpose   : - Check if the Git "cmd.exe" is accessible via the PATH.
-' Returns   : Boolean
-'---------------------------------------------------------------------------------------
-'
-Private Function isGitInstalled() As Boolean
-    'Test if the "Git\cmd" substring is in the PATH string
-    isGitInstalled = InStr(UCase(Environ("PATH")), UCase("Git\cmd"))
-End Function
-
 '---------------------------------------------------------------------------------------
 ' Procedure : vtkInitializeGit
 ' Author    : Abdelfattah Lahbib
@@ -45,7 +31,7 @@ Public Function vtkInitializeGit(folderPath As String, Optional logFile As Strin
  
     On Error GoTo vtkInitializeGit_Err
     
-    If isGitInstalled = False Then
+    If InStr(UCase(Environ("PATH")), UCase("Git\cmd")) = False Then
         err.Raise VTK_GIT_NOT_INSTALLED, "", "Git not installed."
     End If
     
