@@ -13,11 +13,15 @@ Option Explicit
 ' Author    : Abdelfattah Lahbib
 ' Date      : 27/04/2013
 ' Purpose   : - Initialize Git in a directory using the "git init" command.
+'               The directory path has to be absolute, and on the C: drive
 '             - Optionally, writes the output of the "git init" command in a textfile
 '               whose path has to be passed as parameter.
+'               If the path is absolute, a drive other than C: will raise an error
+'               If the path is relative, it will be considered as relatie to the folder path.
 ' Notes     : Returns
 '               - VTK_OK
 '               - VTK_WRONG_FOLDER_PATH
+'               - VTK_FORBIDDEN_PARAMETER
 '               - VTK_GIT_NOT_INSTALLED
 '               - VTK_GIT_ALREADY_INITIALIZED_IN_FOLDER
 '               - VTK_UNEXPECTED_ERR
@@ -28,11 +32,16 @@ Public Function vtkInitializeGit(folderPath As String, Optional logFile As Strin
     Dim retShell As String
     Dim logFileDefaultName As String
     logFileDefaultName = "initialize.log"
+    Dim logFileFullPath As String
  
     On Error GoTo vtkInitializeGit_Err
     
     If InStr(UCase(Environ("PATH")), UCase("Git\cmd")) = False Then
         err.Raise VTK_GIT_NOT_INSTALLED, "", "Git not installed."
+    End If
+    
+    If vtkGitConvertWinPath(folderPath) = VTK_FORBIDDEN_PARAMETER Then
+        err.Raise VTK_FORBIDDEN_PARAMETER, "", "Parameter is invalid."
     End If
     
     If vtkDoesFolderExist(folderPath) = False Then
@@ -41,6 +50,21 @@ Public Function vtkInitializeGit(folderPath As String, Optional logFile As Strin
     
     If vtkDoesFolderExist(folderPath & "\.git") = True Then
         err.Raise VTK_GIT_ALREADY_INITIALIZED_IN_FOLDER, "", "Git has already been initialized in the folder " & folderPath
+    End If
+    
+    ' If a logfile has been passed as a parameter
+    If logFile <> "" Then
+        ' If the path is relative, make it absolute
+        Dim splittedLogFilePath() As String
+        splittedLogFilePath = Split(logFile, ":")
+        If splittedLogFilePath(LBound(splittedLogFilePath)) = logFile Then
+            logFileFullPath = folderPath & "\" & logFile
+        End If
+        ' Test the validity of the final path
+        logFileFullPath = vtkGitConvertWinPath(logFileFullPath)
+        If logFileFullPath = VTK_FORBIDDEN_PARAMETER Then
+            err.Raise VTK_FORBIDDEN_PARAMETER, "", "Parameter is invalid."
+        End If
     End If
     
     Dim wsh As Object
@@ -65,9 +89,11 @@ Public Function vtkInitializeGit(folderPath As String, Optional logFile As Strin
 vtkInitializeGit_Err:
     If ((err.Number = VTK_GIT_NOT_INSTALLED) _
         Or (err.Number = VTK_GIT_ALREADY_INITIALIZED_IN_FOLDER) _
+        Or (err.Number = VTK_FORBIDDEN_PARAMETER) _
         Or (err.Number = VTK_WRONG_FOLDER_PATH)) Then
         vtkInitializeGit = err.Number
     Else
+        Debug.Print "ERR IN INITIALIZE : " & err.Number & err.Description
         vtkInitializeGit = VTK_UNEXPECTED_ERROR
     End If
     Exit Function
@@ -118,6 +144,7 @@ vtkGitConvertWinPath_Error:
     If (err.Number = VTK_FORBIDDEN_PARAMETER) Then
         vtkGitConvertWinPath = err.Number
     Else
+     Debug.Print "ERR IN CONVERT : " & err.Number & err.Description
         vtkGitConvertWinPath = VTK_UNEXPECTED_ERROR
     End If
     Exit Function

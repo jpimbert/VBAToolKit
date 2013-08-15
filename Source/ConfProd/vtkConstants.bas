@@ -1,13 +1,13 @@
 Attribute VB_Name = "vtkConstants"
 Public Const vtkTestProjectName = "TestProject"
 Public Const vtkTestProjectNameWithExtention = "TestProject.xlsm"
-Public Const VTK_OK = 0
-Public Const VTK_UNEXPECTED_ERROR = 2000
-Public Const VTK_WRONG_FOLDER_PATH = 2076
-Public Const VTK_FORBIDDEN_PARAMETER = 2077
+Public Const VTK_OK = "0"
+Public Const VTK_UNEXPECTED_ERROR = "2000"
+Public Const VTK_WRONG_FOLDER_PATH = "2076"
+Public Const VTK_FORBIDDEN_PARAMETER = "2077"
 
-Public Const VTK_GIT_NOT_INSTALLED = 3000
-Public Const VTK_GIT_ALREADY_INITIALIZED_IN_FOLDER = 3001
+Public Const VTK_GIT_NOT_INSTALLED = "3000"
+Public Const VTK_GIT_ALREADY_INITIALIZED_IN_FOLDER = "3001"
 
 '---------------------------------------------------------------------------------------
 ' Procedure : vtkTestPath

@@ -29,6 +29,9 @@ End Property
 Private Sub ITestCase_SetUp(Assert As IAssert)
     
     Set mAssert = Assert
+    
+    Dim fso As New FileSystemObject
+    fso.CreateTextFile ("file.txt")
 
 End Sub
 
@@ -36,124 +39,114 @@ Private Sub ITestCase_TearDown()
     vtkCleanFolder vtkTestPath
 End Sub
 
-
-'---------------------------------------------------------------------------------------
-' Procedure : Test_vtkInitializeGit
-' Author    : Abdelfattah Lahbib
-' Purpose   : Test the initialization of a repository.
-'               -
-'---------------------------------------------------------------------------------------
-'
-Public Sub TestvtkInitializeRepository()
-    Dim RetValInitializeGit As String
-    Dim RetValFileReader As String
-    RetValInitializeGit = vtkInitializeGit()
-    RetValFileReader = vtkTextFileReader(vtkTestPath & "\" & vtkTestProjectName & "\GitLog" & "\logGitInitialize.log")
-    mAssert.Equals Left(RetValFileReader, 12), Chr(10) & "Initialized", "repository must be initilized"
+Public Sub Test_vtkInitializeGit_correctPathExistenceOfDotGitFolder()
+   vtkInitializeGit vtkTestPath
+   mAssert.Should vtkDoesFolderExist(vtkTestPath & "\.git") = True, ".git folder must exist"
 End Sub
 
-'---------------------------------------------------------------------------------------
-' Procedure : TestvtkReInitializeLocalRepository
-' Author    : Abdelfattah Lahbib
-' Purpose   : Test the re-initialization of a repository in a project root folder
-'               - $projectRootFolder\GitLog\logGitInitialize.log must start by "Chr(10) & Reinitialized"
-'---------------------------------------------------------------------------------------
-'
-Public Sub TestReInitializeLocalRepository()
-    Dim RetValInitializeGit As String
-    Dim RetValInitializeGit2 As String
-    Dim RetValFileReader As String
-    
-    RetValInitializeGit = vtkInitializeGit()
-    RetValInitializeGit2 = vtkInitializeGit()
- 
-    RetValFileReader = vtkTextFileReader(vtkTestPath & "\" & vtkTestProjectName & "\GitLog" & "\logGitInitialize.log")
-    mAssert.Equals Left(RetValFileReader, 14), Chr(10) & "Reinitialized", "repository must be reinitilized"
+Public Sub Test_vtkInitializeGit_correctPathRetVal()
+   Dim retVal As Integer
+   retVal = vtkInitializeGit(vtkTestPath)
+   mAssert.Should retVal = VTK_OK, "Return value must be VTK_OK, it's " & retVal
 End Sub
 
-
-'---------------------------------------------------------------------------------------
-' Procedure : TestInitializeGitFileIsCreated
-' Author    : Abdelfattah Lahbib
-' Purpose   : Test the initialization of a repository in the project root folder
-'               - $projectRootFolder\GitLog\logGitInitialize.log must exist
-'---------------------------------------------------------------------------------------
-'
-Public Sub TestInitializeGitFileIsCreated()
-    Dim RetValInitializeGit As String
-    Dim fso As New FileSystemObject
-   
-    RetValInitializeGit = vtkInitializeGit()
-    mAssert.Should fso.FileExists(vtkTestPath & "\" & vtkTestProjectName & "\GitLog\logGitInitialize.log") = True, "log file must be created"
+Public Sub Test_vtkInitializeGit_correctPathReInitializeRetVal()
+    Dim retVal As Integer
+    vtkInitializeGit (vtkTestPath)
+    retVal = vtkInitializeGit(vtkTestPath)
+    mAssert.Should retVal = VTK_GIT_ALREADY_INITIALIZED_IN_FOLDER, "Return value must be VTK_GIT_ALREADY_INITIALIZED"
 End Sub
 
-'---------------------------------------------------------------------------------------
-' Procedure : TestInitializeGitFileIsNotEmpty
-' Author    : Abdelfattah Lahbib
-' Purpose   : Test the initialization of a repository in the project root folder
-'               - $projectRootFolder\GitLog\logGitInitialize.log must not be empty
-'---------------------------------------------------------------------------------------
-'
-Public Sub TestInitializeGitFileIsNotEmpty()
-    Dim RetValInitializeGit As String
-    Dim fso As New FileSystemObject
-    
-    RetValInitializeGit = vtkInitializeGit()
-    
-    mAssert.Should IsEmpty(vtkTestPath & "\" & vtkTestProjectName & "\GitLog\logGitInitialize.log") = False, "log file must not be empty"
+Public Sub Test_vtkInitializeGit_wrongPathUnexistingFolder()
+    Dim retVal As Integer
+    retVal = vtkInitializeGit(vtkTestPath & "\no_folder")
+    mAssert.Should retVal = VTK_WRONG_FOLDER_PATH, "Return value must be VTK_WRONG_FOLDER_PATH"
 End Sub
 
-'---------------------------------------------------------------------------------------
-' Procedure : TestStatusGitFileIsCreated
-' Author    : Abdelfattah Lahbib
-' Purpose   : Test the vtkStatusGit function
-'               - After calling vtkStatusGit, $projectRootFolder\GitLog\logStatus.log must exist
-'---------------------------------------------------------------------------------------
-'
-Public Sub TestStatusGitIsCreated()
-   Dim RetValStatusGit As String
-   Dim fso As New FileSystemObject
-   
-   RetValStatusGit = vtkStatusGit()
-   
-   mAssert.Should fso.FileExists(vtkTestPath & "\" & vtkTestProjectName & "\GitLog\logStatus.log") = True, "status file must be created"
+Public Sub Test_vtkInitializeGit_wrongPathFile()
+    Dim retVal As Integer
+    retVal = vtkInitializeGit(vtkTestPath & "file.txt")
+    mAssert.Should retVal = VTK_WRONG_FOLDER_PATH, "Return value must be VTK_WRONG_FOLDER_PATH"
 End Sub
 
-'---------------------------------------------------------------------------------------
-' Procedure : TestStatusGitFileIsCreated
-' Author    : Abdelfattah Lahbib
-' Purpose   : Test the vtkStatusGit function
-'               - After calling vtkStatusGit, $projectRootFolder\GitLog\logStatus.log must not be empty
-'---------------------------------------------------------------------------------------
-'
-Public Sub TestStatusGitFileNotEmpty()
-    Dim RetValStatusGit As String
-    Dim fso As New FileSystemObject
-    
-    RetValStatusGit = vtkStatusGit()
- 
-    mAssert.Should IsEmpty(vtkTestPath & "\" & vtkTestProjectName & "\GitLog\logStatus.log") = False, "log file must not be empty"
+Public Sub Test_vtkInitializeGit_forbiddenPath1()
+    Dim retVal As Integer
+    retVal = vtkInitializeGit("D:/dummy")
+    mAssert.Should retVal = VTK_FORBIDDEN_PARAMETER, "Return value must be VTK_FORBIDDEN_PARAMETER"
 End Sub
 
+Public Sub Test_vtkInitializeGit_forbiddenPath2()
+    Dim retVal As Integer
+    retVal = vtkInitializeGit("DUMMY:/dummy")
+    mAssert.Should retVal = VTK_FORBIDDEN_PARAMETER, "Return value must be VTK_FORBIDDEN_PARAMETER, is " & retVal
+End Sub
+
+Public Sub Test_vtkInitializeGit_correctPathCustomLogFile()
+    'mAssert.Should retVal = VTK_WRONG_FOLDER_PATH, "Return value must be VTK_WRONG_FOLDER_PATH"
+End Sub
+
+Public Sub Test_vtkGitConvertWinPath_absolutePathOnCDrive()
+    Dim path As String
+    Dim convertedPath As String
+    path = "C:\test1\test2"
+    convertedPath = vtkGitConvertWinPath(path)
+    mAssert.Should convertedPath = Chr(34) & "/test1/test2" & Chr(34), "Path must be correctly transformed."
+End Sub
+
+Public Sub Test_vtkGitConvertWinPath_absolutePathOnOneLetterDriveNotC()
+    Dim path As String
+    Dim convertedPath As String
+    path = "D:\test1\test2"
+    convertedPath = vtkGitConvertWinPath(path)
+    mAssert.Should convertedPath = VTK_FORBIDDEN_PARAMETER, "Path is not valid and shouldn't be allowed."
+End Sub
+
+Public Sub Test_vtkGitConvertWinPath_absolutePathOnSeveralLettersDrive()
+    Dim path As String
+    Dim convertedPath As String
+    path = "TOTO:\test1\test2"
+    convertedPath = vtkGitConvertWinPath(path)
+    mAssert.Should convertedPath = VTK_FORBIDDEN_PARAMETER, "Path is not valid and shouldn't be allowed."
+End Sub
+
+Public Sub Test_vtkGitConvertWinPath_relativePath()
+    Dim path As String
+    Dim convertedPath As String
+    path = "\test1\test2"
+    convertedPath = vtkGitConvertWinPath(path)
+    mAssert.Should convertedPath = VTK_FORBIDDEN_PARAMETER, "Path is not valid and shouldn't be allowed."
+End Sub
 
 Private Function ITest_Suite() As TestSuite
     Set ITest_Suite = New TestSuite
-    ITest_Suite.AddTest ITest_Manager.ClassName, "TestvtkInitializeRepository"
-    ITest_Suite.AddTest ITest_Manager.ClassName, "TestReInitializeLocalRepository"
-    ITest_Suite.AddTest ITest_Manager.ClassName, "TestInitializeGitFileIsCreated"
-    ITest_Suite.AddTest ITest_Manager.ClassName, "TestInitializeGitFileIsNotEmpty"
-    ITest_Suite.AddTest ITest_Manager.ClassName, "TestStatusGitIsCreated"
-    ITest_Suite.AddTest ITest_Manager.ClassName, "TestStatusGitFileNotEmpty"
+    ITest_Suite.AddTest ITest_Manager.ClassName, "Test_vtkInitializeGit_correctPathExistenceOfDotGitFolder"
+    ITest_Suite.AddTest ITest_Manager.ClassName, "Test_vtkInitializeGit_correctPathRetVal"
+    ITest_Suite.AddTest ITest_Manager.ClassName, "Test_vtkInitializeGit_correctPathReInitializeRetVal"
+    ITest_Suite.AddTest ITest_Manager.ClassName, "Test_vtkInitializeGit_wrongPathUnexistingFolder"
+    ITest_Suite.AddTest ITest_Manager.ClassName, "Test_vtkInitializeGit_wrongPathFile"
+    ITest_Suite.AddTest ITest_Manager.ClassName, "Test_vtkInitializeGit_forbiddenPath1"
+    ITest_Suite.AddTest ITest_Manager.ClassName, "Test_vtkInitializeGit_forbiddenPath2"
+    ITest_Suite.AddTest ITest_Manager.ClassName, "Test_vtkInitializeGit_correctPathCustomLogFile"
+    ITest_Suite.AddTest ITest_Manager.ClassName, "Test_vtkGitConvertWinPath_absolutePathOnCDrive"
+    ITest_Suite.AddTest ITest_Manager.ClassName, "Test_vtkGitConvertWinPath_absolutePathOnOneLetterDriveNotC"
+    ITest_Suite.AddTest ITest_Manager.ClassName, "Test_vtkGitConvertWinPath_absolutePathOnSeveralLettersDrive"
+    ITest_Suite.AddTest ITest_Manager.ClassName, "Test_vtkGitConvertWinPath_relativePath"
 End Function
 
 Private Sub ITestCase_RunTest()
     Select Case mManager.methodName
-        Case "TestvtkInitializeRepository": TestvtkInitializeRepository
-        Case "TestReInitializeLocalRepository": TestReInitializeLocalRepository
-        Case "TestInitializeGitFileIsCreated": TestInitializeGitFileIsCreated
-        Case "TestInitializeGitFileIsNotEmpty": TestInitializeGitFileIsNotEmpty
-        Case "TestStatusGitIsCreated": TestStatusGitIsCreated
-        Case "TestStatusGitFileNotEmpty": TestStatusGitFileNotEmpty
+        Case "Test_vtkInitializeGit_correctPathExistenceOfDotGitFolder": Test_vtkInitializeGit_correctPathExistenceOfDotGitFolder
+        Case "Test_vtkInitializeGit_correctPathRetVal": Test_vtkInitializeGit_correctPathRetVal
+        Case "Test_vtkInitializeGit_correctPathReInitializeRetVal": Test_vtkInitializeGit_correctPathReInitializeRetVal
+        Case "Test_vtkInitializeGit_wrongPathUnexistingFolder": Test_vtkInitializeGit_wrongPathUnexistingFolder
+        Case "Test_vtkInitializeGit_wrongPathFile": Test_vtkInitializeGit_wrongPathFile
+        Case "Test_vtkInitializeGit_forbiddenPath1": Test_vtkInitializeGit_forbiddenPath1
+        Case "Test_vtkInitializeGit_forbiddenPath2": Test_vtkInitializeGit_forbiddenPath2
+        Case "Test_vtkInitializeGit_correctPathCustomLogFile": Test_vtkInitializeGit_correctPathCustomLogFile
+        Case "Test_vtkGitConvertWinPath_absolutePathOnCDrive": Test_vtkGitConvertWinPath_absolutePathOnCDrive
+        Case "Test_vtkGitConvertWinPath_absolutePathOnOneLetterDriveNotC": Test_vtkGitConvertWinPath_absolutePathOnOneLetterDriveNotC
+        Case "Test_vtkGitConvertWinPath_absolutePathOnSeveralLettersDrive": Test_vtkGitConvertWinPath_absolutePathOnSeveralLettersDrive
+        Case "Test_vtkGitConvertWinPath_relativePath": Test_vtkGitConvertWinPath_relativePath
         Case Else: mAssert.Should False, "Invalid test name: " & mManager.methodName
     End Select
 End Sub
