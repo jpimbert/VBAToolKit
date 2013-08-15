@@ -10,40 +10,6 @@ Attribute VB_Name = "vtkFileSystemUtilities"
 '---------------------------------------------------------------------------------------
 
 '---------------------------------------------------------------------------------------
-' Procedure : vtkCreateFileInDirectory
-' Author    : Abdelfattah Lahbib
-' Date      : 30/04/2013
-' Purpose   : Create a file named $fileName in the directory $directory
-' Notes     : Notably used for creating Git log files
-'---------------------------------------------------------------------------------------
-'
-Public Function vtkCreateFileInDirectory(fileName As String, directory As String) As String
-
-    Dim fso As New FileSystemObject
-    Dim fullFilePath As String
-      
-On Error GoTo vtkCreateFileInDirectory_Error
-    
-    fullFilePath = directory & "\" & fileName
-      
-    ' If the file doesn't exist, we create it
-    If fso.FileExists(fullFilePath) = False Then
-            fso.CreateTextFile (fullFilePath)
-    End If
-      
-    'return full created file path
-    vtkCreateFileInDirectory = fullFilePath
-
-    On Error GoTo 0
-    Exit Function
-
-vtkCreateFileInDirectory_Error:
-    MsgBox "Error " & err.Number & " (" & err.Description & ") in procedure vtkCreateFileInDirectory of Module vtkGitFunctions"
-    vtkCreateFileInDirectory = err.Number
-
-End Function
-
-'---------------------------------------------------------------------------------------
 ' Procedure : vtkTextFileReader
 ' Author    : Abdelfattah Lahbib
 ' Date      : 30/04/2013
@@ -147,70 +113,13 @@ Public Sub vtkDeleteTreeFolder(rootPath As String)
 End Sub
 
 '---------------------------------------------------------------------------------------
-' Procedure : vtkCleanFolder_Dir
-' Author    : Lucas Vitorino
-' Purpose   : Recursively delete all the content of a folder, leaving it empty.
-' Notes     : - uses only the Dir function rather than FileSystemObject
-'             - WIP. Doesn't currently work
-'---------------------------------------------------------------------------------------
-'
-Public Function vtkCleanFolder_Dir(folderPath As String) As Long
-    
-    On Error GoTo vtkCleanFolder_Error
-    
-    Do Until vtkIsFolderEmpty(folderPath) = True
-    
-    If Right(folderPath, 1) <> "\" Then folderPath = folderPath & "\"
-    Debug.Print "IN FOLDER : " & folderPath
-    
-    Dim subFolder As String
-    
-    ' Erase the files in the folder
-    Kill folderPath & "\*"
-    
-    subFolder = Dir(folderPath, vbDirectory)
-    
-        ' Until there is not subfolder left
-        Do Until subFolder = ""
-            If (GetAttr(folderPath & subFolder) And vbDirectory) Then
-                If subFolder <> "." And subFolder <> ".." Then
-                    vtkCleanFolder (folderPath & subFolder)
-                    Debug.Print "Erasing folder : " & folderPath & subFolder
-                    RmDir folderPath & subFolder
-                End If
-            End If
-            Debug.Print "DEBUG <<"
-            Debug.Print "Current folder = " & folderPath
-            Debug.Print "Current subfolder = " & subFolder
-            subFolder = Dir()
-            Debug.Print ">> DEBUG "
-        Loop
-    
-    Loop
-    Debug.Print "Folder " & folderPath & " empty"
-    
-    On Error GoTo 0
-    vtkCleanFolder = VTK_RETVAL_OK
-    Exit Function
-    
-vtkCleanFolder_Dir_Error:
-    ' Kill sourceFolder.path & "\*" will throw an error 53 if the folder is empty.
-    If err.Number = 53 Then
-        Resume Next
-    Else
-        vtkCleanFolder = VTK_RETVAL_UNEXPECTED_ERROR
-        Debug.Print "ERROR " & err.Number & " : " & err.Description
-        Exit Function
-    End If
-    
-End Function
-
-
-'---------------------------------------------------------------------------------------
 ' Procedure : vtkCleanFolder
 ' Author    : Lucas Vitorino
 ' Purpose   : Recursively delete all the content of a folder, leaving it empty.
-' Notes     : - uses Scripting.FileSystemObject
+' Notes     : Returns
+'               - VTK_RETVAL_OK if successful
+'               - 76 if wrong path or parameter is not a folder
+'               - VTK_RETVAL_UNEXPECTED_ERR if other error
 '---------------------------------------------------------------------------------------
 '
 Public Function vtkCleanFolder(folderPath As String) As Integer
@@ -218,18 +127,22 @@ Public Function vtkCleanFolder(folderPath As String) As Integer
     On Error GoTo vtkCleanFolder_Error
     
     Dim fso As New Scripting.FileSystemObject
-    Dim sourceFolder As Scripting.Folder
-    Dim subFolder As Scripting.Folder
-    
+    Dim sourceFolder As Scripting.folder
+    Dim subFolder As Scripting.folder
+    Dim file As Scripting.file
+
+    ' Will raise an error if folderPath does not correspond to a valid folder
     Set sourceFolder = fso.GetFolder(folderPath)
-    
-    ' Erase the files in the folder
-    Kill sourceFolder.path & "\*"
+
+    ' Erase the files in the folder, even the hidden ones
+    For Each file In sourceFolder.Files
+        fso.DeleteFile file
+    Next file
     
     ' Call the function on all the SubFolders
     For Each subFolder In sourceFolder.SubFolders
         vtkCleanFolder (subFolder.path)
-        RmDir subFolder.path
+        fso.DeleteFolder subFolder
     Next subFolder
     
     On Error GoTo 0
@@ -237,58 +150,76 @@ Public Function vtkCleanFolder(folderPath As String) As Integer
     Exit Function
     
 vtkCleanFolder_Error:
-    ' Kill sourceFolder.path & "\*" will throw an error 53 if the folder is empty.
-    If err.Number = 53 Then
-        Resume Next
+    If err.Number = 76 Then
+        vtkCleanFolder = err.Number
     Else
         vtkCleanFolder = VTK_RETVAL_UNEXPECTED_ERROR
-        Exit Function
     End If
+    Exit Function
     
 End Function
-
-
 
 '---------------------------------------------------------------------------------------
 ' Procedure : vtkDeleteFolder
 ' Author    : Lucas Vitorino
 ' Purpose   : Delete a folder and its content.
+' Notes     : Returns
+'               - VTK_RETVAL_OK if successful
+'               - 76 if wrong path or parameter is not a folder
+'               - VTK_RETVAL_UNEXPECTED_ERR if other error
 '---------------------------------------------------------------------------------------
 '
-Public Sub vtkDeleteFolder(folderPath As String)
-    vtkCleanFolder folderPath
-    RmDir folderPath
-End Sub
-
-
-'---------------------------------------------------------------------------------------
-' Procedure : vtkIsFolderEmpty
-' Author    : Jean-Pierre Imbert
-' Purpose   : Checks if a folder is empty (no subfolders, no files)
-' Return    : Boolean
-'---------------------------------------------------------------------------------------
-'
-Public Function vtkIsFolderEmpty(folderPath As String)
+Public Function vtkDeleteFolder(folderPath As String)
     
     Dim fso As New Scripting.FileSystemObject
-    Dim sourceFolder As Scripting.Folder
+    Dim sourceFolder As Scripting.folder
+
+    On Error GoTo vtkDeleteFolder_Error
+
+    'Will raise an error if the folder doesn't exist
     Set sourceFolder = fso.GetFolder(folderPath)
     
-    vtkIsFolderEmpty = ((sourceFolder.SubFolders.Count = 0) And Dir(folderPath & "\*.*") = "")
-    
+    vtkCleanFolder (folderPath)
+    fso.DeleteFolder (sourceFolder.path)
+
+    On Error GoTo 0
+    vtkDeleteFolder = VTK_RETVAL_OK
+    Exit Function
+
+vtkDeleteFolder_Error:
+    If err.Number = 76 Then
+        vtkDeleteFolder = err.Number
+    Else
+        vtkDeleteFolder = VTK_RETVAL_UNEXPECTED_ERROR
+    End If
+    Exit Function
+
 End Function
+
 
 '---------------------------------------------------------------------------------------
 ' Procedure : vtkDoesFolderExist
 ' Author    : Lucas Vitorino
 ' Purpose   : Checks if a folder exists.
+' Returns   : Boolean. True if the folder exists, hidden or not, False in other cases.
 '---------------------------------------------------------------------------------------
 '
-Public Function vtkDoesFolderExist(folderPath As String) As Boolean
-    If Dir(folderPath, vbDirectory) = "" Then
-        vtkDoesFolderExist = False
-    Else
-        vtkDoesFolderExist = True
-    End If
+Public Function vtkDoesFolderExist(folderPath As String) As Integer
+
+    On Error GoTo vtkDoesFolderExist_Error
+    
+    'Dir(etc,vbDirectory) returns True even if the specified thing is not a directory
+    Dim fso As New FileSystemObject
+    'Will raise an error 76 if wrong path or not a folder
+    fso.GetFolder (folderPath)
+    
+    On Error GoTo 0
+    vtkDoesFolderExist = True
+    Exit Function
+
+vtkDoesFolderExist_Error:
+    vtkDoesFolderExist = False
+    Exit Function
+
 End Function
 

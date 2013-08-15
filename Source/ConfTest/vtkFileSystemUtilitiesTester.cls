@@ -32,15 +32,17 @@ Private Sub ITestCase_SetUp(Assert As IAssert)
     
     Set fso = New FileSystemObject
     
-    On Error Resume Next
-    
-    'Creating a hierarchy of folders.
+    'Creating a hierarchy of folders (mainly for vtkCleanFolder)
+    ' -----------------------------------------------------------------------------
+    fso.CreateFolder (vtkTestPath & "\" & "visible_folder")
+    fso.CreateFolder (vtkTestPath & "\" & "visible_folder" & "\" & "visible_folder")
+    fso.CreateFolder (vtkTestPath & "\" & "hidden_folder")
+    fso.CreateFolder (vtkTestPath & "\" & "hidden_folder" & "\" & "visible_folder")
     fso.CreateFolder (vtkTestPath & "\" & "testFolder0")
-    fso.CreateFolder (vtkTestPath & "\" & "testFolder0" & "\" & "testFolder1")
     fso.CreateFolder (vtkTestPath & "\" & "testFolder0" & "\" & "testFolder11")
+    fso.CreateFolder (vtkTestPath & "\" & "testFolder0" & "\" & "testFolder1")
     fso.CreateFolder (vtkTestPath & "\" & "testFolder0" & "\" & "testFolder1" & "\" & "testFolder2")
     fso.CreateFolder (vtkTestPath & "\" & "testFolder0" & "\" & "testFolder1" & "\" & "testFolder2" & "\" & "testFolder3")
-    
     ' We create three text files to try different configurations
     '   - testFolder0  : text file and 2 subfolders
     '   - testFolder1  : text file and one subfolder
@@ -52,6 +54,14 @@ Private Sub ITestCase_SetUp(Assert As IAssert)
     fso.CreateTextFile (vtkTestPath & "\" & "testFolder0" & "\" & "testFolder1" & "\" & "testFolder2" & _
     "\" & "testFolder3" & "\" & "textFile3.txt")
     
+    '------------------------------------------------------------------------------
+    
+    'Creating other files and folders for simple tests
+    fso.CreateTextFile (vtkTestPath & "\" & "testFolder0" & "\" & "hidden.txt")
+    fso.CreateTextFile (vtkTestPath & "\" & "testFolder0" & "\" & "not_hidden.txt")
+    fso.CreateFolder (vtkTestPath & "\" & "testFolder0" & "\" & "hidden_folder")
+    SetAttr vtkTestPath & "\" & "testFolder0" & "\" & "hidden.txt", vbHidden
+    SetAttr vtkTestPath & "\" & "testFolder0" & "\" & "hidden_folder", vbHidden
 End Sub
 
 Private Sub ITestCase_TearDown()
@@ -60,120 +70,151 @@ Private Sub ITestCase_TearDown()
     
     fso = Nothing
 
-    ' Kill the files
-    Kill vtkTestPath & "\" & "testFolder0" & "\" & "*"
-    Kill vtkTestPath & "\" & "testFolder0" & "\" & "testFolder1" & "\" & "*"
-    Kill vtkTestPath & "\" & "testFolder0" & "\" & "testFolder1" & "\" & "testFolder2" & _
-    "\" & "*"
-    Kill vtkTestPath & "\" & "testFolder0" & "\" & "testFolder1" & "\" & "testFolder2" & _
-    "\" & "testFolder3" & "\" & "*"
-
-    ' Delete the now empty folders
-    RmDir vtkTestPath & "\" & "testFolder0" & "\" & "testFolder1" & "\" & "testFolder2" & "\" & "testFolder3"
-    RmDir vtkTestPath & "\" & "testFolder0" & "\" & "testFolder1" & "\" & "testFolder2"
-    RmDir vtkTestPath & "\" & "testFolder0" & "\" & "testFolder11"
-    RmDir vtkTestPath & "\" & "testFolder0" & "\" & "testFolder1"
-    RmDir vtkTestPath & "\" & "testFolder0"
-
+    vtkCleanFolder (vtkTestPath)
+    
 End Sub
 
 Private Function ITest_Suite() As TestSuite
     Set ITest_Suite = New TestSuite
-    ITest_Suite.AddTest ITest_Manager.ClassName, "TestvtkCreateFileInDirectory"
-    ITest_Suite.AddTest ITest_Manager.ClassName, "Test_vtkCleanFolder__correct_path"
-    ITest_Suite.AddTest ITest_Manager.ClassName, "Test_vtkIsFolderEmpty__empty_folder"
-    ITest_Suite.AddTest ITest_Manager.ClassName, "Test_vtkIsFolderEmpty__folder_with_a_subfolder"
-    ITest_Suite.AddTest ITest_Manager.ClassName, "Test_vtkIsFolderEmpty__folder_with_a_file"
-    ITest_Suite.AddTest ITest_Manager.ClassName, "Test_vtkIsFolderEmpty__folder_with_a_file_and_a_subfolder"
-    ITest_Suite.AddTest ITest_Manager.ClassName, "Test_vtkDoesFolderExist__folder_existing"
-    ITest_Suite.AddTest ITest_Manager.ClassName, "Test_vtkDoesFolderExist__folder_not_existing"
+    ITest_Suite.AddTest ITest_Manager.ClassName, "Test_vtkCleanFolder_correctPathAreFoldersDeleted"
+    ITest_Suite.AddTest ITest_Manager.ClassName, "Test_vtkCleanFolder_correctPathReturnValue"
+    ITest_Suite.AddTest ITest_Manager.ClassName, "Test_vtkCleanFolder_wrongPath"
+    ITest_Suite.AddTest ITest_Manager.ClassName, "Test_vtkCleanFolder_file"
+    ITest_Suite.AddTest ITest_Manager.ClassName, "Test_vtkDeleteFolder_correctPathAreFoldersDeleted"
+    ITest_Suite.AddTest ITest_Manager.ClassName, "Test_vtkDeleteFolder_correctPathReturnValue"
+    ITest_Suite.AddTest ITest_Manager.ClassName, "Test_vtkDeleteFolder_wrongPath"
+    ITest_Suite.AddTest ITest_Manager.ClassName, "Test_vtkDeleteFolder_file"
+    ITest_Suite.AddTest ITest_Manager.ClassName, "Test_vtkDoesFolderExist_visibleFolder"
+    ITest_Suite.AddTest ITest_Manager.ClassName, "Test_vtkDoesFolderExist_hiddenFolder"
+    ITest_Suite.AddTest ITest_Manager.ClassName, "Test_vtkDoesFolderExist_wrongPath"
+    ITest_Suite.AddTest ITest_Manager.ClassName, "Test_vtkDoesFolderExist_visibleFile"
+    ITest_Suite.AddTest ITest_Manager.ClassName, "Test_vtkDoesFolderExist_hiddenFile"
 End Function
 
 Private Sub ITestCase_RunTest()
     Select Case mManager.methodName
-        Case "TestvtkCreateFileInDirectory": TestvtkCreateFileInDirectory
-        Case "Test_vtkCleanFolder__correct_path": Test_vtkCleanFolder__correct_path
-        Case "Test_vtkIsFolderEmpty__empty_folder": Test_vtkIsFolderEmpty__empty_folder
-        Case "Test_vtkIsFolderEmpty__folder_with_a_subfolder": Test_vtkIsFolderEmpty__folder_with_a_subfolder
-        Case "Test_vtkIsFolderEmpty__folder_with_a_file": Test_vtkIsFolderEmpty__folder_with_a_file
-        Case "Test_vtkIsFolderEmpty__folder_with_a_file_and_a_subfolder": Test_vtkIsFolderEmpty__folder_with_a_file_and_a_subfolder
-        Case "Test_vtkDoesFolderExist__folder_existing": Test_vtkDoesFolderExist__folder_existing
-        Case "Test_vtkDoesFolderExist__folder_not_existing": Test_vtkDoesFolderExist__folder_not_existing
+        Case "Test_vtkCleanFolder_correctPathAreFoldersDeleted": Test_vtkCleanFolder_correctPathAreFoldersDeleted
+        Case "Test_vtkCleanFolder_correctPathReturnValue": Test_vtkCleanFolder_correctPathReturnValue
+        Case "Test_vtkCleanFolder_wrongPath": Test_vtkCleanFolder_wrongPath
+        Case "Test_vtkCleanFolder_file": Test_vtkCleanFolder_file
+        Case "Test_vtkDeleteFolder_correctPathAreFoldersDeleted": Test_vtkDeleteFolder_correctPathAreFoldersDeleted
+        Case "Test_vtkDeleteFolder_correctPathReturnValue": Test_vtkDeleteFolder_correctPathReturnValue
+        Case "Test_vtkDeleteFolder_wrongPath": Test_vtkDeleteFolder_wrongPath
+        Case "Test_vtkDeleteFolder_file": Test_vtkDeleteFolder_file
+        Case "Test_vtkDoesFolderExist_visibleFolder": Test_vtkDoesFolderExist_visibleFolder
+        Case "Test_vtkDoesFolderExist_hiddenFolder": Test_vtkDoesFolderExist_hiddenFolder
+        Case "Test_vtkDoesFolderExist_wrongPath": Test_vtkDoesFolderExist_wrongPath
+        Case "Test_vtkDoesFolderExist_visibleFile": Test_vtkDoesFolderExist_visibleFile
+        Case "Test_vtkDoesFolderExist_hiddenFile": Test_vtkDoesFolderExist_hiddenFile
         Case Else: mAssert.Should False, "Invalid test name: " & mManager.methodName
     End Select
 End Sub
 
 
-'---------------------------------------------------------------------------------------
-' Procedure : TestvtkCreateFileInDirectoryFunction
-' Author    : Abdelfattah Lahbib
-' Purpose   : Test the vtkCreateFileInDirectory function
-'               - After calling this function with a functionnal path, the file must be created.
-'---------------------------------------------------------------------------------------
-'
-Public Sub TestvtkCreateFileInDirectory()
+Public Sub Test_vtkCleanFolder_correctPathAreFoldersDeleted()
+    Dim fso As New Scripting.FileSystemObject
+    Dim testFolder As Scripting.folder
 
-Debug.Print "Entering vtkCreateFileInDirectory"
-    Dim fso As New FileSystemObject
-    vtkCreateFileInDirectory "dummyFile.txt", vtkTestPath & "\" & "\testFolder0"
-    mAssert.Should fso.FileExists(vtkTestPath & "\" & "\testFolder0" & "\" & "dummyFile.txt") = True, "File must be created"
-End Sub
+    Set testFolder = fso.GetFolder(vtkTestPath & "\" & "testFolder0")
 
-'---------------------------------------------------------------------------------------
-' Procedure : Test_vtkCleanFolder_correct_path
-' Author    : Lucas Vitorino
-' Purpose   : Test the vtkCleanFolder(folderPath As String) called on a correct path.
-'               - expected : folder cleant
-'---------------------------------------------------------------------------------------
-'
-Public Sub Test_vtkCleanFolder__correct_path()
-    Dim retval As String
-    Dim fso As New FileSystemObject
+    vtkCleanFolder (testFolder.path)
     
-    vtkCleanFolder (vtkTestPath & "\" & "testFolder0")
+    ' (testFolder.SubFolders.Count = 0) And (testFolder.Files.Count = 0) does look at the hidden files.
+    mAssert.Should (testFolder.SubFolders.Count = 0) And (testFolder.Files.Count = 0) = True, "All files and folders must be deleted"
+End Sub
+'
+Public Sub Test_vtkCleanFolder_correctPathReturnValue()
+    Dim testFolder As String
+    testFolder = vtkTestPath & "\" & "testFolder0"
     
-    mAssert.Should vtkIsFolderEmpty(vtkTestPath & "\" & "testFolder0") = True, "The folder must be empty."
+    Dim retVal As Integer
+    retVal = vtkCleanFolder(testFolder)
+
+    mAssert.Should retVal = VTK_OK, "Return value must be VTK_OK"
+End Sub
+
+Public Sub Test_vtkCleanFolder_wrongPath()
+    Dim testFolder As String
+    testFolder = vtkTestPath & "\" & "no_folder"
+    
+    Dim retVal As Integer
+    retVal = vtkCleanFolder(testFolder)
+
+    mAssert.Should retVal = 76, "Return value must be 76 : path not found"
+End Sub
+
+Public Sub Test_vtkCleanFolder_file()
+    Dim filePath As String
+    filePath = vtkTestPath & "\" & "hidden.txt"
+    
+    Dim retVal As Integer
+    retVal = vtkCleanFolder(filePath)
+
+    mAssert.Should retVal = 76, "Return value must be 76 : path not found"
 End Sub
 
 
-'---------------------------------------------------------------------------------------
-' Procedures: Test_vtkIsFolderEmpty__*
-' Author    : Lucas Vitorino
-' Purpose   : Test thte vtkIsFolderEmpty function in different cases. Code is transparent.
-'---------------------------------------------------------------------------------------
+Public Sub Test_vtkDeleteFolder_correctPathAreFoldersDeleted()
+    Dim testFolder As String
+    testFolder = vtkTestPath & "\" & "testFolder0"
+    
+    vtkDeleteFolder testFolder
+    
+    mAssert.Should vtkDoesFolderExist(testFolder) = False, "Folder must be deleted"
+End Sub
 '
-Public Sub Test_vtkIsFolderEmpty__empty_folder()
-    mAssert.Should vtkIsFolderEmpty(vtkTestPath & "\" & "testFolder0" & "\" & "testFolder11") = True, "The folder is empty"
+Public Sub Test_vtkDeleteFolder_correctPathReturnValue()
+    Dim testFolder As String
+    testFolder = vtkTestPath & "\" & "testFolder0"
+    
+    Dim retVal As Integer
+    retVal = vtkDeleteFolder(testFolder)
+
+    mAssert.Should retVal = VTK_OK, "Return value must be VTK_OK"
 End Sub
 
-Public Sub Test_vtkIsFolderEmpty__folder_with_a_subfolder()
-    mAssert.Should vtkIsFolderEmpty(vtkTestPath & "\" & "testFolder0" & "\" & "testFolder1" & "\" & "testFolder2") = False, "The folder is not empty : it contains a subfolder"
+Public Sub Test_vtkDeleteFolder_wrongPath()
+
+    Dim testFolder As String
+    testFolder = vtkTestPath & "\" & "no_folder"
+    
+    Dim retVal As Integer
+    retVal = vtkDeleteFolder(testFolder)
+
+    mAssert.Should retVal = 76, "Return value must be 76 : path not found"
 End Sub
 
-Public Sub Test_vtkIsFolderEmpty__folder_with_a_file()
-    mAssert.Should vtkIsFolderEmpty(vtkTestPath & "\" & "testFolder0" & "\" & _
-    "testFolder1" & "\" & "testFolder2" & "\" & "testFolder3") = False, _
-    "The folder is not empty : it contains a file"
+Public Sub Test_vtkDeleteFolder_file()
+    Dim filePath As String
+    filePath = vtkTestPath & "\" & "hidden.txt"
+    
+    Dim retVal As Integer
+    retVal = vtkCleanFolder(filePath)
+
+    mAssert.Should retVal = 76, "Return value must be 76 : path not found"
 End Sub
 
-Public Sub Test_vtkIsFolderEmpty__folder_with_a_file_and_a_subfolder()
-    mAssert.Should vtkIsFolderEmpty(vtkTestPath & "\" & "testFolder0" & "\" & "testFolder1") = False, _
-    "The folder is not empty : it contains a file and a subfolder"
-End Sub
 
-
-'---------------------------------------------------------------------------------------
-' Procedures: Test_vtkDoesFolderExist__**
-' Author    : Lucas Vitorino
-' Purpose   : Test the vtkDoesFolderExist function in both the cases : yes and no.
-'---------------------------------------------------------------------------------------
-'
-Public Sub Test_vtkDoesFolderExist__folder_existing()
+Public Sub Test_vtkDoesFolderExist_visibleFolder()
     mAssert.Should vtkDoesFolderExist(vtkTestPath & "\" & "testFolder0") = True, "Folder exists."
 End Sub
 
-Public Sub Test_vtkDoesFolderExist__folder_not_existing()
-    mAssert.Should vtkDoesFolderExist(vtkTestPath & "\" & "dummyfolder") = False, "Folder does not exist."
+Public Sub Test_vtkDoesFolderExist_hiddenFolder()
+    mAssert.Should vtkDoesFolderExist(vtkTestPath & "\" & "hidden_folder") = True, "Folder exists."
 End Sub
+
+Public Sub Test_vtkDoesFolderExist_wrongPath()
+    mAssert.Should vtkDoesFolderExist(vtkTestPath & "\" & "no_folder") = False, "Folder does not exist."
+End Sub
+
+Public Sub Test_vtkDoesFolderExist_visibleFile()
+    mAssert.Should vtkDoesFolderExist(vtkTestPath & "\" & "not_hidden.txt") = False, "Is not a folder."
+End Sub
+
+Public Sub Test_vtkDoesFolderExist_hiddenFile()
+    mAssert.Should vtkDoesFolderExist(vtkTestPath & "\" & "hidden.txt") = False, "Is not a folder."
+End Sub
+
+
 
 

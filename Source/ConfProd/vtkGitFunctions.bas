@@ -10,28 +10,16 @@ Option Explicit
 
 
 '---------------------------------------------------------------------------------------
-' Procedure : isGitCmdInString
-' Author    : Lucas Vitorino
-' Purpose   : Test if a string contains the "Git\cmd" substring.
-'---------------------------------------------------------------------------------------
-'
-Private Function isGitCmdInString(myString As String) As Boolean
-    isGitCmdInString = (InStr(UCase(myString), UCase("Git\cmd")))
-End Function
-
-
-'---------------------------------------------------------------------------------------
 ' Procedure : isGitInstalled
 ' Author    : Abdelfattah Lahbib
 ' Date      : 09/06/2013
 ' Purpose   : - Check if the Git "cmd.exe" is accessible via the PATH.
+' Returns   : Boolean
 '---------------------------------------------------------------------------------------
 '
 Private Function isGitInstalled() As Boolean
-    
     'Test if the "Git\cmd" substring is in the PATH string
     isGitInstalled = InStr(UCase(Environ("PATH")), UCase("Git\cmd"))
-    
 End Function
 
 '---------------------------------------------------------------------------------------
@@ -39,112 +27,66 @@ End Function
 ' Author    : Abdelfattah Lahbib
 ' Date      : 27/04/2013
 ' Purpose   : - Initialize Git in a directory using the "git init" command.
-'             - Optionally, writes the output of the "git init" command in a textfile,
-'               in a subfolder whose name has to be passed as parameter.
+'             - Optionally, writes the output of the "git init" command in a textfile
+'               whose path has to be passed as parameter.
+' Notes     : Returns
+'               - VTK_OK
+'               - VTK_WRONG_FOLDER_PATH
+'               - VTK_GIT_NOT_INSTALLED
+'               - VTK_GIT_ALREADY_INITIALIZED_IN_FOLDER
+'               - VTK_UNEXPECTED_ERR
 '---------------------------------------------------------------------------------------
 '
-Public Function vtkInitializeGit(folderPath As String, Optional textLogFolderName As String = "", _
-                                                       Optional textLogFileName As String = "initialize.log")
-    
-    Debug.Print "0"
+Public Function vtkInitializeGit(folderPath As String, Optional logFile As String = "")
     Dim FileInitPath As String
     Dim retShell As String
+    Dim logFileDefaultName As String
+    logFileDefaultName = "initialize.log"
  
     On Error GoTo vtkInitializeGit_Err
-     
+    
     If isGitInstalled = False Then
-        err.Raise 3000, "", "Git is not installed"
+        err.Raise VTK_GIT_NOT_INSTALLED, "", "Git not installed."
     End If
     
-    If vtkDoesFolderExist(folderPath & "\.git") Then
-        err.Raise 3100, "", "Git has already been initialized in the folder " & folderPath
+    If vtkDoesFolderExist(folderPath) = False Then
+        err.Raise VTK_WRONG_FOLDER_PATH, "", "Folder path not found."
     End If
     
-    If textLogFolderName = "" Then
+    If vtkDoesFolderExist(folderPath & "\.git") = True Then
+        err.Raise VTK_GIT_ALREADY_INITIALIZED_IN_FOLDER, "", "Git has already been initialized in the folder " & folderPath
+    End If
+    
+    Dim wsh As Object
+    Set wsh = VBA.CreateObject("WScript.Shell")
+    Dim waitOnReturn As Boolean: waitOnReturn = True
+    
+    If logFile = "" Then
         ' No text log folder specified, simple git init
-        retShell = Shell("cmd.exe /c git init " & vtkGitConvertWinPath(folderPath))
-        Application.Wait (Now + TimeValue("0:00:01"))
+        'retShell = Shell("cmd.exe /c git init " & vtkGitConvertWinPath(folderPath))
+        retShell = ShellAndWait("cmd.exe /c git init " & vtkGitConvertWinPath(folderPath), 0, vbHide, AbandonWait)
     Else
-        ' Text log folder specified
-        ' If it does not yet exist, create text log folder
-        If vtkDoesFolderExist(folderPath & "\" & textLogFolderName) = False Then
-            MkDir folderPath & "\" & textLogFolderName
-        End If
-        ' If it does not yet exist, create text log file
-        If Dir(folderPath & "\" & textLogFolderName & "\" & textLogFileName) = "" Then
-            Dim fso As New FileSystemObject
-            fso.CreateTextFile (folderPath & "\" & textLogFolderName & "\" & textLogFileName)
-        End If
-        ' Git init with redirection of the output
+        ' Git init with redirection of the output : Git will create all the folder tree and the log file if they don't exist
         retShell = Shell("cmd.exe /c git init " & vtkGitConvertWinPath(folderPath) & "  > " _
-        & vtkGitConvertWinPath(folderPath & "\" & textLogFolderName & "\" & textLogFileName))
+        & vtkGitConvertWinPath(logFile))
         Application.Wait (Now + TimeValue("0:00:01"))
     End If
-    
     On Error GoTo 0
-    vtkInitializeGit = 0
+    vtkInitializeGit = VTK_OK
     Exit Function
-    
-    End If
     
     
 vtkInitializeGit_Err:
-    Debug.Print "Error " & err.Number & " in vtkInitializeGit : " & err.Description
-    vtkInitializeGit = err.Number
+    If ((err.Number = VTK_GIT_NOT_INSTALLED) _
+        Or (err.Number = VTK_GIT_ALREADY_INITIALIZED_IN_FOLDER) _
+        Or (err.Number = VTK_WRONG_FOLDER_PATH)) Then
+        vtkInitializeGit = err.Number
+    Else
+        vtkInitializeGit = VTK_UNEXPECTED_ERROR
+    End If
     Exit Function
 
 End Function
-
-
-'---------------------------------------------------------------------------------------
-' Procedure : vtkStatusGit
-' Author    : Abdelfattah Lahbib
-' Date      : 30/04/2013
-' Purpose   : - Log the output of the "git status" command in $projectDirectory\GitLog\logStatus.log
-'             - Pop a MsgBox with the content of this file.
-'---------------------------------------------------------------------------------------
-'
-Public Function vtkStatusGit() As String
-  
-    Dim ActiveProjPath As String
-    Dim logFileName As String
-    Dim GitLogRelativeDirPath As String
-    Dim GitLogAbsoluteDirPath As String
-    Dim logFileFullPath As String
-    Dim retShell As String
-    Dim retShell2 As String
-    Dim fso As New FileSystemObject
-      
-    On Error GoTo vtkStatusGit_Error
-    
-    ' make paths
-    ActiveProjPath = fso.GetParentFolderName(ActiveWorkbook.path)
-    logFileName = "logStatus.log"
-    GitLogRelativeDirPath = "GitLog"
-    GitLogAbsoluteDirPath = ActiveProjPath & "\" & GitLogRelativeDirPath
-    logFileFullPath = GitLogAbsoluteDirPath & "\" & logFileName
-    
-    ' create status log file
-    vtkCreateFileInDirectory logFileName, GitLogAbsoluteDirPath
-    ' Execute git status in the project directory  and log the output in the relevant file
-    retShell = Shell("cmd.exe /k cd " & ActiveProjPath & " & git status   >" & logFileFullPath & " ", vbHide)
-    ' make a break to execute shell commands
-    Application.Wait (Now + TimeValue("0:00:01"))
-    ' kill related processus
-    retShell2 = Shell("cmd.exe /k  TASKKILL /IM cmd.exe")
-    ' make a break to execute shell commands
-    Application.Wait (Now + TimeValue("0:00:01"))
-    ' read log file , and return its content
-    vtkStatusGit = vtkTextFileReader(logFileFullPath)
-
-   On Error GoTo 0
-   Exit Function
-
-vtkStatusGit_Error:
-    MsgBox "Error " & err.Number & " (" & err.Description & ") in procedure vtkStatusGit of Module vtkGitFunctions"
-    vtkStatusGit = err.Number
-End Function
-
 
 '---------------------------------------------------------------------------------------
 ' Procedure : vtkGitConvertWinPath
@@ -154,19 +96,44 @@ End Function
 '               it's a Windows/Unix path format conflict.
 '             - For now, I can't specify the drive letter in a path used with Git.
 '               This function will strip it and git will assume it's "C" .
+'             - Returns
+'               - Converted string if OK
+'               - VTK_FORBIDDEN_PARAMETER if winPath is not absolute, or absolute but not on the C: drive
+'               - VTK_UNEXPECTED_ERR
 '---------------------------------------------------------------------------------------
 '
 Public Function vtkGitConvertWinPath(winPath As String) As String
     
-    Dim unixPath As String
+    Dim convertedPath As String
+    convertedPath = winPath
+    Dim convertedSplittedPath() As String
+    
+    On Error GoTo vtkGitConvertWinPath_Error
+    
+    convertedSplittedPath = Split(convertedPath, ":")
+    
+    ' Only allows absolute paths on the C: drive
+    If convertedSplittedPath(LBound(convertedSplittedPath)) <> "C" Then
+        err.Raise VTK_FORBIDDEN_PARAMETER, "", "Parameter is invalid."
+    End If
+
+    convertedPath = convertedSplittedPath(LBound(convertedSplittedPath) + 1)
+    
     'Changing the backslahes in slashes
     ' NB : Optional
-    unixPath = Replace(winPath, "\", "/")
+    convertedPath = Replace(convertedPath, "\", "/")
+        
+    On Error GoTo 0
+    vtkGitConvertWinPath = Chr(34) & convertedPath & Chr(34)
+    Exit Function
     
-    'Removing the drive letter and the semicolon in the beginning
-    unixPath = Replace(unixPath, Left(unixPath, 1), "", 1, 1)
-    unixPath = Replace(unixPath, Left(unixPath, 1), "", 1, 1)
-    
-    vtkGitConvertWinPath = Chr(34) & unixPath & Chr(34)
-    
+
+vtkGitConvertWinPath_Error:
+    If (err.Number = VTK_FORBIDDEN_PARAMETER) Then
+        vtkGitConvertWinPath = err.Number
+    Else
+        vtkGitConvertWinPath = VTK_UNEXPECTED_ERROR
+    End If
+    Exit Function
+
 End Function
