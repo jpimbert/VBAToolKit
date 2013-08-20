@@ -39,50 +39,108 @@ Private Sub ITestCase_TearDown()
     vtkCleanFolder vtkTestPath
 End Sub
 
+
 Public Sub Test_vtkInitializeGit_correctPathExistenceOfDotGitFolder()
    vtkInitializeGit vtkTestPath
    mAssert.Should vtkDoesFolderExist(vtkTestPath & "\.git") = True, ".git folder must exist"
 End Sub
 
 Public Sub Test_vtkInitializeGit_correctPathRetVal()
-   Dim retVal As Integer
-   retVal = vtkInitializeGit(vtkTestPath)
-   mAssert.Should retVal = VTK_OK, "Return value must be VTK_OK, it's " & retVal
+   Dim retval As Integer
+   retval = vtkInitializeGit(vtkTestPath)
+   mAssert.Equals retval, VTK_OK
 End Sub
 
 Public Sub Test_vtkInitializeGit_correctPathReInitializeRetVal()
-    Dim retVal As Integer
+    Dim error As Integer: error = 0
+    
+    On Error GoTo errHandler
+    
     vtkInitializeGit (vtkTestPath)
-    retVal = vtkInitializeGit(vtkTestPath)
-    mAssert.Should retVal = VTK_GIT_ALREADY_INITIALIZED_IN_FOLDER, "Return value must be VTK_GIT_ALREADY_INITIALIZED"
+    vtkInitializeGit (vtkTestPath)
+    
+    mAssert.Equals error, VTK_GIT_ALREADY_INITIALIZED_IN_FOLDER
+    
+errHandler:
+    error = Err.Number
+    Resume Next
 End Sub
 
 Public Sub Test_vtkInitializeGit_wrongPathUnexistingFolder()
-    Dim retVal As Integer
-    retVal = vtkInitializeGit(vtkTestPath & "\no_folder")
-    mAssert.Should retVal = VTK_WRONG_FOLDER_PATH, "Return value must be VTK_WRONG_FOLDER_PATH"
+    Dim error As Integer: error = 0
+    
+    On Error GoTo errHandler
+    
+    vtkInitializeGit (vtkTestPath & "\no_folder")
+    
+    mAssert.Equals error, VTK_WRONG_FOLDER_PATH
+    
+errHandler:
+    error = Err.Number
+    Resume Next
+    
 End Sub
 
 Public Sub Test_vtkInitializeGit_wrongPathFile()
-    Dim retVal As Integer
-    retVal = vtkInitializeGit(vtkTestPath & "file.txt")
-    mAssert.Should retVal = VTK_WRONG_FOLDER_PATH, "Return value must be VTK_WRONG_FOLDER_PATH"
+    Dim error As Integer: error = 0
+    
+    On Error GoTo errHandler
+    
+    vtkInitializeGit (vtkTestPath & "file.txt")
+    
+    mAssert.Equals error, VTK_WRONG_FOLDER_PATH
+    
+errHandler:
+    error = Err.Number
+    Resume Next
 End Sub
 
 Public Sub Test_vtkInitializeGit_forbiddenPath1()
-    Dim retVal As Integer
-    retVal = vtkInitializeGit("D:/dummy")
-    mAssert.Should retVal = VTK_FORBIDDEN_PARAMETER, "Return value must be VTK_FORBIDDEN_PARAMETER"
+    Dim error As Integer: error = 0
+    
+    On Error GoTo errHandler
+    
+    vtkInitializeGit ("D:/dummy")
+    
+    mAssert.Equals error, VTK_FORBIDDEN_PARAMETER
+    
+errHandler:
+    error = Err.Number
+    Resume Next
+    
 End Sub
 
 Public Sub Test_vtkInitializeGit_forbiddenPath2()
-    Dim retVal As Integer
-    retVal = vtkInitializeGit("DUMMY:/dummy")
-    mAssert.Should retVal = VTK_FORBIDDEN_PARAMETER, "Return value must be VTK_FORBIDDEN_PARAMETER, is " & retVal
+    Dim error As Integer: error = 0
+    
+    On Error GoTo errHandler
+    
+    vtkInitializeGit ("DUMMY:/dummy")
+    
+    mAssert.Equals error, VTK_FORBIDDEN_PARAMETER
+    
+errHandler:
+    error = Err.Number
+    Resume Next
+    
 End Sub
 
-Public Sub Test_vtkInitializeGit_correctPathCustomLogFile()
-    'mAssert.Should retVal = VTK_WRONG_FOLDER_PATH, "Return value must be VTK_WRONG_FOLDER_PATH"
+Public Sub Test_vtkInitializeGit_correctPathLogFileIsDeleted()
+    Dim fso As New Scripting.FileSystemObject
+    vtkInitializeGit vtkTestPath
+    mAssert.Equals fso.FileExists(vtkTestPath & "\initialize.log"), False
+End Sub
+
+Public Sub Test_vtkInitializeGit_correctPathCustomLogFileReturnValue()
+    Dim retval As Integer
+    retval = vtkInitializeGit(vtkTestPath, "initialize.log")
+    mAssert.Equals retval, VTK_OK
+End Sub
+
+Public Sub Test_vtkInitializeGit_correctPathCustomLogFileExists()
+    Dim fso As New FileSystemObject
+    vtkInitializeGit vtkTestPath, "initialize.log"
+    mAssert.Equals fso.FileExists(vtkTestPath & "\initialize.log"), True
 End Sub
 
 Public Sub Test_vtkGitConvertWinPath_absolutePathOnCDrive()
@@ -90,31 +148,61 @@ Public Sub Test_vtkGitConvertWinPath_absolutePathOnCDrive()
     Dim convertedPath As String
     path = "C:\test1\test2"
     convertedPath = vtkGitConvertWinPath(path)
-    mAssert.Should convertedPath = Chr(34) & "/test1/test2" & Chr(34), "Path must be correctly transformed."
+    mAssert.Equals convertedPath, Chr(34) & "/test1/test2" & Chr(34), "Path must be correctly transformed."
 End Sub
 
 Public Sub Test_vtkGitConvertWinPath_absolutePathOnOneLetterDriveNotC()
+    Dim error As Integer: error = 0
     Dim path As String
     Dim convertedPath As String
+    
+    On Error GoTo errHandler
+    
     path = "D:\test1\test2"
     convertedPath = vtkGitConvertWinPath(path)
-    mAssert.Should convertedPath = VTK_FORBIDDEN_PARAMETER, "Path is not valid and shouldn't be allowed."
+    
+    mAssert.Equals error, VTK_FORBIDDEN_PARAMETER
+    
+errHandler:
+    error = Err.Number
+    Resume Next
+    
 End Sub
 
 Public Sub Test_vtkGitConvertWinPath_absolutePathOnSeveralLettersDrive()
+    Dim error As Integer: error = 0
     Dim path As String
     Dim convertedPath As String
+    
+    On Error GoTo errHandler
+    
     path = "TOTO:\test1\test2"
     convertedPath = vtkGitConvertWinPath(path)
-    mAssert.Should convertedPath = VTK_FORBIDDEN_PARAMETER, "Path is not valid and shouldn't be allowed."
+    
+    mAssert.Equals error, VTK_FORBIDDEN_PARAMETER
+    
+errHandler:
+    error = Err.Number
+    Resume Next
+    
 End Sub
 
 Public Sub Test_vtkGitConvertWinPath_relativePath()
+    Dim error As Integer: error = 0
     Dim path As String
     Dim convertedPath As String
+    
+    On Error GoTo errHandler
+    
     path = "\test1\test2"
     convertedPath = vtkGitConvertWinPath(path)
-    mAssert.Should convertedPath = VTK_FORBIDDEN_PARAMETER, "Path is not valid and shouldn't be allowed."
+    
+    mAssert.Equals error, VTK_FORBIDDEN_PARAMETER
+    
+errHandler:
+    error = Err.Number
+    Resume Next
+    
 End Sub
 
 Private Function ITest_Suite() As TestSuite
@@ -126,7 +214,9 @@ Private Function ITest_Suite() As TestSuite
     ITest_Suite.AddTest ITest_Manager.ClassName, "Test_vtkInitializeGit_wrongPathFile"
     ITest_Suite.AddTest ITest_Manager.ClassName, "Test_vtkInitializeGit_forbiddenPath1"
     ITest_Suite.AddTest ITest_Manager.ClassName, "Test_vtkInitializeGit_forbiddenPath2"
-    ITest_Suite.AddTest ITest_Manager.ClassName, "Test_vtkInitializeGit_correctPathCustomLogFile"
+    ITest_Suite.AddTest ITest_Manager.ClassName, "Test_vtkInitializeGit_correctPathLogFileIsDeleted"
+    ITest_Suite.AddTest ITest_Manager.ClassName, "Test_vtkInitializeGit_correctPathCustomLogFileReturnValue"
+    ITest_Suite.AddTest ITest_Manager.ClassName, "Test_vtkInitializeGit_correctPathCustomLogFileExists"
     ITest_Suite.AddTest ITest_Manager.ClassName, "Test_vtkGitConvertWinPath_absolutePathOnCDrive"
     ITest_Suite.AddTest ITest_Manager.ClassName, "Test_vtkGitConvertWinPath_absolutePathOnOneLetterDriveNotC"
     ITest_Suite.AddTest ITest_Manager.ClassName, "Test_vtkGitConvertWinPath_absolutePathOnSeveralLettersDrive"
@@ -142,7 +232,9 @@ Private Sub ITestCase_RunTest()
         Case "Test_vtkInitializeGit_wrongPathFile": Test_vtkInitializeGit_wrongPathFile
         Case "Test_vtkInitializeGit_forbiddenPath1": Test_vtkInitializeGit_forbiddenPath1
         Case "Test_vtkInitializeGit_forbiddenPath2": Test_vtkInitializeGit_forbiddenPath2
-        Case "Test_vtkInitializeGit_correctPathCustomLogFile": Test_vtkInitializeGit_correctPathCustomLogFile
+        Case "Test_vtkInitializeGit_correctPathLogFileIsDeleted": Test_vtkInitializeGit_correctPathLogFileIsDeleted
+        Case "Test_vtkInitializeGit_correctPathCustomLogFileReturnValue": Test_vtkInitializeGit_correctPathCustomLogFileReturnValue
+        Case "Test_vtkInitializeGit_correctPathCustomLogFileExists": Test_vtkInitializeGit_correctPathCustomLogFileExists
         Case "Test_vtkGitConvertWinPath_absolutePathOnCDrive": Test_vtkGitConvertWinPath_absolutePathOnCDrive
         Case "Test_vtkGitConvertWinPath_absolutePathOnOneLetterDriveNotC": Test_vtkGitConvertWinPath_absolutePathOnOneLetterDriveNotC
         Case "Test_vtkGitConvertWinPath_absolutePathOnSeveralLettersDrive": Test_vtkGitConvertWinPath_absolutePathOnSeveralLettersDrive
