@@ -32,7 +32,7 @@ End Sub
 
 Private Sub ITestCase_TearDown()
 '   Delete Folder Tree
-    vtkDeleteTreeFolder vtkTestPath & "\" & vtkTestProjectName
+    vtkDeleteFolder vtkTestPath & "\" & vtkTestProjectName
 End Sub
 
 Public Sub TestCreateTreeFolderDoesNothingWhenPathDoesntExist()

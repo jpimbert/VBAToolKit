@@ -82,37 +82,6 @@ vtkCreateTreeFolder_Error:
 End Function
 
 '---------------------------------------------------------------------------------------
-' Procedure : vtkDeleteTreeFolder
-' Author    : Jean-Pierre Imbert
-' Date      : 06/08/2013
-' Purpose   : Delete a project folder breakdown given as parameter
-'             This procedure is for test purpose
-'---------------------------------------------------------------------------------------
-'
-Public Sub vtkDeleteTreeFolder(rootPath As String)
-    Dir (rootPath)                  ' Make sure to be out of the folder to clean it without Err
-    On Error Resume Next
-    Kill rootPath & "\Source\ConfProd\*"
-    RmDir rootPath & "\Source\ConfProd"
-    Kill rootPath & "\Source\ConfTest\*"
-    RmDir rootPath & "\Source\ConfTest"
-    Kill rootPath & "\Source\VbaUnit\*"
-    RmDir rootPath & "\Source\VbaUnit"
-    Kill rootPath & "\GitLog\*"
-    RmDir rootPath & "\GitLog"
-    Kill rootPath & "\Tests\*"
-    RmDir rootPath & "\Tests"
-    Kill rootPath & "\Source\*"
-    RmDir rootPath & "\Source"
-    Kill rootPath & "\Delivery\*"
-    RmDir rootPath & "\Delivery"
-    Kill rootPath & "\Project\*"
-    RmDir rootPath & "\Project"
-    Kill rootPath & "\*"
-    RmDir rootPath
-End Sub
-
-'---------------------------------------------------------------------------------------
 ' Procedure : vtkCleanFolder
 ' Author    : Lucas Vitorino
 ' Purpose   : Recursively delete all the content of a folder, leaving it empty.
