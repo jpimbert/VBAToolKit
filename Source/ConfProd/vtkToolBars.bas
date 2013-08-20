@@ -7,6 +7,36 @@ Attribute VB_Name = "vtkToolBars"
 '---------------------------------------------------------------------------------------
 Option Explicit
 
+Private colEventHandlers As Collection
+Private buttonClicked As Boolean ' for test with dummy callback
+
+'---------------------------------------------------------------------------------------
+' Procedure : vtkAddEventHandler
+' Author    : Jean-Pierre Imbert
+' Date      : 20/08/2013
+' Purpose   : Create an event handler and associates it with a button and action.
+'---------------------------------------------------------------------------------------
+'
+Public Sub vtkAddEventHandler(action As String, cmdBarCtl As CommandBarControl)
+    Dim evh As New vtkEventHandler
+    cmdBarCtl.onAction = action
+    Set evh.cbe = Application.VBE.Events.CommandBarEvents(cmdBarCtl)
+    If colEventHandlers Is Nothing Then Set colEventHandlers = New Collection
+    colEventHandlers.Add Item:=evh, Key:=action
+    Set evh = Nothing
+End Sub
+
+'---------------------------------------------------------------------------------------
+' Procedure : vtkClearEventHandlers
+' Author    : Jean-Pierre Imbert
+' Date      : 20/08/2013
+' Purpose   : Delete all event handlers associated to the VBE toolbar
+'---------------------------------------------------------------------------------------
+'
+Public Sub vtkClearEventHandlers()
+    Set colEventHandlers = Nothing
+End Sub
+
 '---------------------------------------------------------------------------------------
 ' Procedure : toolBarName
 ' Author    : Jean-Pierre Imbert
@@ -42,7 +72,7 @@ End Function
 '---------------------------------------------------------------------------------------
 '
 Public Sub vtkCreateToolbars()
-    Dim barE As CommandBar, BarV As CommandBar
+    Dim barE As CommandBar, BarV As CommandBar, cbControl As CommandBarControl
     
     ' Create Excel Commandbar if necessary
     On Error Resume Next
@@ -60,6 +90,9 @@ Public Sub vtkCreateToolbars()
     
 End Sub
 
+' Faire une fonction pour ajouter un bouton (à tester avec une fonction Mock de test (+ variable privée)
+' à tester dans les deux barres d'outils
+
 '---------------------------------------------------------------------------------------
 ' Procedure : vtkDeleteToolbars
 ' Author    : Jean-Pierre Imbert
@@ -70,11 +103,71 @@ End Sub
 Public Sub vtkDeleteToolbars()
    On Error Resume Next
     ' Delete Excel Commandbar if necessary
-    Application.CommandBars(toolBarName).Delete
+    Application.CommandBars(toolBarName).Delete     ' Unit tests confirm that the button are deleted with the toolbar
     ' Delete VBE Commandbar if necessary
     Application.VBE.CommandBars(toolBarName).Delete
+    ' Delete Event Handlers for VBE
+    vtkClearEventHandlers
    On Error GoTo 0
 End Sub
+
+'---------------------------------------------------------------------------------------
+' Procedure : vtkCreateToolbarButton
+' Author    : Jean-Pierre Imbert
+' Date      : 20/08/2013
+' Purpose   : Create a button in both toolbars, giving
+'               - tha caption of the button
+'               - the help text of the button
+'               - the faceId of the button (see http://fring.developpez.com/vba/excel/faceid/)
+'               - the name of the procedure to call when the button is clicked
+'---------------------------------------------------------------------------------------
+'
+Public Sub vtkCreateToolbarButton(caption As String, helpText As String, faceId As Integer, action As String)
+    Dim cbControl As CommandBarButton
+
+        ' Create Button in the Excel Command Bar
+    Set cbControl = Application.CommandBars(toolBarName).Controls.Add(Type:=msoControlButton)
+    cbControl.faceId = faceId
+    cbControl.caption = caption
+    cbControl.TooltipText = helpText
+    cbControl.Style = msoButtonAutomatic
+    cbControl.onAction = action
+
+        ' Create Same Button in the VBE Command Bar
+    Set cbControl = Application.VBE.CommandBars(toolBarName).Controls.Add(Type:=msoControlButton)
+    cbControl.faceId = faceId
+    cbControl.caption = caption
+    cbControl.TooltipText = helpText
+    cbControl.Style = msoButtonAutomatic
+    vtkAddEventHandler action:=action, cmdBarCtl:=cbControl
+
+'    Set cbControl = Application.VBE.CommandBars(toolBarName).Controls.Add(Type:=msoControlButton)
+'    cbControl.faceId = 2031
+'    cbControl.caption = "Create Project"
+'    cbControl.TooltipText = "Click here to create a new project"
+'    cbControl.Style = msoButtonAutomatic
+'    vtkAddEventHandler action:="vtkTestButtonClick", cmdBarCtl:=cbControl
+    
+End Sub
+
+'
+'---------------------------------------------------------------------------------------
+' Dummy callback for button event test
+'---------------------------------------------------------------------------------------
+'
+Public Sub vtkTestCommandBarButtonClicked()
+    buttonClicked = True
+End Sub
+Public Sub vtkTestCommandBarButtonClickedReset()
+    buttonClicked = False
+End Sub
+Public Function vtkIsTestCommandBarButtonClicked() As Boolean
+    vtkIsTestCommandBarButtonClicked = buttonClicked
+End Function
+
+'Public Sub vtkTestButtonClick()
+'    Debug.Print "Button Clicked"
+'End Sub
 
 '---------------------------------------------------------------------------------------
 '' Procedure : CreateToolsBarAndButton

@@ -233,9 +233,12 @@ End Sub
 '           instead of import the Document code)
 ' TEST :
 '   execute 'vtkRecreateConfiguration projectName :="VBAToolKit",configurationName:="VBAToolKit"'
+'   if the Project to reconfigure is installed as AddIn, it must be uninstalled then reinstalled.
 '
 ' IMPORTANT TO DO :
+'   il faut éventuellement refermer le classeur qui reste ouvert à la fin (SaveAs n'est pas Close)
 '   il faut aussi récupérer les propriétés du projet existant (description dans AddIn)
+'   il faut réactiver les références éventuelles (notamment extensions)
 '   il faut récupérer la feuille vtkConfigurations existante pour le projet de DEV
 '   il faudrait aussi récupérer les modules non exportés du projet DEV (tmptest)
 '   il faut tester avec un miniprojet où les deux fichiers Excel sont dans Tests

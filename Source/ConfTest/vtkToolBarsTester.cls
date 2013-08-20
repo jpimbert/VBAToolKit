@@ -30,12 +30,18 @@ End Property
 
 Private Sub ITestCase_SetUp(Assert As IAssert)
     Set mAssert = Assert
+    vtkTestCommandBarButtonClickedReset
 End Sub
 
 Private Sub ITestCase_TearDown()
     vtkDeleteToolbars   ' The test toolbars have to be deleted after Unit Test ran
 End Sub
 
+'
+'---------------------------------------------------------------------------------------
+' Toolbar tests
+'---------------------------------------------------------------------------------------
+'
 Public Sub TestExcelToolBarCreation()
     '   Verify that the Excel toolbar exists after creation
     Dim bar As CommandBar
@@ -90,6 +96,116 @@ Public Sub TestVBEToolBarDeletion()
     mAssert.Should bar Is Nothing, "The VBE Toolbar must not exist"
 End Sub
 
+'
+' Tests à exécuter pour l'ajout de boutons
+'   - vérifier que le bouton est ajouté (Excel, VBE)- il faudrait un ID
+'   - vérifier que les boutons sont détruits avec la barre d'outils (Excel, VBE)
+'   - vérifier que le bouton est actif (Excel, VBE)
+'
+'
+'---------------------------------------------------------------------------------------
+' Button tests
+'---------------------------------------------------------------------------------------
+'
+Public Sub Test_ExcelToolBarButtonAdd()
+    '   Verify that a ToolBarButton can be created in the Excel Toolbar
+    Dim bar As CommandBar, button As CommandBarButton, realCaption As String
+
+    vtkCreateToolbars   ' create empty toolbar
+    vtkCreateToolbarButton caption:="Test button", helpText:="", faceId:=1, action:="commandBarButtonClicked"
+    
+   On Error Resume Next
+    Set bar = Application.CommandBars(toolBarName)
+    Set button = bar.Controls(1)
+    realCaption = button.caption
+   On Error GoTo 0
+    
+    mAssert.Equals realCaption, "Test button", "A Button must be created in the Excel ToolBar"
+End Sub
+
+Public Sub Test_VBEToolBarButtonAdd()
+    '   Verify that a ToolBarButton can be created in the VBE Toolbar
+    Dim bar As CommandBar, button As CommandBarButton, realCaption As String
+
+    vtkCreateToolbars   ' create empty toolbar
+    vtkCreateToolbarButton caption:="Test button", helpText:="", faceId:=1, action:="commandBarButtonClicked"
+    
+   On Error Resume Next
+    Set bar = Application.VBE.CommandBars(toolBarName)
+    Set button = bar.Controls(1)
+    realCaption = button.caption
+   On Error GoTo 0
+    
+    mAssert.Equals realCaption, "Test button", "A Button must be created in the Excel ToolBar"
+End Sub
+
+Public Sub Test_ExcelToolBarButtonDelete()
+    '   Verify that a ToolBarButton is deleted when the Excel Toolbar is deleted
+    Dim bar As CommandBar, button As CommandBarButton, realCaption As String, errNum As Long
+
+    vtkCreateToolbars   ' create empty toolbar
+    vtkCreateToolbarButton caption:="Test button", helpText:="", faceId:=1, action:="commandBarButtonClicked"
+    Set bar = Application.CommandBars(toolBarName)
+    Set button = bar.Controls(1)
+    
+   On Error Resume Next
+    vtkDeleteToolbars
+    realCaption = button.caption
+    errNum = err.Number
+   On Error GoTo 0
+    
+    mAssert.Equals errNum, 424, "No Button must be present if the Excel ToolBar is deleted"
+End Sub
+
+Public Sub Test_VBEToolBarButtonDelete()
+    '   Verify that a ToolBarButton is deleted then the VBE Toolbar is deleted
+    Dim bar As CommandBar, button As CommandBarButton, realCaption As String, errNum As Long
+
+    vtkCreateToolbars   ' create empty toolbar
+    vtkCreateToolbarButton caption:="Test button", helpText:="", faceId:=1, action:="commandBarButtonClicked"
+    Set bar = Application.VBE.CommandBars(toolBarName)
+    Set button = bar.Controls(1)
+    
+   On Error Resume Next
+    vtkDeleteToolbars
+    realCaption = button.caption
+    errNum = err.Number
+   On Error GoTo 0
+    
+    mAssert.Equals errNum, 424, "No Button must be present if the VBE ToolBar is deleted"
+End Sub
+
+Public Sub Test_ExcelToolBarButtonClick()
+    '   Verify that a ToolBarButton activation call the dedicated Sub
+    Dim button As CommandBarButton
+
+    vtkCreateToolbars   ' create empty toolbar
+    vtkCreateToolbarButton caption:="Test button", helpText:="", faceId:=1, action:="vtkTestCommandBarButtonClicked"
+    Set button = Application.CommandBars(toolBarName).Controls(1)
+        
+    button.Execute
+    
+    mAssert.Should vtkIsTestCommandBarButtonClicked, "The Excel Toolbar button click must call the dedicated Sub"
+End Sub
+
+Public Sub Test_VBEToolBarButtonClick()
+    '   Verify that a ToolBarButton activation call the dedicated Sub
+    Dim button As CommandBarButton
+
+    vtkCreateToolbars   ' create empty toolbar
+    vtkCreateToolbarButton caption:="Test button", helpText:="", faceId:=1, action:="vtkTestCommandBarButtonClicked"
+    Set button = Application.VBE.CommandBars(toolBarName).Controls(1)
+        
+    button.Execute
+    
+    mAssert.Should vtkIsTestCommandBarButtonClicked, "The VBE Toolbar button click must call the dedicated Sub"
+End Sub
+
+'
+'---------------------------------------------------------------------------------------
+' AddIn activation tests
+'---------------------------------------------------------------------------------------
+'
 Public Sub TestAddInInstall()
     '   Verify that the Add-In installation creates the ToolBars
     Dim barE As CommandBar, BarV As CommandBar
@@ -127,6 +243,11 @@ Private Function ITest_Suite() As TestSuite
     ITest_Suite.AddTest ITest_Manager.ClassName, "TestVBEToolBarCreation"
     ITest_Suite.AddTest ITest_Manager.ClassName, "TestExcelToolBarDeletion"
     ITest_Suite.AddTest ITest_Manager.ClassName, "TestVBEToolBarDeletion"
+    ITest_Suite.AddTest ITest_Manager.ClassName, "Test_ExcelToolBarButtonAdd"
+    ITest_Suite.AddTest ITest_Manager.ClassName, "Test_VBEToolBarButtonAdd"
+    ITest_Suite.AddTest ITest_Manager.ClassName, "Test_ExcelToolBarButtonDelete"
+    ITest_Suite.AddTest ITest_Manager.ClassName, "Test_VBEToolBarButtonDelete"
+    ITest_Suite.AddTest ITest_Manager.ClassName, "Test_ExcelToolBarButtonClick"
     ITest_Suite.AddTest ITest_Manager.ClassName, "TestAddInInstall"
     ITest_Suite.AddTest ITest_Manager.ClassName, "TestAddInUnInstall"
 End Function
@@ -137,6 +258,11 @@ Private Sub ITestCase_RunTest()
         Case "TestVBEToolBarCreation": TestVBEToolBarCreation
         Case "TestExcelToolBarDeletion": TestExcelToolBarDeletion
         Case "TestVBEToolBarDeletion": TestVBEToolBarDeletion
+        Case "Test_ExcelToolBarButtonAdd": Test_ExcelToolBarButtonAdd
+        Case "Test_VBEToolBarButtonAdd": Test_VBEToolBarButtonAdd
+        Case "Test_ExcelToolBarButtonDelete": Test_ExcelToolBarButtonDelete
+        Case "Test_VBEToolBarButtonDelete": Test_VBEToolBarButtonDelete
+        Case "Test_ExcelToolBarButtonClick": Test_ExcelToolBarButtonClick
         Case "TestAddInInstall": TestAddInInstall
         Case "TestAddInUnInstall": TestAddInUnInstall
         Case Else: mAssert.Should False, "Invalid test name: " & mManager.methodName
