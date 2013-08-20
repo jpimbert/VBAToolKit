@@ -67,11 +67,24 @@ End Function
 ' Procedure : vtkCreateToolbars
 ' Author    : Jean-Pierre Imbert
 ' Date      : 09/08/2013
-' Purpose   : Create Excel and VBE toolbars
+' Purpose   : Create Complete Excel and VBE toolbars
 '             - Don't recreate them if they already exists
 '---------------------------------------------------------------------------------------
 '
 Public Sub vtkCreateToolbars()
+    vtkCreateEmptyToolbars
+    vtkCreateToolbarButton caption:="Create Project", helpText:="Click here to create a new project", faceId:=2031, action:="vtkShowCreateProjectForm"
+End Sub
+
+'---------------------------------------------------------------------------------------
+' Procedure : vtkCreateEmptyToolbars
+' Author    : Jean-Pierre Imbert
+' Date      : 09/08/2013
+' Purpose   : Create Empty (no buttons) Excel and VBE toolbars
+'             - Don't recreate them if they already exists
+'---------------------------------------------------------------------------------------
+'
+Public Sub vtkCreateEmptyToolbars()
     Dim barE As CommandBar, BarV As CommandBar, cbControl As CommandBarControl
     
     ' Create Excel Commandbar if necessary
@@ -141,13 +154,6 @@ Public Sub vtkCreateToolbarButton(caption As String, helpText As String, faceId 
     cbControl.Style = msoButtonAutomatic
     vtkAddEventHandler action:=action, cmdBarCtl:=cbControl
 
-'    Set cbControl = Application.VBE.CommandBars(toolBarName).Controls.Add(Type:=msoControlButton)
-'    cbControl.faceId = 2031
-'    cbControl.caption = "Create Project"
-'    cbControl.TooltipText = "Click here to create a new project"
-'    cbControl.Style = msoButtonAutomatic
-'    vtkAddEventHandler action:="vtkTestButtonClick", cmdBarCtl:=cbControl
-    
 End Sub
 
 '
@@ -303,17 +309,19 @@ End Function
 '
 '    BarEx.Visible = True
 'End Sub
+
 '
-''---------------------------------------------------------------------------------------
-'' Procedure : Create_Project
-'' Author    : user
-'' Date      : 07/06/2013
-'' Purpose   : - call form how allo to write project name and path
-''---------------------------------------------------------------------------------------
-''
-'Sub Create_Project()
-'    vtkCreateProjectForm.Show
-'End Sub
+'---------------------------------------------------------------------------------------
+' Procedures : Call back for buttons
+' Author    : Jean-Pierre Imbert
+' Date      : 20/08/2013
+' Purpose   : Just a wrapper to forms, or unit tested subs
+'---------------------------------------------------------------------------------------
+'
+Private Sub vtkShowCreateProjectForm()
+    vtkCreateProjectForm.Show
+End Sub
+
 'Sub Git_Status()
 '   Dim RetValGitStatus As String
 '   RetValGitStatus = vtkStatusGit()
