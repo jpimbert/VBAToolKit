@@ -1,0 +1,6 @@
+# Ignore the content of the Test and GitLog folders
+Test/*
+GitLog/*
+
+# Ignore the temporary Excel files
+Project/~*

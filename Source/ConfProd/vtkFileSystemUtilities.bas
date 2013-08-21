@@ -104,7 +104,7 @@ Public Function vtkCreateTreeFolderWithGitIgnore(folderPath As String)
     contentStream.WriteLine "GitLog/*"
     contentStream.WriteLine ""
     contentStream.WriteLine "# Ignore the temporary Excel files"
-    contentStream.WriteLine "~*"
+    contentStream.WriteLine "Project/~*"
     contentStream.Close
     
     SetAttr folderPath & "\.gitignore ", vbHidden
