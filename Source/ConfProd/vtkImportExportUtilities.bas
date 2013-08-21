@@ -236,11 +236,12 @@ End Sub
 '   if the Project to reconfigure is installed as AddIn, it must be uninstalled then reinstalled.
 '
 ' IMPORTANT TO DO :
-'   il faut aussi récupérer les propriétés du projet existant (description dans AddIn)
-'   il faut réactiver les références éventuelles (notamment extensions)
 '   il faut récupérer la feuille vtkConfigurations existante pour le projet de DEV
 '   il faudrait aussi récupérer les modules non exportés du projet DEV (tmptest)
 '   il faut tester avec un miniprojet où les deux fichiers Excel sont dans Tests
+'
+' WARNING : Cette fonction devra être reprise en profondeur pour être généralisée
+'           Elle sera testée formellement à ce moment là
 '---------------------------------------------------------------------------------------
 '
 Public Sub vtkRecreateConfiguration(projectName As String, configurationName As String)
@@ -266,9 +267,22 @@ Public Sub vtkRecreateConfiguration(projectName As String, configurationName As 
     ' Set attribute properties WARNING - only for Delivery VBAToolKit
     wb.BuiltinDocumentProperties("Title").Value = "VBAToolKit"
     wb.BuiltinDocumentProperties("Comments").Value = "Toolkit improving IDE for VBA projects"
+    ' Deactivate AddIn if the current Excel file is AddIn and installed
+    Dim fso As New FileSystemObject, fileName As String, addInWasActivated As Boolean, a As AddIn
+    fileName = fso.GetFileName(wbPath)
+    If Workbooks(fileName).IsAddin Then
+        For Each a In AddIns
+            Debug.Print a.name, a.Installed, a.progID
+        Next
+        addInWasActivated = AddIns(configurationName).Installed
+        AddIns(configurationName).Installed = False
+       Else
+        addInWasActivated = False
+    End If
     ' Save the Excel file with the good type and erase the previous one (a message is displayed to the user)
-    wb.SaveAs Filename:=rootPath & "\" & wbPath, FileFormat:=vtkDefaultFileFormat(wbPath)
+    wb.SaveAs fileName:=rootPath & "\" & wbPath, FileFormat:=vtkDefaultFileFormat(wbPath)
     wb.Close savechanges:=False
+    If addInWasActivated Then AddIns(configurationName).Installed = True
 End Sub
 
 '

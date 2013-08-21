@@ -58,11 +58,11 @@ Private Sub CancelButton_Click()
 End Sub
 
 Private Sub ProjectPathTextBox_Change()
-    VBAToolKit.enableCreateButton
+    enableCreateButton
 End Sub
 
 Private Sub ProjectNameTextBox_Change()
-    VBAToolKit.enableCreateButton
+    enableCreateButton
 End Sub
 
 '---------------------------------------------------------------------------------------
@@ -73,7 +73,7 @@ End Sub
 '---------------------------------------------------------------------------------------
 '
 Private Sub UserForm_Initialize()
-    VBAToolKit.enableCreateButton
+    enableCreateButton
 End Sub
 
 '---------------------------------------------------------------------------------------
