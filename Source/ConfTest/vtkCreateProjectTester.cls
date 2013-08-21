@@ -7,7 +7,28 @@ Attribute VB_GlobalNameSpace = False
 Attribute VB_Creatable = False
 Attribute VB_PredeclaredId = False
 Attribute VB_Exposed = False
-'Option Explicit
+'---------------------------------------------------------------------------------------
+' Module    : vtkCreateProjectTester
+' Author    : Jean-Pierre Imbert
+' Date      : 21/08/2013
+' Purpose   : Test the Create Project main function
+'
+' Copyright 2013 Skwal-Soft (http://skwalsoft.com)
+'
+'   Licensed under the Apache License, Version 2.0 (the "License");
+'   you may not use this file except in compliance with the License.
+'   You may obtain a copy of the License at
+'
+'       http://www.apache.org/licenses/LICENSE-2.0
+'
+'   Unless required by applicable law or agreed to in writing, software
+'   distributed under the License is distributed on an "AS IS" BASIS,
+'   WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+'   See the License for the specific language governing permissions and
+'   limitations under the License.
+'---------------------------------------------------------------------------------------
+
+Option Explicit
 Implements ITest
 Implements ITestCase
 
@@ -52,7 +73,7 @@ Private Sub OpenDeliveryProject()
     Dim path As String
     Dim fso As New FileSystemObject
     path = fso.GetParentFolderName(ActiveWorkbook.path) & "\" & vtkConfigurationManagerForProject(vtkTestProjectName).getConfigurationPath(vtkTestProjectName)
-    Workbooks.Open Filename:=path
+    Workbooks.Open fileName:=path
 End Sub
 
 Public Sub TestCreateProjectDoesNothingWhenPathDoesntExist()

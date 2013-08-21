@@ -7,6 +7,27 @@ Attribute VB_GlobalNameSpace = False
 Attribute VB_Creatable = False
 Attribute VB_PredeclaredId = False
 Attribute VB_Exposed = False
+'---------------------------------------------------------------------------------------
+' Module    : vtKImportExportUtilitiesTester
+' Author    : Jean-Pierre Imbert
+' Date      : 21/08/2013
+' Purpose   : Test the vtkImportExportUtilities module functions
+'
+' Copyright 2013 Skwal-Soft (http://skwalsoft.com)
+'
+'   Licensed under the Apache License, Version 2.0 (the "License");
+'   you may not use this file except in compliance with the License.
+'   You may obtain a copy of the License at
+'
+'       http://www.apache.org/licenses/LICENSE-2.0
+'
+'   Unless required by applicable law or agreed to in writing, software
+'   distributed under the License is distributed on an "AS IS" BASIS,
+'   WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+'   See the License for the specific language governing permissions and
+'   limitations under the License.
+'---------------------------------------------------------------------------------------
+
 Option Explicit
 Implements ITest
 Implements ITestCase
@@ -107,7 +128,7 @@ End Sub
 Public Sub TestImportInexistantFileDoesNothing()
     '   Verify that an existing Module isn't deleted by a bad import (A2-B1)
     Dim wbForTest As Workbook
-    Set wbForTest = Workbooks.Open(Filename:=vtkPathToTestFolder & "\" & existingWorkbookName)
+    Set wbForTest = Workbooks.Open(fileName:=vtkPathToTestFolder & "\" & existingWorkbookName)
     
     vtkImportOneModule project:=wbForTest.VBProject, moduleName:="TestModule", filePath:="DummyFile.xxx"
     
@@ -118,7 +139,7 @@ End Sub
 Public Sub TestImportExistantFileInExistingModule()
     '   Verify that the existing Module replaced by the new one (A3-B1)
     Dim wbForTest As Workbook
-    Set wbForTest = Workbooks.Open(Filename:=vtkPathToTestFolder & "\" & existingWorkbookName)
+    Set wbForTest = Workbooks.Open(fileName:=vtkPathToTestFolder & "\" & existingWorkbookName)
     
     vtkImportOneModule project:=wbForTest.VBProject, moduleName:="TestModule", filePath:=vtkPathToTestFolder & "\" & moduleToImport
     
@@ -129,7 +150,7 @@ End Sub
 Public Sub TestImportExistantFileInExistingModuleWithNewName()
     '   Verify that the new Module doesn't replace the old one (A1-B1)
     Dim wbForTest As Workbook
-    Set wbForTest = Workbooks.Open(Filename:=vtkPathToTestFolder & "\" & existingWorkbookName)
+    Set wbForTest = Workbooks.Open(fileName:=vtkPathToTestFolder & "\" & existingWorkbookName)
     
     vtkImportOneModule project:=wbForTest.VBProject, moduleName:="NewModule", filePath:=vtkPathToTestFolder & "\" & moduleToImport
     
@@ -141,7 +162,7 @@ End Sub
 Public Sub TestImportExistantFileInExistingClassModule()
     '   Verify that the existing Module replaced by the new one (A3-B2)
     Dim wbForTest As Workbook
-    Set wbForTest = Workbooks.Open(Filename:=vtkPathToTestFolder & "\" & existingWorkbookName)
+    Set wbForTest = Workbooks.Open(fileName:=vtkPathToTestFolder & "\" & existingWorkbookName)
     
     vtkImportOneModule project:=wbForTest.VBProject, moduleName:="TestClass", filePath:=vtkPathToTestFolder & "\" & classToImport
     
@@ -152,7 +173,7 @@ End Sub
 Public Sub TestImportExistantFileInExistingSheetModule()
     '   Verify that the existing Module replaced by the new one (A3-B3)
     Dim wbForTest As Workbook
-    Set wbForTest = Workbooks.Open(Filename:=vtkPathToTestFolder & "\" & existingWorkbookName)
+    Set wbForTest = Workbooks.Open(fileName:=vtkPathToTestFolder & "\" & existingWorkbookName)
     
     vtkImportOneModule project:=wbForTest.VBProject, moduleName:="Feuil1", filePath:=vtkPathToTestFolder & "\" & sheetToImport
     
@@ -163,7 +184,7 @@ End Sub
 Public Sub TestImportExistantFileInExistingWorkbookModule()
     '   Verify that the existing Module replaced by the new one (A3-B3)
     Dim wbForTest As Workbook
-    Set wbForTest = Workbooks.Open(Filename:=vtkPathToTestFolder & "\" & existingWorkbookName)
+    Set wbForTest = Workbooks.Open(fileName:=vtkPathToTestFolder & "\" & existingWorkbookName)
     
     vtkImportOneModule project:=wbForTest.VBProject, moduleName:="ThisWorkbook", filePath:=vtkPathToTestFolder & "\" & workbookToImport
     
@@ -174,7 +195,7 @@ End Sub
 Public Sub TestImportExistantFileInExistingUserFormCode()
     '   Verify that the existing Module replaced by the new one (A3-B3)
     Dim wbForTest As Workbook
-    Set wbForTest = Workbooks.Open(Filename:=vtkPathToTestFolder & "\" & existingWorkbookName)
+    Set wbForTest = Workbooks.Open(fileName:=vtkPathToTestFolder & "\" & existingWorkbookName)
     
     vtkImportOneModule project:=wbForTest.VBProject, moduleName:="TestForm", filePath:=vtkPathToTestFolder & "\" & formToImport
     

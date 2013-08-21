@@ -7,6 +7,27 @@ Attribute VB_GlobalNameSpace = False
 Attribute VB_Creatable = False
 Attribute VB_PredeclaredId = False
 Attribute VB_Exposed = False
+'---------------------------------------------------------------------------------------
+' Module    : vtkConfigurationManagerTester
+' Author    : Jean-Pierre Imbert
+' Date      : 21/08/2013
+' Purpose   : Test the vtkConfigurationManager class
+'
+' Copyright 2013 Skwal-Soft (http://skwalsoft.com)
+'
+'   Licensed under the Apache License, Version 2.0 (the "License");
+'   you may not use this file except in compliance with the License.
+'   You may obtain a copy of the License at
+'
+'       http://www.apache.org/licenses/LICENSE-2.0
+'
+'   Unless required by applicable law or agreed to in writing, software
+'   distributed under the License is distributed on an "AS IS" BASIS,
+'   WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+'   See the License for the specific language governing permissions and
+'   limitations under the License.
+'---------------------------------------------------------------------------------------
+
 Option Explicit
 Implements ITest
 Implements ITestCase
@@ -34,9 +55,9 @@ Private Sub SaveThenReOpenNewWorkbook()
 '       Else
 '        newWorkbook.Close SaveChanges:=True
 '    End If
-    newWorkBook.Close SaveChanges:=True
+    newWorkBook.Close savechanges:=True
     vtkResetConfigurationManagers           ' reset all configuration managers
-    Set newWorkBook = Workbooks.Open(Filename:=savedNewWorkbookPath)
+    Set newWorkBook = Workbooks.Open(fileName:=savedNewWorkbookPath)
     Set newConfManager = vtkConfigurationManagerForProject("NewProject")
 End Sub
 
@@ -60,7 +81,7 @@ Private Sub ITestCase_SetUp(Assert As IAssert)
     Set newConfManager = vtkConfigurationManagerForProject(newProjectName)
     Dim source As String, destination As String
     FileCopy source:=vtkPathToTemplateFolder & "\" & existingWorkbookNameForTest, destination:=vtkPathToTestFolder & "\" & existingProjectName & "_DEV.xlsm"
-    Set existingWorkbook = Workbooks.Open(Filename:=vtkPathToTestFolder & "\" & existingProjectName & "_DEV.xlsm")
+    Set existingWorkbook = Workbooks.Open(fileName:=vtkPathToTestFolder & "\" & existingProjectName & "_DEV.xlsm")
     existingWorkbookName = existingWorkbook.name
     Set existingConfManager = vtkConfigurationManagerForProject(existingProjectName)
 End Sub
@@ -85,7 +106,7 @@ Public Sub TestConfigurationSheetDoesntExistInNewWorkbook()
     Set wb = vtkCreateExcelWorkbookForTestWithProjectName("NewWorkbook")    ' create a fresh new Excel workbook
     wbFullName = wb.FullName
     mAssert.Should Not cm.isConfigurationInitializedForWorkbook(ExcelName:=wb.name), "The Configuration sheet must not exist in new workbook"
-    wb.Close SaveChanges:=False
+    wb.Close savechanges:=False
     Kill PathName:=wbFullName
 End Sub
 
@@ -369,7 +390,6 @@ Private Function ITest_Suite() As TestSuite
     ITest_Suite.AddTest ITest_Manager.ClassName, "TestGetModulePathWithNumberFromExistingProject"
     ITest_Suite.AddTest ITest_Manager.ClassName, "TestGetModulePathWithNumberForNewModule"
     ITest_Suite.AddTest ITest_Manager.ClassName, "TestAddModulePathToSavedProject"
-    ITest_Suite.AddTest ITest_Manager.ClassName, "TestRootPathForNewProject"
     ITest_Suite.AddTest ITest_Manager.ClassName, "TestRootPathForExistingProject"
 End Function
 
@@ -398,7 +418,6 @@ Private Sub ITestCase_RunTest()
         Case "TestGetModulePathWithNumberFromExistingProject": TestGetModulePathWithNumberFromExistingProject
         Case "TestGetModulePathWithNumberForNewModule": TestGetModulePathWithNumberForNewModule
         Case "TestAddModulePathToSavedProject": TestAddModulePathToSavedProject
-        Case "TestRootPathForNewProject": TestRootPathForNewProject
         Case "TestRootPathForExistingProject": TestRootPathForExistingProject
         Case Else: mAssert.Should False, "Invalid test name: " & mManager.methodName
     End Select
