@@ -18,6 +18,7 @@ Option Explicit
 '               whose path has to be passed as parameter.
 '               If the path is absolute, a drive other than C: will raise an error
 '               If the path is relative, it will be considered as relatie to the folder path.
+'             - Adds all the files in the directory to the git repository.
 ' Notes     : Raise errors
 '               - VTK_WRONG_FOLDER_PATH
 '               - VTK_FORBIDDEN_PARAMETER
@@ -28,8 +29,6 @@ Option Explicit
 '---------------------------------------------------------------------------------------
 '
 Public Function vtkInitializeGit(folderPath As String, Optional logFile As String = "")
-    Dim FileInitPath As String
-    Dim retShell As String
     Dim tmpLogFileName As String
     tmpLogFileName = "initialize.log"
     Dim logFileFullPath As String
@@ -70,8 +69,8 @@ Public Function vtkInitializeGit(folderPath As String, Optional logFile As Strin
     End If
     
     ' Intializing git using a shell command and redirecting the output flow in the log file
-    retShell = ShellAndWait("cmd.exe /c git init " & convertedFolderPath _
-    & " > " & convertedLogFilePath, 0, vbHide, AbandonWait)
+    ShellAndWait "cmd.exe /c git init " & convertedFolderPath _
+    & " > " & convertedLogFilePath, 0, vbHide, AbandonWait
     
     ' Check if the initialization went well
     Dim logFileContent As String
@@ -85,6 +84,9 @@ Public Function vtkInitializeGit(folderPath As String, Optional logFile As Strin
     If logFile = "" Then
         Kill folderPath & "\" & tmpLogFileName
     End If
+    
+    ' Adds all the files in the folder tree to the git repository
+    ShellAndWait "cmd.exe /c cd " & folderPath & " & git add " & ". ", 0, vbHide, AbandonWait
      
     On Error GoTo 0
     vtkInitializeGit = VTK_OK
