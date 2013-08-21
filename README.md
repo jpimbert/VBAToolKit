@@ -18,3 +18,16 @@ VBAToolkit integrates the open-source unit-testing VBAUnit framework to encourag
 
 **Convenient interface**  
 A toolbar in Excel and several automatic functions provide easy access to these features.
+
+**Further reading**
+
+1. understand VBAToolKit
+1. [how to install VBAToolKit?](https://github.com/jpimbert/VBAToolKit/wiki/VbaToolKit-SetUp)
+1. how to use VBAToolKit?
+1. how to modify or contribute to VBAToolKit?
+
+---------
+
+VBAToolKit is developed by [Skwal-Soft](http://skwalsoft.com) and [JPI-Conseil](http://www.jpi-conseil.fr)
+
+This work is licensed under the [Apache License, version V2.0](http://www.apache.org/licenses/LICENSE-2.0)
