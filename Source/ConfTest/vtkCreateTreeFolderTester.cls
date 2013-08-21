@@ -32,26 +32,45 @@ End Sub
 
 Private Sub ITestCase_TearDown()
 '   Delete Folder Tree
-    vtkDeleteFolder vtkTestPath & "\" & vtkTestProjectName
+    vtkCleanFolder vtkTestPath
 End Sub
 
 Public Sub TestCreateTreeFolderDoesNothingWhenPathDoesntExist()
     ' The Create Tree Folder function must does nothing and return error when path doesn't exist
     Dim InexistentPath As String
-    Dim returnvalue As Long
+    Dim error As Integer: error = 0
+    
+    On Error GoTo errorHandler
+    
     InexistentPath = vtkTestPath & "\InexistentFolder"
-    returnvalue = vtkCreateTreeFolder(rootPath:=InexistentPath & "\" & vtkTestProjectName)
+    vtkCreateTreeFolder InexistentPath & "\" & vtkTestProjectName
     mAssert.Should Dir(InexistentPath & "\" & vtkTestProjectName, vbDirectory) = "", "The project main folder must not exist"
-    mAssert.Equals returnvalue, 76, "The project creation must fail"
+    mAssert.Equals error, 76, "The project creation must fail"
+    
+    On Error GoTo 0
+    Exit Sub
+    
+errorHandler:
+    error = Err.Number
+    Resume Next
 End Sub
 
 Public Sub TestCreateTreeFolderAlreadyExisting()
-    ' The Create Tree Folder function must does nothing when project already exists
-    Dim returnvalue As Long
-    MkDir vtkTestPath & "\" & vtkTestProjectName 'must respect order mkdir before call vtkcreateproject
-    returnvalue = vtkCreateTreeFolder(rootPath:=vtkTestPath & "\" & vtkTestProjectName)
-    mAssert.Should Dir(vtkTestPath & "\" & vtkTestProjectName, vbDirectory) <> "", "The existing project main folder must exist"
-    mAssert.Equals returnvalue, 75, "The project creation must fail"
+    Dim error As Integer: error = 0
+    
+    On Error GoTo errorHandler
+    
+    MkDir vtkTestPath & "\treeroot"
+    vtkCreateTreeFolder vtkTestPath & "\treeroot"
+    mAssert.Equals error, 75, "The project creation must fail"
+    
+    On Error GoTo 0
+    Exit Sub
+    
+errorHandler:
+    error = Err.Number
+    Resume Next
+    
 End Sub
 
 Public Sub TestMainFolderIsCreated()
@@ -59,7 +78,7 @@ Public Sub TestMainFolderIsCreated()
     Dim returnvalue As Long
     returnvalue = vtkCreateTreeFolder(rootPath:=vtkTestPath & "\" & vtkTestProjectName)
     mAssert.Should Dir(vtkTestPath & "\" & vtkTestProjectName, vbDirectory) <> "", "The project main folder must exist"
-    mAssert.Equals returnvalue, 0, "The project creation must succeed"
+    mAssert.Equals returnvalue, VTK_OK, "The project creation must succeed"
 End Sub
 
 Public Sub TestProjectFolderIsCreated()
@@ -67,7 +86,7 @@ Public Sub TestProjectFolderIsCreated()
     Dim returnvalue As Long
     returnvalue = vtkCreateTreeFolder(rootPath:=vtkTestPath & "\" & vtkTestProjectName)
     mAssert.Should Dir(vtkTestPath & "\" & vtkTestProjectName & "\Project", vbDirectory) <> "", "The Project folder must exist"
-    mAssert.Equals returnvalue, 0, "The project creation must succeed"
+    mAssert.Equals returnvalue, VTK_OK, "The project creation must succeed"
 End Sub
 
 Public Sub TestSourceFolderIsCreated()
@@ -75,7 +94,7 @@ Public Sub TestSourceFolderIsCreated()
     Dim returnvalue As Long
     returnvalue = vtkCreateTreeFolder(rootPath:=vtkTestPath & "\" & vtkTestProjectName)
     mAssert.Should Dir(vtkTestPath & "\" & vtkTestProjectName & "\Source", vbDirectory) <> "", "The Source folder must exist"
-    mAssert.Equals returnvalue, 0, "The project creation must succeed"
+    mAssert.Equals returnvalue, VTK_OK, "The project creation must succeed"
 End Sub
 
 Public Sub TestTestsFolderIsCreated()
@@ -83,7 +102,7 @@ Public Sub TestTestsFolderIsCreated()
     Dim returnvalue As Long
     returnvalue = vtkCreateTreeFolder(rootPath:=vtkTestPath & "\" & vtkTestProjectName)
     mAssert.Should Dir(vtkTestPath & "\" & vtkTestProjectName & "\Tests", vbDirectory) <> "", "The Tests folder must exist"
-    mAssert.Equals returnvalue, 0, "The project creation must succeed"
+    mAssert.Equals returnvalue, VTK_OK, "The project creation must succeed"
 End Sub
 
 Public Sub TestConfProdFolderIsCreated()
@@ -91,7 +110,7 @@ Public Sub TestConfProdFolderIsCreated()
     Dim returnvalue As Long
     returnvalue = vtkCreateTreeFolder(rootPath:=vtkTestPath & "\" & vtkTestProjectName)
     mAssert.Should Dir(vtkTestPath & "\" & vtkTestProjectName & "\source\ConfProd", vbDirectory) <> "", "source\ConfProd folder must exist"
-    mAssert.Equals returnvalue, 0, "The project creation must succeed"
+    mAssert.Equals returnvalue, VTK_OK, "The project creation must succeed"
 End Sub
 
 Public Sub TestConfTestFolderIsCreated()
@@ -99,7 +118,7 @@ Public Sub TestConfTestFolderIsCreated()
     Dim returnvalue As Long
     returnvalue = vtkCreateTreeFolder(rootPath:=vtkTestPath & "\" & vtkTestProjectName)
     mAssert.Should Dir(vtkTestPath & "\" & vtkTestProjectName & "\source\ConfTest", vbDirectory) <> "", "The source\ConfTest folder must exist"
-    mAssert.Equals returnvalue, 0, "The project creation must succeed"
+    mAssert.Equals returnvalue, VTK_OK, "The project creation must succeed"
 End Sub
 
 Public Sub TestVbaUnitFolderIsCreated()
@@ -107,7 +126,7 @@ Public Sub TestVbaUnitFolderIsCreated()
     Dim returnvalue As Long
     returnvalue = vtkCreateTreeFolder(rootPath:=vtkTestPath & "\" & vtkTestProjectName)
     mAssert.Should Dir(vtkTestPath & "\" & vtkTestProjectName & "\source\VbaUnit", vbDirectory) <> "", "The source\VbaUnit folder must exist"
-    mAssert.Equals returnvalue, 0, "The project creation must succeed"
+    mAssert.Equals returnvalue, VTK_OK, "The project creation must succeed"
 End Sub
 
 Public Sub TestGitLogIsCreated()
@@ -115,7 +134,7 @@ Public Sub TestGitLogIsCreated()
     Dim returnvalue As Long
     returnvalue = vtkCreateTreeFolder(rootPath:=vtkTestPath & "\" & vtkTestProjectName)
     mAssert.Should Dir(vtkTestPath & "\" & vtkTestProjectName & "\GitLog", vbDirectory) <> "", "The ..\GitLog folder must exist"
-    mAssert.Equals returnvalue, 0, "The project creation must succeed"
+    mAssert.Equals returnvalue, VTK_OK, "The project creation must succeed"
 End Sub
 
 Public Sub TestDeliveryFolderIsCreated()
@@ -123,8 +142,69 @@ Public Sub TestDeliveryFolderIsCreated()
     Dim returnvalue As Long
     returnvalue = vtkCreateTreeFolder(rootPath:=vtkTestPath & "\" & vtkTestProjectName)
     mAssert.Should Dir(vtkTestPath & "\" & vtkTestProjectName & "\Delivery", vbDirectory) <> "", "The \Delivery folder must exist"
-    mAssert.Equals returnvalue, 0, "The project creation must succeed"
+    mAssert.Equals returnvalue, VTK_OK, "The project creation must succeed"
 End Sub
+
+Public Sub Test_vtkCreateTreeFolderWithGitIgnore_correctPathReturnValue()
+    Dim retval As Integer
+    retval = vtkCreateTreeFolderWithGitIgnore(vtkTestPath & "\treeroot")
+    mAssert.Equals retval, VTK_OK
+End Sub
+
+Public Sub Test_vtkCreateTreeFolderWithGitIgnore_DoesNothingWhenPathDoesntExist()
+    ' The Create Tree Folder function must do nothing and return error when path doesn't exist
+    Dim InexistentPath As String
+    Dim returnvalue As Long
+    Dim error As Integer: error = 0
+    InexistentPath = vtkTestPath & "\InexistentFolder"
+    
+    On Error GoTo errorHandler
+    
+    returnvalue = vtkCreateTreeFolderWithGitIgnore(InexistentPath & "\treeroot")
+    mAssert.Should Dir(InexistentPath & "\treeroot", vbDirectory) = "", "The project main folder must not exist"
+    mAssert.Equals error, 76, "The creation of the folder must fail"
+    
+    On Error GoTo 0
+    Exit Sub
+    
+errorHandler:
+    error = Err.Number
+    Resume Next
+End Sub
+
+Public Sub Test_vtkCreateTreeFolderWithGitIgnore_AlreadyExisting()
+    ' The Create Tree Folder function must do nothing when the root folder already exists
+    Dim InexistentPath As String
+    Dim error As Integer: error = 0
+    
+    On Error GoTo errorHandler
+    
+    MkDir vtkTestPath & "\treeroot"
+    vtkCreateTreeFolderWithGitIgnore vtkTestPath & "\treeroot"
+    mAssert.Should Dir(vtkTestPath & "\treeroot", vbDirectory) <> "", "The existing project main folder must exist"
+    mAssert.Equals error, 75, "The project creation must fail"
+    
+    On Error GoTo 0
+    Exit Sub
+    
+errorHandler:
+    error = Err.Number
+    Resume Next
+End Sub
+
+Public Sub Test_vtkCreateTreeFolderWithGitIgnore_correctPathFileExistsInRoot()
+    Dim fso As New FileSystemObject
+    vtkCreateTreeFolderWithGitIgnore (vtkTestPath & "\treeroot")
+    mAssert.Equals fso.FileExists(vtkTestPath & "\treeroot\.gitignore"), True
+End Sub
+
+Public Sub Test_vtkCreateTreeFolderWithGitIgnore_correctPathFileContentInRoot()
+    Dim contentString As String
+    vtkCreateTreeFolderWithGitIgnore (vtkTestPath & "\treeroot")
+    contentString = vtkTextFileReader(vtkTestPath & "\treeroot\.gitignore")
+    mAssert.Equals Left(contentString, 9), Chr(10) & "# Ignore"
+End Sub
+
 
 Private Function ITest_Suite() As TestSuite
     Set ITest_Suite = New TestSuite
@@ -139,6 +219,11 @@ Private Function ITest_Suite() As TestSuite
     ITest_Suite.AddTest ITest_Manager.ClassName, "TestVbaUnitFolderIsCreated"
     ITest_Suite.AddTest ITest_Manager.ClassName, "TestGitLogIsCreated"
     ITest_Suite.AddTest ITest_Manager.ClassName, "TestDeliveryFolderIsCreated"
+    ITest_Suite.AddTest ITest_Manager.ClassName, "Test_vtkCreateTreeFolderWithGitIgnore_correctPathReturnValue"
+    ITest_Suite.AddTest ITest_Manager.ClassName, "Test_vtkCreateTreeFolderWithGitIgnore_DoesNothingWhenPathDoesntExist"
+    ITest_Suite.AddTest ITest_Manager.ClassName, "Test_vtkCreateTreeFolderWithGitIgnore_AlreadyExisting"
+    ITest_Suite.AddTest ITest_Manager.ClassName, "Test_vtkCreateTreeFolderWithGitIgnore_correctPathFileExistsInRoot"
+    ITest_Suite.AddTest ITest_Manager.ClassName, "Test_vtkCreateTreeFolderWithGitIgnore_correctPathFileContentInRoot"
 End Function
 
 Private Sub ITestCase_RunTest()
@@ -154,6 +239,11 @@ Private Sub ITestCase_RunTest()
         Case "TestVbaUnitFolderIsCreated": TestVbaUnitFolderIsCreated
         Case "TestGitLogIsCreated": TestGitLogIsCreated
         Case "TestDeliveryFolderIsCreated": TestDeliveryFolderIsCreated
+        Case "Test_vtkCreateTreeFolderWithGitIgnore_correctPathReturnValue": Test_vtkCreateTreeFolderWithGitIgnore_correctPathReturnValue
+        Case "Test_vtkCreateTreeFolderWithGitIgnore_DoesNothingWhenPathDoesntExist": Test_vtkCreateTreeFolderWithGitIgnore_DoesNothingWhenPathDoesntExist
+        Case "Test_vtkCreateTreeFolderWithGitIgnore_AlreadyExisting": Test_vtkCreateTreeFolderWithGitIgnore_AlreadyExisting
+        Case "Test_vtkCreateTreeFolderWithGitIgnore_correctPathFileExistsInRoot": Test_vtkCreateTreeFolderWithGitIgnore_correctPathFileExistsInRoot
+        Case "Test_vtkCreateTreeFolderWithGitIgnore_correctPathFileContentInRoot": Test_vtkCreateTreeFolderWithGitIgnore_correctPathFileContentInRoot
         Case Else: mAssert.Should False, "Invalid test name: " & mManager.methodName
     End Select
 End Sub

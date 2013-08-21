@@ -55,31 +55,70 @@ End Function
 '
 Public Function vtkCreateTreeFolder(rootPath As String)
    On Error GoTo vtkCreateTreeFolder_Error
-    ' Create main folder
+    
     MkDir rootPath
-    ' Create Delivery folder
     MkDir rootPath & "\" & "Delivery"
-    ' Create Project folder
     MkDir rootPath & "\" & "Project"
-    ' Create Tests folder
     MkDir rootPath & "\" & "Tests"
-    ' Create GitLog Folder
     MkDir rootPath & "\" & "GitLog"
-    ' Create Source folder
     MkDir rootPath & "\" & "Source"
-    ' Create ConfProd folder
     MkDir rootPath & "\" & "Source" & "\" & "ConfProd"
-    ' Create ConfTest folder
     MkDir rootPath & "\" & "Source" & "\" & "ConfTest"
-    ' Create VbaUnit folder
     MkDir rootPath & "\" & "Source" & "\" & "VbaUnit"
 
    On Error GoTo 0
-   vtkCreateTreeFolder = 0
+   vtkCreateTreeFolder = VTK_OK
    Exit Function
+   
 vtkCreateTreeFolder_Error:
     vtkCreateTreeFolder = Err.Number
+    Err.Raise Err.Number, "Module vtkFileSystemUtilities : Function vtkCreateTreeFolder", Err.Description
 End Function
+'---------------------------------------------------------------------------------------
+' Function  : vtkCreateTreeFolderWithGitIgnoreFiles
+' Author    : Lucas Vitorino
+' Purpose   : Creates the folder tree of a VTK project, and then adds .gitignore files in the relevant
+'             folders to ignore the relevant files.
+'             - One in the project root folder to ignore content in the Test and GitLog subfolders
+'             - One in the Project subfolder to ignore the temporary Excel files
+' Return    : Long error number
+'---------------------------------------------------------------------------------------
+'
+Public Function vtkCreateTreeFolderWithGitIgnore(folderPath As String)
+
+    Dim retval As Integer
+
+    On Error GoTo vtkCreateTreeFolderWithGitIgnore_Error
+
+    retval = vtkCreateTreeFolder(folderPath)
+    If retval <> VTK_OK Then
+        Err.Raise retval, Err.source, Err.Description
+    End If
+    
+    Dim fso As New FileSystemObject
+    Dim contentStream As TextStream
+    
+    Set contentStream = fso.CreateTextFile(folderPath & "\.gitignore ")
+    contentStream.WriteLine "# Ignore the content of the Test and GitLog folders"
+    contentStream.WriteLine "Test/*"
+    contentStream.WriteLine "GitLog/*"
+    contentStream.WriteLine ""
+    contentStream.WriteLine "# Ignore the temporary Excel files"
+    contentStream.WriteLine "~*"
+    contentStream.Close
+    
+    SetAttr folderPath & "\.gitignore ", vbHidden
+    
+    On Error GoTo 0
+    vtkCreateTreeFolderWithGitIgnore = VTK_OK
+    Exit Function
+
+vtkCreateTreeFolderWithGitIgnore_Error:
+    vtkCreateTreeFolderWithGitIgnoreFiles = Err.Number
+    Err.Raise Err.Number, Err.source, Err.Description
+
+End Function
+
 
 '---------------------------------------------------------------------------------------
 ' Procedure : vtkCleanFolder

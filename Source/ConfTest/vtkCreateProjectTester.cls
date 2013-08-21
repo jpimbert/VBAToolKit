@@ -44,7 +44,7 @@ Private Sub ITestCase_TearDown()
     Kill vtkTestPath & "\" & vtkTestProjectName & "\Project\" & vtkTestProjectName & "_DEV.xlsm"
     Kill vtkTestPath & "\" & vtkTestProjectName & "\Delivery\" & vtkTestProjectName & ".xlsm"
 '   Delete Folder Tree
-    vtkDeleteTreeFolder vtkTestPath & "\" & vtkTestProjectName
+    vtkCleanFolder vtkTestPath
     Application.DisplayAlerts = True
 End Sub
 
@@ -52,7 +52,7 @@ Private Sub OpenDeliveryProject()
     Dim path As String
     Dim fso As New FileSystemObject
     path = fso.GetParentFolderName(ActiveWorkbook.path) & "\" & vtkConfigurationManagerForProject(vtkTestProjectName).getConfigurationPath(vtkTestProjectName)
-    Workbooks.Open Filename:=path
+    Workbooks.Open fileName:=path
 End Sub
 
 Public Sub TestCreateProjectDoesNothingWhenPathDoesntExist()
