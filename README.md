@@ -17,4 +17,4 @@ Though, VBATookit does not integrate any versioning system ; using a third party
 VBAToolkit integrates the open-source unit-testing VBAUnit framework to encourage and facilitate Test Driven Development, an healthy development method.
 
 **Convenient interface**  
-A toolbar in Excel provides easy access to these features.
+A toolbar in Excel and several automatic functions provide easy access to these features.
