@@ -236,7 +236,6 @@ End Sub
 '   if the Project to reconfigure is installed as AddIn, it must be uninstalled then reinstalled.
 '
 ' IMPORTANT TO DO :
-'   il faut éventuellement refermer le classeur qui reste ouvert à la fin (SaveAs n'est pas Close)
 '   il faut aussi récupérer les propriétés du projet existant (description dans AddIn)
 '   il faut réactiver les références éventuelles (notamment extensions)
 '   il faut récupérer la feuille vtkConfigurations existante pour le projet de DEV
@@ -262,12 +261,14 @@ Public Sub vtkRecreateConfiguration(projectName As String, configurationName As 
         filePath = cm.getModulePathWithNumber(numModule:=i, numConfiguration:=cn)
         If Not filePath Like "" Then vtkImportOneModule project:=wb.VBProject, moduleName:=cm.module(i), filePath:=rootPath & "\" & filePath
     Next i
-    ' Save the Excel file with the good type and erase the previous one (a message is displayed to the user)
-    wb.SaveAs Filename:=rootPath & "\" & wbPath, FileFormat:=vtkDefaultFileFormat(wbPath)
     ' Recreate references in the new Excel File
     VtkActivateReferences wb:=wb
-    ' Close and save the Ecel File
-    wb.Close SaveChanges:=True
+    ' Set attribute properties WARNING - only for Delivery VBAToolKit
+    wb.BuiltinDocumentProperties("Title").Value = "VBAToolKit"
+    wb.BuiltinDocumentProperties("Comments").Value = "Toolkit improving IDE for VBA projects"
+    ' Save the Excel file with the good type and erase the previous one (a message is displayed to the user)
+    wb.SaveAs Filename:=rootPath & "\" & wbPath, FileFormat:=vtkDefaultFileFormat(wbPath)
+    wb.Close savechanges:=False
 End Sub
 
 '
