@@ -44,28 +44,49 @@ End Sub
 '
 Public Sub TestExcelToolBarCreation()
     '   Verify that the Excel toolbar exists after creation
-    Dim bar As CommandBar
+    Dim barE As CommandBar, barV As CommandBar
     
-    vtkCreateToolbars
+    vtkCreateToolbars vbeToolbar:=False
     
     On Error Resume Next
-    Set bar = Application.CommandBars(toolBarName)
+    Set barE = Application.CommandBars(toolBarName)
+    Set barV = Application.VBE.CommandBars(toolBarName)
     On Error GoTo 0
     
-    mAssert.Should Not bar Is Nothing, "The Excel Toolbar must exist"
+    mAssert.Should Not barE Is Nothing, "The Excel Toolbar must exist"
+    mAssert.Should barV Is Nothing, "The VBE Toolbar must not exist"
 End Sub
 
 Public Sub TestVBEToolBarCreation()
     '   Verify that the VBE toolbar exists after creation
-    Dim bar As CommandBar
+    Dim barE As CommandBar, barV As CommandBar
+    
+    vtkCreateToolbars excToolbar:=False
+    
+    On Error Resume Next
+    Set barE = Application.CommandBars(toolBarName)
+    Set barV = Application.VBE.CommandBars(toolBarName)
+    On Error GoTo 0
+    
+    mAssert.Should barE Is Nothing, "The Excel Toolbar must not exist"
+    mAssert.Should Not barV Is Nothing, "The VBE Toolbar must exist"
+
+End Sub
+
+Public Sub TestBothToolBarCreation()
+    '   Verify that the VBE and Excel toolbars exist after creation
+    Dim barE As CommandBar, barV As CommandBar
     
     vtkCreateToolbars
     
     On Error Resume Next
-    Set bar = Application.VBE.CommandBars(toolBarName)
+    Set barE = Application.CommandBars(toolBarName)
+    Set barV = Application.VBE.CommandBars(toolBarName)
     On Error GoTo 0
     
-    mAssert.Should Not bar Is Nothing, "The VBE Toolbar must exist"
+    mAssert.Should Not barE Is Nothing, "The Excel Toolbar must exist"
+    mAssert.Should Not barV Is Nothing, "The VBE Toolbar must exist"
+
 End Sub
 
 Public Sub TestExcelToolBarDeletion()
@@ -111,7 +132,7 @@ Public Sub Test_ExcelToolBarButtonAdd()
     Dim bar As CommandBar, button As CommandBarButton, realCaption As String
 
     vtkCreateEmptyToolbars   ' create empty toolbar
-    vtkCreateToolbarButton caption:="Test button", helpText:="", faceId:=1, action:="commandBarButtonClicked"
+    vtkCreateToolbarButton caption:="Test button", helpText:="", faceId:=1, action:="commandBarButtonClicked", vbeToolbar:=False
     
    On Error Resume Next
     Set bar = Application.CommandBars(toolBarName)
@@ -127,7 +148,7 @@ Public Sub Test_VBEToolBarButtonAdd()
     Dim bar As CommandBar, button As CommandBarButton, realCaption As String
 
     vtkCreateEmptyToolbars   ' create empty toolbar
-    vtkCreateToolbarButton caption:="Test button", helpText:="", faceId:=1, action:="commandBarButtonClicked"
+    vtkCreateToolbarButton caption:="Test button", helpText:="", faceId:=1, action:="commandBarButtonClicked", excToolbar:=False
     
    On Error Resume Next
     Set bar = Application.VBE.CommandBars(toolBarName)
@@ -207,39 +228,40 @@ End Sub
 '
 Public Sub TestAddInInstall()
     '   Verify that the Add-In installation creates the ToolBars
-    Dim barE As CommandBar, BarV As CommandBar
+    Dim barE As CommandBar, barV As CommandBar
     
     Application.Run Macro:="VBAToolKit_DEV.ThisWorkBook.Workbook_AddinInstall"
     
     On Error Resume Next
     Set barE = Application.CommandBars(toolBarName)
-    Set BarV = Application.VBE.CommandBars(toolBarName)
+    Set barV = Application.VBE.CommandBars(toolBarName)
     On Error GoTo 0
     
     mAssert.Should Not barE Is Nothing, "The Excel Toolbar must exist"
-    mAssert.Should Not BarV Is Nothing, "The VBE Toolbar must exist"
+    mAssert.Should Not barV Is Nothing, "The VBE Toolbar must exist"
 End Sub
 
 Public Sub TestAddInUnInstall()
     '   Verify that the Add-In Uninstallation deletes the ToolBars
-    Dim barE As CommandBar, BarV As CommandBar
+    Dim barE As CommandBar, barV As CommandBar
     
     vtkCreateToolbars
     Application.Run Macro:="VBAToolKit_DEV.ThisWorkBook.Workbook_AddinUninstall"
     
     On Error Resume Next
     Set barE = Application.CommandBars(toolBarName)
-    Set BarV = Application.VBE.CommandBars(toolBarName)
+    Set barV = Application.VBE.CommandBars(toolBarName)
     On Error GoTo 0
     
     mAssert.Should barE Is Nothing, "The Excel Toolbar must not exist"
-    mAssert.Should BarV Is Nothing, "The VBE Toolbar must not exist"
+    mAssert.Should barV Is Nothing, "The VBE Toolbar must not exist"
 End Sub
 
 Private Function ITest_Suite() As TestSuite
     Set ITest_Suite = New TestSuite
     ITest_Suite.AddTest ITest_Manager.ClassName, "TestExcelToolBarCreation"
     ITest_Suite.AddTest ITest_Manager.ClassName, "TestVBEToolBarCreation"
+    ITest_Suite.AddTest ITest_Manager.ClassName, "TestBothToolBarCreation"
     ITest_Suite.AddTest ITest_Manager.ClassName, "TestExcelToolBarDeletion"
     ITest_Suite.AddTest ITest_Manager.ClassName, "TestVBEToolBarDeletion"
     ITest_Suite.AddTest ITest_Manager.ClassName, "Test_ExcelToolBarButtonAdd"
@@ -256,6 +278,7 @@ Private Sub ITestCase_RunTest()
     Select Case mManager.methodName
         Case "TestExcelToolBarCreation": TestExcelToolBarCreation
         Case "TestVBEToolBarCreation": TestVBEToolBarCreation
+        Case "TestBothToolBarCreation": TestBothToolBarCreation
         Case "TestExcelToolBarDeletion": TestExcelToolBarDeletion
         Case "TestVBEToolBarDeletion": TestVBEToolBarDeletion
         Case "Test_ExcelToolBarButtonAdd": Test_ExcelToolBarButtonAdd

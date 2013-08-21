@@ -26,3 +26,7 @@ End Sub
 Private Sub Workbook_AddinUninstall()
     VBAToolKit.vtkToolBars.vtkDeleteToolbars
 End Sub
+
+Private Sub Workbook_Open()
+    If AddIns("VBAToolKit").Installed Then VBAToolKit.vtkToolBars.vtkCreateToolbars excToolbar:=False
+End Sub
