@@ -268,12 +268,9 @@ Public Sub vtkRecreateConfiguration(projectName As String, configurationName As 
     wb.BuiltinDocumentProperties("Title").Value = "VBAToolKit"
     wb.BuiltinDocumentProperties("Comments").Value = "Toolkit improving IDE for VBA projects"
     ' Deactivate AddIn if the current Excel file is AddIn and installed
-    Dim fso As New FileSystemObject, fileName As String, addInWasActivated As Boolean, a As AddIn
+    Dim fso As New FileSystemObject, fileName As String, addInWasActivated As Boolean
     fileName = fso.GetFileName(wbPath)
     If Workbooks(fileName).IsAddin Then
-        For Each a In AddIns
-            Debug.Print a.name, a.Installed, a.progID
-        Next
         addInWasActivated = AddIns(configurationName).Installed
         AddIns(configurationName).Installed = False
        Else

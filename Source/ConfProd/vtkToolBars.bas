@@ -5,7 +5,7 @@ Attribute VB_Name = "vtkToolBars"
 ' Date      : 09/08/2013
 ' Purpose   : Module for Toolbars and ToolbarControls management
 '
-' TODO : add button for VBE ToolKit reactivation (FaceId = 688)
+' TODO :
 '        add button for Add a Module (FaceId = 2646)
 '---------------------------------------------------------------------------------------
 Option Explicit
@@ -76,6 +76,7 @@ End Function
 '
 Public Sub vtkCreateToolbars()
     vtkCreateEmptyToolbars
+    vtkCreateExcelToolbarButton caption:="Reset VBE Toolbar", helpText:="Click here to reset the VBA IDE Toolbar", faceId:=688, action:="VBAToolKit.vtkReactivateVBEToolBar"
     vtkCreateToolbarButton caption:="Create Project", helpText:="Click here to create a new project", faceId:=2031, action:="VBAToolKit.vtkShowCreateProjectForm"
 End Sub
 
@@ -128,6 +129,21 @@ Public Sub vtkDeleteToolbars()
 End Sub
 
 '---------------------------------------------------------------------------------------
+' Procedure : vtkReactivateVBEToolBar
+' Author    : Jean-Pierre Imbert
+' Date      : 21/08/2013
+' Purpose   : Recreate all event handlers for VBE Toolbar after VBA reset
+'---------------------------------------------------------------------------------------
+'
+Public Sub vtkReactivateVBEToolBar()
+    Dim c As CommandBarControl
+    vtkClearEventHandlers
+    For Each c In Application.VBE.CommandBars(toolBarName).Controls
+        vtkAddEventHandler action:=c.onAction, cmdBarCtl:=c
+    Next
+End Sub
+
+'---------------------------------------------------------------------------------------
 ' Procedure : vtkCreateToolbarButton
 ' Author    : Jean-Pierre Imbert
 ' Date      : 20/08/2013
@@ -139,17 +155,12 @@ End Sub
 '---------------------------------------------------------------------------------------
 '
 Public Sub vtkCreateToolbarButton(caption As String, helpText As String, faceId As Integer, action As String)
-    Dim cbControl As CommandBarButton
 
         ' Create Button in the Excel Command Bar
-    Set cbControl = Application.CommandBars(toolBarName).Controls.Add(Type:=msoControlButton)
-    cbControl.faceId = faceId
-    cbControl.caption = caption
-    cbControl.TooltipText = helpText
-    cbControl.Style = msoButtonAutomatic
-    cbControl.onAction = action
+    vtkCreateExcelToolbarButton caption:=caption, helpText:=helpText, faceId:=faceId, action:=action
 
         ' Create Same Button in the VBE Command Bar
+    Dim cbControl As CommandBarButton
     Set cbControl = Application.VBE.CommandBars(toolBarName).Controls.Add(Type:=msoControlButton)
     cbControl.faceId = faceId
     cbControl.caption = caption
@@ -157,6 +168,17 @@ Public Sub vtkCreateToolbarButton(caption As String, helpText As String, faceId 
     cbControl.Style = msoButtonAutomatic
     vtkAddEventHandler action:=action, cmdBarCtl:=cbControl
 
+End Sub
+
+Private Sub vtkCreateExcelToolbarButton(caption As String, helpText As String, faceId As Integer, action As String)
+    Dim cbControl As CommandBarButton
+        ' Create Button in the Excel Command Bar
+    Set cbControl = Application.CommandBars(toolBarName).Controls.Add(Type:=msoControlButton)
+    cbControl.faceId = faceId
+    cbControl.caption = caption
+    cbControl.TooltipText = helpText
+    cbControl.Style = msoButtonAutomatic
+    cbControl.onAction = action
 End Sub
 
 '
