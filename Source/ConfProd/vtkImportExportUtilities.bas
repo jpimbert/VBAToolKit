@@ -23,6 +23,8 @@ Attribute VB_Name = "vtkImportExportUtilities"
 Option Explicit
 
 Private vbaUnitModules As Collection
+Public Const VTK_UNKNOWN_MODULE = 4000
+Public Const VTK_UNEXPECTED_ERROR = 2000    ' To delete when vtkConstants will be updated with Lucas_v code
 
 '---------------------------------------------------------------------------------------
 ' Function  : VBComponentTypeAsString
@@ -175,7 +177,7 @@ End Function
 ' Date      : 09/08/2013
 ' Purpose   : Import a module from a file into a project
 ' Parameters :
-'           - project, a VBProject into which import the module
+'           - project, a VBProject into which to import the module
 '           - moduleName, the name of module to import
 '           - filePath, path of the file to import as new module
 '             if the import succeed, the imported module replace the old one if any
@@ -230,7 +232,46 @@ Public Sub vtkImportOneModule(project As VBProject, moduleName As String, filePa
         Set fso = Nothing
     End If
    On Error GoTo 0
+End Sub
+
+'---------------------------------------------------------------------------------------
+' Procedure : vtkExportOneModule
+' Author    : Jean-Pierre Imbert
+' Date      : 09/08/2013
+' Purpose   : Export a module from a project to a file
+' Parameters :
+'           - project, a VBProject from which to export the module
+'           - moduleName, the name of module to export
+'           - filePath, path of the file to export the module
+' NOTE      : The file in which to export is deleted prior to export if it already exists
+'             except if the file has readonly attribute
+'
+' TODO :    - Replace Filepath functions with new ones in FileSystemUtilities
+'---------------------------------------------------------------------------------------
+'
+Public Sub vtkExportOneModule(project As VBProject, moduleName As String, filePath As String)
+    Dim fso As FileSystemObject, m As VBComponent
     
+   On Error GoTo vtkExportOneModule_Error
+   
+    ' Get the module to export
+    Set m = project.VBComponents(moduleName)
+        
+    ' Kill file if it already exists only AFTER get the module, if it not exists the file must not be deleted
+    If fso.FileExists(filePath) Then fso.DeleteFile fileSpec:=filePath
+    
+    ' Export module
+    m.Export fileName:=filePath
+    
+   On Error GoTo 0
+    Exit Sub
+
+vtkExportOneModule_Error:
+    If err.Number = 9 Then
+        err.Raise Number:=VTK_UNKNOWN_MODULE, source:="ExportOneModule", Description:="Module to export doesn't exist : " & moduleName
+       Else
+        err.Raise Number:=VTK_UNEXPECTED_ERROR, source:="ExportOneModule", Description:="Unexpected error when exporting " & moduleName & " : " & err.Description
+    End If
 End Sub
 
 '---------------------------------------------------------------------------------------

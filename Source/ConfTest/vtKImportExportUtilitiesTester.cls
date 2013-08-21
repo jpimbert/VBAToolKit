@@ -65,6 +65,16 @@ Private Sub ITestCase_SetUp(Assert As IAssert)
     FileCopy source:=vtkPathToTemplateFolder & "\" & formToImport, destination:=vtkPathToTestFolder & "\" & formToImport
 End Sub
 
+'---------------------------------------------------------------------------------------
+'   The existing workbook template contains modules
+'     - Feuil1, Feuil2, Feuil3 (Sheets)
+'     - ThisWorkbook (workbook)
+'     - TestForm (UserForm)
+'     - TestModule (Standard)
+'     - TestClass (Class)
+'   It exists an exported template for each (except Feuil2 and Feuil3)
+'---------------------------------------------------------------------------------------
+
 Private Sub ITestCase_TearDown()
     On Error Resume Next
     Kill PathName:=vtkPathToTestFolder & "\" & existingWorkbookName
@@ -108,7 +118,7 @@ Public Sub TestProdStandardCategory()
     mAssert.Equals vtkStandardCategoryForModuleName("Template"), "Prod", "Template is a standard Module"
 End Sub
 
-'
+'---------------------------------------------------------------------------------------
 '   Tests for importing one Module. The following configurations have to be considered
 '   A/ About the presence of the module to import
 '       A1/ the imported module is a new one in the project
@@ -123,7 +133,7 @@ End Sub
 '   The configuration to tests are :
 '       - B1 and B5 with A1, A2 and A3
 '       - B2, B3 and B4 with A3
-'
+'---------------------------------------------------------------------------------------
 
 Public Sub TestImportInexistantFileDoesNothing()
     '   Verify that an existing Module isn't deleted by a bad import (A2-B1)
