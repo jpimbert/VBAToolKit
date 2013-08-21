@@ -52,18 +52,18 @@ Public Function vtkCreateProject(path As String, name As String, Optional displa
     'Rename Project
     Workbooks(project.workbookDEVName).VBProject.name = project.projectDEVName
     'call function who activate references
-    VtkActivateReferences (project.workbookDEVName)
+    VtkActivateReferences wb:=Workbooks(project.workbookDEVName)
     'initialize configuration Sheet with VBAUnit modules
     vtkInitializeVbaUnitNamesAndPathes project:=project.projectName
     ' Save Development Project Workbook
-    Workbooks(project.workbookDEVName).Save
+    Workbooks(project.workbookDEVName).save
     
     'Create delivery workbook
     Workbooks.Add.SaveAs (rootPath & "\" & project.projectStandardRelativePath), FileFormat:=(52) '52 is xlsm format
     'Rename Project
     Workbooks(project.workbookName).VBProject.name = project.projectName
     'call function who activate references
-    VtkActivateReferences (project.workbookName)
+    VtkActivateReferences wb:=Workbooks(project.workbookName)
     ' A module must be added in the Excel File for the project parameters to be saved
     Workbooks(project.workbookName).VBProject.VBComponents.Add ComponentType:=vbext_ct_StdModule
     ' Save and Close Delivery Project WorkBook

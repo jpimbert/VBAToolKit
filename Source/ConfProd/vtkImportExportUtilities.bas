@@ -262,8 +262,12 @@ Public Sub vtkRecreateConfiguration(projectName As String, configurationName As 
         filePath = cm.getModulePathWithNumber(numModule:=i, numConfiguration:=cn)
         If Not filePath Like "" Then vtkImportOneModule project:=wb.VBProject, moduleName:=cm.module(i), filePath:=rootPath & "\" & filePath
     Next i
-    ' Save the Excel file with the good type and erase the previous one
+    ' Save the Excel file with the good type and erase the previous one (a message is displayed to the user)
     wb.SaveAs Filename:=rootPath & "\" & wbPath, FileFormat:=vtkDefaultFileFormat(wbPath)
+    ' Recreate references in the new Excel File
+    VtkActivateReferences wb:=wb
+    ' Close and save the Ecel File
+    wb.Close SaveChanges:=True
 End Sub
 
 '

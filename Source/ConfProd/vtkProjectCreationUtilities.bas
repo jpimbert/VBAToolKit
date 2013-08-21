@@ -21,7 +21,7 @@ Public Function vtkInitializeVbaUnitNamesAndPathes(project As String) As Boolean
         moduleName = vtkVBAUnitModulesList.Item(i)
         Set module = ThisWorkbook.VBProject.VBComponents(moduleName)
         
-        nm = cm.addModule(moduleName)
+        nm = cm.AddModule(moduleName)
         ret = ret And (nm > 0)
         
         cm.setModulePathWithNumber path:=vtkStandardPathForModule(module), numModule:=nm, numConfiguration:=nc
@@ -37,10 +37,27 @@ End Function
 ' Date      : 26/04/2013
 ' Purpose   : - check that workbook is open and activate VBIDE and +-scripting references
 '---------------------------------------------------------------------------------------
-Public Function VtkActivateReferences(workbookName As String)
-    If VtkWorkbookIsOpen(workbookName) = True Then     'if the workbook is ope
-        On Error Resume Next ' if the first extention is already activated, we will try to activate the second one
-        Workbooks(workbookName).VBProject.References.AddFromGuid "{420B2830-E718-11CF-893D-00A0C9054228}", 0, 0  ' +- to activate Scripting : Microsoft scripting runtime
-        Workbooks(workbookName).VBProject.References.AddFromGuid "{0002E157-0000-0000-C000-000000000046}", 0, 0 ' to activate VBIDE: Microsoft visual basic for applications extensibility 5.3
+Public Sub VtkActivateReferences(wb As Workbook)
+    If VtkWorkbookIsOpen(wb.name) = True Then     'if the workbook is opened
+       On Error Resume Next ' if an extention is already activated, we will try to activate the next one
+        wb.VBProject.References.AddFromGuid "{420B2830-E718-11CF-893D-00A0C9054228}", 0, 0  ' Scripting : Microsoft scripting runtime
+        wb.VBProject.References.AddFromGuid "{0002E157-0000-0000-C000-000000000046}", 0, 0  ' VBIDE : Microsoft visual basic for applications extensibility 5.3
+        wb.VBProject.References.AddFromGuid "{50A7E9B0-70EF-11D1-B75A-00A0C90564FE}", 0, 0  ' Shell32 : Microsoft Shell Controls and Automation
+        wb.VBProject.References.AddFromGuid "{F5078F18-C551-11D3-89B9-0000F81FE221}", 0, 0  ' MSXML2 : Microsoft XML V5.0
+       On Error GoTo 0
     End If
-End Function
+End Sub
+
+'---------------------------------------------------------------------------------------
+' Procedure : vtkDisplayActivatedReferencesGuid
+' Author    : Jean-Pierre Imbert
+' Date      : 21/08/2013
+' Purpose   : Utility Sub for displaying GUID of activated references of current project
+'---------------------------------------------------------------------------------------
+'
+Public Sub vtkDisplayActivatedReferencesGuid()
+    Dim r As VBIDE.Reference
+    For Each r In ActiveWorkbook.VBProject.References
+        Debug.Print r.name, r.GUID
+    Next
+End Sub

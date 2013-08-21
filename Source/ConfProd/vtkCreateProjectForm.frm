@@ -41,8 +41,8 @@ End Sub
 '---------------------------------------------------------------------------------------
 '
 Private Sub CreateButton_Click()
-    vtkCreateProject path:=ProjectPathTextBox.Text, name:=ProjectNameTextBox.Text
-    Unload vtkCreateProjectForm
+    VBAToolKit.vtkCreateProject path:=ProjectPathTextBox.Text, name:=ProjectNameTextBox.Text
+    Unload VBAToolKit.vtkCreateProjectForm
 End Sub
 
 '---------------------------------------------------------------------------------------
@@ -54,15 +54,15 @@ End Sub
 '
 Private Sub CancelButton_Click()
 ' don''t use End , because it stop debugger
-    Unload vtkCreateProjectForm
+    Unload VBAToolKit.vtkCreateProjectForm
 End Sub
 
 Private Sub ProjectPathTextBox_Change()
-    enableCreateButton
+    VBAToolKit.enableCreateButton
 End Sub
 
 Private Sub ProjectNameTextBox_Change()
-    enableCreateButton
+    VBAToolKit.enableCreateButton
 End Sub
 
 '---------------------------------------------------------------------------------------
@@ -73,7 +73,7 @@ End Sub
 '---------------------------------------------------------------------------------------
 '
 Private Sub UserForm_Initialize()
-    enableCreateButton
+    VBAToolKit.enableCreateButton
 End Sub
 
 '---------------------------------------------------------------------------------------
@@ -81,6 +81,8 @@ End Sub
 ' Author    : Jean-Pierre Imbert
 ' Date      : 21/08/2013
 ' Purpose   : Enable the Create Button only if all parameters are typed and OK
+'
+' TODO : Use vtkFileSystemUtilities after branch merging
 '---------------------------------------------------------------------------------------
 '
 Private Sub enableCreateButton()
