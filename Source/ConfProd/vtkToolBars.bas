@@ -83,6 +83,8 @@ Public Sub vtkCreateToolbars(Optional vbeToolbar As Boolean = True, Optional exc
     If excToolbar Then vtkCreateToolbarButton caption:="Reset VBE Toolbar", helpText:="Click here to reset the VBA IDE Toolbar", faceId:=688, action:="VBAToolKit.vtkReactivateVBEToolBar", vbeToolbar:=False, excToolbar:=True
     ' Create other buttons
     vtkCreateToolbarButton caption:="Create Project", helpText:="Click here to create a new project", faceId:=2031, action:="VBAToolKit.vtkShowCreateProjectForm", vbeToolbar:=vbeToolbar, excToolbar:=excToolbar
+'    doesn't work because it's a Hara-Kiri for VBAToolKit itself
+'    vtkCreateToolbarButton caption:="Recreate Delivery", helpText:="Click here to recreate the configuration for delivery", faceId:=680, action:="VBAToolKit.vtkRecreateDeliveryClicked", vbeToolbar:=vbeToolbar, excToolbar:=excToolbar
 End Sub
 
 '---------------------------------------------------------------------------------------
@@ -97,7 +99,7 @@ End Sub
 '---------------------------------------------------------------------------------------
 '
 Public Sub vtkCreateEmptyToolbars(Optional vbeToolbar As Boolean = True, Optional excToolbar As Boolean = True)
-    Dim barE As CommandBar, BarV As CommandBar, cbControl As CommandBarControl
+    Dim barE As CommandBar, barV As CommandBar, cbControl As CommandBarControl
     
     ' Create Excel Commandbar if necessary
     If excToolbar Then
@@ -111,10 +113,10 @@ Public Sub vtkCreateEmptyToolbars(Optional vbeToolbar As Boolean = True, Optiona
     ' Create VBE Commandbar if necessary
     If vbeToolbar Then
         On Error Resume Next
-        Set BarV = Application.VBE.CommandBars(toolBarName)
+        Set barV = Application.VBE.CommandBars(toolBarName)
         On Error GoTo 0
-        If BarV Is Nothing Then Set BarV = Application.VBE.CommandBars.Add(name:=toolBarName, Position:=msoBarTop)
-        BarV.Visible = True
+        If barV Is Nothing Then Set barV = Application.VBE.CommandBars.Add(name:=toolBarName, Position:=msoBarTop)
+        barV.Visible = True
     End If
     
 End Sub

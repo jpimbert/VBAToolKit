@@ -268,14 +268,17 @@ Public Sub vtkRecreateConfiguration(projectName As String, configurationName As 
     wb.BuiltinDocumentProperties("Title").Value = "VBAToolKit"
     wb.BuiltinDocumentProperties("Comments").Value = "Toolkit improving IDE for VBA projects"
     ' Deactivate AddIn if the current Excel file is AddIn and installed
-    Dim fso As New FileSystemObject, fileName As String, addInWasActivated As Boolean
+    Dim fso As New FileSystemObject, fileName As String, addInWasActivated As Boolean, wbIsAddin As Boolean
     fileName = fso.GetFileName(wbPath)
-    If Workbooks(fileName).IsAddin Then
+   On Error Resume Next
+    wbIsAddin = Workbooks(fileName).IsAddin
+    If err.Number = 0 And wbIsAddin Then
         addInWasActivated = AddIns(configurationName).Installed
         AddIns(configurationName).Installed = False
        Else
         addInWasActivated = False
     End If
+   On Error GoTo 0
     ' Save the Excel file with the good type and erase the previous one (a message is displayed to the user)
     wb.SaveAs fileName:=rootPath & "\" & wbPath, FileFormat:=vtkDefaultFileFormat(wbPath)
     wb.Close savechanges:=False
