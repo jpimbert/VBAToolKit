@@ -74,6 +74,7 @@ Private Property Get ITest_Manager() As ITestManager
 End Property
 
 Private Sub ITestCase_SetUp(Assert As IAssert)
+
     Set mAssert = Assert
     Set newWorkBook = vtkCreateExcelWorkbookForTestWithProjectName("NewProject")    ' create an Excel project for tests
     newWorkbookName = newWorkBook.name
@@ -81,9 +82,15 @@ Private Sub ITestCase_SetUp(Assert As IAssert)
     Set newConfManager = vtkConfigurationManagerForProject(newProjectName)
     Dim source As String, destination As String
     FileCopy source:=vtkPathToTemplateFolder & "\" & existingWorkbookNameForTest, destination:=vtkPathToTestFolder & "\" & existingProjectName & "_DEV.xlsm"
+   On Error GoTo ITestCase_SetUp_Error
     Set existingWorkbook = Workbooks.Open(fileName:=vtkPathToTestFolder & "\" & existingProjectName & "_DEV.xlsm")
+   On Error GoTo 0
     existingWorkbookName = existingWorkbook.name
     Set existingConfManager = vtkConfigurationManagerForProject(existingProjectName)
+    Exit Sub
+
+ITestCase_SetUp_Error:
+    If err.Number = 1004 Then Resume    ' It's possible that the file is not ready, just after copy : in this case retry
 End Sub
 
 Private Sub ITestCase_TearDown()

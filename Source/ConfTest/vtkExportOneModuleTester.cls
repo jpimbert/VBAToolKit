@@ -91,6 +91,8 @@ Private Sub ITestCase_TearDown()
     Kill PathName:=vtkPathToTestFolder & "\" & sheetToImport
     Kill PathName:=vtkPathToTestFolder & "\" & workbookToImport
     Kill PathName:=vtkPathToTestFolder & "\" & formToImport
+    Kill PathName:=vtkPathToTestFolder & "\" & "TestModule2.bas"
+    Kill PathName:=vtkPathToTestFolder & "\" & "TestForm.frx"
     On Error GoTo 0
 End Sub
 
@@ -113,50 +115,184 @@ End Sub
 '       - A1-B2     : Test_ModuleDoesntExistAndFileExists
 '       - A2-B1-C1  : Test_StandardModuleExistsAndFileDoesntExist
 '       - A2-B1-C2  : Test_ClassModuleExistsAndFileDoesntExist
-'       - A2-B2-C2  : Test_ClassModuleExistsAndFileExists
+'       - A2-B2-C1  : Test_StandardModuleExistsAndFileExists
 '       - A2-B2-C3  : Test_SheetModuleExistsAndFileExists
 '       - A2-B2-C5  : Test_FormModuleExistsAndFRMFileExists
 '       -             Test_FormModuleExistsAndFRXFileExists
 '---------------------------------------------------------------------------------------
 
 Public Sub Test_ModuleAndFileDoesntExist()
+    Dim filePath As String, moduleName As String
+    
+    filePath = "DummyFile.xxx"
+    moduleName = "InexistantModule"
    
-   On Error GoTo Test_ExportOneModule_ModuleAndFileDoesntExist_Error
-    vtkExportOneModule project:=wbForTest.VBProject, moduleName:="InexistantModule", filePath:="DummyFile.xxx"
+   On Error GoTo Test_Error
+    vtkExportOneModule project:=wbForTest.VBProject, moduleName:=moduleName, filePath:=filePath
    On Error GoTo 0
    
-Test_ExportOneModule_ModuleAndFileDoesntExist_Error:
+Test_Error:
     mAssert.Equals err.Number, VTK_UNKNOWN_MODULE, "Export doesn't work when module is inexistant"
-    mAssert.Should Not fso.FileExists("DummyFile.xxx"), "File must not be created when exported module is inexistant"
+    mAssert.Should Not fso.FileExists(filePath), "File must not be created when exported module is inexistant"
 End Sub
 
 Public Sub Test_ModuleDoesntExistAndFileExists()
-   Dim sizeBefore As Long, sizeAfter As Long, filePath As String
+    Dim sizeBefore As Long, sizeAfter As Long, filePath As String, moduleName As String
    
-   filePath = vtkPathToTestFolder & "\" & moduleToImport
+    filePath = vtkPathToTestFolder & "\" & moduleToImport
+    moduleName = "InexistantModule"
    
-   On Error GoTo Test_ExportOneModule_ModuleAndFileDoesntExist_Error
+   On Error GoTo Test_Error
     sizeBefore = fso.GetFile(filePath).Size
-    vtkExportOneModule project:=wbForTest.VBProject, moduleName:="InexistantModule", filePath:=filePath
+    vtkExportOneModule project:=wbForTest.VBProject, moduleName:=moduleName, filePath:=filePath
    On Error GoTo 0
    
-Test_ExportOneModule_ModuleAndFileDoesntExist_Error:
+Test_Error:
     sizeAfter = fso.GetFile(filePath).Size
     mAssert.Equals err.Number, VTK_UNKNOWN_MODULE, "Export doesn't work when module is inexistant"
-    mAssert.Should fso.FileExists(vtkPathToTestFolder & "\" & moduleToImport), "File is not deleted when exported module is inexistant"
+    mAssert.Should fso.FileExists(filePath), "File is not deleted when exported module is inexistant"
     mAssert.Equals sizeAfter, sizeBefore, "The size of the file must not be changed when exported module is inexistant"
+End Sub
+
+Public Sub Test_StandardModuleExistsAndFileDoesntExist()
+    Dim existingFilePath As String, newFilePath As String, moduleName As String
+
+    existingFilePath = vtkPathToTestFolder & "\" & "TestModule.bas"
+    newFilePath = vtkPathToTestFolder & "\" & "TestModule2.bas"
+    moduleName = "TestModule"
+
+   On Error GoTo Test_Error
+    vtkExportOneModule project:=wbForTest.VBProject, moduleName:=moduleName, filePath:=newFilePath
+    mAssert.Should fso.FileExists(newFilePath), "File must be created when exported existant module"
+    mAssert.Should Not (fso.GetFile(existingFilePath).Size = fso.GetFile(newFilePath).Size), "Size of Exported module must be different than the existing file"
+   On Error GoTo 0
+    Exit Sub
+    
+Test_Error:
+    mAssert.Equals err.Number, 0, "No error must be thrown when Module exists"
+End Sub
+
+Public Sub Test_ClassModuleExistsAndFileDoesntExist()
+    Dim existingFilePath As String, newFilePath As String, moduleName As String
+
+    existingFilePath = vtkPathToTestFolder & "\" & "TestClass.cls"
+    newFilePath = vtkPathToTestFolder & "\" & "TestClass.cls"
+    moduleName = "TestClass"
+
+   On Error GoTo Test_Error
+    vtkExportOneModule project:=wbForTest.VBProject, moduleName:=moduleName, filePath:=newFilePath
+    mAssert.Should fso.FileExists(newFilePath), "File must be created when exported existant module"
+   On Error GoTo 0
+    Exit Sub
+    
+Test_Error:
+    mAssert.Equals err.Number, 0, "No error must be thrown when Module exists"
+End Sub
+
+Public Sub Test_StandardModuleExistsAndFileExists()
+    Dim sizeBefore As Long, sizeAfter As Long, filePath As String, moduleName As String
+
+    filePath = vtkPathToTestFolder & "\" & "TestModule.bas"
+    moduleName = "TestModule"
+
+   On Error GoTo Test_Error
+    sizeBefore = fso.GetFile(filePath).Size
+    vtkExportOneModule project:=wbForTest.VBProject, moduleName:=moduleName, filePath:=filePath
+    sizeAfter = fso.GetFile(filePath).Size
+    mAssert.Should fso.FileExists(filePath), "File must exist when exported existant module"
+    mAssert.Should sizeAfter <> sizeBefore, "Size of new file (" & sizeAfter & ") must be different than size of old file (" & sizeBefore & ")"
+   On Error GoTo 0
+    Exit Sub
+    
+Test_Error:
+    mAssert.Equals err.Number, 0, "No error must be thrown when Module exists"
+End Sub
+
+Public Sub Test_SheetModuleExistsAndFileExists()
+    Dim sizeBefore As Long, sizeAfter As Long, filePath As String, moduleName As String
+
+    filePath = vtkPathToTestFolder & "\" & "Feuil1.cls"
+    moduleName = "Feuil1"
+
+   On Error GoTo Test_Error
+    sizeBefore = fso.GetFile(filePath).Size
+    vtkExportOneModule project:=wbForTest.VBProject, moduleName:=moduleName, filePath:=filePath
+    sizeAfter = fso.GetFile(filePath).Size
+    mAssert.Should fso.FileExists(filePath), "File must exist when exported existant module"
+    mAssert.Should sizeAfter <> sizeBefore, "Size of new file (" & sizeAfter & ") must be different than size of old file (" & sizeBefore & ")"
+   On Error GoTo 0
+    Exit Sub
+    
+Test_Error:
+    mAssert.Equals err.Number, 0, "No error must be thrown when Module exists"
+End Sub
+
+Public Sub Test_FormModuleExistsAndFRMFileExists()
+    Dim sizeBefore As Long, sizeAfter As Long, filePath As String, moduleName As String, secondFilePath As String
+
+    filePath = vtkPathToTestFolder & "\" & "TestForm.frm"
+    secondFilePath = vtkPathToTestFolder & "\" & "TestForm.frx"
+    moduleName = "TestForm"
+
+   On Error GoTo Test_Error
+    sizeBefore = fso.GetFile(filePath).Size
+    vtkExportOneModule project:=wbForTest.VBProject, moduleName:=moduleName, filePath:=filePath
+    sizeAfter = fso.GetFile(filePath).Size
+    mAssert.Should fso.FileExists(filePath), "File must exist when exported existant module"
+    mAssert.Should fso.FileExists(secondFilePath), "File must exist when exported existant module"
+    mAssert.Should sizeAfter <> sizeBefore, "Size of new file (" & sizeAfter & ") must be different than size of old file (" & sizeBefore & ")"
+   On Error GoTo 0
+    Exit Sub
+    
+Test_Error:
+    mAssert.Equals err.Number, 0, "No error must be thrown when Module exists"
+End Sub
+
+Public Sub Test_FormModuleExistsAndFRXFileExists()
+    Dim sizeBefore As Long, sizeAfter As Long, filePath As String, moduleName As String, secondFilePath As String
+
+    filePath = vtkPathToTestFolder & "\" & "TestForm.frm"
+    secondFilePath = vtkPathToTestFolder & "\" & "TestForm.frx"
+    moduleName = "TestForm"
+    
+    fso.CreateTextFile secondFilePath
+
+   On Error GoTo Test_Error
+    sizeBefore = fso.GetFile(secondFilePath).Size
+    vtkExportOneModule project:=wbForTest.VBProject, moduleName:=moduleName, filePath:=filePath
+    sizeAfter = fso.GetFile(secondFilePath).Size
+    mAssert.Should fso.FileExists(filePath), "File must exist when exported existant module"
+    mAssert.Should fso.FileExists(secondFilePath), "File must exist when exported existant module"
+    mAssert.Should sizeAfter <> sizeBefore, "Size of new file (" & sizeAfter & ") must be different than size of old file (" & sizeBefore & ")"
+   On Error GoTo 0
+    Exit Sub
+    
+Test_Error:
+    mAssert.Equals err.Number, 0, "No error must be thrown when Module exists"
 End Sub
 
 Private Function ITest_Suite() As TestSuite
     Set ITest_Suite = New TestSuite
     ITest_Suite.AddTest ITest_Manager.ClassName, "Test_ModuleAndFileDoesntExist"
     ITest_Suite.AddTest ITest_Manager.ClassName, "Test_ModuleDoesntExistAndFileExists"
+    ITest_Suite.AddTest ITest_Manager.ClassName, "Test_StandardModuleExistsAndFileDoesntExist"
+    ITest_Suite.AddTest ITest_Manager.ClassName, "Test_ClassModuleExistsAndFileDoesntExist"
+    ITest_Suite.AddTest ITest_Manager.ClassName, "Test_StandardModuleExistsAndFileExists"
+    ITest_Suite.AddTest ITest_Manager.ClassName, "Test_SheetModuleExistsAndFileExists"
+    ITest_Suite.AddTest ITest_Manager.ClassName, "Test_FormModuleExistsAndFRMFileExists"
+    ITest_Suite.AddTest ITest_Manager.ClassName, "Test_FormModuleExistsAndFRXFileExists"
 End Function
 
 Private Sub ITestCase_RunTest()
     Select Case mManager.methodName
         Case "Test_ModuleAndFileDoesntExist": Test_ModuleAndFileDoesntExist
         Case "Test_ModuleDoesntExistAndFileExists": Test_ModuleDoesntExistAndFileExists
+        Case "Test_StandardModuleExistsAndFileDoesntExist": Test_StandardModuleExistsAndFileDoesntExist
+        Case "Test_ClassModuleExistsAndFileDoesntExist": Test_ClassModuleExistsAndFileDoesntExist
+        Case "Test_StandardModuleExistsAndFileExists": Test_StandardModuleExistsAndFileExists
+        Case "Test_SheetModuleExistsAndFileExists": Test_SheetModuleExistsAndFileExists
+        Case "Test_FormModuleExistsAndFRMFileExists": Test_FormModuleExistsAndFRMFileExists
+        Case "Test_FormModuleExistsAndFRXFileExists": Test_FormModuleExistsAndFRXFileExists
         Case Else: mAssert.Should False, "Invalid test name: " & mManager.methodName
     End Select
 End Sub
