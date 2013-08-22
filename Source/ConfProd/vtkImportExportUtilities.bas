@@ -310,6 +310,40 @@ vtkExportModulesFromAnotherProject_Error:
 End Sub
 
 '---------------------------------------------------------------------------------------
+' Procedure : vtkImportModulesInAnotherProject
+' Author    : Jean-Pierre Imbert
+' Date      : 22/08/2013
+' Purpose   : Import modules listed in a configuration for a project
+'             - the project/configuration containing the modules list are projectName/confName parameters
+'             - the modules are imported in the project projectForModules
+'             - the modules are imported from pathes listed in project/configuration
+'---------------------------------------------------------------------------------------
+'
+Public Sub vtkImportModulesInAnotherProject(projectForModules As VBProject, projectName As String, confName As String)
+    Dim cm As vtkConfigurationManager, rootPath As String
+    Dim cn As Integer, filePath As String, i As Integer
+    
+   On Error GoTo vtkImportModulesInAnotherProject_Error
+
+    ' Get the project and the rootPath of the project
+    Set cm = vtkConfigurationManagerForProject(projectName)
+    cn = cm.getConfigurationNumber(configuration:=confName)
+    rootPath = cm.rootPath
+    
+    ' Import all modules for this configuration into the projectForModules
+    For i = 1 To cm.moduleCount
+        filePath = cm.getModulePathWithNumber(numModule:=i, numConfiguration:=cn)
+        If Not filePath Like "" Then vtkImportOneModule project:=projectForModules, moduleName:=cm.module(i), filePath:=rootPath & "\" & filePath
+    Next i
+    
+   On Error GoTo 0
+   Exit Sub
+
+vtkImportModulesInAnotherProject_Error:
+    err.Raise VTK_UNEXPECTED_ERROR, "vtkImportModulesInAnotherProject_Error", "Unexpected error when importing modules into " & projectForModules.name & " : " & err.Description
+End Sub
+
+'---------------------------------------------------------------------------------------
 ' Procedure : vtkRecreateConfiguration
 ' Author    : Jean-Pierre Imbert
 ' Date      : 09/08/2013
@@ -335,23 +369,18 @@ End Sub
 '---------------------------------------------------------------------------------------
 '
 Public Sub vtkRecreateConfiguration(projectName As String, configurationName As String)
-    Dim cm As vtkConfigurationManager, rootPath As String
-    Dim cn As Integer, filePath As String, wbPath As String, wb As Workbook, i As Integer
+    Dim cm As vtkConfigurationManager, rootPath As String, wbPath As String, wb As Workbook
     ' Get the project and the rootPath of the project
     Set cm = vtkConfigurationManagerForProject(projectName)
     rootPath = cm.rootPath
     ' Get the configuration number in the project and the path of the file
-    cn = cm.getConfigurationNumber(configuration:=configurationName)
-    wbPath = cm.getConfigurationPathWithNumber(cn)
+    wbPath = cm.getConfigurationPath(configuration:=configurationName)
     ' Create a new Excel file
     Set wb = vtkCreateExcelWorkbook()
     ' Set the projectName
     wb.VBProject.name = configurationName
     ' Import all modules for this configuration from the source directory
-    For i = 1 To cm.moduleCount
-        filePath = cm.getModulePathWithNumber(numModule:=i, numConfiguration:=cn)
-        If Not filePath Like "" Then vtkImportOneModule project:=wb.VBProject, moduleName:=cm.module(i), filePath:=rootPath & "\" & filePath
-    Next i
+    vtkImportModulesInAnotherProject projectForModules:=wb.VBProject, projectName:=projectName, confName:=configurationName
     ' Recreate references in the new Excel File
     VtkActivateReferences wb:=wb
     ' Set attribute properties WARNING - only for Delivery VBAToolKit
