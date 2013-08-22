@@ -150,7 +150,7 @@ Public Function vtkCleanFolder(folderPath As String) As Integer
     ' Call the function on all the SubFolders
     For Each subFolder In sourceFolder.SubFolders
         vtkCleanFolder (subFolder.path)
-        fso.DeleteFolder subFolder
+        fso.DeleteFolder subFolder.path, True
     Next subFolder
     
     On Error GoTo 0

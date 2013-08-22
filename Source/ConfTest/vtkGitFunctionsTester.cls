@@ -41,14 +41,32 @@ End Sub
 
 
 Public Sub Test_vtkInitializeGit_correctPathExistenceOfDotGitFolder()
+    On Error GoTo Test_vtkInitializeGit_correctPathExistenceOfDotGitFolder_Error
+
    vtkInitializeGit vtkTestPath
    mAssert.Should vtkDoesFolderExist(vtkTestPath & "\.git") = True, ".git folder must exist"
+
+    On Error GoTo 0
+    Exit Sub
+
+Test_vtkInitializeGit_correctPathExistenceOfDotGitFolder_Error:
+    Debug.Print "Error " & Err.Number & " (" & Err.Description & ") in procedure Test_vtkInitializeGit_correctPathExistenceOfDotGitFolder of Class Module vtkGitFunctionsTester"
+    Resume Next
 End Sub
 
 Public Sub Test_vtkInitializeGit_correctPathRetVal()
-   Dim retval As Integer
-   retval = vtkInitializeGit(vtkTestPath)
-   mAssert.Equals retval, VTK_OK
+    Dim retval As Integer
+    On Error GoTo Test_vtkInitializeGit_correctPathRetVal_Error
+
+    retval = vtkInitializeGit(vtkTestPath)
+    mAssert.Equals retval, VTK_OK
+
+    On Error GoTo 0
+    Exit Sub
+
+Test_vtkInitializeGit_correctPathRetVal_Error:
+    Debug.Print "Error " & Err.Number & " (" & Err.Description & ") in procedure Test_vtkInitializeGit_correctPathRetVal of Class Module vtkGitFunctionsTester"
+    Resume Next
 End Sub
 
 Public Sub Test_vtkInitializeGit_correctPathReInitializeRetVal()
@@ -61,7 +79,11 @@ Public Sub Test_vtkInitializeGit_correctPathReInitializeRetVal()
     
     mAssert.Equals error, VTK_GIT_ALREADY_INITIALIZED_IN_FOLDER
     
+    On Error GoTo 0
+    Exit Sub
+    
 errHandler:
+    'Debug.Print "EXPECTED Error " & Err.Number & " (" & Err.Description & ") in procedure Test_vtkInitializeGit_correctPathReInitializeRetVal of Class Module vtkGitFunctionsTester"
     error = Err.Number
     Resume Next
 End Sub
@@ -75,7 +97,11 @@ Public Sub Test_vtkInitializeGit_wrongPathUnexistingFolder()
     
     mAssert.Equals error, VTK_WRONG_FOLDER_PATH
     
+    On Error GoTo 0
+    Exit Sub
+    
 errHandler:
+    'Debug.Print "EXPECTED Error " & Err.Number & " (" & Err.Description & ") in procedure Test_vtkInitializeGit_wrongPathUnexistingFolder of Class Module vtkGitFunctionsTester"
     error = Err.Number
     Resume Next
     
@@ -90,7 +116,11 @@ Public Sub Test_vtkInitializeGit_wrongPathFile()
     
     mAssert.Equals error, VTK_WRONG_FOLDER_PATH
     
+    On Error GoTo 0
+    Exit Sub
+    
 errHandler:
+    'Debug.Print "EXPECTED Error " & Err.Number & " (" & Err.Description & ") in procedure Test_vtkInitializeGit_wrongPathFile of Class Module vtkGitFunctionsTester"
     error = Err.Number
     Resume Next
 End Sub
@@ -104,7 +134,11 @@ Public Sub Test_vtkInitializeGit_forbiddenPath1()
     
     mAssert.Equals error, VTK_FORBIDDEN_PARAMETER
     
+    On Error GoTo 0
+    Exit Sub
+    
 errHandler:
+    'Debug.Print "EXPECTED Error " & Err.Number & " (" & Err.Description & ") in procedure Test_vtkInitializeGit_forbiddenPath1 of Class Module vtkGitFunctionsTester"
     error = Err.Number
     Resume Next
     
@@ -119,7 +153,11 @@ Public Sub Test_vtkInitializeGit_forbiddenPath2()
     
     mAssert.Equals error, VTK_FORBIDDEN_PARAMETER
     
+    On Error GoTo 0
+    Exit Sub
+    
 errHandler:
+    'Debug.Print "EXPECTED Error " & Err.Number & " (" & Err.Description & ") in procedure Test_vtkInitializeGit_forbiddenPath2 of Class Module vtkGitFunctionsTester"
     error = Err.Number
     Resume Next
     
@@ -127,28 +165,64 @@ End Sub
 
 Public Sub Test_vtkInitializeGit_correctPathLogFileIsDeleted()
     Dim fso As New Scripting.FileSystemObject
+    On Error GoTo Test_vtkInitializeGit_correctPathLogFileIsDeleted_Error
+
     vtkInitializeGit vtkTestPath
     mAssert.Equals fso.FileExists(vtkTestPath & "\initialize.log"), False
+
+    On Error GoTo 0
+    Exit Sub
+
+Test_vtkInitializeGit_correctPathLogFileIsDeleted_Error:
+    Debug.Print "Error " & Err.Number & " (" & Err.Description & ") in procedure Test_vtkInitializeGit_correctPathLogFileIsDeleted of Class Module vtkGitFunctionsTester"
+    Resume Next
 End Sub
 
 Public Sub Test_vtkInitializeGit_correctPathCustomLogFileReturnValue()
     Dim retval As Integer
+    On Error GoTo Test_vtkInitializeGit_correctPathCustomLogFileReturnValue_Error
+
     retval = vtkInitializeGit(vtkTestPath, "initialize.log")
     mAssert.Equals retval, VTK_OK
+
+    On Error GoTo 0
+    Exit Sub
+
+Test_vtkInitializeGit_correctPathCustomLogFileReturnValue_Error:
+    Debug.Print "Error " & Err.Number & " (" & Err.Description & ") in procedure Test_vtkInitializeGit_correctPathCustomLogFileReturnValue of Class Module vtkGitFunctionsTester"
+    Resume Next
 End Sub
 
 Public Sub Test_vtkInitializeGit_correctPathCustomLogFileExists()
     Dim fso As New FileSystemObject
+    On Error GoTo Test_vtkInitializeGit_correctPathCustomLogFileExists_Error
+
     vtkInitializeGit vtkTestPath, "initialize.log"
     mAssert.Equals fso.FileExists(vtkTestPath & "\initialize.log"), True
+
+    On Error GoTo 0
+    Exit Sub
+
+Test_vtkInitializeGit_correctPathCustomLogFileExists_Error:
+    Debug.Print "Error " & Err.Number & " (" & Err.Description & ") in procedure Test_vtkInitializeGit_correctPathCustomLogFileExists of Class Module vtkGitFunctionsTester"
+    Resume Next
 End Sub
 
 Public Sub Test_vtkGitConvertWinPath_absolutePathOnCDrive()
     Dim path As String
     Dim convertedPath As String
+    On Error GoTo Test_vtkGitConvertWinPath_absolutePathOnCDrive_Error
+
     path = "C:\test1\test2"
     convertedPath = vtkGitConvertWinPath(path)
     mAssert.Equals convertedPath, Chr(34) & "/test1/test2" & Chr(34), "Path must be correctly transformed."
+
+    On Error GoTo 0
+    Exit Sub
+
+Test_vtkGitConvertWinPath_absolutePathOnCDrive_Error:
+    Debug.Print "Error " & Err.Number & " (" & Err.Description & ") in procedure Test_vtkGitConvertWinPath_absolutePathOnCDrive of Class Module vtkGitFunctionsTester"
+    Resume Next
 End Sub
 
 Public Sub Test_vtkGitConvertWinPath_absolutePathOnOneLetterDriveNotC()
@@ -163,7 +237,11 @@ Public Sub Test_vtkGitConvertWinPath_absolutePathOnOneLetterDriveNotC()
     
     mAssert.Equals error, VTK_FORBIDDEN_PARAMETER
     
+    On Error GoTo 0
+    Exit Sub
+    
 errHandler:
+    'Debug.Print "EXPECTED Error " & Err.Number & " (" & Err.Description & ") in procedure Test_vtkInitializeGit_wrongPathFile of Class Module vtkGitFunctionsTester"
     error = Err.Number
     Resume Next
     
@@ -181,7 +259,11 @@ Public Sub Test_vtkGitConvertWinPath_absolutePathOnSeveralLettersDrive()
     
     mAssert.Equals error, VTK_FORBIDDEN_PARAMETER
     
+    On Error GoTo 0
+    Exit Sub
+    
 errHandler:
+    'Debug.Print "EXPECTED Error " & Err.Number & " (" & Err.Description & ") in procedure Test_vtkGitConvertWinPath_absolutePathOnSeveralLettersDrive of Class Module vtkGitFunctionsTester"
     error = Err.Number
     Resume Next
     
@@ -199,7 +281,11 @@ Public Sub Test_vtkGitConvertWinPath_relativePath()
     
     mAssert.Equals error, VTK_FORBIDDEN_PARAMETER
     
+    On Error GoTo 0
+    Exit Sub
+    
 errHandler:
+    'Debug.Print "EXPECTED Error " & Err.Number & " (" & Err.Description & ") in procedure Test_vtkGitConvertWinPath_relativePath of Class Module vtkGitFunctionsTester"
     error = Err.Number
     Resume Next
     

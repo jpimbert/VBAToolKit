@@ -115,12 +115,12 @@ Public Sub Test_vtkCleanFolder_correctPathAreFoldersDeleted()
     Dim fso As New Scripting.FileSystemObject
     Dim testFolder As Scripting.Folder
 
-    Set testFolder = fso.GetFolder(vtkTestPath & "\" & "testFolder0")
+    Set testFolder = fso.GetFolder(vtkTestPath)
 
     vtkCleanFolder (testFolder.path)
     
     ' (testFolder.SubFolders.Count = 0) And (testFolder.Files.Count = 0) does look at the hidden files.
-    mAssert.Should (testFolder.SubFolders.Count = 0) And (testFolder.Files.Count = 0) = True, "All files and folders must be deleted"
+    mAssert.Should (testFolder.SubFolders.Count = 0) And (testFolder.Files.Count = 0), "All files and folders must be deleted"
 End Sub
 '
 Public Sub Test_vtkCleanFolder_correctPathReturnValue()
