@@ -84,6 +84,8 @@ Public Function vtkCreateProject(path As String, name As String, Optional displa
     Workbooks(project.workbookName).Close savechanges:=True
     
     Workbooks(project.workbookDEVName).Activate
+    ' Get VBAUnit modules from VBAToolkit (This workbook = current running code)
+    vtkExportModulesFromAnotherProject projectWithModules:=ThisWorkbook.VBProject, projectName:=project.projectName, confName:=project.projectDEVName
     '
     '            RetVtkExportAll = vtkExportAll(ThisWorkbook.name)
     '            RetValImportTestConf = vtkImportTestConfig()

@@ -156,6 +156,7 @@ returnvalue = vtkCreateProject(path:=vtkTestPath, name:=vtkTestProjectName, disp
     Next
 mAssert.Equals j, 2, "the references number must be equal to" & i + 2
 End Sub
+
 Public Sub TestReferencesOfDeliveryWorkbookWasActivated()
  Dim returnvalue As Long
  Dim i As Integer
@@ -174,31 +175,15 @@ returnvalue = vtkCreateProject(path:=vtkTestPath, name:=vtkTestProjectName, disp
 mAssert.Equals j, 2, "the references number must be equal to" & i + 2
 End Sub
 
-'Public Sub TestDevWorkbookPathCorrectlyWritted()
-''test that path  of dev workbook is correctly writted on configuration sheet
-'    returnvalue = vtkCreateProject(path:=vtkTestPath, name:=vtkTestProjectName, displayError:=False)
-'    mAssert.Equals ActiveWorkbook.Sheets(vtkConfSheet).Range(vtkModuleDevRange & vtkFirstLine - 2), Workbooks(vtkTestProjectName & ".xlsm").FullNameURLEncoded
-'End Sub
-'Public Sub TestDevWorkbookNameCorrectlyWritted()
-''test that name  of dev workbook is correctly writted  on configuration sheet
-'    returnvalue = vtkCreateProject(path:=vtkTestPath, name:=vtkTestProjectName, displayError:=False)
-'    mAssert.Equals ActiveWorkbook.Sheets(vtkConfSheet).Range(vtkModuleDevRange & vtkFirstLine - 3), Workbooks(vtkTestProjectName & ".xlsm").name
-'End Sub
-'Public Sub TestDeliveryWorkbookPathCorrectlyWritted()
-''test that path  of delivery workbook is correctly writted on configuration sheet
-'    returnvalue = vtkCreateProject(path:=vtkTestPath, name:=vtkTestProjectName, displayError:=False)
-'    mAssert.Equals ActiveWorkbook.Sheets(vtkConfSheet).Range(vtkModuleDeliveryRange & vtkFirstLine - 2), Workbooks(vtkTestProjectName & ".xlsm").FullNameURLEncoded
-'End Sub
-'Public Sub TestDeliveryWorkbookNameCorrectlyWritted()
-''test that name  of delivery workbook is correctly writted on configuration sheet
-'    returnvalue = vtkCreateProject(path:=vtkTestPath, name:=vtkTestProjectName, displayError:=False)
-'    mAssert.Equals ActiveWorkbook.Sheets(vtkConfSheet).Range(vtkModuleDeliveryRange & vtkFirstLine - 3), Workbooks(vtkTestProjectName & ".xlsm").name
-'End Sub
-'Public Sub TestDevWorkbookIsActive()
-''test that active workbook is the dev one and not delivery
-'    returnvalue = vtkCreateProject(path:=vtkTestPath, name:=vtkTestProjectName, displayError:=False)
-'    mAssert.Equals ActiveWorkbook.name, vtkTestProjectName & ".xlsm", "the dev workbook must be active"
-'End Sub
+Public Sub Test_VBAUnitModulesExportation()
+    '   Verify that VBA modules are exported from VBAToolkit to the new project
+    Dim returnvalue As Long, fso As New FileSystemObject
+    
+    returnvalue = vtkCreateProject(path:=vtkTestPath, name:=vtkTestProjectName, displayError:=False)
+    
+    mAssert.Should fso.FileExists(vtkTestPath & "\" & vtkTestProjectName & "\" & "Source\VbaUnit\" & "VbaUnitMain.bas"), "VBAUnitMain module have to be exported"
+
+End Sub
 'Public Sub TestExportVbaUnitModule()
 '  'test that exported file was not empty , files was correctly named
 '  'the test will compare "vbaunit" file of vbatoolkit and exported file
@@ -247,6 +232,7 @@ Private Function ITest_Suite() As TestSuite
     ITest_Suite.AddTest ITest_Manager.ClassName, "TestDelivProjectIsNamedcorrectly"
     ITest_Suite.AddTest ITest_Manager.ClassName, "TestReferencesOfDevWorkbookWasActivated"
     ITest_Suite.AddTest ITest_Manager.ClassName, "TestReferencesOfDeliveryWorkbookWasActivated"
+    ITest_Suite.AddTest ITest_Manager.ClassName, "Test_VBAUnitModulesExportation"
 End Function
 
 Private Sub ITestCase_RunTest()
@@ -261,6 +247,7 @@ Private Sub ITestCase_RunTest()
         Case "TestDelivProjectIsNamedcorrectly": TestDelivProjectIsNamedcorrectly
         Case "TestReferencesOfDevWorkbookWasActivated": TestReferencesOfDevWorkbookWasActivated
         Case "TestReferencesOfDeliveryWorkbookWasActivated": TestReferencesOfDeliveryWorkbookWasActivated
+        Case "Test_VBAUnitModulesExportation": Test_VBAUnitModulesExportation
         Case Else: mAssert.Should False, "Invalid test name: " & mManager.methodName
     End Select
 End Sub

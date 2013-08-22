@@ -250,7 +250,7 @@ End Sub
 '---------------------------------------------------------------------------------------
 '
 Public Sub vtkExportOneModule(project As VBProject, moduleName As String, filePath As String)
-    Dim fso As FileSystemObject, m As VBComponent
+    Dim fso As New FileSystemObject, m As VBComponent
     
    On Error GoTo vtkExportOneModule_Error
    
@@ -272,6 +272,41 @@ vtkExportOneModule_Error:
        Else
         err.Raise Number:=VTK_UNEXPECTED_ERROR, source:="ExportOneModule", Description:="Unexpected error when exporting " & moduleName & " : " & err.Description
     End If
+End Sub
+
+'---------------------------------------------------------------------------------------
+' Procedure : vtkExportModulesFromAnotherProject
+' Author    : Jean-Pierre Imbert
+' Date      : 22/08/2013
+' Purpose   : Export modules listed in a configuration for a project
+'             - the project/configuration containing the modules list are projectName/confName parameters
+'             - the modules are extracted from project projectWithModules
+'             - the modules are exported to pathes listed in project/configuration
+' NOTE      : Used to get VBAUnit modules (and libs ?) when creating a project
+'---------------------------------------------------------------------------------------
+'
+Public Sub vtkExportModulesFromAnotherProject(projectWithModules As VBProject, projectName As String, confName As String)
+    Dim cm As vtkConfigurationManager, rootPath As String
+    Dim cn As Integer, filePath As String, i As Integer
+    
+   On Error GoTo vtkExportModulesFromAnotherProject_Error
+
+    ' Get the project and the rootPath of the project
+    Set cm = vtkConfigurationManagerForProject(projectName)
+    cn = cm.getConfigurationNumber(configuration:=confName)
+    rootPath = cm.rootPath
+    
+    ' Export all modules for this configuration from the projectWithModules
+    For i = 1 To cm.moduleCount
+        filePath = cm.getModulePathWithNumber(numModule:=i, numConfiguration:=cn)
+        If Not filePath Like "" Then vtkExportOneModule project:=projectWithModules, moduleName:=cm.module(i), filePath:=rootPath & "\" & filePath
+    Next i
+    
+   On Error GoTo 0
+   Exit Sub
+
+vtkExportModulesFromAnotherProject_Error:
+    err.Raise VTK_UNEXPECTED_ERROR, "vtkExportModulesFromAnotherProject", "Unexpected error when exporting modules from " & projectWithModules.name & " : " & err.Description
 End Sub
 
 '---------------------------------------------------------------------------------------
