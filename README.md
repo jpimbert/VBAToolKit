@@ -13,6 +13,9 @@ Currently, its main feature is to ease the management of different configuration
 VBA modules are stored separately in text files, consistent versioning is made possible. 
 Though, VBATookit does not integrate any versioning system ; using a third party software such as Git in the project directory is the way.
 
+**Team collaborative development**
+Excel files can be regenerated from the text source code under version management. This facilitates the merge operations and thus the team collaborative development.
+
 **Facilitating Test Driven Development**  
 VBAToolkit integrates the open-source unit-testing VBAUnit framework to encourage and facilitate Test Driven Development, an healthy development method.
 
