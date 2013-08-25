@@ -22,12 +22,7 @@ VBAToolkit integrates the open-source unit-testing VBAUnit framework to encourag
 **Convenient interface**  
 A toolbar in Excel and several automatic functions provide easy access to these features.
 
-**Further reading**
-
-1. understand VBAToolKit
-1. [how to install VBAToolKit?](https://github.com/jpimbert/VBAToolKit/wiki/VbaToolKit-SetUp)
-1. how to use VBAToolKit?
-1. how to modify or contribute to VBAToolKit?
+[Further reading](https://github.com/jpimbert/VBAToolKit/wiki)
 
 ---------
 
