@@ -50,7 +50,7 @@ Public Sub Test_vtkInitializeGit_correctPathExistenceOfDotGitFolder()
     Exit Sub
 
 Test_vtkInitializeGit_correctPathExistenceOfDotGitFolder_Error:
-    Debug.Print "Error " & Err.Number & " (" & Err.Description & ") in procedure Test_vtkInitializeGit_correctPathExistenceOfDotGitFolder of Class Module vtkGitFunctionsTester"
+    Debug.Print "Error " & Err.number & " (" & Err.Description & ") in procedure Test_vtkInitializeGit_correctPathExistenceOfDotGitFolder of Class Module vtkGitFunctionsTester"
     Resume Next
 End Sub
 
@@ -65,7 +65,7 @@ Public Sub Test_vtkInitializeGit_correctPathRetVal()
     Exit Sub
 
 Test_vtkInitializeGit_correctPathRetVal_Error:
-    Debug.Print "Error " & Err.Number & " (" & Err.Description & ") in procedure Test_vtkInitializeGit_correctPathRetVal of Class Module vtkGitFunctionsTester"
+    Debug.Print "Error " & Err.number & " (" & Err.Description & ") in procedure Test_vtkInitializeGit_correctPathRetVal of Class Module vtkGitFunctionsTester"
     Resume Next
 End Sub
 
@@ -84,7 +84,7 @@ Public Sub Test_vtkInitializeGit_correctPathReInitializeRetVal()
     
 errHandler:
     'Debug.Print "EXPECTED Error " & Err.Number & " (" & Err.Description & ") in procedure Test_vtkInitializeGit_correctPathReInitializeRetVal of Class Module vtkGitFunctionsTester"
-    error = Err.Number
+    error = Err.number
     Resume Next
 End Sub
 
@@ -102,7 +102,7 @@ Public Sub Test_vtkInitializeGit_wrongPathUnexistingFolder()
     
 errHandler:
     'Debug.Print "EXPECTED Error " & Err.Number & " (" & Err.Description & ") in procedure Test_vtkInitializeGit_wrongPathUnexistingFolder of Class Module vtkGitFunctionsTester"
-    error = Err.Number
+    error = Err.number
     Resume Next
     
 End Sub
@@ -121,7 +121,7 @@ Public Sub Test_vtkInitializeGit_wrongPathFile()
     
 errHandler:
     'Debug.Print "EXPECTED Error " & Err.Number & " (" & Err.Description & ") in procedure Test_vtkInitializeGit_wrongPathFile of Class Module vtkGitFunctionsTester"
-    error = Err.Number
+    error = Err.number
     Resume Next
 End Sub
 
@@ -139,7 +139,7 @@ Public Sub Test_vtkInitializeGit_forbiddenPath1()
     
 errHandler:
     'Debug.Print "EXPECTED Error " & Err.Number & " (" & Err.Description & ") in procedure Test_vtkInitializeGit_forbiddenPath1 of Class Module vtkGitFunctionsTester"
-    error = Err.Number
+    error = Err.number
     Resume Next
     
 End Sub
@@ -158,7 +158,7 @@ Public Sub Test_vtkInitializeGit_forbiddenPath2()
     
 errHandler:
     'Debug.Print "EXPECTED Error " & Err.Number & " (" & Err.Description & ") in procedure Test_vtkInitializeGit_forbiddenPath2 of Class Module vtkGitFunctionsTester"
-    error = Err.Number
+    error = Err.number
     Resume Next
     
 End Sub
@@ -174,7 +174,7 @@ Public Sub Test_vtkInitializeGit_correctPathLogFileIsDeleted()
     Exit Sub
 
 Test_vtkInitializeGit_correctPathLogFileIsDeleted_Error:
-    Debug.Print "Error " & Err.Number & " (" & Err.Description & ") in procedure Test_vtkInitializeGit_correctPathLogFileIsDeleted of Class Module vtkGitFunctionsTester"
+    Debug.Print "Error " & Err.number & " (" & Err.Description & ") in procedure Test_vtkInitializeGit_correctPathLogFileIsDeleted of Class Module vtkGitFunctionsTester"
     Resume Next
 End Sub
 
@@ -189,7 +189,7 @@ Public Sub Test_vtkInitializeGit_correctPathCustomLogFileReturnValue()
     Exit Sub
 
 Test_vtkInitializeGit_correctPathCustomLogFileReturnValue_Error:
-    Debug.Print "Error " & Err.Number & " (" & Err.Description & ") in procedure Test_vtkInitializeGit_correctPathCustomLogFileReturnValue of Class Module vtkGitFunctionsTester"
+    Debug.Print "Error " & Err.number & " (" & Err.Description & ") in procedure Test_vtkInitializeGit_correctPathCustomLogFileReturnValue of Class Module vtkGitFunctionsTester"
     Resume Next
 End Sub
 
@@ -204,7 +204,7 @@ Public Sub Test_vtkInitializeGit_correctPathCustomLogFileExists()
     Exit Sub
 
 Test_vtkInitializeGit_correctPathCustomLogFileExists_Error:
-    Debug.Print "Error " & Err.Number & " (" & Err.Description & ") in procedure Test_vtkInitializeGit_correctPathCustomLogFileExists of Class Module vtkGitFunctionsTester"
+    Debug.Print "Error " & Err.number & " (" & Err.Description & ") in procedure Test_vtkInitializeGit_correctPathCustomLogFileExists of Class Module vtkGitFunctionsTester"
     Resume Next
 End Sub
 
@@ -221,7 +221,7 @@ Public Sub Test_vtkGitConvertWinPath_absolutePathOnCDrive()
     Exit Sub
 
 Test_vtkGitConvertWinPath_absolutePathOnCDrive_Error:
-    Debug.Print "Error " & Err.Number & " (" & Err.Description & ") in procedure Test_vtkGitConvertWinPath_absolutePathOnCDrive of Class Module vtkGitFunctionsTester"
+    Debug.Print "Error " & Err.number & " (" & Err.Description & ") in procedure Test_vtkGitConvertWinPath_absolutePathOnCDrive of Class Module vtkGitFunctionsTester"
     Resume Next
 End Sub
 
@@ -242,7 +242,7 @@ Public Sub Test_vtkGitConvertWinPath_absolutePathOnOneLetterDriveNotC()
     
 errHandler:
     'Debug.Print "EXPECTED Error " & Err.Number & " (" & Err.Description & ") in procedure Test_vtkInitializeGit_wrongPathFile of Class Module vtkGitFunctionsTester"
-    error = Err.Number
+    error = Err.number
     Resume Next
     
 End Sub
@@ -264,7 +264,7 @@ Public Sub Test_vtkGitConvertWinPath_absolutePathOnSeveralLettersDrive()
     
 errHandler:
     'Debug.Print "EXPECTED Error " & Err.Number & " (" & Err.Description & ") in procedure Test_vtkGitConvertWinPath_absolutePathOnSeveralLettersDrive of Class Module vtkGitFunctionsTester"
-    error = Err.Number
+    error = Err.number
     Resume Next
     
 End Sub
@@ -286,10 +286,44 @@ Public Sub Test_vtkGitConvertWinPath_relativePath()
     
 errHandler:
     'Debug.Print "EXPECTED Error " & Err.Number & " (" & Err.Description & ") in procedure Test_vtkGitConvertWinPath_relativePath of Class Module vtkGitFunctionsTester"
-    error = Err.Number
+    error = Err.number
     Resume Next
     
 End Sub
+
+Public Sub Test_vtkInitializeGit_correctPathGitExcludeContentIsRight()
+
+    Dim fileContent As String
+    Dim expectedContent As String
+    Dim fso As New FileSystemObject
+
+    On Error GoTo Test_vtkInitializeGit_correctPathGitExcludeContentIsRight_Error
+
+    vtkInitializeGit vtkTestPath
+    
+    fileContent = vtkTextFileReader(vtkTestPath & "\.git\info\exclude")
+    
+    expectedContent = _
+    "# Ignore the content of the Tests and GitLog folders" & Chr(10) & _
+    "/Tests/*" & Chr(10) & _
+    "/GitLog/*" & Chr(10) & _
+    Chr(10) & _
+    "# Ignore the temporary Excel files" & Chr(10) & _
+    "/Project/~*" & Chr(10) & _
+    Chr(10) & _
+    "# Ignore the delivery Excel files" & Chr(10) & _
+    "/Delivery/*.xlsm"
+    
+    mAssert.Equals StrComp(fileContent, expectedContent), True
+
+    On Error GoTo 0
+    Exit Sub
+
+Test_vtkInitializeGit_correctPathGitExcludeContentIsRight_Error:
+    Debug.Print "Error " & Err.number & " (" & Err.Description & ") in procedure Test_vtkInitializeGit_correctPathGitExcludeContentIsRight of Class Module vtkGitFunctionsTester"
+    Resume Next
+End Sub
+
 
 Private Function ITest_Suite() As TestSuite
     Set ITest_Suite = New TestSuite
@@ -307,6 +341,7 @@ Private Function ITest_Suite() As TestSuite
     ITest_Suite.AddTest ITest_Manager.ClassName, "Test_vtkGitConvertWinPath_absolutePathOnOneLetterDriveNotC"
     ITest_Suite.AddTest ITest_Manager.ClassName, "Test_vtkGitConvertWinPath_absolutePathOnSeveralLettersDrive"
     ITest_Suite.AddTest ITest_Manager.ClassName, "Test_vtkGitConvertWinPath_relativePath"
+    ITest_Suite.AddTest ITest_Manager.ClassName, "Test_vtkInitializeGit_correctPathGitExcludeContentIsRight"
 End Function
 
 Private Sub ITestCase_RunTest()
@@ -325,6 +360,7 @@ Private Sub ITestCase_RunTest()
         Case "Test_vtkGitConvertWinPath_absolutePathOnOneLetterDriveNotC": Test_vtkGitConvertWinPath_absolutePathOnOneLetterDriveNotC
         Case "Test_vtkGitConvertWinPath_absolutePathOnSeveralLettersDrive": Test_vtkGitConvertWinPath_absolutePathOnSeveralLettersDrive
         Case "Test_vtkGitConvertWinPath_relativePath": Test_vtkGitConvertWinPath_relativePath
+        Case "Test_vtkInitializeGit_correctPathGitExcludeContentIsRight": Test_vtkInitializeGit_correctPathGitExcludeContentIsRight
         Case Else: mAssert.Should False, "Invalid test name: " & mManager.methodName
     End Select
 End Sub

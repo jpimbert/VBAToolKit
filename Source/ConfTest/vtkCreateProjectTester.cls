@@ -161,6 +161,7 @@ Public Sub Test_vtkCreateProject_correctPathGitFolderIsCreated()
     On Error GoTo Test_vtkCreateProject_correctPathGitFolderIsCreated_Error
 
     vtkCreateProject vtkTestPath, vtkTestProjectName, displayError:=False
+    
     mAssert.Should fso.FolderExists(vtkTestPath & "\" & vtkTestProjectName & "\.git"), ".git folder should be created."
 
     On Error GoTo 0
@@ -171,85 +172,6 @@ Test_vtkCreateProject_correctPathGitFolderIsCreated_Error:
     Resume Next
 End Sub
 
-
-Public Sub Test_vtkCreateProject_correctPathGitIgnoreIsCreated()
-
-    Dim fso As New FileSystemObject
-
-    On Error GoTo Test_vtkCreateProject_correctPathGitIgnoreIsCreated_Error
-
-    vtkCreateProject vtkTestPath, vtkTestProjectName, displayError:=False
-    mAssert.Should fso.FileExists(vtkTestPath & "\" & vtkTestProjectName & "\.gitignore"), ".gitignore file should be created."
-
-    On Error GoTo 0
-    Exit Sub
-
-Test_vtkCreateProject_correctPathGitIgnoreIsCreated_Error:
-    Debug.Print "Error " & Err.Number & " (" & Err.Description & ") in procedure Test_vtkCreateProject_gitIgnoreIsCreated of Class Module vtkCreateProjectTester"
-    Resume Next
-End Sub
-
-
-'Public Sub TestDevWorkbookPathCorrectlyWritted()
-''test that path  of dev workbook is correctly writted on configuration sheet
-'    returnvalue = vtkCreateProject(path:=vtkTestPath, name:=vtkTestProjectName, displayError:=False)
-'    mAssert.Equals ActiveWorkbook.Sheets(vtkConfSheet).Range(vtkModuleDevRange & vtkFirstLine - 2), Workbooks(vtkTestProjectName & ".xlsm").FullNameURLEncoded
-'End Sub
-'Public Sub TestDevWorkbookNameCorrectlyWritted()
-''test that name  of dev workbook is correctly writted  on configuration sheet
-'    returnvalue = vtkCreateProject(path:=vtkTestPath, name:=vtkTestProjectName, displayError:=False)
-'    mAssert.Equals ActiveWorkbook.Sheets(vtkConfSheet).Range(vtkModuleDevRange & vtkFirstLine - 3), Workbooks(vtkTestProjectName & ".xlsm").name
-'End Sub
-'Public Sub TestDeliveryWorkbookPathCorrectlyWritted()
-''test that path  of delivery workbook is correctly writted on configuration sheet
-'    returnvalue = vtkCreateProject(path:=vtkTestPath, name:=vtkTestProjectName, displayError:=False)
-'    mAssert.Equals ActiveWorkbook.Sheets(vtkConfSheet).Range(vtkModuleDeliveryRange & vtkFirstLine - 2), Workbooks(vtkTestProjectName & ".xlsm").FullNameURLEncoded
-'End Sub
-'Public Sub TestDeliveryWorkbookNameCorrectlyWritted()
-''test that name  of delivery workbook is correctly writted on configuration sheet
-'    returnvalue = vtkCreateProject(path:=vtkTestPath, name:=vtkTestProjectName, displayError:=False)
-'    mAssert.Equals ActiveWorkbook.Sheets(vtkConfSheet).Range(vtkModuleDeliveryRange & vtkFirstLine - 3), Workbooks(vtkTestProjectName & ".xlsm").name
-'End Sub
-'Public Sub TestDevWorkbookIsActive()
-''test that active workbook is the dev one and not delivery
-'    returnvalue = vtkCreateProject(path:=vtkTestPath, name:=vtkTestProjectName, displayError:=False)
-'    mAssert.Equals ActiveWorkbook.name, vtkTestProjectName & ".xlsm", "the dev workbook must be active"
-'End Sub
-'Public Sub TestExportVbaUnitModule()
-'  'test that exported file was not empty , files was correctly named
-'  'the test will compare "vbaunit" file of vbatoolkit and exported file
-'  Dim fs As Object
-'  Set fs = CreateObject("Scripting.FileSystemObject")
-'
-'  'call create project function
-'  returnvalue = vtkCreateProject(path:=vtkTestPath, name:=vtkTestProjectName, displayError:=False)
-'  'vbaunit files of vbatoolkit project
-'  sourceVbaUnitFile = Dir(vtkInstallPath & "\source\VbaUnit\*.*", vbDirectory)
-'
-' 'list of files in the folder
-' Do While sourceVbaUnitFile <> ""
-'    'ignore these two name
-'    If sourceVbaUnitFile <> "." And sourceVbaUnitFile <> ".." Then
-'      'test that exported files was not empty
-'       mAssert.Should IsEmpty(vtkTestPath & "\" & vtkTestProjectName & "\source\VbaUnit\" & sourceVbaUnitFile) = False, sourceVbaUnitFile & "should not be empty"
-'      'test name, extension, and the existence of the file in the created project
-'       mAssert.Should fs.FileExists(vtkTestPath & "\" & vtkTestProjectName & "\source\VbaUnit\" & sourceVbaUnitFile) = True, sourceVbaUnitFile & "must exist"
-'    End If
-'  'point to the next element
-'  sourceVbaUnitFile = Dir
-' Loop
-'
-'End Sub
-'Public Sub TestImportModules()
-''test that modules was imported to the test workbook
-'Dim returnvalue As String
-'Dim NbrMod1 As Integer
-'
-'    returnvalue = vtkCreateProject(path:=vtkTestPath, name:=vtkTestProjectName, displayError:=False)
-'    NbrMod1 = Workbooks(vtkTestProjectName & ".xlsm").VBProject.VBComponents.Count
-''18 vbaunitmodule + 4 default module (4sheets + 1 workbook )
-'mAssert.Equals NbrMod1, 18 + 4 + 1, "18 modules must be imported"
-'End Sub
 
 Private Function ITest_Suite() As TestSuite
     Set ITest_Suite = New TestSuite
@@ -264,7 +186,6 @@ Private Function ITest_Suite() As TestSuite
     ITest_Suite.AddTest ITest_Manager.ClassName, "TestReferencesOfDevWorkbookWasActivated"
     ITest_Suite.AddTest ITest_Manager.ClassName, "TestReferencesOfDeliveryWorkbookWasActivated"
     ITest_Suite.AddTest ITest_Manager.ClassName, "Test_vtkCreateProject_correctPathGitFolderIsCreated"
-    ITest_Suite.AddTest ITest_Manager.ClassName, "Test_vtkCreateProject_correctPathGitIgnoreIsCreated"
 End Function
 
 Private Sub ITestCase_RunTest()
@@ -280,7 +201,6 @@ Private Sub ITestCase_RunTest()
         Case "TestReferencesOfDevWorkbookWasActivated": TestReferencesOfDevWorkbookWasActivated
         Case "TestReferencesOfDeliveryWorkbookWasActivated": TestReferencesOfDeliveryWorkbookWasActivated
         Case "Test_vtkCreateProject_correctPathGitFolderIsCreated": Test_vtkCreateProject_correctPathGitFolderIsCreated
-        Case "Test_vtkCreateProject_correctPathGitIgnoreIsCreated": Test_vtkCreateProject_correctPathGitIgnoreIsCreated
         Case Else: mAssert.Should False, "Invalid test name: " & mManager.methodName
     End Select
 End Sub

@@ -18,6 +18,12 @@ Option Explicit
 '               whose path has to be passed as parameter.
 '               If the path is absolute, a drive other than C: will raise an error
 '               If the path is relative, it will be considered as relatie to the folder path.
+'             - Delete the previous $GIT_FOLDER/info/exclude file and creates a new one
+'               that excludes :
+'               - the content of the $VTK_PROJECT_FOLDER/Tests
+'               - the content of the $VTK_PROJECT_FOLDER/GitLog
+'               - the temporary files in $VTK_PROJECT_FOLDER/Project
+'               - the Excel files in $VTK_PROJECT_FOLDER/Delivery
 '             - Adds all the files in the directory to the git repository.
 ' Notes     : Raise errors
 '               - VTK_WRONG_FOLDER_PATH
@@ -35,6 +41,9 @@ Public Function vtkInitializeGit(folderPath As String, Optional logFile As Strin
     
     Dim convertedFolderPath As String
     Dim convertedLogFilePath As String
+    
+    Dim fso As New FileSystemObject
+    Dim contentStream As TextStream
     
     On Error GoTo vtkInitializeGit_Err
         
@@ -85,6 +94,22 @@ Public Function vtkInitializeGit(folderPath As String, Optional logFile As Strin
         Kill folderPath & "\" & tmpLogFileName
     End If
     
+    ' Delete the default git exclude file
+    fso.DeleteFile folderPath & "\.git\info\exclude", True
+    
+    ' Create it again and fill it with the content we want.
+    Set contentStream = fso.CreateTextFile(folderPath & "\.git\info\exclude")
+    contentStream.WriteLine "# Ignore the content of the Tests and GitLog folders"
+    contentStream.WriteLine "/Tests/*"
+    contentStream.WriteLine "/GitLog/*"
+    contentStream.WriteLine
+    contentStream.WriteLine "# Ignore the temporary Excel files"
+    contentStream.WriteLine "/Project/~*"
+    contentStream.WriteLine
+    contentStream.WriteLine "# Ignore the delivery Excel files"
+    contentStream.WriteLine "/Delivery/*.xlsm"
+    contentStream.Close
+    
     ' Adds all the files in the folder tree to the git repository
     ShellAndWait "cmd.exe /c cd " & folderPath & " & git add " & ". ", 0, vbHide, AbandonWait
      
@@ -94,17 +119,17 @@ Public Function vtkInitializeGit(folderPath As String, Optional logFile As Strin
     
     
 vtkInitializeGit_Err:
-    If ((Err.Number = VTK_GIT_NOT_INSTALLED) _
-        Or (Err.Number = VTK_GIT_ALREADY_INITIALIZED_IN_FOLDER) _
-        Or (Err.Number = VTK_FORBIDDEN_PARAMETER) _
-        Or (Err.Number = VTK_GIT_PROBLEM_DURING_INITIALIZATION) _
-        Or (Err.Number = VTK_WRONG_FOLDER_PATH)) Then
-        Err.Raise Err.Number, "Module vktGitFuntions : Function vtkGitInitialize", Err.Description
+    If ((Err.number = VTK_GIT_NOT_INSTALLED) _
+        Or (Err.number = VTK_GIT_ALREADY_INITIALIZED_IN_FOLDER) _
+        Or (Err.number = VTK_FORBIDDEN_PARAMETER) _
+        Or (Err.number = VTK_GIT_PROBLEM_DURING_INITIALIZATION) _
+        Or (Err.number = VTK_WRONG_FOLDER_PATH)) Then
+        Err.Raise Err.number, "Module vktGitFuntions : Function vtkGitInitialize", Err.Description
     Else
-        'Debug.Print "ERR IN INITIALIZE : " & err.Number & err.Description
+        Debug.Print "ERR IN INITIALIZE : " & Err.number & Err.Description
         Err.Raise VTK_UNEXPECTED_ERROR, "Module vktGitFuntions : Function vtkGitInitialize", Err.Description
     End If
-    
+     
     Exit Function
 
 End Function
@@ -150,8 +175,8 @@ Public Function vtkGitConvertWinPath(winPath As String) As String
     
 
 vtkGitConvertWinPath_Error:
-    If (Err.Number = VTK_FORBIDDEN_PARAMETER) Then
-        Err.Raise Err.Number, "Module vtkGitFunctions ; Function vtkGitConvertWinPath", Err.Description
+    If (Err.number = VTK_FORBIDDEN_PARAMETER) Then
+        Err.Raise Err.number, "Module vtkGitFunctions ; Function vtkGitConvertWinPath", Err.Description
     Else
         'Debug.Print "ERR IN CONVERT : " & Err.Number & Err.Description
         Err.Raise VTK_UNEXPECTED_ERROR, "Module vtkGitFunctions ; Function vtkGitConvertWinPath", Err.Description

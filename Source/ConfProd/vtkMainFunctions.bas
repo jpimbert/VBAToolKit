@@ -44,7 +44,7 @@ Public Function vtkCreateProject(path As String, name As String, Optional displa
     
     ' Create tree folder
     Dim internalError As Long
-    internalError = vtkCreateTreeFolderWithGitIgnore(rootPath)
+    internalError = vtkCreateTreeFolder(rootPath)
     If internalError <> VTK_OK Then GoTo vtkCreateProject_ErrorTreeFolder
      
     'Save created project with xlsm extention
@@ -73,14 +73,22 @@ Public Function vtkCreateProject(path As String, name As String, Optional displa
     '
     '            RetVtkExportAll = vtkExportAll(ThisWorkbook.name)
     '            RetValImportTestConf = vtkImportTestConfig()
+    
+    On Error GoTo vtkCreateProject_ErrorGit
+    vtkInitializeGit rootPath
+    
     On Error GoTo 0
     vtkCreateProject = 0
     Exit Function
 vtkCreateProject_ErrorTreeFolder:
     vtkCreateProject = internalError
-    If displayError Then MsgBox "Error " & Err.Number & " (" & Err.Description & ") in procedure vtkCreateProject of Module MainFunctions"
+    If displayError Then MsgBox "Error " & Err.number & " (" & Err.Description & ") in procedure vtkCreateProject of Module MainFunctions"
     Exit Function
 vtkCreateProject_Error:
-    vtkCreateProject = Err.Number
-    If displayError Then MsgBox "Error " & Err.Number & " (" & Err.Description & ") in procedure vtkCreateProject of Module MainFunctions"
+    vtkCreateProject = Err.number
+    If displayError Then MsgBox "Error " & Err.number & " (" & Err.Description & ") in procedure vtkCreateProject of Module MainFunctions"
+vtkCreateProject_ErrorGit:
+    vtkCreateProject = Err.number
+    If displayError Then MsgBox "Error " & Err.number & " (" & Err.Description & ") in procedure vtkCreateProject of Module MainFunctions"
+
 End Function
