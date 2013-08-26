@@ -7,6 +7,27 @@ Attribute VB_GlobalNameSpace = False
 Attribute VB_Creatable = False
 Attribute VB_PredeclaredId = False
 Attribute VB_Exposed = False
+'---------------------------------------------------------------------------------------
+' Module    : vtkConfigurationManagersTester
+' Author    : Jean-Pierre Imbert
+' Date      : 21/08/2013
+' Purpose   : Test the vtkConfigurationManagers module capacities
+'
+' Copyright 2013 Skwal-Soft (http://skwalsoft.com)
+'
+'   Licensed under the Apache License, Version 2.0 (the "License");
+'   you may not use this file except in compliance with the License.
+'   You may obtain a copy of the License at
+'
+'       http://www.apache.org/licenses/LICENSE-2.0
+'
+'   Unless required by applicable law or agreed to in writing, software
+'   distributed under the License is distributed on an "AS IS" BASIS,
+'   WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+'   See the License for the specific language governing permissions and
+'   limitations under the License.
+'---------------------------------------------------------------------------------------
+
 Option Explicit
 Implements ITest
 Implements ITestCase
@@ -79,7 +100,7 @@ Public Sub TestInoperantProjectConfigurationSheetInitializationForExistingProjec
     
     ' Active an existing VBAToolKit project
     vtkCloseAndKillWorkbook wb:=wbForTest
-    Set wbForTest = Workbooks.Open(Filename:=vtkPathToTestFolder & "\" & existingWorkbookName)
+    Set wbForTest = Workbooks.Open(fileName:=vtkPathToTestFolder & "\" & existingWorkbookName)
     
     ' Try to Initialize workbook
     vtkInitializeConfigurationForActiveWorkBook
@@ -95,7 +116,7 @@ Public Sub TestProjectNameAfterProjectConfigurationSheetInitialization()
     
     ' Open uninitialized workbook
     vtkCloseAndKillWorkbook wb:=wbForTest
-    Set wbForTest = Workbooks.Open(Filename:=vtkPathToTestFolder & "\" & uninitializedWorkbookName)
+    Set wbForTest = Workbooks.Open(fileName:=vtkPathToTestFolder & "\" & uninitializedWorkbookName)
     
     ' Initialize workbook
     vtkInitializeConfigurationForActiveWorkBook
@@ -111,7 +132,7 @@ Public Sub TestWorkbookNameAfterProjectConfigurationSheetInitialization()
     
     ' Open uninitialized workbook
     vtkCloseAndKillWorkbook wb:=wbForTest
-    Set wbForTest = Workbooks.Open(Filename:=vtkPathToTestFolder & "\" & uninitializedWorkbookName)
+    Set wbForTest = Workbooks.Open(fileName:=vtkPathToTestFolder & "\" & uninitializedWorkbookName)
     
     ' Initialize workbook
     vtkInitializeConfigurationForActiveWorkBook
@@ -128,7 +149,7 @@ Public Sub TestConfigurationAfterProjectConfigurationSheetInitialization()
     ' Open uninitialized workbook
     Dim pName As String
     vtkCloseAndKillWorkbook wb:=wbForTest
-    Set wbForTest = Workbooks.Open(Filename:=vtkPathToTestFolder & "\" & uninitializedWorkbookName)
+    Set wbForTest = Workbooks.Open(fileName:=vtkPathToTestFolder & "\" & uninitializedWorkbookName)
     pName = wbForTest.VBProject.name
     
     ' Initialize workbook

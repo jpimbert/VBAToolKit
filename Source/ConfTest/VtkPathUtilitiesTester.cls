@@ -7,6 +7,27 @@ Attribute VB_GlobalNameSpace = False
 Attribute VB_Creatable = False
 Attribute VB_PredeclaredId = False
 Attribute VB_Exposed = False
+'---------------------------------------------------------------------------------------
+' Module    : VtkPathUtilitiesTester
+' Author    : Jean-Pierre Imbert
+' Date      : 21/08/2013
+' Purpose   : Test the vtkPathUtilities module functions
+'
+' Copyright 2013 Skwal-Soft (http://skwalsoft.com)
+'
+'   Licensed under the Apache License, Version 2.0 (the "License");
+'   you may not use this file except in compliance with the License.
+'   You may obtain a copy of the License at
+'
+'       http://www.apache.org/licenses/LICENSE-2.0
+'
+'   Unless required by applicable law or agreed to in writing, software
+'   distributed under the License is distributed on an "AS IS" BASIS,
+'   WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+'   See the License for the specific language governing permissions and
+'   limitations under the License.
+'---------------------------------------------------------------------------------------
+
 Option Explicit
 Implements ITest
 Implements ITestCase
@@ -35,7 +56,7 @@ Private Sub ITestCase_TearDown()
 End Sub
 
 Public Sub TestPathOfCurrentProject()
-    ' Verify that the path of the current project is where VBAToolKit is installed
+    ' Verify the path of the current project is where VBATollKit is installed
     mAssert.Equals vtkPathOfCurrentProject, vtkInstallPath
 End Sub
 
@@ -48,8 +69,9 @@ Public Sub TestPathToSourceFolder()
     ' Verify the path of the current Source Folder
     mAssert.Equals vtkPathToSourceFolder, vtkInstallPath & "\Source"
 End Sub
+
 Public Sub TestPathfinishbyVBAToolKit()
-    ' Verify that the path finishes by "\VBAToolKit"
+    ' Verify that the path finish by "\VBAToolKit"
     mAssert.Equals Right(vtkPathOfCurrentProject, 11), "\VBAToolKit", "the install path must finish by \VBAToolKit"
     ' Verify that the path contain ":\Users\"
     Dim bUser As Boolean, bDocument As Boolean
@@ -58,12 +80,42 @@ Public Sub TestPathfinishbyVBAToolKit()
     mAssert.Should bUser Or bDocument, "the install path must contain :\Users\ or :\Documents\"
 End Sub
 
+Public Sub TestFileExtensionForStandardPath()
+    mAssert.Equals vtkGetFileExtension("C:\Documents and Settings\User1\Documents\FileName.ext"), "ext", "The extension of this standard file is ext"
+End Sub
+
+Public Sub TestFileExtensionForFileName()
+    mAssert.Equals vtkGetFileExtension("FileName.bas"), "bas", "The extension of this file name is bas"
+End Sub
+
+Public Sub TestFileExtensionWithTwoDots()
+    mAssert.Equals vtkGetFileExtension("FileName.WithDot.xlsx"), "xlsx", "The extension of this file with a dot in name is xlsx"
+End Sub
+
+Public Sub TestFileExtensionWithEmptyExtension()
+    mAssert.Equals vtkGetFileExtension("FileName."), "", "This file has a dot but no extension"
+End Sub
+
+Public Sub TestFileExtensionWithNoExtension()
+    mAssert.Equals vtkGetFileExtension("FileName"), "", "This file has no extension"
+End Sub
+
+Public Sub TestFileExtensionWithJustAnExtension()
+    mAssert.Equals vtkGetFileExtension(".FileName"), "FileName", "FileName is the extension"
+End Sub
+
 Private Function ITest_Suite() As TestSuite
     Set ITest_Suite = New TestSuite
     ITest_Suite.AddTest ITest_Manager.ClassName, "TestPathOfCurrentProject"
     ITest_Suite.AddTest ITest_Manager.ClassName, "TestPathToTestFolder"
     ITest_Suite.AddTest ITest_Manager.ClassName, "TestPathToSourceFolder"
     ITest_Suite.AddTest ITest_Manager.ClassName, "TestPathfinishbyVBAToolKit"
+    ITest_Suite.AddTest ITest_Manager.ClassName, "TestFileExtensionForStandardPath"
+    ITest_Suite.AddTest ITest_Manager.ClassName, "TestFileExtensionForFileName"
+    ITest_Suite.AddTest ITest_Manager.ClassName, "TestFileExtensionWithTwoDots"
+    ITest_Suite.AddTest ITest_Manager.ClassName, "TestFileExtensionWithEmptyExtension"
+    ITest_Suite.AddTest ITest_Manager.ClassName, "TestFileExtensionWithNoExtension"
+    ITest_Suite.AddTest ITest_Manager.ClassName, "TestFileExtensionWithJustAnExtension"
 End Function
 
 Private Sub ITestCase_RunTest()
@@ -72,6 +124,12 @@ Private Sub ITestCase_RunTest()
         Case "TestPathToTestFolder": TestPathToTestFolder
         Case "TestPathToSourceFolder": TestPathToSourceFolder
         Case "TestPathfinishbyVBAToolKit": TestPathfinishbyVBAToolKit
+        Case "TestFileExtensionForStandardPath": TestFileExtensionForStandardPath
+        Case "TestFileExtensionForFileName": TestFileExtensionForFileName
+        Case "TestFileExtensionWithTwoDots": TestFileExtensionWithTwoDots
+        Case "TestFileExtensionWithEmptyExtension": TestFileExtensionWithEmptyExtension
+        Case "TestFileExtensionWithNoExtension": TestFileExtensionWithNoExtension
+        Case "TestFileExtensionWithJustAnExtension": TestFileExtensionWithJustAnExtension
         Case Else: mAssert.Should False, "Invalid test name: " & mManager.methodName
     End Select
 End Sub

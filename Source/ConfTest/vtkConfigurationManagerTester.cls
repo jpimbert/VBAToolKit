@@ -7,6 +7,27 @@ Attribute VB_GlobalNameSpace = False
 Attribute VB_Creatable = False
 Attribute VB_PredeclaredId = False
 Attribute VB_Exposed = False
+'---------------------------------------------------------------------------------------
+' Module    : vtkConfigurationManagerTester
+' Author    : Jean-Pierre Imbert
+' Date      : 21/08/2013
+' Purpose   : Test the vtkConfigurationManager class
+'
+' Copyright 2013 Skwal-Soft (http://skwalsoft.com)
+'
+'   Licensed under the Apache License, Version 2.0 (the "License");
+'   you may not use this file except in compliance with the License.
+'   You may obtain a copy of the License at
+'
+'       http://www.apache.org/licenses/LICENSE-2.0
+'
+'   Unless required by applicable law or agreed to in writing, software
+'   distributed under the License is distributed on an "AS IS" BASIS,
+'   WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+'   See the License for the specific language governing permissions and
+'   limitations under the License.
+'---------------------------------------------------------------------------------------
+
 Option Explicit
 Implements ITest
 Implements ITestCase
@@ -34,9 +55,9 @@ Private Sub SaveThenReOpenNewWorkbook()
 '       Else
 '        newWorkbook.Close SaveChanges:=True
 '    End If
-    newWorkBook.Close SaveChanges:=True
+    newWorkBook.Close savechanges:=True
     vtkResetConfigurationManagers           ' reset all configuration managers
-    Set newWorkBook = Workbooks.Open(Filename:=savedNewWorkbookPath)
+    Set newWorkBook = Workbooks.Open(fileName:=savedNewWorkbookPath)
     Set newConfManager = vtkConfigurationManagerForProject("NewProject")
 End Sub
 
@@ -53,6 +74,7 @@ Private Property Get ITest_Manager() As ITestManager
 End Property
 
 Private Sub ITestCase_SetUp(Assert As IAssert)
+
     Set mAssert = Assert
     Set newWorkBook = vtkCreateExcelWorkbookForTestWithProjectName("NewProject")    ' create an Excel project for tests
     newWorkbookName = newWorkBook.name
@@ -60,9 +82,15 @@ Private Sub ITestCase_SetUp(Assert As IAssert)
     Set newConfManager = vtkConfigurationManagerForProject(newProjectName)
     Dim source As String, destination As String
     FileCopy source:=vtkPathToTemplateFolder & "\" & existingWorkbookNameForTest, destination:=vtkPathToTestFolder & "\" & existingProjectName & "_DEV.xlsm"
-    Set existingWorkbook = Workbooks.Open(Filename:=vtkPathToTestFolder & "\" & existingProjectName & "_DEV.xlsm")
+   On Error GoTo ITestCase_SetUp_Error
+    Set existingWorkbook = Workbooks.Open(fileName:=vtkPathToTestFolder & "\" & existingProjectName & "_DEV.xlsm")
+   On Error GoTo 0
     existingWorkbookName = existingWorkbook.name
     Set existingConfManager = vtkConfigurationManagerForProject(existingProjectName)
+    Exit Sub
+
+ITestCase_SetUp_Error:
+    If err.Number = 1004 Then Resume    ' It's possible that the file is not ready, just after copy : in this case retry
 End Sub
 
 Private Sub ITestCase_TearDown()
@@ -85,7 +113,7 @@ Public Sub TestConfigurationSheetDoesntExistInNewWorkbook()
     Set wb = vtkCreateExcelWorkbookForTestWithProjectName("NewWorkbook")    ' create a fresh new Excel workbook
     wbFullName = wb.FullName
     mAssert.Should Not cm.isConfigurationInitializedForWorkbook(ExcelName:=wb.name), "The Configuration sheet must not exist in new workbook"
-    wb.Close SaveChanges:=False
+    wb.Close savechanges:=False
     Kill PathName:=wbFullName
 End Sub
 
@@ -260,8 +288,8 @@ End Sub
 Public Sub TestAddNonExistantModuleToSavedProject()
 '       Verify the capability to add a new module, non existant, and retrieve it
     ' set new modules
-    mAssert.Equals newConfManager.addModule(module:="NewModule1"), 1, "Number of the first module added"
-    mAssert.Equals newConfManager.addModule(module:="NewModule2"), 2, "Number of the second module added"
+    mAssert.Equals newConfManager.AddModule(module:="NewModule1"), 1, "Number of the first module added"
+    mAssert.Equals newConfManager.AddModule(module:="NewModule2"), 2, "Number of the second module added"
     ' save and re-open file
     SaveThenReOpenNewWorkbook
     ' verify modules
@@ -276,8 +304,8 @@ Public Sub TestAddExistantModuleToExistingProject()
 '       Verify the capability to not add an existing module in an existing project
     Dim n As Integer
     ' set new modules
-    mAssert.Equals existingConfManager.addModule(module:="Module1"), -1, "Number of the first existing module"
-    mAssert.Equals existingConfManager.addModule(module:="Module5"), -5, "Number of the fifth existing module"
+    mAssert.Equals existingConfManager.AddModule(module:="Module1"), -1, "Number of the first existing module"
+    mAssert.Equals existingConfManager.AddModule(module:="Module5"), -5, "Number of the fifth existing module"
     mAssert.Equals existingConfManager.moduleCount, 5, "There must be five modules, no change, in the existing project"
 End Sub
 
@@ -285,7 +313,7 @@ Public Sub TestAddModuleWithExistingStringToExistingProject()
 '       Verify the capability to add a new module whose name is included in existing module in an existing project
     Dim n As Integer
     ' set new modules
-    mAssert.Equals existingConfManager.addModule(module:="Module"), 6, "Number for the new module"
+    mAssert.Equals existingConfManager.AddModule(module:="Module"), 6, "Number for the new module"
     mAssert.Equals existingConfManager.moduleCount, 6, "There must be six modules, one more module, in the existing project"
 End Sub
 
@@ -307,7 +335,7 @@ End Sub
 
 Public Sub TestGetModulePathWithNumberForNewModule()
 '       Verify the default module path define at module adding
-    mAssert.Equals newConfManager.addModule(module:="NewModule1"), 1, "Number of the first module added"
+    mAssert.Equals newConfManager.AddModule(module:="NewModule1"), 1, "Number of the first module added"
     mAssert.Equals newConfManager.getModulePathWithNumber(numModule:=1, numConfiguration:=1), "", "Inexistant module path number 1,1"
     mAssert.Equals newConfManager.getModulePathWithNumber(numModule:=1, numConfiguration:=2), "", "Inexistant module path number 1,2"
 End Sub
@@ -315,10 +343,10 @@ End Sub
 Public Sub TestAddModulePathToSavedProject()
 '       Verify the capability to add a new module, non existant, and retrieve it
     ' set new modules
-    mAssert.Equals newConfManager.addModule(module:="NewModule1"), 1, "Number of the first module added"
-    mAssert.Equals newConfManager.addModule(module:="NewModule2"), 2, "Number of the second module added"
-    mAssert.Equals newConfManager.addModule(module:="NewModule3"), 3, "Number of the third module added"
-    mAssert.Equals newConfManager.addModule(module:="NewModule4"), 4, "Number of the fourth module added"
+    mAssert.Equals newConfManager.AddModule(module:="NewModule1"), 1, "Number of the first module added"
+    mAssert.Equals newConfManager.AddModule(module:="NewModule2"), 2, "Number of the second module added"
+    mAssert.Equals newConfManager.AddModule(module:="NewModule3"), 3, "Number of the third module added"
+    mAssert.Equals newConfManager.AddModule(module:="NewModule4"), 4, "Number of the fourth module added"
     ' save and re-open file
     SaveThenReOpenNewWorkbook
     ' set new pathes
@@ -337,6 +365,11 @@ Public Sub TestAddModulePathToSavedProject()
     mAssert.Equals newConfManager.getModulePathWithNumber(numModule:=3, numConfiguration:=2), "Path2Module3", "Module path number 3,2"
     mAssert.Equals newConfManager.getModulePathWithNumber(numModule:=4, numConfiguration:=1), "", "Module path number 4,1"
     mAssert.Equals newConfManager.getModulePathWithNumber(numModule:=4, numConfiguration:=2), "", "Module path number 4,2"
+End Sub
+
+Public Sub TestRootPathForExistingProject()
+    mAssert.Equals existingConfManager.rootPath, vtkPathOfCurrentProject, "The root Path is not initialized for a new Workbook"
+    mAssert.Equals existingConfManager.rootPath, vtkPathOfCurrentProject, "The second call to rootPath give the same result as the previous one"
 End Sub
 
 Private Function ITest_Suite() As TestSuite
@@ -364,6 +397,7 @@ Private Function ITest_Suite() As TestSuite
     ITest_Suite.AddTest ITest_Manager.ClassName, "TestGetModulePathWithNumberFromExistingProject"
     ITest_Suite.AddTest ITest_Manager.ClassName, "TestGetModulePathWithNumberForNewModule"
     ITest_Suite.AddTest ITest_Manager.ClassName, "TestAddModulePathToSavedProject"
+    ITest_Suite.AddTest ITest_Manager.ClassName, "TestRootPathForExistingProject"
 End Function
 
 Private Sub ITestCase_RunTest()
@@ -391,6 +425,7 @@ Private Sub ITestCase_RunTest()
         Case "TestGetModulePathWithNumberFromExistingProject": TestGetModulePathWithNumberFromExistingProject
         Case "TestGetModulePathWithNumberForNewModule": TestGetModulePathWithNumberForNewModule
         Case "TestAddModulePathToSavedProject": TestAddModulePathToSavedProject
+        Case "TestRootPathForExistingProject": TestRootPathForExistingProject
         Case Else: mAssert.Should False, "Invalid test name: " & mManager.methodName
     End Select
 End Sub

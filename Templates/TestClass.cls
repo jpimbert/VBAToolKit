@@ -7,12 +7,17 @@ Attribute VB_GlobalNameSpace = False
 Attribute VB_Creatable = False
 Attribute VB_PredeclaredId = False
 Attribute VB_Exposed = False
+Option Explicit
+
+Private m_projectName As String
 
 '---------------------------------------------------------------------------------------
 ' Module    : vtkProject
 ' Author    : Jean-Pierre Imbert
 ' Date      : 04/06/2013
 ' Purpose   : Manage a VB Toolkit Project and its attributes
+'---------------------------------------------------------------------------------------
+
 '
 '   Fonctions à implémenter
 '
@@ -20,23 +25,6 @@ Attribute VB_Exposed = False
 ' - Attacher les fonctions de chemin à cet objet
 ' - Attacher cet objet et le configuration manager associé
 '
-' Copyright 2013 Skwal-Soft (http://skwalsoft.com)
-'
-'   Licensed under the Apache License, Version 2.0 (the "License");
-'   you may not use this file except in compliance with the License.
-'   You may obtain a copy of the License at
-'
-'       http://www.apache.org/licenses/LICENSE-2.0
-'
-'   Unless required by applicable law or agreed to in writing, software
-'   distributed under the License is distributed on an "AS IS" BASIS,
-'   WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-'   See the License for the specific language governing permissions and
-'   limitations under the License.
-'---------------------------------------------------------------------------------------
-Option Explicit
-
-Private m_projectName As String
 
 '---------------------------------------------------------------------------------------
 ' Property  : projectName As String

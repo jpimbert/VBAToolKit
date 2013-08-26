@@ -7,6 +7,27 @@ Attribute VB_GlobalNameSpace = False
 Attribute VB_Creatable = False
 Attribute VB_PredeclaredId = False
 Attribute VB_Exposed = False
+'---------------------------------------------------------------------------------------
+' Module    : vtkProjectTester
+' Author    : Jean-Pierre Imbert
+' Date      : 21/08/2013
+' Purpose   : Test the vtkProject class
+'
+' Copyright 2013 Skwal-Soft (http://skwalsoft.com)
+'
+'   Licensed under the Apache License, Version 2.0 (the "License");
+'   you may not use this file except in compliance with the License.
+'   You may obtain a copy of the License at
+'
+'       http://www.apache.org/licenses/LICENSE-2.0
+'
+'   Unless required by applicable law or agreed to in writing, software
+'   distributed under the License is distributed on an "AS IS" BASIS,
+'   WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+'   See the License for the specific language governing permissions and
+'   limitations under the License.
+'---------------------------------------------------------------------------------------
+
 Option Explicit
 Implements ITest
 Implements ITestCase
@@ -39,7 +60,7 @@ Private Sub ITestCase_TearDown()
 End Sub
 
 Public Sub TestNullProject()
-    ' Verify that all properties are null when the object is not initialized
+'       Verify that all properties are null when the object is not initialized
     Dim p As New vtkProject
     mAssert.Equals p.projectName, "", "The project must be null"
     mAssert.Equals p.projectDEVName, "", "The project development must be null"
@@ -50,27 +71,27 @@ Public Sub TestNullProject()
 End Sub
 
 Public Sub TestProjectNameForDevelopment()
-    ' Verify the project name for the development
+'       Verify the project name for development
     mAssert.Equals project.projectDEVName, "TestProject_DEV", "The project development is suffixed by _DEV"
 End Sub
 
 Public Sub TestProjectDevelopmentRelativePath()
-    ' Verify the relative project path for the development
+'       Verify the project path for development
     mAssert.Equals project.projectDEVStandardRelativePath, "Project\" & "TestProject_DEV.xlsm", "The project development standard path"
 End Sub
 
 Public Sub TestProjectRelativePath()
-    ' Verify the relative project path
+'       Verify the project path
     mAssert.Equals project.projectStandardRelativePath, "Delivery\" & "TestProject.xlsm", "The project development standard path"
 End Sub
 
 Public Sub TestProjectDevelopmentWorkbookName()
-    ' Verify the name of the DEV workbook.
+'       Verify the project path for development
     mAssert.Equals project.workbookDEVName, "TestProject_DEV.xlsm", "The project development standard path"
 End Sub
 
 Public Sub TestProjectWorkbookName()
-    ' Verify the name of the workbook
+'       Verify the project path
     mAssert.Equals project.workbookName, "TestProject.xlsm", "The project development standard path"
 End Sub
 
@@ -95,5 +116,7 @@ Private Sub ITestCase_RunTest()
         Case Else: mAssert.Should False, "Invalid test name: " & mManager.methodName
     End Select
 End Sub
+
+
 
 
