@@ -79,74 +79,74 @@ End Sub
 Public Sub TestCreateProjectDoesNothingWhenPathDoesntExist()
     ' The createProject must does nothing when path doesn't exist
     Dim InexistentPath As String
-    Dim returnValue As Long
+    Dim returnvalue As Long
     InexistentPath = vtkTestPath & "\InexistentFolder"
-    returnValue = vtkCreateProject(path:=InexistentPath, name:=vtkTestProjectName, displayError:=False)
+    returnvalue = vtkCreateProject(path:=InexistentPath, name:=vtkTestProjectName, displayError:=False)
     mAssert.Should Dir(InexistentPath & "\" & vtkTestProjectName, vbDirectory) = "", "The project main folder must exist"
-    mAssert.Equals returnValue, 76, "The project creation must fail"
+    mAssert.Equals returnvalue, 76, "The project creation must fail"
 End Sub
 
 Public Sub TestCreateProjectAlreadyExisting()
     ' The createProject must does nothing when project already exists
-    Dim returnValue As Long
+    Dim returnvalue As Long
     MkDir vtkTestPath & "\" & vtkTestProjectName 'must respect order mkdir before call vtkcreateproject
-    returnValue = vtkCreateProject(path:=vtkTestPath, name:=vtkTestProjectName, displayError:=False)
+    returnvalue = vtkCreateProject(path:=vtkTestPath, name:=vtkTestProjectName, displayError:=False)
     mAssert.Should Dir(vtkTestPath & "\" & vtkTestProjectName, vbDirectory) <> "", "The existing project main folder must exist"
-    mAssert.Equals returnValue, 75, "The project creation must fail"
+    mAssert.Equals returnvalue, 75, "The project creation must fail"
 End Sub
 
 Public Sub TestMainFolderIsCreated()
     ' The createProject subroutine must create a new folder named like the project in the path
-    Dim returnValue As Long
-    returnValue = vtkCreateProject(path:=vtkTestPath, name:=vtkTestProjectName, displayError:=False)
+    Dim returnvalue As Long
+    returnvalue = vtkCreateProject(path:=vtkTestPath, name:=vtkTestProjectName, displayError:=False)
     mAssert.Should Dir(vtkTestPath & "\" & vtkTestProjectName, vbDirectory) <> "", "The project main folder must exist"
-    mAssert.Equals returnValue, 0, "The project creation must succeed"
+    mAssert.Equals returnvalue, VTK_OK, "The project creation must succeed"
 End Sub
 
 Public Sub TestDevXlsmFileCreated()
 'test that xlsm file is created in the right path
-    Dim returnValue As Long
-    returnValue = vtkCreateProject(path:=vtkTestPath, name:=vtkTestProjectName, displayError:=False)
+    Dim returnvalue As Long
+    returnvalue = vtkCreateProject(path:=vtkTestPath, name:=vtkTestProjectName, displayError:=False)
     mAssert.Should Dir(vtkTestPath & "\" & vtkTestProjectName & "\" & "Project" & "\" & vtkTestProjectName & "_DEV.xlsm", vbDirectory) <> "", "the workbook must be created"
 End Sub
 
 Public Sub TestDevXlsmFileIsNamedcorrectly()
 'test that xlsm is correctly renamed
-    Dim returnValue As Long
-    returnValue = vtkCreateProject(path:=vtkTestPath, name:=vtkTestProjectName, displayError:=False)
+    Dim returnvalue As Long
+    returnvalue = vtkCreateProject(path:=vtkTestPath, name:=vtkTestProjectName, displayError:=False)
     mAssert.Equals Workbooks(vtkTestProjectName & "_DEV.xlsm").VBProject.name, vtkTestProjectName & "_DEV", "the workbook name must be like " & vtkTestProjectName & "_DEV"
 End Sub
 
 Public Sub TestDelivXlsmFileCreated()
 'test that xlsm file is created in the right path
-    Dim returnValue As Long
-    returnValue = vtkCreateProject(path:=vtkTestPath, name:=vtkTestProjectName, displayError:=False)
+    Dim returnvalue As Long
+    returnvalue = vtkCreateProject(path:=vtkTestPath, name:=vtkTestProjectName, displayError:=False)
     mAssert.Should Dir(vtkTestPath & "\" & vtkTestProjectName & "\" & "Delivery" & "\" & vtkTestProjectName & ".xlsm", vbDirectory) <> "", "the workbook must be created"
 End Sub
 
 Public Sub TestDevProjectIsNamedcorrectly()
 'test that xlsm is correctly renamed
-    Dim returnValue As Long
-    returnValue = vtkCreateProject(path:=vtkTestPath, name:=vtkTestProjectName, displayError:=False)
+    Dim returnvalue As Long
+    returnvalue = vtkCreateProject(path:=vtkTestPath, name:=vtkTestProjectName, displayError:=False)
     mAssert.Should Workbooks(vtkTestProjectName & "_DEV.xlsm").VBProject.name = vtkTestProjectName & "_DEV", "the workbook name must be like " & vtkTestProjectName & "_DEV"
 End Sub
 
 Public Sub TestDelivProjectIsNamedcorrectly()
 'test that xlsm is correctly renamed
-    Dim returnValue As Long
-    returnValue = vtkCreateProject(path:=vtkTestPath, name:=vtkTestProjectName, displayError:=False)
+    Dim returnvalue As Long
+    returnvalue = vtkCreateProject(path:=vtkTestPath, name:=vtkTestProjectName, displayError:=False)
     OpenDeliveryProject
     mAssert.Equals Workbooks(vtkTestProjectName & ".xlsm").VBProject.name, vtkTestProjectName, "the workbook name must be like " & vtkTestProjectName & "_DEV"
 End Sub
 
 Public Sub TestReferencesOfDevWorkbookWasActivated()
- Dim returnValue As Long
+ Dim returnvalue As Long
  Dim i As Integer
  Dim j As Integer
  j = 0
 'this function will count extention number before executing function ,
 'and extentions number must be equal to(initial extention number + added extention number )
-returnValue = vtkCreateProject(path:=vtkTestPath, name:=vtkTestProjectName, displayError:=False)
+returnvalue = vtkCreateProject(path:=vtkTestPath, name:=vtkTestProjectName, displayError:=False)
     OpenDeliveryProject
  
     For i = 1 To Workbooks(vtkTestProjectName & "_DEV.xlsm").VBProject.References.Count
@@ -158,13 +158,13 @@ mAssert.Equals j, 2, "the references number must be equal to" & i + 2
 End Sub
 
 Public Sub TestReferencesOfDeliveryWorkbookWasActivated()
- Dim returnValue As Long
+ Dim returnvalue As Long
  Dim i As Integer
  Dim j As Integer
  j = 0
 'this function will count extention number before executing function ,
 'and extentions number must be equal to(initial extention number + added extention number )
-returnValue = vtkCreateProject(path:=vtkTestPath, name:=vtkTestProjectName, displayError:=False)
+returnvalue = vtkCreateProject(path:=vtkTestPath, name:=vtkTestProjectName, displayError:=False)
     OpenDeliveryProject
     
     For i = 1 To Workbooks(vtkTestProjectName & ".xlsm").VBProject.References.Count
@@ -182,6 +182,7 @@ Public Sub Test_VBAUnitModulesExportation()
     returnvalue = vtkCreateProject(path:=vtkTestPath, name:=vtkTestProjectName, displayError:=False)
     
     mAssert.Should fso.FileExists(vtkTestPath & "\" & vtkTestProjectName & "\" & "Source\VbaUnit\" & "VbaUnitMain.bas"), "VBAUnitMain module have to be exported"
+End Sub
 
 Public Sub Test_VBAUnitModulesImportation()
     '   Verify that VBA modules are imported in the new project
@@ -209,13 +210,13 @@ Public Sub Test_vtkCreateProject_correctPathGitFolderIsCreated()
 
     vtkCreateProject vtkTestPath, vtkTestProjectName, displayError:=False
     
-    mAssert.Should fso.FolderExists(vtkTestPath & "\" & vtkTestProjectName & "\.git"), ".git folder should be created."
+    mAssert.Should fso.folderExists(vtkTestPath & "\" & vtkTestProjectName & "\.git"), ".git folder should be created."
 
     On Error GoTo 0
     Exit Sub
 
 Test_vtkCreateProject_correctPathGitFolderIsCreated_Error:
-    Debug.Print "Error " & Err.Number & " (" & Err.Description & ") in procedure Test_vtkCreateProject_gitFolderIsCreated of Class Module vtkCreateProjectTester"
+    Debug.Print "Error " & err.Number & " (" & err.Description & ") in procedure Test_vtkCreateProject_gitFolderIsCreated of Class Module vtkCreateProjectTester"
     Resume Next
 End Sub
 
@@ -233,7 +234,7 @@ Private Function ITest_Suite() As TestSuite
     ITest_Suite.AddTest ITest_Manager.ClassName, "TestReferencesOfDevWorkbookWasActivated"
     ITest_Suite.AddTest ITest_Manager.ClassName, "TestReferencesOfDeliveryWorkbookWasActivated"
     ITest_Suite.AddTest ITest_Manager.ClassName, "Test_VBAUnitModulesExportation"
-    ITest_Suite.AddTest ITest_Manager.ClassName, "Test_VBAUnitModulesImportation"
+    ITest_Suite.AddTest ITest_Manager.ClassName, "Test_VBAUnitModulesExportation"
     ITest_Suite.AddTest ITest_Manager.ClassName, "Test_vtkCreateProject_correctPathGitFolderIsCreated"
 End Function
 
@@ -250,7 +251,7 @@ Private Sub ITestCase_RunTest()
         Case "TestReferencesOfDevWorkbookWasActivated": TestReferencesOfDevWorkbookWasActivated
         Case "TestReferencesOfDeliveryWorkbookWasActivated": TestReferencesOfDeliveryWorkbookWasActivated
         Case "Test_VBAUnitModulesExportation": Test_VBAUnitModulesExportation
-        Case "Test_VBAUnitModulesImportation": Test_VBAUnitModulesImportation
+        Case "Test_VBAUnitModulesExportation": Test_VBAUnitModulesExportation
         Case "Test_vtkCreateProject_correctPathGitFolderIsCreated": Test_vtkCreateProject_correctPathGitFolderIsCreated
         Case Else: mAssert.Should False, "Invalid test name: " & mManager.methodName
     End Select

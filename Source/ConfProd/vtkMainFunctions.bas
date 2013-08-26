@@ -70,7 +70,7 @@ Public Function vtkCreateProject(path As String, name As String, Optional displa
     'initialize configuration Sheet with VBAUnit modules
     vtkInitializeVbaUnitNamesAndPathes project:=project.projectName
     ' Save Development Project Workbook
-    Workbooks(project.workbookDEVName).Save
+    Workbooks(project.workbookDEVName).save
     
     'Create delivery workbook
     Workbooks.Add.SaveAs (rootPath & "\" & project.projectStandardRelativePath), FileFormat:=(52) '52 is xlsm format
@@ -91,27 +91,26 @@ Public Function vtkCreateProject(path As String, name As String, Optional displa
     ' Import VBAUnit (and lib ?) modules in the new Excel file project
     vtkImportModulesInAnotherProject projectForModules:=wb.VBProject, projectName:=project.projectName, confName:=project.projectDEVName
  
-   ' Save configured and updated project for test 
+   ' Save configured and updated project for test
     wb.save
-	
-	' Initialize git
-	On Error GoTo vtkCreateProject_ErrorGit
+        
+    ' Initialize git
+    On Error GoTo vtkCreateProject_ErrorGit
     vtkInitializeGit rootPath
 
-
-	On Error GoTo 0
+    On Error GoTo 0
     vtkCreateProject = VTK_OK
     Exit Function
 
 vtkCreateProject_ErrorTreeFolder:
     vtkCreateProject = internalError
-    If displayError Then MsgBox "Error " & Err.number & " (" & Err.Description & ") in procedure vtkCreateProject of Module MainFunctions"
+    If displayError Then MsgBox "Error " & err.number & " (" & err.Description & ") in procedure vtkCreateProject of Module MainFunctions"
     Exit Function
 vtkCreateProject_Error:
-    vtkCreateProject = Err.number
-    If displayError Then MsgBox "Error " & Err.number & " (" & Err.Description & ") in procedure vtkCreateProject of Module MainFunctions"
+    vtkCreateProject = err.number
+    If displayError Then MsgBox "Error " & err.number & " (" & err.Description & ") in procedure vtkCreateProject of Module MainFunctions"
 vtkCreateProject_ErrorGit:
-    vtkCreateProject = Err.number
-    If displayError Then MsgBox "Error " & Err.number & " (" & Err.Description & ") in procedure vtkCreateProject of Module MainFunctions"
+    vtkCreateProject = err.number
+    If displayError Then MsgBox "Error " & err.number & " (" & err.Description & ") in procedure vtkCreateProject of Module MainFunctions"
 
 End Function

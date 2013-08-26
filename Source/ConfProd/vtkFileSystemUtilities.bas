@@ -38,42 +38,11 @@ On Error GoTo vtkTextFileReader_Error
    Exit Function
 
 vtkTextFileReader_Error:
-    MsgBox "Error " & Err.number & " (" & Err.Description & ") in procedure VtkTextFileReader of Module vtkGitFunctions"
-    vtkTextFileReader = Err.number
+    MsgBox "Error " & err.Number & " (" & err.Description & ") in procedure VtkTextFileReader of Module vtkGitFunctions"
+    vtkTextFileReader = err.Number
     
 End Function
 
-
-'---------------------------------------------------------------------------------------
-' Function  : vtkCreateTreeFolder
-' Author    : Jean-Pierre Imbert
-' Date      : 06/08/2013
-' Purpose   : Create a project folder breakdown into the folder given as parameter
-'             This procedure is isolated to be easier to test
-' Return    : Long error number
-'---------------------------------------------------------------------------------------
-'
-Public Function vtkCreateTreeFolder(rootPath As String)
-   On Error GoTo vtkCreateTreeFolder_Error
-    
-    MkDir rootPath
-    MkDir rootPath & "\" & "Delivery"
-    MkDir rootPath & "\" & "Project"
-    MkDir rootPath & "\" & "Tests"
-    MkDir rootPath & "\" & "GitLog"
-    MkDir rootPath & "\" & "Source"
-    MkDir rootPath & "\" & "Source" & "\" & "ConfProd"
-    MkDir rootPath & "\" & "Source" & "\" & "ConfTest"
-    MkDir rootPath & "\" & "Source" & "\" & "VbaUnit"
-
-   On Error GoTo 0
-   vtkCreateTreeFolder = VTK_OK
-   Exit Function
-   
-vtkCreateTreeFolder_Error:
-    vtkCreateTreeFolder = Err.number
-    Err.Raise Err.number, "Module vtkFileSystemUtilities : Function vtkCreateTreeFolder", Err.Description
-End Function
 
 '---------------------------------------------------------------------------------------
 ' Procedure : vtkCleanFolder
@@ -113,8 +82,8 @@ Public Function vtkCleanFolder(folderPath As String) As Integer
     Exit Function
     
 vtkCleanFolder_Error:
-    If Err.number = 76 Then
-        vtkCleanFolder = Err.number
+    If err.Number = 76 Then
+        vtkCleanFolder = err.Number
     Else
         vtkCleanFolder = VTK_UNEXPECTED_ERROR
     End If
@@ -150,8 +119,8 @@ Public Function vtkDeleteFolder(folderPath As String)
     Exit Function
 
 vtkDeleteFolder_Error:
-    If Err.number = 76 Then
-        vtkDeleteFolder = Err.number
+    If err.Number = 76 Then
+        vtkDeleteFolder = err.Number
     Else
         vtkDeleteFolder = VTK_UNEXPECTED_ERROR
     End If

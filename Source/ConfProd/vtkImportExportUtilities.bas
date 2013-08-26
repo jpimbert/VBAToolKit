@@ -24,7 +24,6 @@ Option Explicit
 
 Private vbaUnitModules As Collection
 Public Const VTK_UNKNOWN_MODULE = 4000
-Public Const VTK_UNEXPECTED_ERROR = 2000    ' To delete when vtkConstants will be updated with Lucas_v code
 
 '---------------------------------------------------------------------------------------
 ' Function  : VBComponentTypeAsString

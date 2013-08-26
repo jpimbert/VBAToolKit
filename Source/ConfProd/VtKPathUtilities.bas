@@ -93,3 +93,66 @@ Public Function vtkGetFileExtension(filePath As String) As String
     End If
 End Function
 
+'---------------------------------------------------------------------------------------
+' Function  : vtkCreateTreeFolder
+' Author    : Jean-Pierre Imbert
+' Date      : 06/08/2013
+' Purpose   : Create a project folder breakdown into the folder given as parameter
+'             This procedure is isolated to be easier to test
+' Return    : Long error number
+'---------------------------------------------------------------------------------------
+'
+Public Function vtkCreateTreeFolder(rootPath As String)
+   On Error GoTo vtkCreateTreeFolder_Error
+    
+    MkDir rootPath
+    MkDir rootPath & "\" & "Delivery"
+    MkDir rootPath & "\" & "Project"
+    MkDir rootPath & "\" & "Tests"
+    MkDir rootPath & "\" & "GitLog"
+    MkDir rootPath & "\" & "Source"
+    MkDir rootPath & "\" & "Source" & "\" & "ConfProd"
+    MkDir rootPath & "\" & "Source" & "\" & "ConfTest"
+    MkDir rootPath & "\" & "Source" & "\" & "VbaUnit"
+
+   On Error GoTo 0
+   vtkCreateTreeFolder = VTK_OK
+   Exit Function
+   
+vtkCreateTreeFolder_Error:
+    vtkCreateTreeFolder = err.Number
+    err.Raise err.Number, "Module vtkFileSystemUtilities : Function vtkCreateTreeFolder", err.Description
+End Function
+
+'---------------------------------------------------------------------------------------
+' Procedure : vtkDeleteTreeFolder
+' Author    : Jean-Pierre Imbert
+' Date      : 06/08/2013
+' Purpose   : Delete a project folder breakdown given as parameter
+'             This procedure is for test purpose
+'---------------------------------------------------------------------------------------
+'
+Public Sub vtkDeleteTreeFolder(rootPath As String)
+    Dir (rootPath)                  ' Make sure to be out of the folder to clean it without Err
+    On Error Resume Next
+    Kill rootPath & "\Source\ConfProd\*"
+    RmDir rootPath & "\Source\ConfProd"
+    Kill rootPath & "\Source\ConfTest\*"
+    RmDir rootPath & "\Source\ConfTest"
+    Kill rootPath & "\Source\VbaUnit\*"
+    RmDir rootPath & "\Source\VbaUnit"
+    Kill rootPath & "\GitLog\*"
+    RmDir rootPath & "\GitLog"
+    Kill rootPath & "\Tests\*"
+    RmDir rootPath & "\Tests"
+    Kill rootPath & "\Source\*"
+    RmDir rootPath & "\Source"
+    Kill rootPath & "\Delivery\*"
+    RmDir rootPath & "\Delivery"
+    Kill rootPath & "\Project\*"
+    RmDir rootPath & "\Project"
+    Kill rootPath & "\*"
+    RmDir rootPath
+End Sub
+
+
