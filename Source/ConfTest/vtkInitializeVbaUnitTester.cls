@@ -7,6 +7,27 @@ Attribute VB_GlobalNameSpace = False
 Attribute VB_Creatable = False
 Attribute VB_PredeclaredId = False
 Attribute VB_Exposed = False
+'---------------------------------------------------------------------------------------
+' Module    : vtkInitializeVbaUnitTester
+' Author    : Jean-Pierre Imbert
+' Date      : 21/08/2013
+' Purpose   : Test the vtkInitializeVBAUnit function
+'
+' Copyright 2013 Skwal-Soft (http://skwalsoft.com)
+'
+'   Licensed under the Apache License, Version 2.0 (the "License");
+'   you may not use this file except in compliance with the License.
+'   You may obtain a copy of the License at
+'
+'       http://www.apache.org/licenses/LICENSE-2.0
+'
+'   Unless required by applicable law or agreed to in writing, software
+'   distributed under the License is distributed on an "AS IS" BASIS,
+'   WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+'   See the License for the specific language governing permissions and
+'   limitations under the License.
+'---------------------------------------------------------------------------------------
+
 Option Explicit
 
 Implements ITest
@@ -43,18 +64,18 @@ Private Sub ITestCase_TearDown()
 End Sub
 
 Public Sub TestAddVBAUnitInNewProject()
-    ' Verify the count of added VBAUnit modules
+'       Verify the count of added VBAUnit modules
     mAssert.Equals newConfManager.moduleCount, 0, "There is no module in the new project"
     vtkInitializeVbaUnitNamesAndPathes project:=projectName
     mAssert.Equals newConfManager.moduleCount, 18, "Number of VBAUnit modules included in new project"
 End Sub
 
 Public Sub TestPathOfModuleVBAUnitInNewProject()
-    ' Verify the path of the "VbaUnitMain" module
+'       Verify the path of VbaUnitMain
     vtkInitializeVbaUnitNamesAndPathes project:=projectName
     Dim nm As Integer
     nm = newConfManager.getModuleNumber("VbaUnitMain")
-    mAssert.Should nm > 0, "The module VbaUnitMain of VbaUnit must be added in the new project"
+    mAssert.Should nm > 0, "The module VBA Unit must be added in the new project"
     Dim nc As Integer
     nc = newConfManager.getConfigurationNumber(vtkProjectForName(projectName).projectDEVName)
     mAssert.Should nc > 0, "The New Project configuration must be added in the new project"
@@ -62,11 +83,11 @@ Public Sub TestPathOfModuleVBAUnitInNewProject()
 End Sub
 
 Public Sub TestPathOfModuleAssertInNewProject()
-    ' Verify the path of the "Assert" module
+'       Verify the path of VbaUnitMain
     vtkInitializeVbaUnitNamesAndPathes project:=projectName
     Dim nm As Integer
     nm = newConfManager.getModuleNumber("Assert")
-    mAssert.Should nm > 0, "The module Assert of VbaUnit must be added in the new project"
+    mAssert.Should nm > 0, "The module VBA Unit must be added in the new project"
     Dim nc As Integer
     nc = newConfManager.getConfigurationNumber(vtkProjectForName(projectName).projectDEVName)
     mAssert.Should nc > 0, "The New Project configuration must be added in the new project"
@@ -74,18 +95,18 @@ Public Sub TestPathOfModuleAssertInNewProject()
 End Sub
 
 Public Sub TestPathOfModuleIAssertInNewProject()
-    ' Verify the path of the "IAssert" module
+'       Verify the path of VbaUnitMain
     vtkInitializeVbaUnitNamesAndPathes project:=projectName
     Dim nm As Integer
     nm = newConfManager.getModuleNumber("IAssert")
-    mAssert.Should nm > 0, "The module IAssert of VbaUnit must be added in the new project"
+    mAssert.Should nm > 0, "The module VBA Unit must be added in the new project"
     Dim nc As Integer
     nc = newConfManager.getConfigurationNumber(vtkProjectForName(projectName).projectDEVName)
     mAssert.Should nc > 0, "The New Project configuration must be added in the new project"
     mAssert.Equals newConfManager.getModulePathWithNumber(nm, nc), "Source\VbaUnit\IAssert.cls", "Relative path of IAssert module"
 End Sub
 
-' TODO : Ajouter des tests pour Module absent, configuration absente, ...
+' Ajouter des tests pour Module absent, configuration absente, ...
 
 Private Function ITest_Suite() As TestSuite
     Set ITest_Suite = New TestSuite

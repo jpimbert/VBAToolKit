@@ -10,6 +10,19 @@ Option Explicit
 '   - Each instance of Configuration Manager is attached to the DEV Excel Workbook of a project
 '       - the method vtkConfigurationManagerForProject give the instance attached to a workbook, or create it
 '
+' Copyright 2013 Skwal-Soft (http://skwalsoft.com)
+'
+'   Licensed under the Apache License, Version 2.0 (the "License");
+'   you may not use this file except in compliance with the License.
+'   You may obtain a copy of the License at
+'
+'       http://www.apache.org/licenses/LICENSE-2.0
+'
+'   Unless required by applicable law or agreed to in writing, software
+'   distributed under the License is distributed on an "AS IS" BASIS,
+'   WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+'   See the License for the specific language governing permissions and
+'   limitations under the License.
 '---------------------------------------------------------------------------------------
 
 '   collection of instances indexed by project names
@@ -36,9 +49,13 @@ Public Function vtkConfigurationManagerForProject(projectName As String) As vtkC
     If err <> 0 Then
         Set cm = New vtkConfigurationManager
         cm.projectName = projectName
-        configurationManagers.Add Item:=cm, Key:=projectName
+        If cm.projectName Like projectName Then     ' The initialization could fail (if the Workbook is closed)
+            configurationManagers.Add Item:=cm, Key:=projectName
+           Else
+            Set cm = Nothing
         End If
-    On Error GoTo 0
+    End If
+   On Error GoTo 0
     ' return the configuration manager
     Set vtkConfigurationManagerForProject = cm
 End Function
@@ -84,7 +101,7 @@ Public Sub vtkInitializeConfigurationForActiveWorkBook()
     ActiveWorkbook.VBProject.name = project.projectDEVName
     
     ' Change the workbook name
-    ActiveWorkbook.SaveAs Filename:=ActiveWorkbook.path & "\" & project.workbookDEVName
+    ActiveWorkbook.SaveAs fileName:=ActiveWorkbook.path & "\" & project.workbookDEVName
     
     ' Prepare configuration manager
     Dim i As Integer, c As VBComponent, cn_dev As Integer, cn_prod As Integer, nm As Integer
@@ -96,7 +113,7 @@ Public Sub vtkInitializeConfigurationForActiveWorkBook()
     For i = 1 To ActiveWorkbook.VBProject.VBComponents.Count
         Set c = ActiveWorkbook.VBProject.VBComponents.Item(i)
         If c.Type <> vbext_ct_Document Then
-            nm = cm.addModule(c.name)
+            nm = cm.AddModule(c.name)
             cm.setModulePathWithNumber path:=vtkStandardPathForModule(module:=c), numModule:=nm, numConfiguration:=cn_dev
             If vtkStandardCategoryForModuleName(moduleName:=c.name) Like "Prod" Then
                 cm.setModulePathWithNumber path:=vtkStandardPathForModule(module:=c), numModule:=nm, numConfiguration:=cn_prod

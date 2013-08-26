@@ -7,7 +7,28 @@ Attribute VB_GlobalNameSpace = False
 Attribute VB_Creatable = False
 Attribute VB_PredeclaredId = False
 Attribute VB_Exposed = False
-'Option Explicit
+'---------------------------------------------------------------------------------------
+' Module    : vtkCreateProjectTester
+' Author    : Jean-Pierre Imbert
+' Date      : 21/08/2013
+' Purpose   : Test the Create Project main function
+'
+' Copyright 2013 Skwal-Soft (http://skwalsoft.com)
+'
+'   Licensed under the Apache License, Version 2.0 (the "License");
+'   you may not use this file except in compliance with the License.
+'   You may obtain a copy of the License at
+'
+'       http://www.apache.org/licenses/LICENSE-2.0
+'
+'   Unless required by applicable law or agreed to in writing, software
+'   distributed under the License is distributed on an "AS IS" BASIS,
+'   WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+'   See the License for the specific language governing permissions and
+'   limitations under the License.
+'---------------------------------------------------------------------------------------
+
+Option Explicit
 Implements ITest
 Implements ITestCase
 
@@ -135,6 +156,7 @@ returnValue = vtkCreateProject(path:=vtkTestPath, name:=vtkTestProjectName, disp
     Next
 mAssert.Equals j, 2, "the references number must be equal to" & i + 2
 End Sub
+
 Public Sub TestReferencesOfDeliveryWorkbookWasActivated()
  Dim returnValue As Long
  Dim i As Integer
@@ -153,9 +175,34 @@ returnValue = vtkCreateProject(path:=vtkTestPath, name:=vtkTestProjectName, disp
 mAssert.Equals j, 2, "the references number must be equal to" & i + 2
 End Sub
 
+Public Sub Test_VBAUnitModulesExportation()
+    '   Verify that VBA modules are exported from VBAToolkit to the new project
+    Dim returnvalue As Long, fso As New FileSystemObject
+    
+    returnvalue = vtkCreateProject(path:=vtkTestPath, name:=vtkTestProjectName, displayError:=False)
+    
+    mAssert.Should fso.FileExists(vtkTestPath & "\" & vtkTestProjectName & "\" & "Source\VbaUnit\" & "VbaUnitMain.bas"), "VBAUnitMain module have to be exported"
+
+Public Sub Test_VBAUnitModulesImportation()
+    '   Verify that VBA modules are imported in the new project
+    Dim returnvalue As Long, fso As New FileSystemObject
+    
+    returnvalue = vtkCreateProject(path:=vtkTestPath, name:=vtkTestProjectName, displayError:=False)
+    
+   On Error GoTo Test_VBAUnitModulesImportation_Error
+    mAssert.Should Not Workbooks(vtkTestProjectName & "_DEV.xlsm").VBProject.VBComponents("VBAUnitMain") Is Nothing, "VBAUnitMain module have to be imported"
+    mAssert.Should Not Workbooks(vtkTestProjectName & "_DEV.xlsm").VBProject.VBComponents("TestClassLister") Is Nothing, "TestClassLister module have to be imported"
+    mAssert.Should Not Workbooks(vtkTestProjectName & "_DEV.xlsm").VBProject.VBComponents("TestRunner") Is Nothing, "TestRunner module have to be imported"
+    mAssert.Should Not Workbooks(vtkTestProjectName & "_DEV.xlsm").VBProject.VBComponents("IRunManager") Is Nothing, "IRunManager module have to be imported"
+    mAssert.Should Not Workbooks(vtkTestProjectName & "_DEV.xlsm").VBProject.VBComponents("TestResult") Is Nothing, "TestResult module have to be imported"
+   On Error GoTo 0
+   Exit Sub
+
+Test_VBAUnitModulesImportation_Error:
+    mAssert.Should False, "No error have to be raised during project creation (Err=" & err.Number & ": " & err.Description & ")"
+End Sub
 
 Public Sub Test_vtkCreateProject_correctPathGitFolderIsCreated()
-
     Dim fso As New FileSystemObject
     
     On Error GoTo Test_vtkCreateProject_correctPathGitFolderIsCreated_Error
@@ -185,6 +232,8 @@ Private Function ITest_Suite() As TestSuite
     ITest_Suite.AddTest ITest_Manager.ClassName, "TestDelivProjectIsNamedcorrectly"
     ITest_Suite.AddTest ITest_Manager.ClassName, "TestReferencesOfDevWorkbookWasActivated"
     ITest_Suite.AddTest ITest_Manager.ClassName, "TestReferencesOfDeliveryWorkbookWasActivated"
+    ITest_Suite.AddTest ITest_Manager.ClassName, "Test_VBAUnitModulesExportation"
+    ITest_Suite.AddTest ITest_Manager.ClassName, "Test_VBAUnitModulesImportation"
     ITest_Suite.AddTest ITest_Manager.ClassName, "Test_vtkCreateProject_correctPathGitFolderIsCreated"
 End Function
 
@@ -200,6 +249,8 @@ Private Sub ITestCase_RunTest()
         Case "TestDelivProjectIsNamedcorrectly": TestDelivProjectIsNamedcorrectly
         Case "TestReferencesOfDevWorkbookWasActivated": TestReferencesOfDevWorkbookWasActivated
         Case "TestReferencesOfDeliveryWorkbookWasActivated": TestReferencesOfDeliveryWorkbookWasActivated
+        Case "Test_VBAUnitModulesExportation": Test_VBAUnitModulesExportation
+        Case "Test_VBAUnitModulesImportation": Test_VBAUnitModulesImportation
         Case "Test_vtkCreateProject_correctPathGitFolderIsCreated": Test_vtkCreateProject_correctPathGitFolderIsCreated
         Case Else: mAssert.Should False, "Invalid test name: " & mManager.methodName
     End Select

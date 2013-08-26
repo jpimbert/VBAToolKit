@@ -7,6 +7,20 @@ Option Explicit
 ' Purpose   : This module contains the functions called for the main capacities of VBAToolKit
 '               - new project creation
 '               - (other capacities will be delelopped later)
+'
+' Copyright 2013 Skwal-Soft (http://skwalsoft.com)
+'
+'   Licensed under the Apache License, Version 2.0 (the "License");
+'   you may not use this file except in compliance with the License.
+'   You may obtain a copy of the License at
+'
+'       http://www.apache.org/licenses/LICENSE-2.0
+'
+'   Unless required by applicable law or agreed to in writing, software
+'   distributed under the License is distributed on an "AS IS" BASIS,
+'   WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+'   See the License for the specific language governing permissions and
+'   limitations under the License.
 '---------------------------------------------------------------------------------------
 
 '---------------------------------------------------------------------------------------
@@ -52,34 +66,43 @@ Public Function vtkCreateProject(path As String, name As String, Optional displa
     'Rename Project
     Workbooks(project.workbookDEVName).VBProject.name = project.projectDEVName
     'call function who activate references
-    VtkActivateReferences (project.workbookDEVName)
+    VtkActivateReferences wb:=Workbooks(project.workbookDEVName)
     'initialize configuration Sheet with VBAUnit modules
     vtkInitializeVbaUnitNamesAndPathes project:=project.projectName
     ' Save Development Project Workbook
-    Workbooks(project.workbookDEVName).save
+    Workbooks(project.workbookDEVName).Save
     
     'Create delivery workbook
     Workbooks.Add.SaveAs (rootPath & "\" & project.projectStandardRelativePath), FileFormat:=(52) '52 is xlsm format
     'Rename Project
     Workbooks(project.workbookName).VBProject.name = project.projectName
     'call function who activate references
-    VtkActivateReferences (project.workbookName)
+    VtkActivateReferences wb:=Workbooks(project.workbookName)
     ' A module must be added in the Excel File for the project parameters to be saved
     Workbooks(project.workbookName).VBProject.VBComponents.Add ComponentType:=vbext_ct_StdModule
     ' Save and Close Delivery Project WorkBook
-    Workbooks(project.workbookName).Close SaveChanges:=True
+    Workbooks(project.workbookName).Close savechanges:=True
     
-    Workbooks(project.workbookDEVName).Activate
-    '
-    '            RetVtkExportAll = vtkExportAll(ThisWorkbook.name)
-    '            RetValImportTestConf = vtkImportTestConfig()
-    
-    On Error GoTo vtkCreateProject_ErrorGit
+    Dim wb As Workbook
+    Set wb = Workbooks(project.workbookDEVName)
+    wb.Activate
+    ' Get VBAUnit modules from VBAToolkit (This workbook = current running code)
+    vtkExportModulesFromAnotherProject projectWithModules:=ThisWorkbook.VBProject, projectName:=project.projectName, confName:=project.projectDEVName
+    ' Import VBAUnit (and lib ?) modules in the new Excel file project
+    vtkImportModulesInAnotherProject projectForModules:=wb.VBProject, projectName:=project.projectName, confName:=project.projectDEVName
+ 
+   ' Save configured and updated project for test 
+    wb.save
+	
+	' Initialize git
+	On Error GoTo vtkCreateProject_ErrorGit
     vtkInitializeGit rootPath
-    
-    On Error GoTo 0
-    vtkCreateProject = 0
+
+
+	On Error GoTo 0
+    vtkCreateProject = VTK_OK
     Exit Function
+
 vtkCreateProject_ErrorTreeFolder:
     vtkCreateProject = internalError
     If displayError Then MsgBox "Error " & Err.number & " (" & Err.Description & ") in procedure vtkCreateProject of Module MainFunctions"

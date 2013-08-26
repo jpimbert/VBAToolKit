@@ -4,11 +4,27 @@ Attribute VB_Name = "vtkImportExportUtilities"
 ' Author    : Jean-Pierre Imbert
 ' Date      : 07/08/2013
 ' Purpose   : Group utilitiy functions for Modules Import/Export management
+'
+' Copyright 2013 Skwal-Soft (http://skwalsoft.com)
+'
+'   Licensed under the Apache License, Version 2.0 (the "License");
+'   you may not use this file except in compliance with the License.
+'   You may obtain a copy of the License at
+'
+'       http://www.apache.org/licenses/LICENSE-2.0
+'
+'   Unless required by applicable law or agreed to in writing, software
+'   distributed under the License is distributed on an "AS IS" BASIS,
+'   WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+'   See the License for the specific language governing permissions and
+'   limitations under the License.
 '---------------------------------------------------------------------------------------
 
 Option Explicit
 
 Private vbaUnitModules As Collection
+Public Const VTK_UNKNOWN_MODULE = 4000
+Public Const VTK_UNEXPECTED_ERROR = 2000    ' To delete when vtkConstants will be updated with Lucas_v code
 
 '---------------------------------------------------------------------------------------
 ' Function  : VBComponentTypeAsString
@@ -155,27 +171,239 @@ Public Function vtkVBAUnitModulesList() As Collection
     Set vtkVBAUnitModulesList = vbaUnitModules
 End Function
 
-''---------------------------------------------------------------------------------------
-'' Procedure : vtkIsVbaUnit
-'' Author    : user
-'' Date      : 17/05/2013
-'' Purpose   : - take name in parameter and verify if the module is a vbaunit module
-''---------------------------------------------------------------------------------------
-''
-'Public Function vtkIsVbaUnit(modulename As String) As Boolean
-'Dim i As Integer
-'Dim valinit As Integer
-'Dim valfin As Integer
-'    valinit = vtkFirstLine
-'    valfin = vtkFirstLine + 17
-'    vtkIsVbaUnit = False
-' For i = vtkFirstLine To valfin
-'  If modulename = Range(vtkModuleNameRange & i) And modulename <> "" Then
-'     vtkIsVbaUnit = True
-'  Exit For
-'  End If
-' Next
-'End Function
+'---------------------------------------------------------------------------------------
+' Procedure : vtkImportOneModule
+' Author    : Jean-Pierre Imbert
+' Date      : 09/08/2013
+' Purpose   : Import a module from a file into a project
+' Parameters :
+'           - project, a VBProject into which to import the module
+'           - moduleName, the name of module to import
+'           - filePath, path of the file to import as new module
+'             if the import succeed, the imported module replace the old one if any
+'
+' Programming Tip
+'       It's impossible to remove an existing module by VBA code, so the import is done
+'       by a/ really import the module if it doesn't exist
+'          b/ erase then rewrite the lines of code if it already exists
+'
+' WARNING : The code of User Form can be imported with this method
+'           but the form layout can't be imported if it already exist in the project
+'---------------------------------------------------------------------------------------
+'
+Public Sub vtkImportOneModule(project As VBProject, moduleName As String, filePath As String)
+    Dim newModule As VBComponent, oldModule As VBComponent
+    
+   
+   On Error Resume Next
+    Set oldModule = project.VBComponents(moduleName)
+    
+    ' If the oldModule doesn't exist, we can directly import the file
+    If oldModule Is Nothing Then
+        Set newModule = project.VBComponents.Import(filePath)
+        If Not newModule Is Nothing Then newModule.name = moduleName
+       Else
+    ' If the oldModule exists, we have to copy lines of code from the file
+        ' Read File
+        Dim fso, buf As TextStream, code As String
+        Set fso = CreateObject("Scripting.FileSystemObject")
+        Const ForReading = 1, ForWriting = 2, ForAppending = 3
+        Const TristateUseDefault = -2, TristateTrue = -1, TristateFalse = 0
+
+        Set buf = fso.OpenTextFile(filePath, ForReading, False, TristateUseDefault)
+        
+        ' If file open OK, read the code
+        If Not buf Is Nothing Then
+            ' Discards the first lines before the first "Attribute" line
+            Do
+                code = buf.ReadLine
+                Loop While Not Left$(code, 9) Like "Attribute"
+            ' Discards the "Attribute" lines
+            Do While Left$(code, 9) Like "Attribute"
+                code = buf.ReadLine
+                Loop
+            ' Read all remaining lines
+            code = code & vbCrLf & buf.ReadAll
+            
+            ' Replace the code
+            oldModule.CodeModule.DeleteLines StartLine:=1, Count:=oldModule.CodeModule.CountOfLines
+            oldModule.CodeModule.InsertLines 1, code
+        End If
+        Set fso = Nothing
+    End If
+   On Error GoTo 0
+End Sub
+
+'---------------------------------------------------------------------------------------
+' Procedure : vtkExportOneModule
+' Author    : Jean-Pierre Imbert
+' Date      : 09/08/2013
+' Purpose   : Export a module from a project to a file
+' Parameters :
+'           - project, a VBProject from which to export the module
+'           - moduleName, the name of module to export
+'           - filePath, path of the file to export the module
+' NOTE      : The file in which to export is deleted prior to export if it already exists
+'             except if the file has readonly attribute
+'
+' TODO :    - Replace Filepath functions with new ones in FileSystemUtilities
+'---------------------------------------------------------------------------------------
+'
+Public Sub vtkExportOneModule(project As VBProject, moduleName As String, filePath As String)
+    Dim fso As New FileSystemObject, m As VBComponent
+    
+   On Error GoTo vtkExportOneModule_Error
+   
+    ' Get the module to export
+    Set m = project.VBComponents(moduleName)
+        
+    ' Kill file if it already exists only AFTER get the module, if it not exists the file must not be deleted
+    If fso.FileExists(filePath) Then fso.DeleteFile fileSpec:=filePath
+    
+    ' Export module
+    m.Export fileName:=filePath
+    
+   On Error GoTo 0
+    Exit Sub
+
+vtkExportOneModule_Error:
+    If err.Number = 9 Then
+        err.Raise Number:=VTK_UNKNOWN_MODULE, source:="ExportOneModule", Description:="Module to export doesn't exist : " & moduleName
+       Else
+        err.Raise Number:=VTK_UNEXPECTED_ERROR, source:="ExportOneModule", Description:="Unexpected error when exporting " & moduleName & " : " & err.Description
+    End If
+End Sub
+
+'---------------------------------------------------------------------------------------
+' Procedure : vtkExportModulesFromAnotherProject
+' Author    : Jean-Pierre Imbert
+' Date      : 22/08/2013
+' Purpose   : Export modules listed in a configuration for a project
+'             - the project/configuration containing the modules list are projectName/confName parameters
+'             - the modules are extracted from project projectWithModules
+'             - the modules are exported to pathes listed in project/configuration
+' NOTE      : Used to get VBAUnit modules (and libs ?) when creating a project
+'---------------------------------------------------------------------------------------
+'
+Public Sub vtkExportModulesFromAnotherProject(projectWithModules As VBProject, projectName As String, confName As String)
+    Dim cm As vtkConfigurationManager, rootPath As String
+    Dim cn As Integer, filePath As String, i As Integer
+    
+   On Error GoTo vtkExportModulesFromAnotherProject_Error
+
+    ' Get the project and the rootPath of the project
+    Set cm = vtkConfigurationManagerForProject(projectName)
+    cn = cm.getConfigurationNumber(configuration:=confName)
+    rootPath = cm.rootPath
+    
+    ' Export all modules for this configuration from the projectWithModules
+    For i = 1 To cm.moduleCount
+        filePath = cm.getModulePathWithNumber(numModule:=i, numConfiguration:=cn)
+        If Not filePath Like "" Then vtkExportOneModule project:=projectWithModules, moduleName:=cm.module(i), filePath:=rootPath & "\" & filePath
+    Next i
+    
+   On Error GoTo 0
+   Exit Sub
+
+vtkExportModulesFromAnotherProject_Error:
+    err.Raise VTK_UNEXPECTED_ERROR, "vtkExportModulesFromAnotherProject", "Unexpected error when exporting modules from " & projectWithModules.name & " : " & err.Description
+End Sub
+
+'---------------------------------------------------------------------------------------
+' Procedure : vtkImportModulesInAnotherProject
+' Author    : Jean-Pierre Imbert
+' Date      : 22/08/2013
+' Purpose   : Import modules listed in a configuration for a project
+'             - the project/configuration containing the modules list are projectName/confName parameters
+'             - the modules are imported in the project projectForModules
+'             - the modules are imported from pathes listed in project/configuration
+'---------------------------------------------------------------------------------------
+'
+Public Sub vtkImportModulesInAnotherProject(projectForModules As VBProject, projectName As String, confName As String)
+    Dim cm As vtkConfigurationManager, rootPath As String
+    Dim cn As Integer, filePath As String, i As Integer
+    
+   On Error GoTo vtkImportModulesInAnotherProject_Error
+
+    ' Get the project and the rootPath of the project
+    Set cm = vtkConfigurationManagerForProject(projectName)
+    cn = cm.getConfigurationNumber(configuration:=confName)
+    rootPath = cm.rootPath
+    
+    ' Import all modules for this configuration into the projectForModules
+    For i = 1 To cm.moduleCount
+        filePath = cm.getModulePathWithNumber(numModule:=i, numConfiguration:=cn)
+        If Not filePath Like "" Then vtkImportOneModule project:=projectForModules, moduleName:=cm.module(i), filePath:=rootPath & "\" & filePath
+    Next i
+    
+   On Error GoTo 0
+   Exit Sub
+
+vtkImportModulesInAnotherProject_Error:
+    err.Raise VTK_UNEXPECTED_ERROR, "vtkImportModulesInAnotherProject_Error", "Unexpected error when importing modules into " & projectForModules.name & " : " & err.Description
+End Sub
+
+'---------------------------------------------------------------------------------------
+' Procedure : vtkRecreateConfiguration
+' Author    : Jean-Pierre Imbert
+' Date      : 09/08/2013
+' Purpose   : recreate a complete configuration based on
+'             - the vtkConfiguration sheet of the project
+'             - the exported modules located in the Source folder
+' Params    - projectName
+'           - configurationName
+' WARNING : We use vtkImportOneModule because the document module importation is
+'           not efficient with VBComponents.Import (creation of a double class module
+'           instead of import the Document code)
+' TEST :
+'   execute 'vtkRecreateConfiguration projectName :="VBAToolKit",configurationName:="VBAToolKit"'
+'   if the Project to reconfigure is installed as AddIn, it must be uninstalled then reinstalled.
+'
+' IMPORTANT TO DO :
+'   il faut récupérer la feuille vtkConfigurations existante pour le projet de DEV
+'   il faudrait aussi récupérer les modules non exportés du projet DEV (tmptest)
+'   il faut tester avec un miniprojet où les deux fichiers Excel sont dans Tests
+'
+' WARNING : Cette fonction devra être reprise en profondeur pour être généralisée
+'           Elle sera testée formellement à ce moment là
+'---------------------------------------------------------------------------------------
+'
+Public Sub vtkRecreateConfiguration(projectName As String, configurationName As String)
+    Dim cm As vtkConfigurationManager, rootPath As String, wbPath As String, wb As Workbook
+    ' Get the project and the rootPath of the project
+    Set cm = vtkConfigurationManagerForProject(projectName)
+    rootPath = cm.rootPath
+    ' Get the configuration number in the project and the path of the file
+    wbPath = cm.getConfigurationPath(configuration:=configurationName)
+    ' Create a new Excel file
+    Set wb = vtkCreateExcelWorkbook()
+    ' Set the projectName
+    wb.VBProject.name = configurationName
+    ' Import all modules for this configuration from the source directory
+    vtkImportModulesInAnotherProject projectForModules:=wb.VBProject, projectName:=projectName, confName:=configurationName
+    ' Recreate references in the new Excel File
+    VtkActivateReferences wb:=wb
+    ' Set attribute properties WARNING - only for Delivery VBAToolKit
+    wb.BuiltinDocumentProperties("Title").Value = "VBAToolKit"
+    wb.BuiltinDocumentProperties("Comments").Value = "Toolkit improving IDE for VBA projects"
+    ' Deactivate AddIn if the current Excel file is AddIn and installed
+    Dim fso As New FileSystemObject, fileName As String, addInWasActivated As Boolean, wbIsAddin As Boolean
+    fileName = fso.GetFileName(wbPath)
+   On Error Resume Next
+    wbIsAddin = Workbooks(fileName).IsAddin
+    If err.Number = 0 And wbIsAddin Then
+        addInWasActivated = AddIns(configurationName).Installed
+        AddIns(configurationName).Installed = False
+       Else
+        addInWasActivated = False
+    End If
+   On Error GoTo 0
+    ' Save the Excel file with the good type and erase the previous one (a message is displayed to the user)
+    wb.SaveAs fileName:=rootPath & "\" & wbPath, FileFormat:=vtkDefaultFileFormat(wbPath)
+    wb.Close savechanges:=False
+    If addInWasActivated Then AddIns(configurationName).Installed = True
+End Sub
+
 '
 ''---------------------------------------------------------------------------------------
 '' Procedure : vtkListAllModules
@@ -368,33 +596,3 @@ End Function
 '    Wend
 'End Function
 '
-''---------------------------------------------------------------------------------------
-'' Procedure : vtkImportModule
-'' Author    : user
-'' Date      : 17/05/2013
-'' Purpose   : - import module to a workbook
-''             - Return number of imported modules
-''---------------------------------------------------------------------------------------
-''
-'Public Function vtkImportTestConfig() As Integer
-'Dim i As Integer
-'
-'
-'        i = 0
-'    While ActiveWorkbook.Sheets(vtkConfSheet).Range(vtkModuleNameRange & vtkFirstLine + i) <> ""
-'
-'        On Error Resume Next
-'             ' if the module is a class or module
-'             If (ActiveWorkbook.VBProject.VBComponents(ActiveWorkbook.Sheets(vtkConfSheet).Range(vtkModuleNameRange & vtkFirstLine + i)).Type = 1 Or ActiveWorkbook.VBProject.VBComponents(ActiveWorkbook.Sheets(vtkConfSheet).Range(vtkModuleNameRange & vtkFirstLine + i)).Type = 2) Then
-'                'if the module exist we will delete it and we will replace it
-'                ActiveWorkbook.VBProject.VBComponents.Remove ActiveWorkbook.VBProject.VBComponents(ActiveWorkbook.Sheets(vtkConfSheet).Range(vtkModuleNameRange & vtkFirstLine + i))
-'                ActiveWorkbook.VBProject.VBComponents.Import ActiveWorkbook.Sheets(vtkConfSheet).Range(vtkModuleDevRange & vtkFirstLine + i)
-'                ActiveWorkbook.Sheets(vtkConfSheet).Range(vtkModuleInformationsRange & vtkFirstLine + i) = "module imported at " & Now
-'
-'             End If
-'
-'        i = i + 1
-'    Wend
-'vtkImportTestConfig = i
-'On Error GoTo 0
-'End Function

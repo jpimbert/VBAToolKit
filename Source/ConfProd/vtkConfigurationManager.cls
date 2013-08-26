@@ -22,15 +22,32 @@ Option Explicit
 '       - the method vtkConfigurationManagerForProject of module vtkConfigurationManagers give the instance attached to a project, or create it
 '   - a VTK project is implemented by a main Excel file containing a sheet named "vtkConfigurations"
 '       - if such a sheet doesn't exist, it is created
+'   - When initializing an instance, the relative development project workbook must be opened
+'       - else initialization is not performed
 '
 ' To implement later
 '   - automatic recognition of the configuration sheet version, and proposal to the user to convert to the last version
 '       cell $A$1 contains the version identification of the sheet version like "vtkConfigurations v1.0"
 '
+' Copyright 2013 Skwal-Soft (http://skwalsoft.com)
+'
+'   Licensed under the Apache License, Version 2.0 (the "License");
+'   you may not use this file except in compliance with the License.
+'   You may obtain a copy of the License at
+'
+'       http://www.apache.org/licenses/LICENSE-2.0
+'
+'   Unless required by applicable law or agreed to in writing, software
+'   distributed under the License is distributed on an "AS IS" BASIS,
+'   WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+'   See the License for the specific language governing permissions and
+'   limitations under the License.
 '---------------------------------------------------------------------------------------
 
 Private m_projectName As String             ' The configuration of a project is attached to the DEV Excel file
+Private m_workbook As Workbook
 Private m_configurationSheet As Worksheet
+Private m_rootPath As String
 Private Const sheetName As String = "vtkConfigurations"
 Private Const currentVersion As String = "vtkConfigurations v1.0"
 Private Const nbTitleColumns As Integer = 1
@@ -38,8 +55,8 @@ Private Const nbTitleRows As Integer = 2
 
 Private Sub Class_Terminate()
     Set m_configurationSheet = Nothing
+    Set m_workbook = Nothing
 End Sub
-
 
 '---------------------------------------------------------------------------------------
 ' Property  : projectName as String - Read/Write - Public
@@ -54,10 +71,52 @@ Public Property Get projectName() As String
 End Property
 
 Public Property Let projectName(ByVal sprojectName As String)
-    If m_projectName <> sprojectName Then
+    Dim wbName As String
+    wbName = vtkProjectForName(sprojectName).workbookDEVName
+    If m_projectName <> sprojectName And VtkWorkbookIsOpen(wbName) Then
         m_projectName = sprojectName
+        Set m_workbook = Workbooks(wbName)
+        m_rootPath = ""
         setConfigurationSheet      ' Reset the configuration sheet when the attached project is changed
     End If
+End Property
+
+'---------------------------------------------------------------------------------------
+' Property  : workbook as WorkBook - Read Only - Private
+' Author    : Jean-Pierre Imbert
+' Date      : 09/08/2013
+' Purpose   : return the workbook containing the project
+'---------------------------------------------------------------------------------------
+'
+Private Property Get Workbook() As Workbook
+    Set Workbook = m_workbook
+End Property
+
+'---------------------------------------------------------------------------------------
+' Property  : rootPath as String - Read Only - Public
+' Author    : Jean-Pierre Imbert
+' Date      : 09/08/2013
+' Purpose   : return the rootPath of the project if the Excel file was already saved
+'             - or return "" if the rootPath can't be determined
+'             - the rootPath is cached when identified the first time
+'---------------------------------------------------------------------------------------
+'
+Public Property Get rootPath() As String
+    Dim ret As String
+    If Not m_rootPath Like "" Then
+        ret = m_rootPath
+       Else
+        ret = ""
+        If Not Workbook Is Nothing Then
+            ret = Workbook.path
+            If Not ret Like "" Then
+                Dim fso As New FileSystemObject
+                ret = fso.GetParentFolderName(ret)
+                m_rootPath = ret
+            End If
+        End If
+    End If
+    rootPath = ret
 End Property
 
 '---------------------------------------------------------------------------------------
@@ -90,10 +149,10 @@ End Function
 Private Sub setConfigurationSheet()
     Dim ws As Worksheet
     On Error Resume Next
-    Set ws = Workbooks(vtkProjectForName(projectName).workbookDEVName).Worksheets(sheetName)
+    Set ws = Workbook.Worksheets(sheetName)
     On Error GoTo 0
     If ws Is Nothing Then        ' If the Configuration doesn't exist, create one
-        Set ws = Workbooks(vtkProjectForName(projectName).workbookDEVName).Worksheets.Add(Type:=xlWorksheet)
+        Set ws = Workbook.Worksheets.Add(Type:=xlWorksheet)
         ws.name = sheetName
         '   Initialize the configuration sheet
         initializeConfigurationSheet ws
@@ -311,7 +370,7 @@ End Function
 '               - if the module is already existant, return minus the number of the existant module
 '---------------------------------------------------------------------------------------
 '
-Public Function addModule(module As String) As Integer
+Public Function AddModule(module As String) As Integer
     Dim n As Integer
     n = getModuleNumber(module)
     If n = 0 Then   ' n = 0 means non-existant module
@@ -321,9 +380,9 @@ Public Function addModule(module As String) As Integer
         For i = 1 To configurationCount                         ' For each configuration
             configurationSheet.Cells(n + nbTitleRows, i + nbTitleColumns) = "-"     ' Set Default path as not initialized
         Next i
-        addModule = n
+        AddModule = n
        Else
-        addModule = -n
+        AddModule = -n
     End If
 End Function
 
