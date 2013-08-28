@@ -55,19 +55,14 @@ Private Sub ITestCase_TearDown()
 
 End Sub
 
-Public Sub TestPathOfCurrentProject()
-    ' Verify the path of the current project is where VBATollKit is installed
-    mAssert.Equals vtkPathOfCurrentProject, vtkInstallPath
-End Sub
-
 Public Sub TestPathToTestFolder()
     ' Verify the path of the current Test Folder
-    mAssert.Equals vtkPathToTestFolder, vtkInstallPath & "\Tests"
+    mAssert.Equals vtkPathToTestFolder, vtkPathOfCurrentProject & "\Tests"
 End Sub
 
 Public Sub TestPathToSourceFolder()
     ' Verify the path of the current Source Folder
-    mAssert.Equals vtkPathToSourceFolder, vtkInstallPath & "\Source"
+    mAssert.Equals vtkPathToSourceFolder, vtkPathOfCurrentProject & "\Source"
 End Sub
 
 Public Sub TestPathfinishbyVBAToolKit()
@@ -106,7 +101,6 @@ End Sub
 
 Private Function ITest_Suite() As TestSuite
     Set ITest_Suite = New TestSuite
-    ITest_Suite.AddTest ITest_Manager.ClassName, "TestPathOfCurrentProject"
     ITest_Suite.AddTest ITest_Manager.ClassName, "TestPathToTestFolder"
     ITest_Suite.AddTest ITest_Manager.ClassName, "TestPathToSourceFolder"
     ITest_Suite.AddTest ITest_Manager.ClassName, "TestPathfinishbyVBAToolKit"
@@ -120,7 +114,6 @@ End Function
 
 Private Sub ITestCase_RunTest()
     Select Case mManager.methodName
-        Case "TestPathOfCurrentProject": TestPathOfCurrentProject
         Case "TestPathToTestFolder": TestPathToTestFolder
         Case "TestPathToSourceFolder": TestPathToSourceFolder
         Case "TestPathfinishbyVBAToolKit": TestPathfinishbyVBAToolKit
