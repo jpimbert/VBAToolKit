@@ -18,6 +18,7 @@ Option Explicit
 '               - 'number' (read only) is the number of the configuration in the configuration manager
 '               - 'path' is the full path for the Excel workbook containing the configuration (wrapper to 'parent' methods)
 '               - 'modules' is a collection of vtkModule objects, all the modules contained in the configuration with non null path (wrapper to 'parent' methods)
+'             A vtkConfiguration object must be initialized with 'init' method
 '
 ' Copyright 2013 Skwal-Soft (http://skwalsoft.com)
 '
@@ -37,3 +38,49 @@ Option Explicit
 Private m_parent As vtkConfigurationManager             ' A configuration is attached to a Configuration Manager
 Private m_number As Integer
 
+'---------------------------------------------------------------------------------------
+' Procedure : init
+' Author    : Jean-Pierre Imbert
+' Date      : 28/08/2013
+' Purpose   : Initialize a vtkConfiguration object with parent and number
+'
+' NOTE      : This method is dedicated to be used by vtkConfigurationManager
+'---------------------------------------------------------------------------------------
+'
+Public Sub init(confManager As vtkConfigurationManager, confNumber As Integer)
+    Set m_parent = confManager
+    m_number = confNumber
+End Sub
+
+'---------------------------------------------------------------------------------------
+' Property  : parent as vtkConfigurationManager (Read Only, initialized with init)
+' Author    : Jean-Pierre Imbert
+' Date      : 28/08/2013
+' Purpose   : The vtkConfiguration in which is declared this vtkConfiguration
+'---------------------------------------------------------------------------------------
+'
+Property Get parent() As vtkConfigurationManager
+    Set parent = m_parent
+End Property
+
+'---------------------------------------------------------------------------------------
+' Property  : number as Integer (Read Only, initialized with init)
+' Author    : Jean-Pierre Imbert
+' Date      : 28/08/2013
+' Purpose   : The number of the configuration in its parent
+'---------------------------------------------------------------------------------------
+'
+Property Get number() As Integer
+    number = m_number
+End Property
+
+'---------------------------------------------------------------------------------------
+' Property  : name as string (wrapper on the parent vtkConfigurationManager)
+' Author    : Jean-Pierre Imbert
+' Date      : 28/08/2013
+' Purpose   : The name of the configuration
+'---------------------------------------------------------------------------------------
+'
+Property Get name() As String
+    name = m_parent.configuration(m_number)
+End Property
