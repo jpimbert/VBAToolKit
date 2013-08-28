@@ -137,30 +137,111 @@ M_Error:
     mAssert.Should False, "Unexpected Error (" & err.number & "): " & err.Description
 End Sub
 
+Public Sub Test_GetPathForConfiguration_ExistingConfiguration()
+    ' This test verifies the path for configuration of each vtkModule object
+    ' collection just initialized from an Excel worlbook
+    
+   On Error GoTo M_Error
+
+    mAssert.Equals confManager.modules(3).getPathForConfiguration("InitializedProject_DEV"), "Tests\TestForm.frm", "Path of the module in the Test workbook"
+    mAssert.Equals confManager.modules("TestModule").getPathForConfiguration("InitializedProject_DEV"), "Tests\TestModule.bas", "Path of the module in the Test workbook"
+
+   On Error GoTo 0
+   Exit Sub
+
+M_Error:
+    mAssert.Should False, "Unexpected Error (" & err.number & "): " & err.Description
+End Sub
+
+Public Sub Test_GetPathForConfiguration_InexistingConfigurationRaiseError()
+    ' This test verifies the path for configuration of each vtkModule object
+    ' collection just initialized from an Excel worlbook
+    Dim module As vtkModule
+    
+   On Error GoTo M_Error
+    Set module = confManager.modules(3)
+    mAssert.Equals module.getPathForConfiguration("NonExistant Configuration"), "", "Path of the module for non existant configuration"
+    mAssert.Should False, "An error must be raised"
+
+   On Error GoTo 0
+   Exit Sub
+
+M_Error:
+    mAssert.Equals err.number, VTK_INEXISTANT_CONFIGURATION, "Error raised"
+End Sub
+
+Public Sub Test_GetPathForConfiguration_InexistingConfigurationNullPath()
+    ' This test verifies the path for configuration of each vtkModule object
+    ' collection just initialized from an Excel worlbook
+    
+   On Error Resume Next
+
+    mAssert.Equals confManager.modules(3).getPathForConfiguration("NonExistant Configuration"), "", "Path of the module for non existant configuration"
+
+   On Error GoTo 0
+End Sub
+
+Public Sub Test_SetPathForConfiguration_ExistingConfiguration()
+    ' This test verifies the setting of path for configuration of each vtkModule object
+    ' collection just initialized from an Excel worlbook
+    
+   On Error GoTo M_Error
+
+    confManager.modules(3).setPathForConfiguration "InitializedProject_DEV", "new Path"
+    mAssert.Equals confManager.modules("TestForm").getPathForConfiguration("InitializedProject_DEV"), "new Path", "Path of the module in the Test workbook"
+
+   On Error GoTo 0
+   Exit Sub
+
+M_Error:
+    mAssert.Should False, "Unexpected Error (" & err.number & "): " & err.Description
+End Sub
+
+Public Sub Test_SetPathForConfiguration_InexistingConfigurationRaiseError()
+    ' This test verifies the setting of path for configuration of each vtkModule object
+    ' collection just initialized from an Excel worlbook
+    
+   On Error GoTo M_Error
+    confManager.modules(3).setPathForConfiguration "NonExistant Configuration", "newPath"
+    mAssert.Should False, "An error must be raised"
+
+   On Error GoTo 0
+   Exit Sub
+
+M_Error:
+    mAssert.Equals err.number, VTK_INEXISTANT_CONFIGURATION, "Error raised"
+End Sub
+
 Private Function ITest_Suite() As TestSuite
     Set ITest_Suite = New TestSuite
-    ITest_Suite.AddTest ITest_Manager.ClassName, "Test_ConfigurationCollection_Count"
+    ITest_Suite.AddTest ITest_Manager.ClassName, "Test_ModuleCollection_Count"
     ITest_Suite.AddTest ITest_Manager.ClassName, "Test_AddedConfigurationCollection_Count"
-    ITest_Suite.AddTest ITest_Manager.ClassName, "Test_ConfigurationCollection_Parent"
-    ITest_Suite.AddTest ITest_Manager.ClassName, "Test_AddedConfigurationCollection_Parent"
-    ITest_Suite.AddTest ITest_Manager.ClassName, "Test_ConfigurationCollection_Number"
-    ITest_Suite.AddTest ITest_Manager.ClassName, "Test_AddedConfigurationCollection_Number"
-    ITest_Suite.AddTest ITest_Manager.ClassName, "Test_ConfigurationGetName"
-    ITest_Suite.AddTest ITest_Manager.ClassName, "Test_ConfigurationGetPath"
-    ITest_Suite.AddTest ITest_Manager.ClassName, "Test_ConfigurationSetPath"
+    ITest_Suite.AddTest ITest_Manager.ClassName, "Test_ModuleCollection_Parent"
+    ITest_Suite.AddTest ITest_Manager.ClassName, "Test_AddedModuleCollection_Parent"
+    ITest_Suite.AddTest ITest_Manager.ClassName, "Test_ModuleCollection_Number"
+    ITest_Suite.AddTest ITest_Manager.ClassName, "Test_AddedModuleCollection_Number"
+    ITest_Suite.AddTest ITest_Manager.ClassName, "Test_ModuleGetName"
+    ITest_Suite.AddTest ITest_Manager.ClassName, "Test_GetPathForConfiguration_ExistingConfiguration"
+    ITest_Suite.AddTest ITest_Manager.ClassName, "Test_GetPathForConfiguration_InexistingConfigurationRaiseError"
+    ITest_Suite.AddTest ITest_Manager.ClassName, "Test_GetPathForConfiguration_InexistingConfigurationNullPath"
+    ITest_Suite.AddTest ITest_Manager.ClassName, "Test_SetPathForConfiguration_ExistingConfiguration"
+    ITest_Suite.AddTest ITest_Manager.ClassName, "Test_SetPathForConfiguration_InexistingConfigurationRaiseError"
 End Function
 
 Private Sub ITestCase_RunTest()
     Select Case mManager.methodName
-        Case "Test_ConfigurationCollection_Count": Test_ConfigurationCollection_Count
+        Case "Test_ModuleCollection_Count": Test_ModuleCollection_Count
         Case "Test_AddedConfigurationCollection_Count": Test_AddedConfigurationCollection_Count
-        Case "Test_ConfigurationCollection_Parent": Test_ConfigurationCollection_Parent
-        Case "Test_AddedConfigurationCollection_Parent": Test_AddedConfigurationCollection_Parent
-        Case "Test_ConfigurationCollection_Number": Test_ConfigurationCollection_Number
-        Case "Test_AddedConfigurationCollection_Number": Test_AddedConfigurationCollection_Number
-        Case "Test_ConfigurationGetName": Test_ConfigurationGetName
-        Case "Test_ConfigurationGetPath": Test_ConfigurationGetPath
-        Case "Test_ConfigurationSetPath": Test_ConfigurationSetPath
+        Case "Test_ModuleCollection_Parent": Test_ModuleCollection_Parent
+        Case "Test_AddedModuleCollection_Parent": Test_AddedModuleCollection_Parent
+        Case "Test_ModuleCollection_Number": Test_ModuleCollection_Number
+        Case "Test_AddedModuleCollection_Number": Test_AddedModuleCollection_Number
+        Case "Test_ModuleGetName": Test_ModuleGetName
+        Case "Test_GetPathForConfiguration_ExistingConfiguration": Test_GetPathForConfiguration_ExistingConfiguration
+        Case "Test_GetPathForConfiguration_InexistingConfigurationRaiseError": Test_GetPathForConfiguration_InexistingConfigurationRaiseError
+        Case "Test_GetPathForConfiguration_InexistingConfigurationNullPath": Test_GetPathForConfiguration_InexistingConfigurationNullPath
+        Case "Test_SetPathForConfiguration_ExistingConfiguration": Test_SetPathForConfiguration_ExistingConfiguration
+        Case "Test_SetPathForConfiguration_InexistingConfigurationRaiseError": Test_SetPathForConfiguration_InexistingConfigurationRaiseError
         Case Else: mAssert.Should False, "Invalid test name: " & mManager.methodName
     End Select
 End Sub

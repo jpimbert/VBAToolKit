@@ -99,3 +99,23 @@ End Property
 Property Let path(newPath As String)
     m_parent.setConfigurationPathWithNumber m_number, newPath
 End Property
+
+'---------------------------------------------------------------------------------------
+' Property  : modules as collection (Read Only)
+' Author    : Jean-Pierre Imbert
+' Date      : 28/08/2013
+' Purpose   : All modules with non null path are included in the collection
+'             the vtkModules are attached to the configuration
+'---------------------------------------------------------------------------------------
+'
+Property Get modules() As Collection
+    Dim col As New Collection, i As Integer, m As vtkModule
+    For i = 1 To m_parent.moduleCount
+        If Not (m_parent.getModulePathWithNumber(numModule:=i, numConfiguration:=m_number) Like "") Then
+            Set m = New vtkModule
+            m.init confManager:=m_parent, modNumber:=i, confNumber:=m_number
+            col.Add Item:=m, Key:=m_parent.module(i)
+        End If
+    Next i
+    Set modules = col
+End Property

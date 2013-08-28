@@ -21,3 +21,6 @@ Option Explicit
 '   limitations under the License.
 '---------------------------------------------------------------------------------------
 
+Public Const VTK_MODULE_NOTATTACHED = 4001              ' The module must be attached to a configuration
+Public Const VTK_INEXISTANT_CONFIGURATION = 4002        ' Unknown configuration
+

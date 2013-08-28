@@ -92,3 +92,36 @@ Property Get name() As String
     name = m_parent.module(m_number)
 End Property
 
+'---------------------------------------------------------------------------------------
+' Procedure : getPathForConfiguration
+' Author    : Jean-Pierre Imbert
+' Date      : 28/08/2013
+' Purpose   : get the path of the module for a specific configuration
+' Error Raised :
+'           VTK_INEXISTANT_CONFIGURATION if the configuration is inexistant
+'---------------------------------------------------------------------------------------
+'
+Public Function getPathForConfiguration(confName As String) As String
+    Dim cn As Integer
+    cn = m_parent.getConfigurationNumber(confName)
+    getPathForConfiguration = ""
+    If cn = 0 Then err.Raise VTK_INEXISTANT_CONFIGURATION, "vtkModule getPathForConfiguration", "Configuration """ & confName & """ in project """ & m_parent.projectName & """"
+    getPathForConfiguration = m_parent.getModulePathWithNumber(m_number, cn)
+End Function
+
+'---------------------------------------------------------------------------------------
+' Procedure : setPathForConfiguration
+' Author    : Jean-Pierre Imbert
+' Date      : 28/08/2013
+' Purpose   : change the path of the module for a specific configuration
+' Error Raised :
+'           VTK_INEXISTANT_CONFIGURATION if the configuration is inexistant
+'---------------------------------------------------------------------------------------
+'
+Public Function setPathForConfiguration(confName As String, newPath As String) As String
+    Dim cn As Integer
+    cn = m_parent.getConfigurationNumber(confName)
+    If cn = 0 Then err.Raise VTK_INEXISTANT_CONFIGURATION, "vtkModule getPathForConfiguration", "Configuration """ & confName & """ in project """ & m_parent.projectName & """"
+    m_parent.setModulePathWithNumber path:=newPath, numModule:=m_number, numConfiguration:=cn
+End Function
+

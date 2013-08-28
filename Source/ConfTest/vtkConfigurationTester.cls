@@ -140,8 +140,8 @@ Public Sub Test_ConfigurationGetPath()
     
    On Error GoTo M_Error
 
-    mAssert.Equals confManager.configurations(1).path, "Tests/InitializedProject_DEV.xlsm", "Path of the vtkConfiguration object by Index"
-    mAssert.Equals confManager.configurations("InitializedProject_DEV").path, "Tests/InitializedProject_DEV.xlsm", "Path of the vtkConfiguration object by Name"
+    mAssert.Equals confManager.configurations(1).path, "Tests\InitializedProject_DEV.xlsm", "Path of the vtkConfiguration object by Index"
+    mAssert.Equals confManager.configurations("InitializedProject_DEV").path, "Tests\InitializedProject_DEV.xlsm", "Path of the vtkConfiguration object by Name"
 
    On Error GoTo 0
    Exit Sub
@@ -167,7 +167,56 @@ M_Error:
     mAssert.Should False, "Unexpected Error (" & err.number & "): " & err.Description
 End Sub
 
-' Tester toutes les propriétés (RO et RW) - pour un projet initialisé et pour une conf ajoutée
+Public Sub Test_ConfigurationModules_Initialized()
+    ' This test verifies the modules property of a vtkConfiguration object
+    ' collection just initialized from an Excel worlbook
+
+   On Error GoTo M_Error
+    mAssert.Equals confManager.configurations(1).modules.Count, 4, "Number of modules in the Configuration"
+    mAssert.Equals confManager.configurations(1).modules(1).name, "TestModule", "Name of the first module in the configuration"
+    mAssert.Equals confManager.configurations(1).modules(2).name, "TestClass", "Name of the second module in the configuration"
+    mAssert.Equals confManager.configurations(1).modules(3).name, "TestForm", "Name of the third module in the configuration"
+    mAssert.Equals confManager.configurations(1).modules(4).name, "ThisWorkbook", "Name of the fourth module in the configuration"
+
+   On Error GoTo 0
+   Exit Sub
+
+M_Error:
+    mAssert.Should False, "Unexpected Error (" & err.number & "): " & err.Description
+End Sub
+
+Public Sub Test_ConfigurationModules_NewEmpty()
+    ' This test verifies the modules property of a vtkConfiguration object
+    ' New collection added in an Excel worlbook
+    
+    confManager.addConfiguration ("NewConfiguration")
+
+   On Error GoTo M_Error
+    mAssert.Equals confManager.configurations("NewConfiguration").modules.Count, 0, "Number of modules in the Configuration"
+
+   On Error GoTo 0
+   Exit Sub
+
+M_Error:
+    mAssert.Should False, "Unexpected Error (" & err.number & "): " & err.Description
+End Sub
+
+Public Sub Test_ConfigurationModules_NewNotEmpty()
+    ' This test verifies the modules property of a vtkConfiguration object
+    ' New collection initialized in an Excel worlbook
+    
+    confManager.addConfiguration ("NewConfiguration")
+    confManager.setModulePathWithNumber "newPath", 3, 2
+
+   On Error GoTo M_Error
+    mAssert.Equals confManager.configurations("NewConfiguration").modules.Count, 1, "Number of modules in the Configuration"
+
+   On Error GoTo 0
+   Exit Sub
+
+M_Error:
+    mAssert.Should False, "Unexpected Error (" & err.number & "): " & err.Description
+End Sub
 
 Private Function ITest_Suite() As TestSuite
     Set ITest_Suite = New TestSuite
@@ -180,6 +229,9 @@ Private Function ITest_Suite() As TestSuite
     ITest_Suite.AddTest ITest_Manager.ClassName, "Test_ConfigurationGetName"
     ITest_Suite.AddTest ITest_Manager.ClassName, "Test_ConfigurationGetPath"
     ITest_Suite.AddTest ITest_Manager.ClassName, "Test_ConfigurationSetPath"
+    ITest_Suite.AddTest ITest_Manager.ClassName, "Test_ConfigurationModules_Initialized"
+    ITest_Suite.AddTest ITest_Manager.ClassName, "Test_ConfigurationModules_NewEmpty"
+    ITest_Suite.AddTest ITest_Manager.ClassName, "Test_ConfigurationModules_NewNotEmpty"
 End Function
 
 Private Sub ITestCase_RunTest()
@@ -193,6 +245,9 @@ Private Sub ITestCase_RunTest()
         Case "Test_ConfigurationGetName": Test_ConfigurationGetName
         Case "Test_ConfigurationGetPath": Test_ConfigurationGetPath
         Case "Test_ConfigurationSetPath": Test_ConfigurationSetPath
+        Case "Test_ConfigurationModules_Initialized": Test_ConfigurationModules_Initialized
+        Case "Test_ConfigurationModules_NewEmpty": Test_ConfigurationModules_NewEmpty
+        Case "Test_ConfigurationModules_NewNotEmpty": Test_ConfigurationModules_NewNotEmpty
         Case Else: mAssert.Should False, "Invalid test name: " & mManager.methodName
     End Select
 End Sub
