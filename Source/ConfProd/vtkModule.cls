@@ -66,7 +66,7 @@ End Sub
 ' Purpose   : The vtkConfiguration in which is declared this vtkModule
 '---------------------------------------------------------------------------------------
 '
-Property Get parent() As vtkConfigurationManager
+Public Property Get parent() As vtkConfigurationManager
     Set parent = m_parent
 End Property
 
@@ -77,8 +77,20 @@ End Property
 ' Purpose   : The number of the module in its parent
 '---------------------------------------------------------------------------------------
 '
-Property Get number() As Integer
+Public Property Get number() As Integer
     number = m_number
+End Property
+
+'---------------------------------------------------------------------------------------
+' Property  : confNumber as Integer (Read Only, initialized with init)
+' Author    : Jean-Pierre Imbert
+' Date      : 28/08/2013
+' Purpose   : The number in its parent of the configuration attached to the module
+'             or 0 if no configuration is attached
+'---------------------------------------------------------------------------------------
+'
+Public Property Get confNumber() As Integer
+    confNumber = m_confNumber
 End Property
 
 '---------------------------------------------------------------------------------------
@@ -89,7 +101,7 @@ End Property
 '---------------------------------------------------------------------------------------
 '
 Property Get name() As String
-    name = m_parent.module(m_number)
+    name = parent.module(number)
 End Property
 
 '---------------------------------------------------------------------------------------
@@ -103,10 +115,10 @@ End Property
 '
 Public Function getPathForConfiguration(confName As String) As String
     Dim cn As Integer
-    cn = m_parent.getConfigurationNumber(confName)
+    cn = parent.getConfigurationNumber(confName)
     getPathForConfiguration = ""
-    If cn = 0 Then err.Raise VTK_INEXISTANT_CONFIGURATION, "vtkModule getPathForConfiguration", "Configuration """ & confName & """ in project """ & m_parent.projectName & """"
-    getPathForConfiguration = m_parent.getModulePathWithNumber(m_number, cn)
+    If cn = 0 Then err.Raise VTK_INEXISTANT_CONFIGURATION, "vtkModule getPathForConfiguration", "Configuration """ & confName & """ in project """ & parent.projectName & """"
+    getPathForConfiguration = parent.getModulePathWithNumber(number, cn)
 End Function
 
 '---------------------------------------------------------------------------------------
@@ -120,8 +132,59 @@ End Function
 '
 Public Function setPathForConfiguration(confName As String, newPath As String) As String
     Dim cn As Integer
-    cn = m_parent.getConfigurationNumber(confName)
-    If cn = 0 Then err.Raise VTK_INEXISTANT_CONFIGURATION, "vtkModule getPathForConfiguration", "Configuration """ & confName & """ in project """ & m_parent.projectName & """"
-    m_parent.setModulePathWithNumber path:=newPath, numModule:=m_number, numConfiguration:=cn
+    cn = parent.getConfigurationNumber(confName)
+    If cn = 0 Then err.Raise VTK_INEXISTANT_CONFIGURATION, "vtkModule getPathForConfiguration", "Configuration """ & confName & """ in project """ & parent.projectName & """"
+    parent.setModulePathWithNumber path:=newPath, numModule:=number, numConfiguration:=cn
 End Function
 
+'---------------------------------------------------------------------------------------
+' Procedure : configuration
+' Author    : Jean-Pierre Imbert
+' Date      : 28/08/2013
+' Purpose   : Get the name of the configuration attached to the module
+' Error Raised :
+'           VTK_MODULE_NOTATTACHED if the module is not attached to a configuration
+'---------------------------------------------------------------------------------------
+'
+Public Property Get configuration() As String
+    configuration = ""
+    If confNumber = 0 Then err.Raise VTK_MODULE_NOTATTACHED, "vtkModule::configuration()", "Module """ & parent.module(number) & """ not attached to a configuration "
+    configuration = parent.configuration(confNumber)
+End Property
+
+'---------------------------------------------------------------------------------------
+' Procedure : path
+' Author    : Jean-Pierre Imbert
+' Date      : 28/08/2013
+' Purpose   : Get the path of the module in the configuration attached
+' Error Raised :
+'           VTK_MODULE_NOTATTACHED if the module is not attached to a configuration
+'---------------------------------------------------------------------------------------
+'
+Public Property Get path() As String
+    path = ""
+    If confNumber = 0 Then err.Raise VTK_MODULE_NOTATTACHED, "vtkModule::path()", "Module """ & parent.module(number) & """ not attached to a configuration"
+    path = parent.getModulePathWithNumber(numModule:=number, numConfiguration:=confNumber)
+End Property
+
+'---------------------------------------------------------------------------------------
+' Procedure : VBAModule
+' Author    : Jean-Pierre Imbert
+' Date      : 28/08/2013
+' Purpose   : Get the VBComponent of the module in the configuration attached
+' Error Raised :
+'           VTK_MODULE_NOTATTACHED if the module is not attached to a configuration
+'           VTK_WORKBOOK_NOTOPEN if the Workbook of the configuration is not open
+'           no error raised if Component is not in the configuration, just return Nothing
+'---------------------------------------------------------------------------------------
+'
+Public Property Get VBAModule() As VBComponent
+    Dim wb As Workbook, fso As New FileSystemObject, wbName As String
+    Set VBAModule = Nothing
+    If confNumber = 0 Then err.Raise VTK_MODULE_NOTATTACHED, "vtkModule::VBAModule()", "Module """ & parent.module(number) & """ not attached to a configuration"
+    wbName = fso.GetFileName(parent.getConfigurationPathWithNumber(confNumber))
+    If Not VtkWorkbookIsOpen(wbName) Then err.Raise VTK_WORKBOOK_NOTOPEN, "vtkModule::configuration()", "Workbook """ & wbName & """ is not open"
+   On Error Resume Next
+    Set VBAModule = Workbooks(wbName).VBProject.VBComponents(name)
+   On Error GoTo 0
+End Property
