@@ -80,17 +80,10 @@ Private Sub ITestCase_SetUp(Assert As IAssert)
     newWorkbookName = newWorkBook.name
     newProjectName = newWorkBook.VBProject.name
     Set newConfManager = vtkConfigurationManagerForProject(newProjectName)
-    Dim source As String, destination As String
-    FileCopy source:=vtkPathToTemplateFolder & "\" & existingWorkbookNameForTest, destination:=vtkPathToTestFolder & "\" & existingProjectName & "_DEV.xlsm"
-   On Error GoTo ITestCase_SetUp_Error
-    Set existingWorkbook = Workbooks.Open(fileName:=vtkPathToTestFolder & "\" & existingProjectName & "_DEV.xlsm")
-   On Error GoTo 0
+    
+    Set existingWorkbook = getTestFileFromTemplate(fileName:=existingWorkbookNameForTest, destinationName:=existingProjectName & "_DEV.xlsm", openExcel:=True)
     existingWorkbookName = existingWorkbook.name
     Set existingConfManager = vtkConfigurationManagerForProject(existingProjectName)
-    Exit Sub
-
-ITestCase_SetUp_Error:
-    If err.Number = 1004 Then Resume    ' It's possible that the file is not ready, just after copy : in this case retry
 End Sub
 
 Private Sub ITestCase_TearDown()
