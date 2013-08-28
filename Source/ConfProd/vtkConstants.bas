@@ -21,9 +21,6 @@ Option Explicit
 '   limitations under the License.
 '---------------------------------------------------------------------------------------
 
-Public Const vtkTestProjectName = "TestProject"
-Public Const vtkTestProjectNameWithExtention = "TestProject.xlsm"
-
 Public Const VTK_OK = 0
 Public Const VTK_UNEXPECTED_ERROR = 2001
 Public Const VTK_WRONG_FOLDER_PATH = 2076
