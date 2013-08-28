@@ -1,10 +1,11 @@
-Attribute VB_Name = "vtkConstants"
+Attribute VB_Name = "vtkTestUtilities"
 Option Explicit
 '---------------------------------------------------------------------------------------
-' Module    : vtkConstants
+' Module    : vtkTestUtilities
 ' Author    : Jean-Pierre Imbert
-' Date      : 21/08/2013
-' Purpose   :
+' Date      : 28/08/2013
+' Purpose   : Some utilities to facilitate test writing
+'             - vtkTestPath, gives the path of the current project
 '
 ' Copyright 2013 Skwal-Soft (http://skwalsoft.com)
 '
@@ -21,6 +22,16 @@ Option Explicit
 '   limitations under the License.
 '---------------------------------------------------------------------------------------
 
-Public Const vtkTestProjectName = "TestProject"
-Public Const vtkTestProjectNameWithExtention = "TestProject.xlsm"
+
+'---------------------------------------------------------------------------------------
+' Procedure : vtkTestPath
+' Author    : Jean-Pierre Imbert
+' Date      : 07/05/2013
+' Purpose   : -Return the path of the Test Folder of the current project  '..\VBAToolKit\Tests
+'---------------------------------------------------------------------------------------
+'
+Public Function vtkTestPath() As String
+    vtkTestPath = vtkPathToTestFolder
+End Function
+
 
