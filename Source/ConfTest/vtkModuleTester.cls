@@ -212,6 +212,153 @@ M_Error:
     mAssert.Equals err.number, VTK_INEXISTANT_CONFIGURATION, "Error raised"
 End Sub
 
+Public Sub Test_Configuration_Attached()
+    ' This test verifies the getting of configuration for a module attached to a configuration
+    ' collection just initialized from an Excel worlbook
+    
+   On Error GoTo M_Error
+    mAssert.Equals confManager.configurations(1).modules(2).configuration, "InitializedProject_DEV", "Name of configuration"
+
+   On Error GoTo 0
+   Exit Sub
+
+M_Error:
+    mAssert.Should False, "Unexpected Error (" & err.number & "): " & err.Description
+End Sub
+
+Public Sub Test_Configuration_NotAttachedErrorRaised()
+    ' This test verifies the getting of configuration for a module not attached to a configuration
+    ' collection just initialized from an Excel worlbook
+    
+   On Error GoTo M_Error
+    mAssert.Equals confManager.modules(2).configuration, "", "Name of configuration"
+    mAssert.Should False, "An error must be raised"
+
+   On Error GoTo 0
+   Exit Sub
+
+M_Error:
+    mAssert.Equals err.number, VTK_MODULE_NOTATTACHED, "Error raised"
+End Sub
+
+Public Sub Test_Configuration_NotAttachedNoError()
+    ' This test verifies the getting of configuration for a module not attached to a configuration
+    ' collection just initialized from an Excel worlbook
+    
+   On Error Resume Next
+    mAssert.Equals confManager.modules(2).configuration, "", "Name of configuration"
+    mAssert.Equals err.number, VTK_MODULE_NOTATTACHED, "Error raised"
+End Sub
+
+Public Sub Test_Path_Attached()
+    ' This test verifies the getting of the path for a module attached to a configuration
+    ' collection just initialized from an Excel worlbook
+    
+   On Error GoTo M_Error
+    mAssert.Equals confManager.configurations(1).modules(2).path, "Tests\TestClass.cls", "Path of module"
+
+   On Error GoTo 0
+   Exit Sub
+
+M_Error:
+    mAssert.Should False, "Unexpected Error (" & err.number & "): " & err.Description
+End Sub
+
+Public Sub Test_Path_NotAttachedErrorRaised()
+    ' This test verifies the getting of the path for a module not attached to a configuration
+    ' collection just initialized from an Excel worlbook
+    
+   On Error GoTo M_Error
+    mAssert.Equals confManager.modules(2).path, "", "Path of module"
+    mAssert.Should False, "An error must be raised"
+
+   On Error GoTo 0
+   Exit Sub
+
+M_Error:
+    mAssert.Equals err.number, VTK_MODULE_NOTATTACHED, "Error raised"
+End Sub
+
+Public Sub Test_Path_NotAttachedNoError()
+    ' This test verifies the getting of the path for a module not attached to a configuration
+    ' collection just initialized from an Excel worlbook
+    
+   On Error Resume Next
+    mAssert.Equals confManager.modules(2).path, "", "Path of module"
+    mAssert.Equals err.number, VTK_MODULE_NOTATTACHED, "Error raised"
+End Sub
+
+Public Sub Test_VBAModule_Attached()
+    ' This test verifies the getting of the VBAModule for a module attached to a configuration
+    ' collection just initialized from an Excel worlbook
+    
+   On Error GoTo M_Error
+    mAssert.Equals confManager.configurations(1).modules(4).VBAModule.name, "ThisWorkbook", "Name of VBComponent"
+
+   On Error GoTo 0
+   Exit Sub
+
+M_Error:
+    mAssert.Should False, "Unexpected Error (" & err.number & "): " & err.Description
+End Sub
+
+Public Sub Test_VBAModule_NotAttachedErrorRaised()
+    ' This test verifies the getting of the VBAModule for a module not attached to a configuration
+    ' collection just initialized from an Excel worlbook
+    
+   On Error GoTo M_Error
+    mAssert.Equals confManager.modules(4).VBAModule.name, "", "Name of VBComponent"
+    mAssert.Should False, "An error must be raised"
+
+   On Error GoTo 0
+   Exit Sub
+
+M_Error:
+    mAssert.Equals err.number, VTK_MODULE_NOTATTACHED, "Error raised"
+End Sub
+
+Public Sub Test_VBAModule_NotAttachedNoError()
+    ' This test verifies the getting of the VBAModule for a module not attached to a configuration
+    ' collection just initialized from an Excel worlbook
+    
+   On Error Resume Next
+    mAssert.Equals confManager.modules(4).VBAModule.name, "", "Name of VBComponent"
+    mAssert.Equals err.number, VTK_MODULE_NOTATTACHED, "Error raised"
+End Sub
+
+Public Sub Test_VBAModule_NotOpen()
+    ' This test verifies the getting of the VBAModule for a module attached to a configuration
+    ' New configuration, Excel file not open
+    confManager.addConfiguration configuration:="NewConfiguration", path:="path/toto.xlsm"
+    confManager.modules(3).setPathForConfiguration "NewConfiguration", "Toto/Module.cls"
+    
+   On Error GoTo M_Error
+    mAssert.Equals confManager.configurations("NewConfiguration").modules(1).VBAModule.name, "", "Name of VBComponent"
+    mAssert.Should False, "An error must be raised"
+
+   On Error GoTo 0
+   Exit Sub
+
+M_Error:
+    mAssert.Equals err.number, VTK_WORKBOOK_NOTOPEN, "Error raised"
+End Sub
+
+Public Sub Test_VBAModule_NoModule()
+    ' This test verifies the getting of the VBAModule for a module attached to a configuration
+    ' New module not in project, Excel file open
+    confManager.addModule module:="NewModule"
+    confManager.modules("NewModule").setPathForConfiguration "InitializedProject_DEV", "Toto/Module.cls"
+
+   On Error GoTo M_Error
+    mAssert.Should confManager.configurations(1).modules("NewModule").VBAModule Is Nothing, "VBComponent must ne Nothing"
+
+   On Error GoTo 0
+   Exit Sub
+
+M_Error:
+    mAssert.Should False, "Unexpected Error (" & err.number & "): " & err.Description
+End Sub
+
 Private Function ITest_Suite() As TestSuite
     Set ITest_Suite = New TestSuite
     ITest_Suite.AddTest ITest_Manager.ClassName, "Test_ModuleCollection_Count"
@@ -226,6 +373,16 @@ Private Function ITest_Suite() As TestSuite
     ITest_Suite.AddTest ITest_Manager.ClassName, "Test_GetPathForConfiguration_InexistingConfigurationNullPath"
     ITest_Suite.AddTest ITest_Manager.ClassName, "Test_SetPathForConfiguration_ExistingConfiguration"
     ITest_Suite.AddTest ITest_Manager.ClassName, "Test_SetPathForConfiguration_InexistingConfigurationRaiseError"
+    ITest_Suite.AddTest ITest_Manager.ClassName, "Test_Configuration_Attached"
+    ITest_Suite.AddTest ITest_Manager.ClassName, "Test_Configuration_NotAttachedErrorRaised"
+    ITest_Suite.AddTest ITest_Manager.ClassName, "Test_Configuration_NotAttachedNoError"
+    ITest_Suite.AddTest ITest_Manager.ClassName, "Test_Path_Attached"
+    ITest_Suite.AddTest ITest_Manager.ClassName, "Test_Path_NotAttachedErrorRaised"
+    ITest_Suite.AddTest ITest_Manager.ClassName, "Test_Path_NotAttachedNoError"
+    ITest_Suite.AddTest ITest_Manager.ClassName, "Test_VBAModule_Attached"
+    ITest_Suite.AddTest ITest_Manager.ClassName, "Test_VBAModule_NotAttachedErrorRaised"
+    ITest_Suite.AddTest ITest_Manager.ClassName, "Test_VBAModule_NotAttachedNoError"
+    ITest_Suite.AddTest ITest_Manager.ClassName, "Test_VBAModule_NotOpen"
 End Function
 
 Private Sub ITestCase_RunTest()
@@ -242,6 +399,16 @@ Private Sub ITestCase_RunTest()
         Case "Test_GetPathForConfiguration_InexistingConfigurationNullPath": Test_GetPathForConfiguration_InexistingConfigurationNullPath
         Case "Test_SetPathForConfiguration_ExistingConfiguration": Test_SetPathForConfiguration_ExistingConfiguration
         Case "Test_SetPathForConfiguration_InexistingConfigurationRaiseError": Test_SetPathForConfiguration_InexistingConfigurationRaiseError
+        Case "Test_Configuration_Attached": Test_Configuration_Attached
+        Case "Test_Configuration_NotAttachedErrorRaised": Test_Configuration_NotAttachedErrorRaised
+        Case "Test_Configuration_NotAttachedNoError": Test_Configuration_NotAttachedNoError
+        Case "Test_Path_Attached": Test_Path_Attached
+        Case "Test_Path_NotAttachedErrorRaised": Test_Path_NotAttachedErrorRaised
+        Case "Test_Path_NotAttachedNoError": Test_Path_NotAttachedNoError
+        Case "Test_VBAModule_Attached": Test_VBAModule_Attached
+        Case "Test_VBAModule_NotAttachedErrorRaised": Test_VBAModule_NotAttachedErrorRaised
+        Case "Test_VBAModule_NotAttachedNoError": Test_VBAModule_NotAttachedNoError
+        Case "Test_VBAModule_NotOpen": Test_VBAModule_NotOpen
         Case Else: mAssert.Should False, "Invalid test name: " & mManager.methodName
     End Select
 End Sub
