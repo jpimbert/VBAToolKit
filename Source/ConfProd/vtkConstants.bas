@@ -21,6 +21,3 @@ Option Explicit
 '   limitations under the License.
 '---------------------------------------------------------------------------------------
 
-Public Const vtkTestProjectName = "TestProject"
-Public Const vtkTestProjectNameWithExtention = "TestProject.xlsm"
-

@@ -32,6 +32,8 @@ Option Explicit
 Implements ITest
 Implements ITestCase
 
+Private Const vtkTestProjectName = "TestProject"
+
 Private mManager As TestCaseManager
 Private mAssert As IAssert
 
