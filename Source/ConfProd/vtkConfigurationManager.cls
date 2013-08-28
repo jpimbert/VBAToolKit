@@ -371,6 +371,22 @@ Public Property Get moduleCount() As Integer
 End Property
 
 '---------------------------------------------------------------------------------------
+' Procedure : modules
+' Author    : Jean-Pierre Imbert
+' Date      : 28/08/2013
+' Purpose   : Return a collection of initialized vtkModule objects
+'---------------------------------------------------------------------------------------
+'
+Public Function modules() As Collection
+    Dim col As New Collection, i As Integer, m As vtkModule
+    For i = 1 To moduleCount
+        Set m = New vtkModule
+        m.init confManager:=Me, modNumber:=i
+        col.Add Item:=m, Key:=module(i)
+    Next i
+    Set modules = col
+End Function
+'---------------------------------------------------------------------------------------
 ' Function  : module
 ' Author    : Jean-Pierre Imbert
 ' Date      : 26/05/2013
