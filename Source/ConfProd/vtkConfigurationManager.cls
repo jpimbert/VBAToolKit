@@ -65,12 +65,12 @@ End Sub
 ' Purpose   : name of the project attached to this configuration manager
 '               - when changed, the configurationWorkSheet private property is seset
 ' NOTE      : This is the Default property
-'               - "Attribute Value.Value.VB_UserMemId = 0" is added as first line of property Get (in exported Module)
+'               - "Attribute Value.VB_UserMemId = 0" is added as first line of property Get (in exported Module)
 ' WARNING   : The attribute must be explicitly added after each export, or just before import
 '---------------------------------------------------------------------------------------
 '
 Public Property Get projectName() As String
-    Attribute Value.VB_UserMemId = 0
+Attribute projectName.VB_UserMemId = 0
     projectName = m_projectName
 End Property
 
@@ -235,6 +235,35 @@ Public Function configuration(n As Integer) As String
 End Function
 
 '---------------------------------------------------------------------------------------
+' Procedure : addConfiguration
+' Author    : Jean-Pierre Imbert
+' Date      : 28/08/2013
+' Purpose   : Add a configuration to the configuration manager
+'             - optionaly a path may be given for the configuration
+'             - all modules pathes are initialized to Null
+'             - if the configuration already exists, it is not added
+' Return    : the number of the added configuration
+'             - if the configuration already exists, return minus the configuration number
+'---------------------------------------------------------------------------------------
+'
+Public Function addConfiguration(configuration As String, Optional path As String = "") As Integer
+    Dim n As Integer
+    n = getConfigurationNumber(configuration)
+    If n = 0 Then   ' n = 0 means non-existant configuration
+        n = configurationCount + 1                                        ' Set module number
+        configurationSheet.Cells(1, n + nbTitleColumns) = configuration   ' Write module name
+        configurationSheet.Cells(2, n + nbTitleColumns) = path            ' Write module path
+        Dim i As Integer
+        For i = 1 To moduleCount                         ' For each module
+            configurationSheet.Cells(i + nbTitleRows, n + nbTitleColumns) = "-"     ' Set Default path as not initialized
+        Next i
+        addConfiguration = n
+       Else
+        addConfiguration = -n
+    End If
+End Function
+
+'---------------------------------------------------------------------------------------
 ' Procedure : getConfigurationNumber
 ' Author    : Jean-Pierre Imbert
 ' Date      : 26/05/2013
@@ -374,7 +403,7 @@ End Function
 '               - if the module is already existant, return minus the number of the existant module
 '---------------------------------------------------------------------------------------
 '
-Public Function AddModule(module As String) As Integer
+Public Function addModule(module As String) As Integer
     Dim n As Integer
     n = getModuleNumber(module)
     If n = 0 Then   ' n = 0 means non-existant module
@@ -384,9 +413,9 @@ Public Function AddModule(module As String) As Integer
         For i = 1 To configurationCount                         ' For each configuration
             configurationSheet.Cells(n + nbTitleRows, i + nbTitleColumns) = "-"     ' Set Default path as not initialized
         Next i
-        AddModule = n
+        addModule = n
        Else
-        AddModule = -n
+        addModule = -n
     End If
 End Function
 
