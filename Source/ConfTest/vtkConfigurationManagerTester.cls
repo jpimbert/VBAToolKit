@@ -99,6 +99,20 @@ Private Sub ITestCase_TearDown()
     vtkResetConfigurationManagers             ' reset all configuration managers
 End Sub
 
+Public Sub Test_PropertyName_DefaultGet()
+    '   Verify that the Property Name is the Default property for vtkConfigurationManager
+    '   - In fact there is no need to run the test, just to compile it
+    mAssert.Equals newConfManager, "NewProject", "The name property must be the default one for vtkConfigurationManager"
+End Sub
+
+Public Sub Test_PropertyName_DefaultLet()
+    '   Verify that the Property Name is the Default property for vtkConfigurationManager
+    '   - In fact there is no need to run the test, just to compile it
+    mAssert.Equals existingConfManager, "ExistingProject", "The name property of existingConf before modification"
+    existingConfManager = "NewProject"
+    mAssert.Equals existingConfManager, "NewProject", "The name property of existingConf after modification"
+End Sub
+
 Public Sub TestConfigurationSheetExistsInExistingWorkbook()
     '   Verify that the configuration sheet presence is detected in existing workbook
     '   using a fresh configuration Manager (with no default sheet initialized)
@@ -374,6 +388,8 @@ End Sub
 
 Private Function ITest_Suite() As TestSuite
     Set ITest_Suite = New TestSuite
+    ITest_Suite.AddTest ITest_Manager.ClassName, "Test_PropertyName_DefaultGet"
+    ITest_Suite.AddTest ITest_Manager.ClassName, "Test_PropertyName_DefaultLet"
     ITest_Suite.AddTest ITest_Manager.ClassName, "TestConfigurationSheetExistsInExistingWorkbook"
     ITest_Suite.AddTest ITest_Manager.ClassName, "TestConfigurationSheetDoesntExistInNewWorkbook"
     ITest_Suite.AddTest ITest_Manager.ClassName, "TestConfigurationSheetCreationForNewProject"
@@ -402,6 +418,8 @@ End Function
 
 Private Sub ITestCase_RunTest()
     Select Case mManager.methodName
+        Case "Test_PropertyName_DefaultGet": Test_PropertyName_DefaultGet
+        Case "Test_PropertyName_DefaultLet": Test_PropertyName_DefaultLet
         Case "TestConfigurationSheetExistsInExistingWorkbook": TestConfigurationSheetExistsInExistingWorkbook
         Case "TestConfigurationSheetDoesntExistInNewWorkbook": TestConfigurationSheetDoesntExistInNewWorkbook
         Case "TestConfigurationSheetCreationForNewProject": TestConfigurationSheetCreationForNewProject

@@ -64,9 +64,13 @@ End Sub
 ' Date      : 25/05/2013
 ' Purpose   : name of the project attached to this configuration manager
 '               - when changed, the configurationWorkSheet private property is seset
+' NOTE      : This is the Default property
+'               - "Attribute Value.Value.VB_UserMemId = 0" is added as first line of property Get (in exported Module)
+' WARNING   : The attribute must be explicitly added after each export, or just before import
 '---------------------------------------------------------------------------------------
 '
 Public Property Get projectName() As String
+    Attribute Value.VB_UserMemId = 0
     projectName = m_projectName
 End Property
 
