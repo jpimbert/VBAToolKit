@@ -264,6 +264,23 @@ Public Function addConfiguration(configuration As String, Optional path As Strin
 End Function
 
 '---------------------------------------------------------------------------------------
+' Procedure : configurations
+' Author    : Jean-Pierre Imbert
+' Date      : 28/08/2013
+' Purpose   : Return a collection of initialized vtkConfiguration objects
+'---------------------------------------------------------------------------------------
+'
+Public Function configurations() As Collection
+    Dim col As New Collection, i As Integer, c As vtkConfiguration
+    For i = 1 To configurationCount
+        Set c = New vtkConfiguration
+        c.init confManager:=Me, confNumber:=i
+        col.Add Item:=c, Key:=configuration(i)
+    Next i
+    Set configurations = col
+End Function
+
+'---------------------------------------------------------------------------------------
 ' Procedure : getConfigurationNumber
 ' Author    : Jean-Pierre Imbert
 ' Date      : 26/05/2013
