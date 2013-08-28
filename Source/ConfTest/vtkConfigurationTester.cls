@@ -134,6 +134,39 @@ M_Error:
     mAssert.Should False, "Unexpected Error (" & err.number & "): " & err.Description
 End Sub
 
+Public Sub Test_ConfigurationGetPath()
+    ' This test verifies the path of each vtkConfiguration object
+    ' collection just initialized from an Excel worlbook
+    
+   On Error GoTo M_Error
+
+    mAssert.Equals confManager.configurations(1).path, "Tests/InitializedProject_DEV.xlsm", "Path of the vtkConfiguration object by Index"
+    mAssert.Equals confManager.configurations("InitializedProject_DEV").path, "Tests/InitializedProject_DEV.xlsm", "Path of the vtkConfiguration object by Name"
+
+   On Error GoTo 0
+   Exit Sub
+
+M_Error:
+    mAssert.Should False, "Unexpected Error (" & err.number & "): " & err.Description
+End Sub
+
+Public Sub Test_ConfigurationSetPath()
+    ' This test verifies the path setting of each vtkConfiguration object
+    ' collection just initialized from an Excel worlbook
+
+   On Error GoTo M_Error
+    confManager.configurations(1).path = "NewPath"
+    mAssert.Equals confManager.configurations(1).path, "NewPath", "Path of the vtkConfiguration object by index"
+    mAssert.Equals confManager.configurations("InitializedProject_DEV").path, "NewPath", "Path of the vtkConfiguration object by name"
+    mAssert.Equals confManager.getConfigurationPathWithNumber(1), "NewPath", "Path of the modified configuration in the configuration manager"
+
+   On Error GoTo 0
+   Exit Sub
+
+M_Error:
+    mAssert.Should False, "Unexpected Error (" & err.number & "): " & err.Description
+End Sub
+
 ' Tester toutes les propriétés (RO et RW) - pour un projet initialisé et pour une conf ajoutée
 
 Private Function ITest_Suite() As TestSuite
@@ -144,6 +177,9 @@ Private Function ITest_Suite() As TestSuite
     ITest_Suite.AddTest ITest_Manager.ClassName, "Test_AddedConfigurationCollection_Parent"
     ITest_Suite.AddTest ITest_Manager.ClassName, "Test_ConfigurationCollection_Number"
     ITest_Suite.AddTest ITest_Manager.ClassName, "Test_AddedConfigurationCollection_Number"
+    ITest_Suite.AddTest ITest_Manager.ClassName, "Test_ConfigurationGetName"
+    ITest_Suite.AddTest ITest_Manager.ClassName, "Test_ConfigurationGetPath"
+    ITest_Suite.AddTest ITest_Manager.ClassName, "Test_ConfigurationSetPath"
 End Function
 
 Private Sub ITestCase_RunTest()
@@ -154,6 +190,9 @@ Private Sub ITestCase_RunTest()
         Case "Test_AddedConfigurationCollection_Parent": Test_AddedConfigurationCollection_Parent
         Case "Test_ConfigurationCollection_Number": Test_ConfigurationCollection_Number
         Case "Test_AddedConfigurationCollection_Number": Test_AddedConfigurationCollection_Number
+        Case "Test_ConfigurationGetName": Test_ConfigurationGetName
+        Case "Test_ConfigurationGetPath": Test_ConfigurationGetPath
+        Case "Test_ConfigurationSetPath": Test_ConfigurationSetPath
         Case Else: mAssert.Should False, "Invalid test name: " & mManager.methodName
     End Select
 End Sub

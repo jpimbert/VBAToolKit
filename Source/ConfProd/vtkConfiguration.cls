@@ -75,7 +75,7 @@ Property Get number() As Integer
 End Property
 
 '---------------------------------------------------------------------------------------
-' Property  : name as string (wrapper on the parent vtkConfigurationManager)
+' Property  : name as string (Read Only, wrapper on the parent vtkConfigurationManager)
 ' Author    : Jean-Pierre Imbert
 ' Date      : 28/08/2013
 ' Purpose   : The name of the configuration
@@ -83,4 +83,19 @@ End Property
 '
 Property Get name() As String
     name = m_parent.configuration(m_number)
+End Property
+
+'---------------------------------------------------------------------------------------
+' Property  : path as string (wrapper on the parent vtkConfigurationManager)
+' Author    : Jean-Pierre Imbert
+' Date      : 28/08/2013
+' Purpose   : The relative path of the configuration
+'---------------------------------------------------------------------------------------
+'
+Property Get path() As String
+    path = m_parent.getConfigurationPathWithNumber(m_number)
+End Property
+
+Property Let path(newPath As String)
+    m_parent.setConfigurationPathWithNumber m_number, newPath
 End Property
