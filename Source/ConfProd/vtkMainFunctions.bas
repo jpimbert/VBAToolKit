@@ -59,7 +59,7 @@ Public Function vtkCreateProject(path As String, name As String, Optional displa
     ' Create tree folder
     Dim internalError As Long
     internalError = vtkCreateTreeFolder(rootPath)
-    If internalError <> 0 Then GoTo vtkCreateProject_ErrorTreeFolder
+    If internalError <> VTK_OK Then GoTo vtkCreateProject_ErrorTreeFolder
      
     'Save created project with xlsm extention
     Workbooks.Add.SaveAs (rootPath & "\" & project.projectDEVStandardRelativePath), FileFormat:=xlOpenXMLWorkbookMacroEnabled
@@ -91,16 +91,26 @@ Public Function vtkCreateProject(path As String, name As String, Optional displa
     ' Import VBAUnit (and lib ?) modules in the new Excel file project
     vtkImportModulesInAnotherProject projectForModules:=wb.VBProject, projectName:=project.projectName, confName:=project.projectDEVName
  
-   ' Save configured and updated project for test 
+   ' Save configured and updated project for test
     wb.save
+        
+    ' Initialize git
+    On Error GoTo vtkCreateProject_ErrorGit
+    vtkInitializeGit rootPath
 
-    vtkCreateProject = 0
+    On Error GoTo 0
+    vtkCreateProject = VTK_OK
     Exit Function
+
 vtkCreateProject_ErrorTreeFolder:
     vtkCreateProject = internalError
-    If displayError Then MsgBox "Error " & err.Number & " (" & err.Description & ") in procedure vtkCreateProject of Module MainFunctions"
+    If displayError Then MsgBox "Error " & err.number & " (" & err.Description & ") in procedure vtkCreateProject of Module MainFunctions"
     Exit Function
 vtkCreateProject_Error:
-    vtkCreateProject = err.Number
-    If displayError Then MsgBox "Error " & err.Number & " (" & err.Description & ") in procedure vtkCreateProject of Module MainFunctions"
+    vtkCreateProject = err.number
+    If displayError Then MsgBox "Error " & err.number & " (" & err.Description & ") in procedure vtkCreateProject of Module MainFunctions"
+vtkCreateProject_ErrorGit:
+    vtkCreateProject = err.number
+    If displayError Then MsgBox "Error " & err.number & " (" & err.Description & ") in procedure vtkCreateProject of Module MainFunctions"
+
 End Function
