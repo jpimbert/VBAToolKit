@@ -53,98 +53,203 @@ End Sub
 
 Private Sub ITestCase_TearDown()
 '   Delete Folder Tree
-    vtkDeleteTreeFolder vtkTestPath & "\" & vtkTestProjectName
+    vtkCleanFolder vtkTestPath
 End Sub
 
 Public Sub TestCreateTreeFolderDoesNothingWhenPathDoesntExist()
     ' The Create Tree Folder function must does nothing and return error when path doesn't exist
     Dim InexistentPath As String
-    Dim returnvalue As Long
+    
+    Dim error As Integer: error = -1
+    
+    On Error GoTo TestCreateTreeFolderDoesNothingWhenPathDoesntExist_Error
+
     InexistentPath = vtkTestPath & "\InexistentFolder"
-    returnvalue = vtkCreateTreeFolder(rootPath:=InexistentPath & "\" & vtkTestProjectName)
+    vtkCreateTreeFolder rootPath:=InexistentPath & "\" & vtkTestProjectName
     mAssert.Should Dir(InexistentPath & "\" & vtkTestProjectName, vbDirectory) = "", "The project main folder must not exist"
-    mAssert.Equals returnvalue, 76, "The project creation must fail"
+    mAssert.Equals error, 76, "The project creation must fail"
+
+    On Error GoTo 0
+    Exit Sub
+
+TestCreateTreeFolderDoesNothingWhenPathDoesntExist_Error:
+    'Debug.Print "Error " & err.Number & " (" & err.Description & ") in procedure TestCreateTreeFolderDoesNothingWhenPathDoesntExist of Class Module vtkCreateTreeFolderTester"
+    error = err.Number
+    Resume Next
 End Sub
 
 Public Sub TestCreateTreeFolderAlreadyExisting()
     ' The Create Tree Folder function must does nothing when project already exists
     Dim returnvalue As Long
+    Dim error As Integer: error = -1
+    
+    On Error GoTo TestCreateTreeFolderAlreadyExisting_Error
+
     MkDir vtkTestPath & "\" & vtkTestProjectName 'must respect order mkdir before call vtkcreateproject
-    returnvalue = vtkCreateTreeFolder(rootPath:=vtkTestPath & "\" & vtkTestProjectName)
+    vtkCreateTreeFolder rootPath:=vtkTestPath & "\" & vtkTestProjectName
     mAssert.Should Dir(vtkTestPath & "\" & vtkTestProjectName, vbDirectory) <> "", "The existing project main folder must exist"
-    mAssert.Equals returnvalue, 75, "The project creation must fail"
+    mAssert.Equals error, 75, "The project creation must fail"
+
+    On Error GoTo 0
+    Exit Sub
+
+TestCreateTreeFolderAlreadyExisting_Error:
+    'Debug.Print "Error " & err.Number & " (" & err.Description & ") in procedure TestCreateTreeFolderAlreadyExisting of Class Module vtkCreateTreeFolderTester"
+    error = err.Number
+    Resume Next
 End Sub
 
 Public Sub TestMainFolderIsCreated()
     ' The Create Tree Folder function must create a new folder named like the project in the path
     Dim returnvalue As Long
+    On Error GoTo TestMainFolderIsCreated_Error
+
     returnvalue = vtkCreateTreeFolder(rootPath:=vtkTestPath & "\" & vtkTestProjectName)
     mAssert.Should Dir(vtkTestPath & "\" & vtkTestProjectName, vbDirectory) <> "", "The project main folder must exist"
-    mAssert.Equals returnvalue, 0, "The project creation must succeed"
+    mAssert.Equals returnvalue, VTK_OK, "The project creation must succeed"
+
+    On Error GoTo 0
+    Exit Sub
+
+TestMainFolderIsCreated_Error:
+    Debug.Print "Error " & err.Number & " (" & err.Description & ") in procedure TestMainFolderIsCreated of Class Module vtkCreateTreeFolderTester"
+    Resume Next
 End Sub
 
 Public Sub TestProjectFolderIsCreated()
     ' The Create Tree Folder function must create a new folder named Project
     Dim returnvalue As Long
+    On Error GoTo TestProjectFolderIsCreated_Error
+
     returnvalue = vtkCreateTreeFolder(rootPath:=vtkTestPath & "\" & vtkTestProjectName)
     mAssert.Should Dir(vtkTestPath & "\" & vtkTestProjectName & "\Project", vbDirectory) <> "", "The Project folder must exist"
-    mAssert.Equals returnvalue, 0, "The project creation must succeed"
+    mAssert.Equals returnvalue, VTK_OK, "The project creation must succeed"
+
+    On Error GoTo 0
+    Exit Sub
+
+TestProjectFolderIsCreated_Error:
+    Debug.Print "Error " & err.Number & " (" & err.Description & ") in procedure TestProjectFolderIsCreated of Class Module vtkCreateTreeFolderTester"
+    Resume Next
 End Sub
 
 Public Sub TestSourceFolderIsCreated()
     ' The Create Tree Folder function must create a new folder named Source
     Dim returnvalue As Long
+    On Error GoTo TestSourceFolderIsCreated_Error
+
     returnvalue = vtkCreateTreeFolder(rootPath:=vtkTestPath & "\" & vtkTestProjectName)
     mAssert.Should Dir(vtkTestPath & "\" & vtkTestProjectName & "\Source", vbDirectory) <> "", "The Source folder must exist"
-    mAssert.Equals returnvalue, 0, "The project creation must succeed"
+    mAssert.Equals returnvalue, VTK_OK, "The project creation must succeed"
+
+    On Error GoTo 0
+    Exit Sub
+
+TestSourceFolderIsCreated_Error:
+    Debug.Print "Error " & err.Number & " (" & err.Description & ") in procedure TestSourceFolderIsCreated of Class Module vtkCreateTreeFolderTester"
+    Resume Next
 End Sub
 
 Public Sub TestTestsFolderIsCreated()
     ' The Create Tree Folder function must create a new folder named Tests
     Dim returnvalue As Long
+    On Error GoTo TestTestsFolderIsCreated_Error
+
     returnvalue = vtkCreateTreeFolder(rootPath:=vtkTestPath & "\" & vtkTestProjectName)
     mAssert.Should Dir(vtkTestPath & "\" & vtkTestProjectName & "\Tests", vbDirectory) <> "", "The Tests folder must exist"
-    mAssert.Equals returnvalue, 0, "The project creation must succeed"
+    mAssert.Equals returnvalue, VTK_OK, "The project creation must succeed"
+
+    On Error GoTo 0
+    Exit Sub
+
+TestTestsFolderIsCreated_Error:
+    Debug.Print "Error " & err.Number & " (" & err.Description & ") in procedure TestTestsFolderIsCreated of Class Module vtkCreateTreeFolderTester"
+    Resume Next
 End Sub
 
 Public Sub TestConfProdFolderIsCreated()
     ' The Create Tree Folder function must create a new folder named ConfProd
     Dim returnvalue As Long
+    On Error GoTo TestConfProdFolderIsCreated_Error
+
     returnvalue = vtkCreateTreeFolder(rootPath:=vtkTestPath & "\" & vtkTestProjectName)
     mAssert.Should Dir(vtkTestPath & "\" & vtkTestProjectName & "\source\ConfProd", vbDirectory) <> "", "source\ConfProd folder must exist"
-    mAssert.Equals returnvalue, 0, "The project creation must succeed"
+    mAssert.Equals returnvalue, VTK_OK, "The project creation must succeed"
+
+    On Error GoTo 0
+    Exit Sub
+
+TestConfProdFolderIsCreated_Error:
+    Debug.Print "Error " & err.Number & " (" & err.Description & ") in procedure TestConfProdFolderIsCreated of Class Module vtkCreateTreeFolderTester"
+    Resume Next
 End Sub
 
 Public Sub TestConfTestFolderIsCreated()
     ' The Create Tree Folder function must create a new folder named ConfProd
     Dim returnvalue As Long
+    On Error GoTo TestConfTestFolderIsCreated_Error
+
     returnvalue = vtkCreateTreeFolder(rootPath:=vtkTestPath & "\" & vtkTestProjectName)
     mAssert.Should Dir(vtkTestPath & "\" & vtkTestProjectName & "\source\ConfTest", vbDirectory) <> "", "The source\ConfTest folder must exist"
-    mAssert.Equals returnvalue, 0, "The project creation must succeed"
+    mAssert.Equals returnvalue, VTK_OK, "The project creation must succeed"
+
+    On Error GoTo 0
+    Exit Sub
+
+TestConfTestFolderIsCreated_Error:
+    Debug.Print "Error " & err.Number & " (" & err.Description & ") in procedure TestConfTestFolderIsCreated of Class Module vtkCreateTreeFolderTester"
+    Resume Next
 End Sub
 
 Public Sub TestVbaUnitFolderIsCreated()
     ' The Create Tree Folder function must create a new folder named ConfProd
     Dim returnvalue As Long
+    On Error GoTo TestVbaUnitFolderIsCreated_Error
+
     returnvalue = vtkCreateTreeFolder(rootPath:=vtkTestPath & "\" & vtkTestProjectName)
     mAssert.Should Dir(vtkTestPath & "\" & vtkTestProjectName & "\source\VbaUnit", vbDirectory) <> "", "The source\VbaUnit folder must exist"
-    mAssert.Equals returnvalue, 0, "The project creation must succeed"
+    mAssert.Equals returnvalue, VTK_OK, "The project creation must succeed"
+
+    On Error GoTo 0
+    Exit Sub
+
+TestVbaUnitFolderIsCreated_Error:
+    Debug.Print "Error " & err.Number & " (" & err.Description & ") in procedure TestVbaUnitFolderIsCreated of Class Module vtkCreateTreeFolderTester"
+    Resume Next
 End Sub
 
 Public Sub TestGitLogIsCreated()
     ' The Create Tree Folder function must create a new folder named GitLog
     Dim returnvalue As Long
+    On Error GoTo TestGitLogIsCreated_Error
+
     returnvalue = vtkCreateTreeFolder(rootPath:=vtkTestPath & "\" & vtkTestProjectName)
     mAssert.Should Dir(vtkTestPath & "\" & vtkTestProjectName & "\GitLog", vbDirectory) <> "", "The ..\GitLog folder must exist"
-    mAssert.Equals returnvalue, 0, "The project creation must succeed"
+    mAssert.Equals returnvalue, VTK_OK, "The project creation must succeed"
+
+    On Error GoTo 0
+    Exit Sub
+
+TestGitLogIsCreated_Error:
+    Debug.Print "Error " & err.Number & " (" & err.Description & ") in procedure TestGitLogIsCreated of Class Module vtkCreateTreeFolderTester"
+    Resume Next
 End Sub
 
 Public Sub TestDeliveryFolderIsCreated()
     ' The Create Tree Folder function must create a new folder named Delivery
     Dim returnvalue As Long
+    On Error GoTo TestDeliveryFolderIsCreated_Error
+
     returnvalue = vtkCreateTreeFolder(rootPath:=vtkTestPath & "\" & vtkTestProjectName)
     mAssert.Should Dir(vtkTestPath & "\" & vtkTestProjectName & "\Delivery", vbDirectory) <> "", "The \Delivery folder must exist"
-    mAssert.Equals returnvalue, 0, "The project creation must succeed"
+    mAssert.Equals returnvalue, VTK_OK, "The project creation must succeed"
+
+    On Error GoTo 0
+    Exit Sub
+
+TestDeliveryFolderIsCreated_Error:
+    Debug.Print "Error " & err.Number & " (" & err.Description & ") in procedure TestDeliveryFolderIsCreated of Class Module vtkCreateTreeFolderTester"
+    Resume Next
 End Sub
 
 Private Function ITest_Suite() As TestSuite

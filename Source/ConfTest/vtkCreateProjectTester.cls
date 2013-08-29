@@ -65,7 +65,7 @@ Private Sub ITestCase_TearDown()
     Kill vtkTestPath & "\" & vtkTestProjectName & "\Project\" & vtkTestProjectName & "_DEV.xlsm"
     Kill vtkTestPath & "\" & vtkTestProjectName & "\Delivery\" & vtkTestProjectName & ".xlsm"
 '   Delete Folder Tree
-    vtkDeleteTreeFolder vtkTestPath & "\" & vtkTestProjectName
+    vtkCleanFolder vtkTestPath
     Application.DisplayAlerts = True
 End Sub
 
@@ -100,7 +100,7 @@ Public Sub TestMainFolderIsCreated()
     Dim returnvalue As Long
     returnvalue = vtkCreateProject(path:=vtkTestPath, name:=vtkTestProjectName, displayError:=False)
     mAssert.Should Dir(vtkTestPath & "\" & vtkTestProjectName, vbDirectory) <> "", "The project main folder must exist"
-    mAssert.Equals returnvalue, 0, "The project creation must succeed"
+    mAssert.Equals returnvalue, VTK_OK, "The project creation must succeed"
 End Sub
 
 Public Sub TestDevXlsmFileCreated()
@@ -182,7 +182,6 @@ Public Sub Test_VBAUnitModulesExportation()
     returnvalue = vtkCreateProject(path:=vtkTestPath, name:=vtkTestProjectName, displayError:=False)
     
     mAssert.Should fso.FileExists(vtkTestPath & "\" & vtkTestProjectName & "\" & "Source\VbaUnit\" & "VbaUnitMain.bas"), "VBAUnitMain module have to be exported"
-
 End Sub
 
 Public Sub Test_VBAUnitModulesImportation()
@@ -204,6 +203,24 @@ Test_VBAUnitModulesImportation_Error:
     mAssert.Should False, "No error have to be raised during project creation (Err=" & err.Number & ": " & err.Description & ")"
 End Sub
 
+Public Sub Test_vtkCreateProject_correctPathGitFolderIsCreated()
+    Dim fso As New FileSystemObject
+    
+    On Error GoTo Test_vtkCreateProject_correctPathGitFolderIsCreated_Error
+
+    vtkCreateProject vtkTestPath, vtkTestProjectName, displayError:=False
+    
+    mAssert.Should fso.folderExists(vtkTestPath & "\" & vtkTestProjectName & "\.git"), ".git folder should be created."
+
+    On Error GoTo 0
+    Exit Sub
+
+Test_vtkCreateProject_correctPathGitFolderIsCreated_Error:
+    mAssert.Should False, "Error " & err.Number & " (" & err.Description & ") in procedure Test_vtkCreateProject_gitFolderIsCreated of Class Module vtkCreateProjectTester"
+    Resume Next
+End Sub
+
+
 Private Function ITest_Suite() As TestSuite
     Set ITest_Suite = New TestSuite
     ITest_Suite.AddTest ITest_Manager.ClassName, "TestCreateProjectDoesNothingWhenPathDoesntExist"
@@ -218,6 +235,7 @@ Private Function ITest_Suite() As TestSuite
     ITest_Suite.AddTest ITest_Manager.ClassName, "TestReferencesOfDeliveryWorkbookWasActivated"
     ITest_Suite.AddTest ITest_Manager.ClassName, "Test_VBAUnitModulesExportation"
     ITest_Suite.AddTest ITest_Manager.ClassName, "Test_VBAUnitModulesImportation"
+    ITest_Suite.AddTest ITest_Manager.ClassName, "Test_vtkCreateProject_correctPathGitFolderIsCreated"
 End Function
 
 Private Sub ITestCase_RunTest()
@@ -234,6 +252,7 @@ Private Sub ITestCase_RunTest()
         Case "TestReferencesOfDeliveryWorkbookWasActivated": TestReferencesOfDeliveryWorkbookWasActivated
         Case "Test_VBAUnitModulesExportation": Test_VBAUnitModulesExportation
         Case "Test_VBAUnitModulesImportation": Test_VBAUnitModulesImportation
+        Case "Test_vtkCreateProject_correctPathGitFolderIsCreated": Test_vtkCreateProject_correctPathGitFolderIsCreated
         Case Else: mAssert.Should False, "Invalid test name: " & mManager.methodName
     End Select
 End Sub

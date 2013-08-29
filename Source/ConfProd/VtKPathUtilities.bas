@@ -104,30 +104,24 @@ End Function
 '
 Public Function vtkCreateTreeFolder(rootPath As String)
    On Error GoTo vtkCreateTreeFolder_Error
-    ' Create main folder
+    
     MkDir rootPath
-    ' Create Delivery folder
     MkDir rootPath & "\" & "Delivery"
-    ' Create Project folder
     MkDir rootPath & "\" & "Project"
-    ' Create Tests folder
     MkDir rootPath & "\" & "Tests"
-    ' Create GitLog Folder
     MkDir rootPath & "\" & "GitLog"
-    ' Create Source folder
     MkDir rootPath & "\" & "Source"
-    ' Create ConfProd folder
     MkDir rootPath & "\" & "Source" & "\" & "ConfProd"
-    ' Create ConfTest folder
     MkDir rootPath & "\" & "Source" & "\" & "ConfTest"
-    ' Create VbaUnit folder
     MkDir rootPath & "\" & "Source" & "\" & "VbaUnit"
 
    On Error GoTo 0
-   vtkCreateTreeFolder = 0
+   vtkCreateTreeFolder = VTK_OK
    Exit Function
+   
 vtkCreateTreeFolder_Error:
     vtkCreateTreeFolder = err.Number
+    err.Raise err.Number, "Module vtkFileSystemUtilities : Function vtkCreateTreeFolder", err.Description
 End Function
 
 '---------------------------------------------------------------------------------------
