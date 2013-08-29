@@ -1,4 +1,4 @@
-﻿Attribute VB_Name = "vtkConstants"
+Attribute VB_Name = "vtkConstants"
 Option Explicit
 '---------------------------------------------------------------------------------------
 ' Module    : vtkConstants
