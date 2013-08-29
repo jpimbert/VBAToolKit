@@ -1,17 +1,30 @@
 Attribute VB_Name = "vtkGitFunctions"
 '---------------------------------------------------------------------------------------
-' Module    : vtkGitHubFunctions
-' Author    : Abdelfattah Lahbib
-' Date      : 08/06/2013
+' Module    : vtkGitFunctions
+' Author    : Lucas Vitorino
 ' Purpose   : Interact with Git
+'
+' Copyright 2013 Skwal-Soft (http://skwalsoft.com)
+'
+'   Licensed under the Apache License, Version 2.0 (the "License");
+'   you may not use this file except in compliance with the License.
+'   You may obtain a copy of the License at
+'
+'       http://www.apache.org/licenses/LICENSE-2.0
+'
+'   Unless required by applicable law or agreed to in writing, software
+'   distributed under the License is distributed on an "AS IS" BASIS,
+'   WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+'   See the License for the specific language governing permissions and
+'   limitations under the License.
+'---------------------------------------------------------------------------------------
 '---------------------------------------------------------------------------------------
 
 Option Explicit
 
 '---------------------------------------------------------------------------------------
 ' Procedure : vtkInitializeGit
-' Author    : Abdelfattah Lahbib
-' Date      : 27/04/2013
+' Author    : Lucas Vitorino
 ' Purpose   : - Initialize Git in a directory using the "git init" command.
 '               The directory path has to be absolute, and on the C: drive
 '             - Optionally, writes the output of the "git init" command in a textfile
@@ -48,18 +61,18 @@ Public Function vtkInitializeGit(folderPath As String, Optional logFile As Strin
     On Error GoTo vtkInitializeGit_Err
         
     If InStr(UCase(Environ("PATH")), UCase("Git\cmd")) = False Then
-        Err.Raise VTK_GIT_NOT_INSTALLED, "", "Git not installed."
+        err.Raise VTK_GIT_NOT_INSTALLED, "", "Git not installed."
     End If
     
     ' Potentially raise VTK_FORBIDDEN_PARAMETER
     convertedFolderPath = vtkGitConvertWinPath(folderPath)
     
     If vtkDoesFolderExist(folderPath) = False Then
-        Err.Raise VTK_WRONG_FOLDER_PATH, "", "Folder path not found."
+        err.Raise VTK_WRONG_FOLDER_PATH, "", "Folder path not found."
     End If
     
     If vtkDoesFolderExist(folderPath & "\.git") = True Then
-        Err.Raise VTK_GIT_ALREADY_INITIALIZED_IN_FOLDER, "", "Git has already been initialized in the folder " & folderPath
+        err.Raise VTK_GIT_ALREADY_INITIALIZED_IN_FOLDER, "", "Git has already been initialized in the folder " & folderPath
     End If
     
     ' Get the path of the log file that will be used
@@ -85,7 +98,7 @@ Public Function vtkInitializeGit(folderPath As String, Optional logFile As Strin
     Dim logFileContent As String
     logFileContent = vtkTextFileReader(folderPath & "\" & tmpLogFileName)
     If Left(logFileContent, 12) <> Chr(10) & "Initialized" Then
-        Err.Raise VTK_GIT_PROBLEM_DURING_INITIALIZATION, , "There was a problem during Git initialization." _
+        err.Raise VTK_GIT_PROBLEM_DURING_INITIALIZATION, , "There was a problem during Git initialization." _
         & vbCrLf & "Content of the log file : " & logFileContent
     End If
     
@@ -119,15 +132,15 @@ Public Function vtkInitializeGit(folderPath As String, Optional logFile As Strin
     
     
 vtkInitializeGit_Err:
-    If ((Err.number = VTK_GIT_NOT_INSTALLED) _
-        Or (Err.number = VTK_GIT_ALREADY_INITIALIZED_IN_FOLDER) _
-        Or (Err.number = VTK_FORBIDDEN_PARAMETER) _
-        Or (Err.number = VTK_GIT_PROBLEM_DURING_INITIALIZATION) _
-        Or (Err.number = VTK_WRONG_FOLDER_PATH)) Then
-        Err.Raise Err.number, "Module vktGitFuntions : Function vtkGitInitialize", Err.Description
+    If ((err.Number = VTK_GIT_NOT_INSTALLED) _
+        Or (err.Number = VTK_GIT_ALREADY_INITIALIZED_IN_FOLDER) _
+        Or (err.Number = VTK_FORBIDDEN_PARAMETER) _
+        Or (err.Number = VTK_GIT_PROBLEM_DURING_INITIALIZATION) _
+        Or (err.Number = VTK_WRONG_FOLDER_PATH)) Then
+        err.Raise err.Number, "Module vktGitFuntions : Function vtkGitInitialize", err.Description
     Else
-        Debug.Print "ERR IN INITIALIZE : " & Err.number & Err.Description
-        Err.Raise VTK_UNEXPECTED_ERROR, "Module vktGitFuntions : Function vtkGitInitialize", Err.Description
+        Debug.Print "ERR IN INITIALIZE : " & err.Number & err.Description
+        err.Raise VTK_UNEXPECTED_ERROR, "Module vktGitFuntions : Function vtkGitInitialize", err.Description
     End If
      
     Exit Function
@@ -160,7 +173,7 @@ Public Function vtkGitConvertWinPath(winPath As String) As String
     
     ' Only allows absolute paths on the C: drive
     If convertedSplittedPath(LBound(convertedSplittedPath)) <> "C" Then
-        Err.Raise VTK_FORBIDDEN_PARAMETER, "", "Parameter is invalid."
+        err.Raise VTK_FORBIDDEN_PARAMETER, "", "Parameter is invalid."
     End If
 
     convertedPath = convertedSplittedPath(LBound(convertedSplittedPath) + 1)
@@ -175,11 +188,11 @@ Public Function vtkGitConvertWinPath(winPath As String) As String
     
 
 vtkGitConvertWinPath_Error:
-    If (Err.number = VTK_FORBIDDEN_PARAMETER) Then
-        Err.Raise Err.number, "Module vtkGitFunctions ; Function vtkGitConvertWinPath", Err.Description
+    If (err.Number = VTK_FORBIDDEN_PARAMETER) Then
+        err.Raise err.Number, "Module vtkGitFunctions ; Function vtkGitConvertWinPath", err.Description
     Else
         'Debug.Print "ERR IN CONVERT : " & Err.Number & Err.Description
-        Err.Raise VTK_UNEXPECTED_ERROR, "Module vtkGitFunctions ; Function vtkGitConvertWinPath", Err.Description
+        err.Raise VTK_UNEXPECTED_ERROR, "Module vtkGitFunctions ; Function vtkGitConvertWinPath", err.Description
     End If
     Exit Function
 

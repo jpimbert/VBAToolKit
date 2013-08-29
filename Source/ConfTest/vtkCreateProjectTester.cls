@@ -216,7 +216,7 @@ Public Sub Test_vtkCreateProject_correctPathGitFolderIsCreated()
     Exit Sub
 
 Test_vtkCreateProject_correctPathGitFolderIsCreated_Error:
-    Debug.Print "Error " & err.Number & " (" & err.Description & ") in procedure Test_vtkCreateProject_gitFolderIsCreated of Class Module vtkCreateProjectTester"
+    mAssert.Should False, "Error " & err.Number & " (" & err.Description & ") in procedure Test_vtkCreateProject_gitFolderIsCreated of Class Module vtkCreateProjectTester"
     Resume Next
 End Sub
 
@@ -234,7 +234,7 @@ Private Function ITest_Suite() As TestSuite
     ITest_Suite.AddTest ITest_Manager.ClassName, "TestReferencesOfDevWorkbookWasActivated"
     ITest_Suite.AddTest ITest_Manager.ClassName, "TestReferencesOfDeliveryWorkbookWasActivated"
     ITest_Suite.AddTest ITest_Manager.ClassName, "Test_VBAUnitModulesExportation"
-    ITest_Suite.AddTest ITest_Manager.ClassName, "Test_VBAUnitModulesExportation"
+    ITest_Suite.AddTest ITest_Manager.ClassName, "Test_VBAUnitModulesImportation"
     ITest_Suite.AddTest ITest_Manager.ClassName, "Test_vtkCreateProject_correctPathGitFolderIsCreated"
 End Function
 
@@ -251,7 +251,7 @@ Private Sub ITestCase_RunTest()
         Case "TestReferencesOfDevWorkbookWasActivated": TestReferencesOfDevWorkbookWasActivated
         Case "TestReferencesOfDeliveryWorkbookWasActivated": TestReferencesOfDeliveryWorkbookWasActivated
         Case "Test_VBAUnitModulesExportation": Test_VBAUnitModulesExportation
-        Case "Test_VBAUnitModulesExportation": Test_VBAUnitModulesExportation
+        Case "Test_VBAUnitModulesImportation": Test_VBAUnitModulesImportation
         Case "Test_vtkCreateProject_correctPathGitFolderIsCreated": Test_vtkCreateProject_correctPathGitFolderIsCreated
         Case Else: mAssert.Should False, "Invalid test name: " & mManager.methodName
     End Select
