@@ -73,7 +73,6 @@ Public Sub TestCreateTreeFolderDoesNothingWhenPathDoesntExist()
     Exit Sub
 
 TestCreateTreeFolderDoesNothingWhenPathDoesntExist_Error:
-    'Debug.Print "Error " & err.Number & " (" & err.Description & ") in procedure TestCreateTreeFolderDoesNothingWhenPathDoesntExist of Class Module vtkCreateTreeFolderTester"
     error = err.Number
     Resume Next
 End Sub
@@ -94,7 +93,6 @@ Public Sub TestCreateTreeFolderAlreadyExisting()
     Exit Sub
 
 TestCreateTreeFolderAlreadyExisting_Error:
-    'Debug.Print "Error " & err.Number & " (" & err.Description & ") in procedure TestCreateTreeFolderAlreadyExisting of Class Module vtkCreateTreeFolderTester"
     error = err.Number
     Resume Next
 End Sub
@@ -112,7 +110,7 @@ Public Sub TestMainFolderIsCreated()
     Exit Sub
 
 TestMainFolderIsCreated_Error:
-    Debug.Print "Error " & err.Number & " (" & err.Description & ") in procedure TestMainFolderIsCreated of Class Module vtkCreateTreeFolderTester"
+    mAssert.Should False, "Error " & err.Number & " (" & err.Description & ") in procedure TestMainFolderIsCreated of Class Module vtkCreateTreeFolderTester"
     Resume Next
 End Sub
 
@@ -129,7 +127,7 @@ Public Sub TestProjectFolderIsCreated()
     Exit Sub
 
 TestProjectFolderIsCreated_Error:
-    Debug.Print "Error " & err.Number & " (" & err.Description & ") in procedure TestProjectFolderIsCreated of Class Module vtkCreateTreeFolderTester"
+    mAssert.Should False, "Error " & err.Number & " (" & err.Description & ") in procedure TestProjectFolderIsCreated of Class Module vtkCreateTreeFolderTester"
     Resume Next
 End Sub
 
@@ -146,7 +144,7 @@ Public Sub TestSourceFolderIsCreated()
     Exit Sub
 
 TestSourceFolderIsCreated_Error:
-    Debug.Print "Error " & err.Number & " (" & err.Description & ") in procedure TestSourceFolderIsCreated of Class Module vtkCreateTreeFolderTester"
+    mAssert.Should False, "Error " & err.Number & " (" & err.Description & ") in procedure TestSourceFolderIsCreated of Class Module vtkCreateTreeFolderTester"
     Resume Next
 End Sub
 
@@ -163,7 +161,7 @@ Public Sub TestTestsFolderIsCreated()
     Exit Sub
 
 TestTestsFolderIsCreated_Error:
-    Debug.Print "Error " & err.Number & " (" & err.Description & ") in procedure TestTestsFolderIsCreated of Class Module vtkCreateTreeFolderTester"
+    mAssert.Should False, "Error " & err.Number & " (" & err.Description & ") in procedure TestTestsFolderIsCreated of Class Module vtkCreateTreeFolderTester"
     Resume Next
 End Sub
 
@@ -180,7 +178,7 @@ Public Sub TestConfProdFolderIsCreated()
     Exit Sub
 
 TestConfProdFolderIsCreated_Error:
-    Debug.Print "Error " & err.Number & " (" & err.Description & ") in procedure TestConfProdFolderIsCreated of Class Module vtkCreateTreeFolderTester"
+    mAssert.Should False, "Error " & err.Number & " (" & err.Description & ") in procedure TestConfProdFolderIsCreated of Class Module vtkCreateTreeFolderTester"
     Resume Next
 End Sub
 
@@ -197,7 +195,7 @@ Public Sub TestConfTestFolderIsCreated()
     Exit Sub
 
 TestConfTestFolderIsCreated_Error:
-    Debug.Print "Error " & err.Number & " (" & err.Description & ") in procedure TestConfTestFolderIsCreated of Class Module vtkCreateTreeFolderTester"
+    mAssert.Should False, "Error " & err.Number & " (" & err.Description & ") in procedure TestConfTestFolderIsCreated of Class Module vtkCreateTreeFolderTester"
     Resume Next
 End Sub
 
@@ -214,7 +212,7 @@ Public Sub TestVbaUnitFolderIsCreated()
     Exit Sub
 
 TestVbaUnitFolderIsCreated_Error:
-    Debug.Print "Error " & err.Number & " (" & err.Description & ") in procedure TestVbaUnitFolderIsCreated of Class Module vtkCreateTreeFolderTester"
+    mAssert.Should False, "Error " & err.Number & " (" & err.Description & ") in procedure TestVbaUnitFolderIsCreated of Class Module vtkCreateTreeFolderTester"
     Resume Next
 End Sub
 
@@ -231,7 +229,7 @@ Public Sub TestGitLogIsCreated()
     Exit Sub
 
 TestGitLogIsCreated_Error:
-    Debug.Print "Error " & err.Number & " (" & err.Description & ") in procedure TestGitLogIsCreated of Class Module vtkCreateTreeFolderTester"
+    mAssert.Should False, "Error " & err.Number & " (" & err.Description & ") in procedure TestGitLogIsCreated of Class Module vtkCreateTreeFolderTester"
     Resume Next
 End Sub
 
@@ -248,7 +246,7 @@ Public Sub TestDeliveryFolderIsCreated()
     Exit Sub
 
 TestDeliveryFolderIsCreated_Error:
-    Debug.Print "Error " & err.Number & " (" & err.Description & ") in procedure TestDeliveryFolderIsCreated of Class Module vtkCreateTreeFolderTester"
+    mAssert.Should False, "Error " & err.Number & " (" & err.Description & ") in procedure TestDeliveryFolderIsCreated of Class Module vtkCreateTreeFolderTester"
     Resume Next
 End Sub
 
