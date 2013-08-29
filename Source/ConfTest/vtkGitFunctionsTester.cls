@@ -89,7 +89,7 @@ Test_vtkInitializeGit_correctPathRetVal_Error:
 End Sub
 
 Public Sub Test_vtkInitializeGit_correctPathReInitializeRetVal()
-    Dim error As Integer: error = 0
+    Dim error As Integer: error = -1
     
     On Error GoTo errHandler
     
@@ -107,7 +107,7 @@ errHandler:
 End Sub
 
 Public Sub Test_vtkInitializeGit_wrongPathUnexistingFolder()
-    Dim error As Integer: error = 0
+    Dim error As Integer: error = -1
     
     On Error GoTo errHandler
     
@@ -125,7 +125,7 @@ errHandler:
 End Sub
 
 Public Sub Test_vtkInitializeGit_wrongPathFile()
-    Dim error As Integer: error = 0
+    Dim error As Integer: error = -1
     
     On Error GoTo errHandler
     
@@ -142,7 +142,7 @@ errHandler:
 End Sub
 
 Public Sub Test_vtkInitializeGit_forbiddenPath1()
-    Dim error As Integer: error = 0
+    Dim error As Integer: error = -1
     
     On Error GoTo errHandler
     
@@ -160,7 +160,7 @@ errHandler:
 End Sub
 
 Public Sub Test_vtkInitializeGit_forbiddenPath2()
-    Dim error As Integer: error = 0
+    Dim error As Integer: error = -1
     
     On Error GoTo errHandler
     
@@ -240,7 +240,7 @@ Test_vtkGitConvertWinPath_absolutePathOnCDrive_Error:
 End Sub
 
 Public Sub Test_vtkGitConvertWinPath_absolutePathOnOneLetterDriveNotC()
-    Dim error As Integer: error = 0
+    Dim error As Integer: error = -1
     Dim path As String
     Dim convertedPath As String
     
@@ -261,7 +261,7 @@ errHandler:
 End Sub
 
 Public Sub Test_vtkGitConvertWinPath_absolutePathOnSeveralLettersDrive()
-    Dim error As Integer: error = 0
+    Dim error As Integer: error = -1
     Dim path As String
     Dim convertedPath As String
     
@@ -282,7 +282,7 @@ errHandler:
 End Sub
 
 Public Sub Test_vtkGitConvertWinPath_relativePath()
-    Dim error As Integer: error = 0
+    Dim error As Integer: error = -1
     Dim path As String
     Dim convertedPath As String
     
