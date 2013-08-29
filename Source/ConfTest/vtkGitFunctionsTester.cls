@@ -320,10 +320,10 @@ Public Sub Test_vtkInitializeGit_correctPathGitExcludeContentIsRight()
     "/GitLog/*" & Chr(10) & _
     Chr(10) & _
     "# Ignore the temporary Excel files" & Chr(10) & _
-    "/Project/~*" & Chr(10) & _
+    "~*" & Chr(10) & _
     Chr(10) & _
     "# Ignore the delivery Excel files" & Chr(10) & _
-    "/Delivery/*.xlsm"
+    "/Delivery/*.xl*"
     
     mAssert.Equals StrComp(fileContent, expectedContent), True
 
