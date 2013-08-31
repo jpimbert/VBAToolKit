@@ -153,7 +153,7 @@ Public Sub Test_ExcelToolBarButtonAdd()
     Dim bar As CommandBar, button As CommandBarButton, realCaption As String
 
     vtkCreateEmptyToolbars   ' create empty toolbar
-    vtkCreateToolbarButton caption:="Test button", helpText:="", faceId:=1, action:="commandBarButtonClicked", vbeToolbar:=False
+    vtkCreateToolbarButton caption:="Test button", helpText:="", faceId:=1, action:="vtkTestCommandBarButtonClicked", vbeToolbar:=False
     
    On Error Resume Next
     Set bar = Application.CommandBars(toolBarName)
@@ -169,7 +169,7 @@ Public Sub Test_VBEToolBarButtonAdd()
     Dim bar As CommandBar, button As CommandBarButton, realCaption As String
 
     vtkCreateEmptyToolbars   ' create empty toolbar
-    vtkCreateToolbarButton caption:="Test button", helpText:="", faceId:=1, action:="commandBarButtonClicked", excToolbar:=False
+    vtkCreateToolbarButton caption:="Test button", helpText:="", faceId:=1, action:="vtkTestCommandBarButtonClicked", excToolbar:=False
     
    On Error Resume Next
     Set bar = Application.VBE.CommandBars(toolBarName)
@@ -185,7 +185,7 @@ Public Sub Test_ExcelToolBarButtonDelete()
     Dim bar As CommandBar, button As CommandBarButton, realCaption As String, errNum As Long
 
     vtkCreateEmptyToolbars   ' create empty toolbar
-    vtkCreateToolbarButton caption:="Test button", helpText:="", faceId:=1, action:="commandBarButtonClicked"
+    vtkCreateToolbarButton caption:="Test button", helpText:="", faceId:=1, action:="vtkTestCommandBarButtonClicked"
     Set bar = Application.CommandBars(toolBarName)
     Set button = bar.Controls(1)
     
@@ -203,7 +203,7 @@ Public Sub Test_VBEToolBarButtonDelete()
     Dim bar As CommandBar, button As CommandBarButton, realCaption As String, errNum As Long
 
     vtkCreateEmptyToolbars   ' create empty toolbar
-    vtkCreateToolbarButton caption:="Test button", helpText:="", faceId:=1, action:="commandBarButtonClicked"
+    vtkCreateToolbarButton caption:="Test button", helpText:="", faceId:=1, action:="vtkTestCommandBarButtonClicked"
     Set bar = Application.VBE.CommandBars(toolBarName)
     Set button = bar.Controls(1)
     

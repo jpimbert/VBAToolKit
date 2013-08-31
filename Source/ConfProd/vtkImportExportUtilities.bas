@@ -98,7 +98,7 @@ Public Function vtkStandardCategoryForModuleName(moduleName As String) As String
    On Error Resume Next
     Dim ret As String
     ret = vtkVBAUnitModulesList.Item(moduleName)
-    If err.Number = 0 Then
+    If err.number = 0 Then
         vtkStandardCategoryForModuleName = "VBAUnit"
        On Error GoTo 0
         Exit Function
@@ -266,10 +266,10 @@ Public Sub vtkExportOneModule(project As VBProject, moduleName As String, filePa
     Exit Sub
 
 vtkExportOneModule_Error:
-    If err.Number = 9 Then
-        err.Raise Number:=VTK_UNKNOWN_MODULE, source:="ExportOneModule", Description:="Module to export doesn't exist : " & moduleName
+    If err.number = 9 Then
+        err.Raise number:=VTK_UNKNOWN_MODULE, source:="ExportOneModule", Description:="Module to export doesn't exist : " & moduleName
        Else
-        err.Raise Number:=VTK_UNEXPECTED_ERROR, source:="ExportOneModule", Description:="Unexpected error when exporting " & moduleName & " : " & err.Description
+        err.Raise number:=VTK_UNEXPECTED_ERROR, source:="ExportOneModule", Description:="Unexpected error when exporting " & moduleName & " : " & err.Description
     End If
 End Sub
 
@@ -390,7 +390,7 @@ Public Sub vtkRecreateConfiguration(projectName As String, configurationName As 
     fileName = fso.GetFileName(wbPath)
    On Error Resume Next
     wbIsAddin = Workbooks(fileName).IsAddin
-    If err.Number = 0 And wbIsAddin Then
+    If err.number = 0 And wbIsAddin Then
         addInWasActivated = AddIns(configurationName).Installed
         AddIns(configurationName).Installed = False
        Else
@@ -400,6 +400,12 @@ Public Sub vtkRecreateConfiguration(projectName As String, configurationName As 
     ' Save the Excel file with the good type and erase the previous one (a message is displayed to the user)
     wb.SaveAs fileName:=rootPath & "\" & wbPath, FileFormat:=vtkDefaultFileFormat(wbPath)
     wb.Close savechanges:=False
+    ' Copy the AddIn in App Data folder (Only Excel 2007 at the moment)
+    Dim appPath As String
+    appPath = ""
+    If Application.Version = "12.0" Then appPath = Environ("appdata") & "\Microsoft\AddIns\" & fileName ' Path for Excel 2007
+    If Not appPath Like "" Then fso.CopyFile source:=rootPath & "\" & wbPath, destination:=appPath, OverWriteFiles:=True
+    ' Reactivate The AddIn if it was activated
     If addInWasActivated Then AddIns(configurationName).Installed = True
 End Sub
 

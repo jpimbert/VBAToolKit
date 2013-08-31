@@ -55,6 +55,17 @@ Public Sub vtkClearEventHandlers()
 End Sub
 
 '---------------------------------------------------------------------------------------
+' Procedure : projectName
+' Author    : Jean-Pierre Imbert
+' Date      : 09/08/2013
+' Purpose   : Give name of running project
+'---------------------------------------------------------------------------------------
+'
+Private Function projectName() As String
+    projectName = ThisWorkbook.VBProject.name
+End Function
+
+'---------------------------------------------------------------------------------------
 ' Procedure : toolBarName
 ' Author    : Jean-Pierre Imbert
 ' Date      : 09/08/2013
@@ -64,7 +75,7 @@ End Sub
 '---------------------------------------------------------------------------------------
 '
 Private Function toolBarName() As String
-    toolBarName = ThisWorkbook.VBProject.name
+    toolBarName = projectName
 End Function
 
 '---------------------------------------------------------------------------------------
@@ -77,7 +88,7 @@ End Function
 '---------------------------------------------------------------------------------------
 '
 Private Function controlTag() As String
-    controlTag = ThisWorkbook.VBProject.name & "_Tag"
+    controlTag = projectName & "_Tag"
 End Function
 
 '---------------------------------------------------------------------------------------
@@ -94,11 +105,11 @@ End Function
 Public Sub vtkCreateToolbars(Optional vbeToolbar As Boolean = True, Optional excToolbar As Boolean = True)
     vtkCreateEmptyToolbars vbeToolbar:=vbeToolbar, excToolbar:=excToolbar
     ' Create the button for VBE Toolbar reactivation
-    If excToolbar Then vtkCreateToolbarButton caption:="Reset VBE Toolbar", helpText:="Click here to reset the VBA IDE Toolbar", faceId:=688, action:="VBAToolKit.vtkReactivateVBEToolBar", vbeToolbar:=False, excToolbar:=True
+    If excToolbar Then vtkCreateToolbarButton caption:="Reset VBE Toolbar", helpText:="Click here to reset the VBA IDE Toolbar", faceId:=688, action:=projectName & ".vtkReactivateVBEToolBar", vbeToolbar:=False, excToolbar:=True
     ' Create other buttons
-    vtkCreateToolbarButton caption:="Create Project", helpText:="Click here to create a new project", faceId:=2031, action:="VBAToolKit.vtkShowCreateProjectForm", vbeToolbar:=vbeToolbar, excToolbar:=excToolbar
+    vtkCreateToolbarButton caption:="Create Project", helpText:="Click here to create a new project", faceId:=2031, action:=projectName & ".vtkShowCreateProjectForm", vbeToolbar:=vbeToolbar, excToolbar:=excToolbar
 '    doesn't work because it's a Hara-Kiri for VBAToolKit itself
-'    vtkCreateToolbarButton caption:="Recreate Delivery", helpText:="Click here to recreate the configuration for delivery", faceId:=680, action:="VBAToolKit.vtkRecreateDeliveryClicked", vbeToolbar:=vbeToolbar, excToolbar:=excToolbar
+'    vtkCreateToolbarButton caption:="Recreate Delivery", helpText:="Click here to recreate the configuration for delivery", faceId:=680, action:=projectName & ".vtkRecreateDeliveryClicked", vbeToolbar:=vbeToolbar, excToolbar:=excToolbar
 End Sub
 
 '---------------------------------------------------------------------------------------
