@@ -53,34 +53,34 @@ Private Sub ITestCase_SetUp(Assert As IAssert)
     
     'Creating a hierarchy of folders (mainly for vtkCleanFolder)
     ' -----------------------------------------------------------------------------
-    fso.CreateFolder (vtkTestPath & "\" & "visible_folder")
-    fso.CreateFolder (vtkTestPath & "\" & "visible_folder" & "\" & "visible_folder")
-    fso.CreateFolder (vtkTestPath & "\" & "hidden_folder")
-    fso.CreateFolder (vtkTestPath & "\" & "hidden_folder" & "\" & "visible_folder")
-    fso.CreateFolder (vtkTestPath & "\" & "testFolder0")
-    fso.CreateFolder (vtkTestPath & "\" & "testFolder0" & "\" & "testFolder11")
-    fso.CreateFolder (vtkTestPath & "\" & "testFolder0" & "\" & "testFolder1")
-    fso.CreateFolder (vtkTestPath & "\" & "testFolder0" & "\" & "testFolder1" & "\" & "testFolder2")
-    fso.CreateFolder (vtkTestPath & "\" & "testFolder0" & "\" & "testFolder1" & "\" & "testFolder2" & "\" & "testFolder3")
+    fso.CreateFolder (VBAToolKit.vtkTestPath & "\" & "visible_folder")
+    fso.CreateFolder (VBAToolKit.vtkTestPath & "\" & "visible_folder" & "\" & "visible_folder")
+    fso.CreateFolder (VBAToolKit.vtkTestPath & "\" & "hidden_folder")
+    fso.CreateFolder (VBAToolKit.vtkTestPath & "\" & "hidden_folder" & "\" & "visible_folder")
+    fso.CreateFolder (VBAToolKit.vtkTestPath & "\" & "testFolder0")
+    fso.CreateFolder (VBAToolKit.vtkTestPath & "\" & "testFolder0" & "\" & "testFolder11")
+    fso.CreateFolder (VBAToolKit.vtkTestPath & "\" & "testFolder0" & "\" & "testFolder1")
+    fso.CreateFolder (VBAToolKit.vtkTestPath & "\" & "testFolder0" & "\" & "testFolder1" & "\" & "testFolder2")
+    fso.CreateFolder (VBAToolKit.vtkTestPath & "\" & "testFolder0" & "\" & "testFolder1" & "\" & "testFolder2" & "\" & "testFolder3")
     ' We create three text files to try different configurations
     '   - testFolder0  : text file and 2 subfolders
     '   - testFolder1  : text file and one subfolder
     '   - testFolder11 : empty
     '   - testFolder2  : subfolder only
     '   - testFolder3  : text file only
-    fso.CreateTextFile (vtkTestPath & "\" & "testFolder0" & "\" & "textFile0.txt")
-    fso.CreateTextFile (vtkTestPath & "\" & "testFolder0" & "\" & "testFolder1" & "\" & "textFile1.txt")
-    fso.CreateTextFile (vtkTestPath & "\" & "testFolder0" & "\" & "testFolder1" & "\" & "testFolder2" & _
+    fso.CreateTextFile (VBAToolKit.vtkTestPath & "\" & "testFolder0" & "\" & "textFile0.txt")
+    fso.CreateTextFile (VBAToolKit.vtkTestPath & "\" & "testFolder0" & "\" & "testFolder1" & "\" & "textFile1.txt")
+    fso.CreateTextFile (VBAToolKit.vtkTestPath & "\" & "testFolder0" & "\" & "testFolder1" & "\" & "testFolder2" & _
     "\" & "testFolder3" & "\" & "textFile3.txt")
     
     '------------------------------------------------------------------------------
     
     'Creating other files and folders for simple tests
-    fso.CreateTextFile (vtkTestPath & "\" & "testFolder0" & "\" & "hidden.txt")
-    fso.CreateTextFile (vtkTestPath & "\" & "testFolder0" & "\" & "not_hidden.txt")
-    fso.CreateFolder (vtkTestPath & "\" & "testFolder0" & "\" & "hidden_folder")
-    SetAttr vtkTestPath & "\" & "testFolder0" & "\" & "hidden.txt", vbHidden
-    SetAttr vtkTestPath & "\" & "testFolder0" & "\" & "hidden_folder", vbHidden
+    fso.CreateTextFile (VBAToolKit.vtkTestPath & "\" & "testFolder0" & "\" & "hidden.txt")
+    fso.CreateTextFile (VBAToolKit.vtkTestPath & "\" & "testFolder0" & "\" & "not_hidden.txt")
+    fso.CreateFolder (VBAToolKit.vtkTestPath & "\" & "testFolder0" & "\" & "hidden_folder")
+    SetAttr VBAToolKit.vtkTestPath & "\" & "testFolder0" & "\" & "hidden.txt", vbHidden
+    SetAttr VBAToolKit.vtkTestPath & "\" & "testFolder0" & "\" & "hidden_folder", vbHidden
 End Sub
 
 Private Sub ITestCase_TearDown()
@@ -89,7 +89,7 @@ Private Sub ITestCase_TearDown()
     
     fso = Nothing
 
-    vtkCleanFolder (vtkTestPath)
+    vtkCleanFolder (VBAToolKit.vtkTestPath)
     
 End Sub
 
@@ -134,7 +134,7 @@ Public Sub Test_vtkCleanFolder_correctPathAreFoldersDeleted()
     Dim fso As New Scripting.FileSystemObject
     Dim testFolder As Scripting.Folder
 
-    Set testFolder = fso.GetFolder(vtkTestPath)
+    Set testFolder = fso.GetFolder(VBAToolKit.vtkTestPath)
 
     vtkCleanFolder (testFolder.path)
     
@@ -144,7 +144,7 @@ End Sub
 '
 Public Sub Test_vtkCleanFolder_correctPathReturnValue()
     Dim testFolder As String
-    testFolder = vtkTestPath & "\" & "testFolder0"
+    testFolder = VBAToolKit.vtkTestPath & "\" & "testFolder0"
     
     Dim retval As Integer
     retval = vtkCleanFolder(testFolder)
@@ -154,7 +154,7 @@ End Sub
 
 Public Sub Test_vtkCleanFolder_wrongPath()
     Dim testFolder As String
-    testFolder = vtkTestPath & "\" & "no_folder"
+    testFolder = VBAToolKit.vtkTestPath & "\" & "no_folder"
     
     Dim retval As Integer
     retval = vtkCleanFolder(testFolder)
@@ -164,7 +164,7 @@ End Sub
 
 Public Sub Test_vtkCleanFolder_file()
     Dim filePath As String
-    filePath = vtkTestPath & "\" & "hidden.txt"
+    filePath = VBAToolKit.vtkTestPath & "\" & "hidden.txt"
     
     Dim retval As Integer
     retval = vtkCleanFolder(filePath)
@@ -175,7 +175,7 @@ End Sub
 
 Public Sub Test_vtkDeleteFolder_correctPathAreFoldersDeleted()
     Dim testFolder As String
-    testFolder = vtkTestPath & "\" & "testFolder0"
+    testFolder = VBAToolKit.vtkTestPath & "\" & "testFolder0"
     
     vtkDeleteFolder testFolder
     
@@ -184,7 +184,7 @@ End Sub
 '
 Public Sub Test_vtkDeleteFolder_correctPathReturnValue()
     Dim testFolder As String
-    testFolder = vtkTestPath & "\" & "testFolder0"
+    testFolder = VBAToolKit.vtkTestPath & "\" & "testFolder0"
     
     Dim retval As Integer
     retval = vtkDeleteFolder(testFolder)
@@ -195,7 +195,7 @@ End Sub
 Public Sub Test_vtkDeleteFolder_wrongPath()
 
     Dim testFolder As String
-    testFolder = vtkTestPath & "\" & "no_folder"
+    testFolder = VBAToolKit.vtkTestPath & "\" & "no_folder"
     
     Dim retval As Integer
     retval = vtkDeleteFolder(testFolder)
@@ -205,7 +205,7 @@ End Sub
 
 Public Sub Test_vtkDeleteFolder_file()
     Dim filePath As String
-    filePath = vtkTestPath & "\" & "hidden.txt"
+    filePath = VBAToolKit.vtkTestPath & "\" & "hidden.txt"
     
     Dim retval As Integer
     retval = vtkCleanFolder(filePath)
@@ -215,23 +215,23 @@ End Sub
 
 
 Public Sub Test_vtkDoesFolderExist_visibleFolder()
-    mAssert.Should vtkDoesFolderExist(vtkTestPath & "\" & "testFolder0") = True, "Folder exists."
+    mAssert.Should vtkDoesFolderExist(VBAToolKit.vtkTestPath & "\" & "testFolder0") = True, "Folder exists."
 End Sub
 
 Public Sub Test_vtkDoesFolderExist_hiddenFolder()
-    mAssert.Should vtkDoesFolderExist(vtkTestPath & "\" & "hidden_folder") = True, "Folder exists."
+    mAssert.Should vtkDoesFolderExist(VBAToolKit.vtkTestPath & "\" & "hidden_folder") = True, "Folder exists."
 End Sub
 
 Public Sub Test_vtkDoesFolderExist_wrongPath()
-    mAssert.Should vtkDoesFolderExist(vtkTestPath & "\" & "no_folder") = False, "Folder does not exist."
+    mAssert.Should vtkDoesFolderExist(VBAToolKit.vtkTestPath & "\" & "no_folder") = False, "Folder does not exist."
 End Sub
 
 Public Sub Test_vtkDoesFolderExist_visibleFile()
-    mAssert.Should vtkDoesFolderExist(vtkTestPath & "\" & "not_hidden.txt") = False, "Is not a folder."
+    mAssert.Should vtkDoesFolderExist(VBAToolKit.vtkTestPath & "\" & "not_hidden.txt") = False, "Is not a folder."
 End Sub
 
 Public Sub Test_vtkDoesFolderExist_hiddenFile()
-    mAssert.Should vtkDoesFolderExist(vtkTestPath & "\" & "hidden.txt") = False, "Is not a folder."
+    mAssert.Should vtkDoesFolderExist(VBAToolKit.vtkTestPath & "\" & "hidden.txt") = False, "Is not a folder."
 End Sub
 
 

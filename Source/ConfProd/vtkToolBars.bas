@@ -246,9 +246,19 @@ End Function
 Private Sub vtkShowCreateProjectForm()
     vtkCreateProjectForm.Show
 End Sub
+
 ' Special CallBack, manually configured in Excel to recreate AddIn
 '   Options Excel, Personnaliser, choisir Macro pour bouton de raccourci rapide
 Public Sub vtkClickForVBAToolKitRecreation()
     vtkRecreateConfiguration projectName:="VBAToolKit", configurationName:="VBAToolKit"
 End Sub
+
+' Special CallBack, manually configured in Excel to recreate Dev Project
+'   Must be run from another project named VBAToolKit2
+Public Sub vtkClickForVBAToolKitDEVRecreation()
+    If Not ActiveWorkbook.VBProject.name Like "VBAToolKit2_DEV" Then Exit Sub
+    If Not ActiveWorkbook.name Like "VBAToolKit2_DEV.xlsm" Then Exit Sub
+    vtkRecreateConfiguration projectName:="VBAToolKit2", configurationName:="VBAToolKit_DEV"
+End Sub
+
 

@@ -50,15 +50,15 @@ Private Sub ITestCase_SetUp(Assert As IAssert)
 End Sub
 
 Private Sub ITestCase_TearDown()
-    vtkCleanFolder vtkTestPath
+    vtkCleanFolder VBAToolKit.vtkTestPath
 End Sub
 
 
 Public Sub Test_vtkInitializeGit_correctPathExistenceOfDotGitFolder()
     On Error GoTo Test_vtkInitializeGit_correctPathExistenceOfDotGitFolder_Error
 
-   vtkInitializeGit vtkTestPath
-   mAssert.Should vtkDoesFolderExist(vtkTestPath & "\.git") = True, ".git folder must exist"
+   vtkInitializeGit VBAToolKit.vtkTestPath
+   mAssert.Should vtkDoesFolderExist(VBAToolKit.vtkTestPath & "\.git") = True, ".git folder must exist"
 
     On Error GoTo 0
     Exit Sub
@@ -72,7 +72,7 @@ Public Sub Test_vtkInitializeGit_correctPathRetVal()
     Dim retval As Integer
     On Error GoTo Test_vtkInitializeGit_correctPathRetVal_Error
 
-    retval = vtkInitializeGit(vtkTestPath)
+    retval = vtkInitializeGit(VBAToolKit.vtkTestPath)
     mAssert.Equals retval, VTK_OK
 
     On Error GoTo 0
@@ -88,8 +88,8 @@ Public Sub Test_vtkInitializeGit_correctPathReInitializeRetVal()
     
     On Error GoTo errHandler
     
-    vtkInitializeGit (vtkTestPath)
-    vtkInitializeGit (vtkTestPath)
+    vtkInitializeGit (VBAToolKit.vtkTestPath)
+    vtkInitializeGit (VBAToolKit.vtkTestPath)
     
     mAssert.Equals error, VTK_GIT_ALREADY_INITIALIZED_IN_FOLDER
     
@@ -106,7 +106,7 @@ Public Sub Test_vtkInitializeGit_wrongPathUnexistingFolder()
     
     On Error GoTo errHandler
     
-    vtkInitializeGit (vtkTestPath & "\no_folder")
+    vtkInitializeGit (VBAToolKit.vtkTestPath & "\no_folder")
     
     mAssert.Equals error, VTK_WRONG_FOLDER_PATH
     
@@ -124,7 +124,7 @@ Public Sub Test_vtkInitializeGit_wrongPathFile()
     
     On Error GoTo errHandler
     
-    vtkInitializeGit (vtkTestPath & "file.txt")
+    vtkInitializeGit (VBAToolKit.vtkTestPath & "file.txt")
     
     mAssert.Equals error, VTK_WRONG_FOLDER_PATH
     
@@ -176,8 +176,8 @@ Public Sub Test_vtkInitializeGit_correctPathLogFileIsDeleted()
     Dim fso As New Scripting.FileSystemObject
     On Error GoTo Test_vtkInitializeGit_correctPathLogFileIsDeleted_Error
 
-    vtkInitializeGit vtkTestPath
-    mAssert.Equals fso.FileExists(vtkTestPath & "\initialize.log"), False
+    vtkInitializeGit VBAToolKit.vtkTestPath
+    mAssert.Equals fso.FileExists(VBAToolKit.vtkTestPath & "\initialize.log"), False
 
     On Error GoTo 0
     Exit Sub
@@ -191,7 +191,7 @@ Public Sub Test_vtkInitializeGit_correctPathCustomLogFileReturnValue()
     Dim retval As Integer
     On Error GoTo Test_vtkInitializeGit_correctPathCustomLogFileReturnValue_Error
 
-    retval = vtkInitializeGit(vtkTestPath, "initialize.log")
+    retval = vtkInitializeGit(VBAToolKit.vtkTestPath, "initialize.log")
     mAssert.Equals retval, VTK_OK
 
     On Error GoTo 0
@@ -206,8 +206,8 @@ Public Sub Test_vtkInitializeGit_correctPathCustomLogFileExists()
     Dim fso As New FileSystemObject
     On Error GoTo Test_vtkInitializeGit_correctPathCustomLogFileExists_Error
 
-    vtkInitializeGit vtkTestPath, "initialize.log"
-    mAssert.Equals fso.FileExists(vtkTestPath & "\initialize.log"), True
+    vtkInitializeGit VBAToolKit.vtkTestPath, "initialize.log"
+    mAssert.Equals fso.FileExists(VBAToolKit.vtkTestPath & "\initialize.log"), True
 
     On Error GoTo 0
     Exit Sub
@@ -305,9 +305,9 @@ Public Sub Test_vtkInitializeGit_correctPathGitExcludeContentIsRight()
 
     On Error GoTo Test_vtkInitializeGit_correctPathGitExcludeContentIsRight_Error
 
-    vtkInitializeGit vtkTestPath
+    vtkInitializeGit VBAToolKit.vtkTestPath
     
-    fileContent = vtkTextFileReader(vtkTestPath & "\.git\info\exclude")
+    fileContent = vtkTextFileReader(VBAToolKit.vtkTestPath & "\.git\info\exclude")
     
     expectedContent = _
     "# Ignore the content of the Tests and GitLog folders" & Chr(10) & _
