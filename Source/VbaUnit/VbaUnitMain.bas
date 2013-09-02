@@ -14,6 +14,7 @@ Public Sub Run(Optional TestClassName As String)
     Dim hfin As Single
    
     hdebut = Timer 'debut
+    VBAToolKit.vtkTestUtilities.prepare       ' Prepare vtkTestUtilities
     Application.ScreenUpdating = False
 '    Dim objShell As New Shell
 '    objShell.MinimizeAll        ' Minimize all windows
