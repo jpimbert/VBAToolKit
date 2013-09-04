@@ -36,8 +36,12 @@ Private mAssert As IAssert
 
 Private Const testWorkbookName As String = "TestProject_DEV.xlsm"
 Private Const testProjectName As String = "TestProject"
-Private Const testModule1 As String = "TestModule1.bas"
-Private Const testModule2 As String = "TestModule2.bas"
+Private Const testModule1FileName As String = "TestModule1.bas"
+Private Const testModule2FileName As String = "TestModule2.bas"
+Private Const importedModuleFileName As String = "TestModule.bas"
+Private Const testModule1Name As String = "TestModule1"
+Private Const testModule2Name As String = "TestModule2"
+Private Const importedModuleName As String = "TestModule"
 Private Const totalNumberOfModules As Integer = 2
 
 Private cm As vtkConfigurationManager
@@ -152,8 +156,8 @@ Public Sub Test_vtkExportConfiguration_filesJustExportedTrue()
     
     On Error GoTo Test_vtkExportConfiguration_filesYetCreatedTrue_Error
 
-    vtkExportOneModule wbForTest.VBProject, testModule1, vtkPathToTestFolder & "\" & testModule1
-    vtkExportOneModule wbForTest.VBProject, testModule2, vtkPathToTestFolder & "\" & testModule2
+    vtkExportOneModule wbForTest.VBProject, testModule1Name, vtkPathToTestFolder & "\" & testModule1FileName
+    vtkExportOneModule wbForTest.VBProject, testModule2Name, vtkPathToTestFolder & "\" & testModule2FileName
 
     retVal = vtkExportConfiguration(wbForTest.VBProject, testProjectName, testConf.name, onlyModified:=True)
     mAssert.Equals retVal, totalNumberOfModules
@@ -171,8 +175,8 @@ Public Sub Test_vtkExportConfiguration_filesJustExportedFalse()
     
     On Error GoTo Test_vtkExportConfiguration_filesJustExportedFalse_Error
     
-    vtkExportOneModule wbForTest.VBProject, testModule1, vtkPathToTestFolder & "\" & testModule1
-    vtkExportOneModule wbForTest.VBProject, testModule2, vtkPathToTestFolder & "\" & testModule2
+    vtkExportOneModule wbForTest.VBProject, testModule1Name, vtkPathToTestFolder & "\" & testModule1FileName
+    vtkExportOneModule wbForTest.VBProject, testModule2Name, vtkPathToTestFolder & "\" & testModule2FileName
 
     retVal = vtkExportConfiguration(wbForTest.VBProject, testProjectName, testConf.name, onlyModified:=False)
     mAssert.Equals retVal, 0
@@ -190,10 +194,10 @@ Public Sub Test_vtkExportConfiguration_oneFileModifiedTrue()
     
     On Error GoTo Test_vtkExportConfiguration_oneFileModifiedTrue_Error
 
-    vtkExportOneModule wbForTest.VBProject, testModule1, vtkPathToTestFolder & "\" & testModule1
-    vtkExportOneModule wbForTest.VBProject, testModule2, vtkPathToTestFolder & "\" & testModule2
+    vtkExportOneModule wbForTest.VBProject, testModule1Name, vtkPathToTestFolder & "\" & testModule1FileName
+    vtkExportOneModule wbForTest.VBProject, testModule2Name, vtkPathToTestFolder & "\" & testModule2FileName
 
-    insertDummyProcedureInCodeModule wbForTest.VBProject.VBComponents(testModule1).CodeModule, dummyInt:=1
+    insertDummyProcedureInCodeModule wbForTest.VBProject.VBComponents(testModule1Name).CodeModule, dummyInt:=1
     
     retVal = vtkExportConfiguration(wbForTest.VBProject, testProjectName, testConf.name, onlyModified:=True)
     mAssert.Equals retVal, 1
@@ -213,10 +217,10 @@ Public Sub Test_vtkExportConfiguration_oneFileModifiedFalse()
     
     On Error GoTo Test_vtkExportConfiguration_oneFileModifiedFalse_Error
 
-    vtkExportOneModule wbForTest.VBProject, testModule1, vtkPathToTestFolder & "\" & testModule1
-    vtkExportOneModule wbForTest.VBProject, testModule2, vtkPathToTestFolder & "\" & testModule2
+    vtkExportOneModule wbForTest.VBProject, testModule1Name, vtkPathToTestFolder & "\" & testModule1FileName
+    vtkExportOneModule wbForTest.VBProject, testModule2Name, vtkPathToTestFolder & "\" & testModule2FileName
 
-    insertDummyProcedureInCodeModule wbForTest.VBProject.VBComponents(testModule1).CodeModule, dummyInt:=1
+    insertDummyProcedureInCodeModule wbForTest.VBProject.VBComponents(testModule1Name).CodeModule, dummyInt:=1
     
     retVal = vtkExportConfiguration(wbForTest.VBProject, testProjectName, testConf.name, onlyModified:=False)
     mAssert.Equals retVal, totalNumberOfModules
@@ -236,11 +240,11 @@ Public Sub Test_vtkExportConfiguration_twoFilesModifiedTrue()
     
     On Error GoTo Test_vtkExportConfiguration_twoFilesModifiedTrue_Error
 
-    vtkExportOneModule wbForTest.VBProject, testModule1, vtkPathToTestFolder & "\" & testModule1
-    vtkExportOneModule wbForTest.VBProject, testModule2, vtkPathToTestFolder & "\" & testModule2
+    vtkExportOneModule wbForTest.VBProject, testModule1Name, vtkPathToTestFolder & "\" & testModule1FileName
+    vtkExportOneModule wbForTest.VBProject, testModule2Name, vtkPathToTestFolder & "\" & testModule2FileName
 
-    insertDummyProcedureInCodeModule wbForTest.VBProject.VBComponents(testModule1).CodeModule, dummyInt:=1
-    insertDummyProcedureInCodeModule wbForTest.VBProject.VBComponents(testModule1).CodeModule, dummyInt:=2
+    insertDummyProcedureInCodeModule wbForTest.VBProject.VBComponents(testModule1Name).CodeModule, dummyInt:=1
+    insertDummyProcedureInCodeModule wbForTest.VBProject.VBComponents(testModule2Name).CodeModule, dummyInt:=2
     
     retVal = vtkExportConfiguration(wbForTest.VBProject, testProjectName, testConf.name, onlyModified:=True)
     mAssert.Equals retVal, 2
@@ -259,11 +263,11 @@ Public Sub Test_vtkExportConfiguration_twoFilesModifiedFalse()
     
     On Error GoTo Test_vtkExportConfiguration_twoFilesModifiedFalse_Error
 
-    vtkExportOneModule wbForTest.VBProject, testModule1, vtkPathToTestFolder & "\" & testModule1
-    vtkExportOneModule wbForTest.VBProject, testModule2, vtkPathToTestFolder & "\" & testModule2
+    vtkExportOneModule wbForTest.VBProject, testModule1Name, vtkPathToTestFolder & "\" & testModule1FileName
+    vtkExportOneModule wbForTest.VBProject, testModule2Name, vtkPathToTestFolder & "\" & testModule2FileName
 
-    insertDummyProcedureInCodeModule wbForTest.VBProject.VBComponents(testModule1).CodeModule, dummyInt:=1
-    insertDummyProcedureInCodeModule wbForTest.VBProject.VBComponents(testModule1).CodeModule, dummyInt:=2
+    insertDummyProcedureInCodeModule wbForTest.VBProject.VBComponents(testModule1Name).CodeModule, dummyInt:=1
+    insertDummyProcedureInCodeModule wbForTest.VBProject.VBComponents(testModule1Name).CodeModule, dummyInt:=2
     
     retVal = vtkExportConfiguration(wbForTest.VBProject, testProjectName, testConf.name, onlyModified:=False)
     mAssert.Equals retVal, totalNumberOfModules
@@ -277,6 +281,31 @@ Test_vtkExportConfiguration_twoFilesModifiedFalse_Error:
 
 End Sub
 
+Public Sub Test_vtkExportConfiguration_importedModuleMustBeExported()
+    Dim retVal As Integer
+
+    On Error GoTo Test_vtkExportConfiguration_importedModuleMustBeExported_Error
+
+    ' We export the modules already present so that they don't get exported again
+    vtkExportOneModule wbForTest.VBProject, testModule1Name, vtkPathToTestFolder & "\" & testModule1FileName
+    vtkExportOneModule wbForTest.VBProject, testModule1Name, vtkPathToTestFolder & "\" & testModule1FileName
+
+    ' We import the module
+    vtkImportOneModule wbForTest.VBProject, importedModuleName, vtkPathToTestFolder & "\" & importedModuleFileName
+    
+    retVal = vtkExportConfiguration(wbForTest.VBProject, testProjectName, testConf.name, onlyModified:=True)
+    
+    mAssert.Equals retVal, 0
+
+    On Error GoTo 0
+    Exit Sub
+
+Test_vtkExportConfiguration_importedModuleMustBeExported_Error:
+    mAssert.Should False, "Unexpected error " & Err.number & " (" & Err.Description & ") in procedure Test_vtkExportConfiguration_importedFileMustBeExported of Class Module vtkExportConfigurationTester"
+    Resume Next
+End Sub
+
+
 Private Function ITest_Suite() As TestSuite
     Set ITest_Suite = New TestSuite
     ITest_Suite.AddTest ITest_Manager.ClassName, "Test_vtkExportConfiguration_filesNotYetCreatedTrue"
@@ -287,6 +316,7 @@ Private Function ITest_Suite() As TestSuite
     ITest_Suite.AddTest ITest_Manager.ClassName, "Test_vtkExportConfiguration_oneFileModifiedFalse"
     ITest_Suite.AddTest ITest_Manager.ClassName, "Test_vtkExportConfiguration_twoFilesModifiedTrue"
     ITest_Suite.AddTest ITest_Manager.ClassName, "Test_vtkExportConfiguration_twoFilesModifiedFalse"
+    ITest_Suite.AddTest ITest_Manager.ClassName, "Test_vtkExportConfiguration_importedModuleMustBeExported"
 End Function
 
 Private Sub ITestCase_RunTest()
@@ -299,6 +329,7 @@ Private Sub ITestCase_RunTest()
         Case "Test_vtkExportConfiguration_oneFileModifiedFalse": Test_vtkExportConfiguration_oneFileModifiedFalse
         Case "Test_vtkExportConfiguration_twoFilesModifiedTrue": Test_vtkExportConfiguration_twoFilesModifiedTrue
         Case "Test_vtkExportConfiguration_twoFilesModifiedFalse": Test_vtkExportConfiguration_twoFilesModifiedFalse
+        Case "Test_vtkExportConfiguration_importedModuleMustBeExported": Test_vtkExportConfiguration_importedModuleMustBeExported
         Case Else: mAssert.Should False, "Invalid test name: " & mManager.methodName
     End Select
 End Sub
