@@ -62,7 +62,7 @@ Private Property Get ITest_Manager() As ITestManager
 End Property
 
 Private Sub ITestCase_SetUp(Assert As IAssert)
-    On Error GoTo ITestCase_SetUp_Error
+    On Error Resume Next
 
     Set mAssert = Assert
     
@@ -76,11 +76,6 @@ Private Sub ITestCase_SetUp(Assert As IAssert)
 
     On Error GoTo 0
     Exit Sub
-
-ITestCase_SetUp_Error:
-    Debug.Print "Unexpected error " & Err.number & " (" & Err.Description & ") in procedure ITestCase_SetUp of Class Module vtkExportConfigurationTester"
-    vtkCloseAndKillWorkbook Wb:=wbForTest
-    Exit Sub
     
 End Sub
 
@@ -90,19 +85,8 @@ Private Sub ITestCase_TearDown()
     vtkCleanFolder vtkPathToTestFolder
 
 End Sub
-'--------------------------------------------------
-' Tests to be written
-'   - export configuration with files not yet created and onlyModified = True => retval = number of modules in the configuration
-'   - export configuration with files not yet created and onlyModified = False => retval = number of modules in the configuration
-'   - export configuration with files just exported and onlyModified = True => retval = number of modules in the configuration
-'   - export configuration with files just exported and onlyModified = False => retval = 0
-'
-'   - export configuration with one file modified and onlyModified = True => retval = 1
-'   - export configuration with one file modified and onlyModified = False => retval = 2
-'   - export configuration with two files modified and onlyModified = True => retval = 2
-'   - export configuration with two files modified and onlyModified = False => retval = 2
-' -------------------------------------------------
 
+' Quick procedure to modify a module
 Private Sub insertDummyProcedureInCodeModule(codemo As VBIDE.CodeModule, dummyInt As Integer)
     Dim dummyProcedure As String
     
@@ -116,6 +100,7 @@ Private Sub insertDummyProcedureInCodeModule(codemo As VBIDE.CodeModule, dummyIn
 
 End Sub
 
+' -------- TESTS ---------
 
 Public Sub Test_vtkExportConfiguration_filesNotYetCreatedTrue()
     Dim retVal As Integer
@@ -123,7 +108,7 @@ Public Sub Test_vtkExportConfiguration_filesNotYetCreatedTrue()
     On Error GoTo Test_vtkExportConfiguration_filesNotYetCreatedTrue_Error
 
     retVal = vtkExportConfiguration(wbForTest.VBProject, testProjectName, testConf.name, onlyModified:=True)
-    mAssert.Equals retVal, totalNumberOfModules
+    mAssert.Equals retVal, totalNumberOfModules, totalNumberOfModules & " should be exported as files do not yet exist."
 
     On Error GoTo 0
     Exit Sub
@@ -140,13 +125,48 @@ Public Sub Test_vtkExportConfiguration_filesNotYetCreatedFalse()
     On Error GoTo Test_vtkExportConfiguration_filesNotYetCreatedFalse_Error
 
     retVal = vtkExportConfiguration(wbForTest.VBProject, testProjectName, testConf.name, onlyModified:=False)
-    mAssert.Equals retVal, totalNumberOfModules
+    mAssert.Equals retVal, totalNumberOfModules, totalNumberOfModules & " should be exported as files do not yet exist."
 
     On Error GoTo 0
     Exit Sub
 
 Test_vtkExportConfiguration_filesNotYetCreatedFalse_Error:
     mAssert.Should False, "Unexpected error " & Err.number & " (" & Err.Description & ") in procedure Test_vtkExportConfiguration_filesNotYetCreatedFalse of Class Module vtkExportConfigurationTester"
+    Resume Next
+
+End Sub
+
+Public Sub Test_vtkExportConfiguration_filesNotYetCreatedFalseFilesAreCreated1()
+    Dim retVal As Integer
+
+    On Error GoTo Test_vtkExportConfiguration_filesNotYetCreatedFalseFilesAreCreated1_Error
+
+    retVal = vtkExportConfiguration(wbForTest.VBProject, testProjectName, testConf.name, onlyModified:=False)
+    mAssert.Should fso.FileExists(vtkPathToTestFolder & "\" & testModule1FileName), testModule1FileName & " should have been created."
+
+    On Error GoTo 0
+    Exit Sub
+
+Test_vtkExportConfiguration_filesNotYetCreatedFalseFilesAreCreated1_Error:
+    Debug.Print "Unexpected error " & Err.number & " (" & Err.Description & ") in procedure Test_vtkExportConfiguration_filesNotYetCreatedFalseFilesAreCreated of Class Module vtkExportConfigurationTester"
+    Resume Next
+
+End Sub
+
+
+Public Sub Test_vtkExportConfiguration_filesNotYetCreatedFalseFilesAreCreated2()
+    Dim retVal As Integer
+
+    On Error GoTo Test_vtkExportConfiguration_filesNotYetCreatedFalseFilesAreCreated2_Error
+
+    retVal = vtkExportConfiguration(wbForTest.VBProject, testProjectName, testConf.name, onlyModified:=False)
+    mAssert.Should fso.FileExists(vtkPathToTestFolder & "\" & testModule2FileName), testModule2FileName & " should have been created."
+
+    On Error GoTo 0
+    Exit Sub
+
+Test_vtkExportConfiguration_filesNotYetCreatedFalseFilesAreCreated2_Error:
+    Debug.Print "Unexpected error " & Err.number & " (" & Err.Description & ") in procedure Test_vtkExportConfiguration_filesNotYetCreatedFalseFilesAreCreated of Class Module vtkExportConfigurationTester"
     Resume Next
 
 End Sub
@@ -160,7 +180,7 @@ Public Sub Test_vtkExportConfiguration_filesJustExportedTrue()
     vtkExportOneModule wbForTest.VBProject, testModule2Name, vtkPathToTestFolder & "\" & testModule2FileName
 
     retVal = vtkExportConfiguration(wbForTest.VBProject, testProjectName, testConf.name, onlyModified:=True)
-    mAssert.Equals retVal, totalNumberOfModules
+    mAssert.Equals retVal, 0, "No module should be exported as files yet exist and onlyModified = True"
 
     On Error GoTo 0
     Exit Sub
@@ -179,7 +199,7 @@ Public Sub Test_vtkExportConfiguration_filesJustExportedFalse()
     vtkExportOneModule wbForTest.VBProject, testModule2Name, vtkPathToTestFolder & "\" & testModule2FileName
 
     retVal = vtkExportConfiguration(wbForTest.VBProject, testProjectName, testConf.name, onlyModified:=False)
-    mAssert.Equals retVal, 0
+    mAssert.Equals retVal, totalNumberOfModules, totalNumberOfModules & " modules should be exported as onlyModified = False."
 
     On Error GoTo 0
     Exit Sub
@@ -200,7 +220,7 @@ Public Sub Test_vtkExportConfiguration_oneFileModifiedTrue()
     insertDummyProcedureInCodeModule wbForTest.VBProject.VBComponents(testModule1Name).CodeModule, dummyInt:=1
     
     retVal = vtkExportConfiguration(wbForTest.VBProject, testProjectName, testConf.name, onlyModified:=True)
-    mAssert.Equals retVal, 1
+    mAssert.Equals retVal, 1, "1 module should be exported as 1 module has been modified and onlyModified = True"
 
     On Error GoTo 0
     Exit Sub
@@ -223,7 +243,7 @@ Public Sub Test_vtkExportConfiguration_oneFileModifiedFalse()
     insertDummyProcedureInCodeModule wbForTest.VBProject.VBComponents(testModule1Name).CodeModule, dummyInt:=1
     
     retVal = vtkExportConfiguration(wbForTest.VBProject, testProjectName, testConf.name, onlyModified:=False)
-    mAssert.Equals retVal, totalNumberOfModules
+    mAssert.Equals retVal, totalNumberOfModules, totalNumberOfModules & " modules should be exported as onlyModified = False"
 
     On Error GoTo 0
     Exit Sub
@@ -247,7 +267,7 @@ Public Sub Test_vtkExportConfiguration_twoFilesModifiedTrue()
     insertDummyProcedureInCodeModule wbForTest.VBProject.VBComponents(testModule2Name).CodeModule, dummyInt:=2
     
     retVal = vtkExportConfiguration(wbForTest.VBProject, testProjectName, testConf.name, onlyModified:=True)
-    mAssert.Equals retVal, 2
+    mAssert.Equals retVal, 2, "2 modules should be exported as 2 modules have been modified and onlyModified = True"
 
     On Error GoTo 0
     Exit Sub
@@ -270,7 +290,7 @@ Public Sub Test_vtkExportConfiguration_twoFilesModifiedFalse()
     insertDummyProcedureInCodeModule wbForTest.VBProject.VBComponents(testModule1Name).CodeModule, dummyInt:=2
     
     retVal = vtkExportConfiguration(wbForTest.VBProject, testProjectName, testConf.name, onlyModified:=False)
-    mAssert.Equals retVal, totalNumberOfModules
+    mAssert.Equals retVal, totalNumberOfModules, totalNumberOfModules & " modules should be exported as onlyModified = False"
 
     On Error GoTo 0
     Exit Sub
@@ -295,7 +315,7 @@ Public Sub Test_vtkExportConfiguration_importedModuleMustBeExported()
     
     retVal = vtkExportConfiguration(wbForTest.VBProject, testProjectName, testConf.name, onlyModified:=True)
     
-    mAssert.Equals retVal, 0
+    mAssert.Equals retVal, 1, "1 module should be exported as the others already exist and 1 module has been imported."
 
     On Error GoTo 0
     Exit Sub
@@ -310,6 +330,8 @@ Private Function ITest_Suite() As TestSuite
     Set ITest_Suite = New TestSuite
     ITest_Suite.AddTest ITest_Manager.ClassName, "Test_vtkExportConfiguration_filesNotYetCreatedTrue"
     ITest_Suite.AddTest ITest_Manager.ClassName, "Test_vtkExportConfiguration_filesNotYetCreatedFalse"
+    ITest_Suite.AddTest ITest_Manager.ClassName, "Test_vtkExportConfiguration_filesNotYetCreatedFalseFilesAreCreated1"
+    ITest_Suite.AddTest ITest_Manager.ClassName, "Test_vtkExportConfiguration_filesNotYetCreatedFalseFilesAreCreated2"
     ITest_Suite.AddTest ITest_Manager.ClassName, "Test_vtkExportConfiguration_filesJustExportedTrue"
     ITest_Suite.AddTest ITest_Manager.ClassName, "Test_vtkExportConfiguration_filesJustExportedFalse"
     ITest_Suite.AddTest ITest_Manager.ClassName, "Test_vtkExportConfiguration_oneFileModifiedTrue"
@@ -323,6 +345,8 @@ Private Sub ITestCase_RunTest()
     Select Case mManager.methodName
         Case "Test_vtkExportConfiguration_filesNotYetCreatedTrue": Test_vtkExportConfiguration_filesNotYetCreatedTrue
         Case "Test_vtkExportConfiguration_filesNotYetCreatedFalse": Test_vtkExportConfiguration_filesNotYetCreatedFalse
+        Case "Test_vtkExportConfiguration_filesNotYetCreatedFalseFilesAreCreated1": Test_vtkExportConfiguration_filesNotYetCreatedFalseFilesAreCreated1
+        Case "Test_vtkExportConfiguration_filesNotYetCreatedFalseFilesAreCreated2": Test_vtkExportConfiguration_filesNotYetCreatedFalseFilesAreCreated2
         Case "Test_vtkExportConfiguration_filesJustExportedTrue": Test_vtkExportConfiguration_filesJustExportedTrue
         Case "Test_vtkExportConfiguration_filesJustExportedFalse": Test_vtkExportConfiguration_filesJustExportedFalse
         Case "Test_vtkExportConfiguration_oneFileModifiedTrue": Test_vtkExportConfiguration_oneFileModifiedTrue

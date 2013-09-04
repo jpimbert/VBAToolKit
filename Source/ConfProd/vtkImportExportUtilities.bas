@@ -412,33 +412,57 @@ End Sub
 '---------------------------------------------------------------------------------------
 ' Procedure : vtkExportConfiguration
 ' Author    : Lucas Vitorino
-' Purpose   : Export all the modules of a configuration to their respective paths.
-'             Optionally, export only the modified modules.
+' Purpose   : - Export all the modules of a configuration to their respective paths, and returns the number
+'               of exported modules.
+'             - Optionally, export only the modules modified since last save
+' Behaviour : - If onlyModified = True, export modules whose source file does not yet exist and modules whose file
+'               exists but that have been modified since last save.
+'             - If onlyModified = False, export every module of the configuration.
+' Returns   : Integer
 '---------------------------------------------------------------------------------------
 '
-Public Function vtkExportConfiguration(projectWithModules As VBProject, projectName As String, confName As String, Optional onlyModified As Boolean = False)
-   ' Dim cm As vtkConfigurationManager, rootPath As String
-   ' Dim cn As Integer, filePath As String, i As Integer
+Public Function vtkExportConfiguration(projectWithModules As VBProject, projectName As String, confName As String, _
+        Optional onlyModified As Boolean = False) As Integer
     
+    Dim cm As vtkConfigurationManager, rootPath As String
+    Dim cn As Integer, filePath As String, i As Integer
+    Dim mo As vtkModule
+    Dim exportedModulesCount As Integer: exportedModulesCount = 0
+    Dim fso As New FileSystemObject
+    On Error GoTo vtkExportConfiguration_Error
 
-    ' Get the project and the rootPath of the project
-   ' On Error GoTo vtkExportConfiguration_Error
-
-   ' Set cm = vtkConfigurationManagerForProject(projectName)
-   ' cn = cm.getConfigurationNumber(configuration:=confName)
-   ' rootPath = cm.rootPath
     
     ' Export all modules for this configuration from the projectWithModules
-
+    Set cm = vtkConfigurationManagerForProject(projectName)
+    For Each mo In cm.configurations(confName).modules
+        
+        ' If the module is in the configuration
+        If Not mo.path Like "" Then
+        
+            Dim modulePath As String
+            modulePath = cm.rootPath & "\" & mo.path
+            
+            If onlyModified = True And fso.FileExists(modulePath) = True Then
+                If mo.VBAModule.Saved = False Then
+                    vtkExportOneModule projectWithModules, mo.name, modulePath
+                    exportedModulesCount = exportedModulesCount + 1
+                End If
+            Else
+                vtkExportOneModule projectWithModules, mo.name, modulePath
+                exportedModulesCount = exportedModulesCount + 1
+            End If
+            
+        End If
+        
+    Next
     
-   'On Error GoTo 0
-   'Exit Sub
+    On Error GoTo 0
+    vtkExportConfiguration = exportedModulesCount
+    Exit Function
 
-'vtkExportConfiguration_Error:
-'    Err.Raise Err.number, "procedure vtkExportConfiguration of Module vtkImportExportUtilities", Err.source
-'    Resume Next
-
-    vtkExportConfiguration = 10
+vtkExportConfiguration_Error:
+    Err.Raise Err.number, "procedure vtkExportConfiguration of Module vtkImportExportUtilities", Err.source
+    Resume Next
 
 End Function
 
