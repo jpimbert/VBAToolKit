@@ -100,8 +100,55 @@ Private Sub insertDummyProcedureInCodeModule(codemo As VBIDE.CodeModule, dummyIn
 
 End Sub
 
-' -------- TESTS ---------
+' -------------------------------------------------------------------------
+'                               TESTS
+' -------------------------------------------------------------------------
+'
+' - Source files are not yet created, onlyModified = True
+'    - expected : all modules are exported
+'    - Test_vtkExportConfiguration_filesNotYetCreatedTrue
+'
+' - Source files are not yet created, onlyModified = False
+'    - expected : all modules are exported
+'    - Test_vtkExportConfiguration_filesNotYetCreatedFalse
+'
+' - Source files are not yet created, onlyModified = False
+'    - expected : testModule1FileName has been created
+'    - Test_vtkExportConfiguration_filesNotYetCreatedFalseFilesAreCreated1
+'
+' - Source files are not yet created, onlyModified = False
+'    - expected : testModule2FileName has been created
+'    - Test_vtkExportConfiguration_filesNotYetCreatedFalseFilesAreCreated2
+'
+' - Source files are created, onlyModified = True
+'    - expected : 0 modules are exported
+'    - Test_vtkExportConfiguration_filesJustExportedTrue
+'
+' - Source files are created, onlyModified = False
+'    - expected : all modules are exported
+'    - Test_vtkExportConfiguration_filesJustExportedFalse
+'
+' - Source files are exported, 1 module is modified, onlyModified = True
+'    - expected : 1 module is exported
+'    - Test_vtkExportConfiguration_oneFileModifiedTrue
+'
+' - Source files are exported, 1 module is modified, onlyModified = False
+'    - expected : all modules are exported
+'    - Test_vtkExportConfiguration_oneFileModifiedFalse
+'
+' - Source files are exported, 2 modules are modified, onlyModified = True
+'    - expected : 2 modules are exported
+'    - Test_vtkExportConfiguration_twoFilesModifiedTrue
+'
+' - Source files are exported, 2 modules are modified, onlyModified = False
+'    - expected : all modules are exported
+'    - Test_vtkExportConfiguration_twoFilesModifiedFalse
 
+' - Source files are exported, 1 module is imported, onlyModified = True
+'    - expected : 1 module is exported
+'    - Test_vtkExportConfiguration_importedModuleMustBeExported
+'
+' -------------------------------------------------------------------------
 Public Sub Test_vtkExportConfiguration_filesNotYetCreatedTrue()
     Dim retVal As Integer
     
