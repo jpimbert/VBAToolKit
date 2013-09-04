@@ -98,7 +98,7 @@ Public Function vtkStandardCategoryForModuleName(moduleName As String) As String
    On Error Resume Next
     Dim ret As String
     ret = vtkVBAUnitModulesList.Item(moduleName)
-    If err.number = 0 Then
+    If Err.number = 0 Then
         vtkStandardCategoryForModuleName = "VBAUnit"
        On Error GoTo 0
         Exit Function
@@ -225,7 +225,7 @@ Public Sub vtkImportOneModule(project As VBProject, moduleName As String, filePa
             code = code & vbCrLf & buf.ReadAll
             
             ' Replace the code
-            oldModule.CodeModule.DeleteLines StartLine:=1, Count:=oldModule.CodeModule.CountOfLines
+            oldModule.CodeModule.DeleteLines StartLine:=1, count:=oldModule.CodeModule.CountOfLines
             oldModule.CodeModule.InsertLines 1, code
         End If
         Set fso = Nothing
@@ -266,10 +266,10 @@ Public Sub vtkExportOneModule(project As VBProject, moduleName As String, filePa
     Exit Sub
 
 vtkExportOneModule_Error:
-    If err.number = 9 Then
-        err.Raise number:=VTK_UNKNOWN_MODULE, source:="ExportOneModule", Description:="Module to export doesn't exist : " & moduleName
+    If Err.number = 9 Then
+        Err.Raise number:=VTK_UNKNOWN_MODULE, source:="ExportOneModule", Description:="Module to export doesn't exist : " & moduleName
        Else
-        err.Raise number:=VTK_UNEXPECTED_ERROR, source:="ExportOneModule", Description:="Unexpected error when exporting " & moduleName & " : " & err.Description
+        Err.Raise number:=VTK_UNEXPECTED_ERROR, source:="ExportOneModule", Description:="Unexpected error when exporting " & moduleName & " : " & Err.Description
     End If
 End Sub
 
@@ -305,7 +305,7 @@ Public Sub vtkExportModulesFromAnotherProject(projectWithModules As VBProject, p
    Exit Sub
 
 vtkExportModulesFromAnotherProject_Error:
-    err.Raise VTK_UNEXPECTED_ERROR, "vtkExportModulesFromAnotherProject", "Unexpected error when exporting modules from " & projectWithModules.name & " : " & err.Description
+    Err.Raise VTK_UNEXPECTED_ERROR, "vtkExportModulesFromAnotherProject", "Unexpected error when exporting modules from " & projectWithModules.name & " : " & Err.Description
 End Sub
 
 '---------------------------------------------------------------------------------------
@@ -339,7 +339,7 @@ Public Sub vtkImportModulesInAnotherProject(projectForModules As VBProject, proj
    Exit Sub
 
 vtkImportModulesInAnotherProject_Error:
-    err.Raise VTK_UNEXPECTED_ERROR, "vtkImportModulesInAnotherProject_Error", "Unexpected error when importing modules into " & projectForModules.name & " : " & err.Description
+    Err.Raise VTK_UNEXPECTED_ERROR, "vtkImportModulesInAnotherProject_Error", "Unexpected error when importing modules into " & projectForModules.name & " : " & Err.Description
 End Sub
 
 '---------------------------------------------------------------------------------------
@@ -368,29 +368,29 @@ End Sub
 '---------------------------------------------------------------------------------------
 '
 Public Sub vtkRecreateConfiguration(projectName As String, configurationName As String)
-    Dim cm As vtkConfigurationManager, rootPath As String, wbPath As String, wb As Workbook
+    Dim cm As vtkConfigurationManager, rootPath As String, wbPath As String, Wb As Workbook
     ' Get the project and the rootPath of the project
     Set cm = vtkConfigurationManagerForProject(projectName)
     rootPath = cm.rootPath
     ' Get the configuration number in the project and the path of the file
     wbPath = cm.getConfigurationPath(configuration:=configurationName)
     ' Create a new Excel file
-    Set wb = vtkCreateExcelWorkbook()
+    Set Wb = vtkCreateExcelWorkbook()
     ' Set the projectName
-    wb.VBProject.name = configurationName
+    Wb.VBProject.name = configurationName
     ' Import all modules for this configuration from the source directory
-    vtkImportModulesInAnotherProject projectForModules:=wb.VBProject, projectName:=projectName, confName:=configurationName
+    vtkImportModulesInAnotherProject projectForModules:=Wb.VBProject, projectName:=projectName, confName:=configurationName
     ' Recreate references in the new Excel File
-    VtkActivateReferences wb:=wb
+    VtkActivateReferences Wb:=Wb
     ' Set attribute properties WARNING - only for Delivery VBAToolKit
-    wb.BuiltinDocumentProperties("Title").Value = "VBAToolKit"
-    wb.BuiltinDocumentProperties("Comments").Value = "Toolkit improving IDE for VBA projects"
+    Wb.BuiltinDocumentProperties("Title").Value = "VBAToolKit"
+    Wb.BuiltinDocumentProperties("Comments").Value = "Toolkit improving IDE for VBA projects"
     ' Deactivate AddIn if the current Excel file is AddIn and installed
     Dim fso As New FileSystemObject, fileName As String, addInWasActivated As Boolean, wbIsAddin As Boolean
     fileName = fso.GetFileName(wbPath)
    On Error Resume Next
     wbIsAddin = Workbooks(fileName).IsAddin
-    If err.number = 0 And wbIsAddin Then
+    If Err.number = 0 And wbIsAddin Then
         addInWasActivated = AddIns(configurationName).Installed
         AddIns(configurationName).Installed = False
        Else
@@ -398,8 +398,8 @@ Public Sub vtkRecreateConfiguration(projectName As String, configurationName As 
     End If
    On Error GoTo 0
     ' Save the Excel file with the good type and erase the previous one (a message is displayed to the user)
-    wb.SaveAs fileName:=rootPath & "\" & wbPath, FileFormat:=vtkDefaultFileFormat(wbPath)
-    wb.Close savechanges:=False
+    Wb.SaveAs fileName:=rootPath & "\" & wbPath, FileFormat:=vtkDefaultFileFormat(wbPath)
+    Wb.Close savechanges:=False
     ' Copy the AddIn in App Data folder (Only Excel 2007 at the moment)
     Dim appPath As String
     appPath = ""
@@ -408,6 +408,39 @@ Public Sub vtkRecreateConfiguration(projectName As String, configurationName As 
     ' Reactivate The AddIn if it was activated
     If addInWasActivated Then AddIns(configurationName).Installed = True
 End Sub
+
+'---------------------------------------------------------------------------------------
+' Procedure : vtkExportConfiguration
+' Author    : Lucas Vitorino
+' Purpose   : Export all the modules of a configuration to their respective paths.
+'             Optionally, export only the modified modules.
+'---------------------------------------------------------------------------------------
+'
+Public Function vtkExportConfiguration(projectWithModules As VBProject, projectName As String, confName As String, Optional onlyModified As Boolean = False)
+   ' Dim cm As vtkConfigurationManager, rootPath As String
+   ' Dim cn As Integer, filePath As String, i As Integer
+    
+
+    ' Get the project and the rootPath of the project
+   ' On Error GoTo vtkExportConfiguration_Error
+
+   ' Set cm = vtkConfigurationManagerForProject(projectName)
+   ' cn = cm.getConfigurationNumber(configuration:=confName)
+   ' rootPath = cm.rootPath
+    
+    ' Export all modules for this configuration from the projectWithModules
+
+    
+   'On Error GoTo 0
+   'Exit Sub
+
+'vtkExportConfiguration_Error:
+'    Err.Raise Err.number, "procedure vtkExportConfiguration of Module vtkImportExportUtilities", Err.source
+'    Resume Next
+
+    vtkExportConfiguration = 10
+
+End Function
 
 '
 ''---------------------------------------------------------------------------------------
