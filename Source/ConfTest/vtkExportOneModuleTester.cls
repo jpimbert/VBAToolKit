@@ -83,7 +83,7 @@ End Sub
 Private Sub ITestCase_TearDown()
     On Error Resume Next
     
-    vtkCloseAndKillWorkbook wb:=wbForTest
+    vtkCloseAndKillWorkbook Wb:=wbForTest
 
     Kill PathName:=vtkPathToTestFolder & "\" & existingWorkbookName
     Kill PathName:=vtkPathToTestFolder & "\" & moduleToImport
@@ -132,7 +132,7 @@ Public Sub Test_ModuleAndFileDoesntExist()
    On Error GoTo 0
    
 Test_Error:
-    mAssert.Equals err.Number, VTK_UNKNOWN_MODULE, "Export doesn't work when module is inexistant"
+    mAssert.Equals Err.number, VTK_UNKNOWN_MODULE, "Export doesn't work when module is inexistant"
     mAssert.Should Not fso.FileExists(filePath), "File must not be created when exported module is inexistant"
 End Sub
 
@@ -149,7 +149,7 @@ Public Sub Test_ModuleDoesntExistAndFileExists()
    
 Test_Error:
     sizeAfter = fso.GetFile(filePath).Size
-    mAssert.Equals err.Number, VTK_UNKNOWN_MODULE, "Export doesn't work when module is inexistant"
+    mAssert.Equals Err.number, VTK_UNKNOWN_MODULE, "Export doesn't work when module is inexistant"
     mAssert.Should fso.FileExists(filePath), "File is not deleted when exported module is inexistant"
     mAssert.Equals sizeAfter, sizeBefore, "The size of the file must not be changed when exported module is inexistant"
 End Sub
@@ -169,7 +169,7 @@ Public Sub Test_StandardModuleExistsAndFileDoesntExist()
     Exit Sub
     
 Test_Error:
-    mAssert.Equals err.Number, 0, "No error must be thrown when Module exists"
+    mAssert.Equals Err.number, 0, "No error must be thrown when Module exists"
 End Sub
 
 Public Sub Test_ClassModuleExistsAndFileDoesntExist()
@@ -186,7 +186,7 @@ Public Sub Test_ClassModuleExistsAndFileDoesntExist()
     Exit Sub
     
 Test_Error:
-    mAssert.Equals err.Number, 0, "No error must be thrown when Module exists"
+    mAssert.Equals Err.number, 0, "No error must be thrown when Module exists"
 End Sub
 
 Public Sub Test_StandardModuleExistsAndFileExists()
@@ -205,7 +205,7 @@ Public Sub Test_StandardModuleExistsAndFileExists()
     Exit Sub
     
 Test_Error:
-    mAssert.Equals err.Number, 0, "No error must be thrown when Module exists"
+    mAssert.Equals Err.number, 0, "No error must be thrown when Module exists"
 End Sub
 
 Public Sub Test_SheetModuleExistsAndFileExists()
@@ -224,7 +224,7 @@ Public Sub Test_SheetModuleExistsAndFileExists()
     Exit Sub
     
 Test_Error:
-    mAssert.Equals err.Number, 0, "No error must be thrown when Module exists"
+    mAssert.Equals Err.number, 0, "No error must be thrown when Module exists"
 End Sub
 
 Public Sub Test_FormModuleExistsAndFRMFileExists()
@@ -245,7 +245,7 @@ Public Sub Test_FormModuleExistsAndFRMFileExists()
     Exit Sub
     
 Test_Error:
-    mAssert.Equals err.Number, 0, "No error must be thrown when Module exists"
+    mAssert.Equals Err.number, 0, "No error must be thrown when Module exists"
 End Sub
 
 Public Sub Test_FormModuleExistsAndFRXFileExists()
@@ -268,7 +268,7 @@ Public Sub Test_FormModuleExistsAndFRXFileExists()
     Exit Sub
     
 Test_Error:
-    mAssert.Equals err.Number, 0, "No error must be thrown when Module exists"
+    mAssert.Equals Err.number, 0, "No error must be thrown when Module exists"
 End Sub
 
 Private Function ITest_Suite() As TestSuite

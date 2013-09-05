@@ -87,8 +87,8 @@ Private Sub ITestCase_SetUp(Assert As IAssert)
 End Sub
 
 Private Sub ITestCase_TearDown()
-    vtkCloseAndKillWorkbook wb:=newWorkBook     ' close the new Excel project
-    vtkCloseAndKillWorkbook wb:=existingWorkbook ' close the existing Excel project
+    vtkCloseAndKillWorkbook Wb:=newWorkBook     ' close the new Excel project
+    vtkCloseAndKillWorkbook Wb:=existingWorkbook ' close the existing Excel project
     vtkResetConfigurationManagers             ' reset all configuration managers
 End Sub
 
@@ -116,11 +116,11 @@ End Sub
 Public Sub TestConfigurationSheetDoesntExistInNewWorkbook()
     '   Verify that the configuration sheet missing is detected in new workbook
     '   using a fresh configuration Manager (with no default sheet initialized)
-    Dim cm As New vtkConfigurationManager, wb As Workbook, wbFullName As String
-    Set wb = vtkCreateExcelWorkbookForTestWithProjectName("NewWorkbook")    ' create a fresh new Excel workbook
-    wbFullName = wb.FullName
-    mAssert.Should Not cm.isConfigurationInitializedForWorkbook(ExcelName:=wb.name), "The Configuration sheet must not exist in new workbook"
-    wb.Close savechanges:=False
+    Dim cm As New vtkConfigurationManager, Wb As Workbook, wbFullName As String
+    Set Wb = vtkCreateExcelWorkbookForTestWithProjectName("NewWorkbook")    ' create a fresh new Excel workbook
+    wbFullName = Wb.FullName
+    mAssert.Should Not cm.isConfigurationInitializedForWorkbook(ExcelName:=Wb.name), "The Configuration sheet must not exist in new workbook"
+    Wb.Close savechanges:=False
     Kill PathName:=wbFullName
 End Sub
 
@@ -129,7 +129,7 @@ Public Sub TestConfigurationSheetCreationForNewProject()
     Dim ws As Worksheet
     On Error Resume Next
     Set ws = newWorkBook.Sheets("vtkConfigurations")
-    mAssert.Equals err, 0, "A configuration manager must create a Configuration sheet"
+    mAssert.Equals Err, 0, "A configuration manager must create a Configuration sheet"
     On Error GoTo 0
     mAssert.Should newWorkBook.Sheets("vtkConfigurations") Is newConfManager.configurationSheet, "The configurationSheet property of the conf manager must be equal to the configuration sheet of the workbook"
 End Sub
@@ -139,7 +139,7 @@ Public Sub TestConfigurationSheetRetrievalForExistingProject()
     Dim ws As Worksheet
     On Error Resume Next
     Set ws = existingWorkbook.Sheets("vtkConfigurations")
-    mAssert.Equals err, 0, "A configuration manager must be accessible in an existing project"
+    mAssert.Equals Err, 0, "A configuration manager must be accessible in an existing project"
     On Error GoTo 0
     mAssert.Should existingWorkbook.Sheets("vtkConfigurations") Is existingConfManager.configurationSheet, "The configurationSheet property of the conf manager must be equal to the configuration sheet of the workbook"
 End Sub

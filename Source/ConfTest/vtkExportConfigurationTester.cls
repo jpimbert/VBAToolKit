@@ -62,27 +62,21 @@ Private Property Get ITest_Manager() As ITestManager
 End Property
 
 Private Sub ITestCase_SetUp(Assert As IAssert)
-    On Error Resume Next
 
     Set mAssert = Assert
     
-    FileCopy source:=vtkPathToTemplateFolder & "\" & testWorkbookName, destination:=vtkPathToTestFolder & "\" & testWorkbookName
-
-    Set wbForTest = Workbooks.Open(fileName:=vtkPathToTestFolder & "\" & testWorkbookName)
+    Set wbForTest = VBAToolKit.getTestFileFromTemplate(fileName:=testWorkbookName, openExcel:=True)
     
-    vtkResetConfigurationManagers
     Set cm = vtkConfigurationManagerForProject(testProjectName)
     Set testConf = cm.configurations(wbForTest.VBProject.name)
-
-    On Error GoTo 0
-    Exit Sub
     
 End Sub
 
 Private Sub ITestCase_TearDown()
     
+    vtkResetConfigurationManagers
     vtkCloseAndKillWorkbook Wb:=wbForTest
-    vtkCleanFolder vtkPathToTestFolder
+    vtkCleanFolder VBAToolKit.vtkTestPath
 
 End Sub
 
@@ -112,14 +106,6 @@ End Sub
 '    - expected : all modules are exported
 '    - Test_vtkExportConfiguration_filesNotYetCreatedFalse
 '
-' - Source files are not yet created, onlyModified = False
-'    - expected : testModule1FileName has been created
-'    - Test_vtkExportConfiguration_filesNotYetCreatedFalseFilesAreCreated1
-'
-' - Source files are not yet created, onlyModified = False
-'    - expected : testModule2FileName has been created
-'    - Test_vtkExportConfiguration_filesNotYetCreatedFalseFilesAreCreated2
-'
 ' - Source files are created, onlyModified = True
 '    - expected : 0 modules are exported
 '    - Test_vtkExportConfiguration_filesJustExportedTrue
@@ -145,17 +131,25 @@ End Sub
 '    - Test_vtkExportConfiguration_twoFilesModifiedFalse
 
 ' - Source files are exported, 1 module is imported, onlyModified = True
-'    - expected : 1 module is exported
-'    - Test_vtkExportConfiguration_importedModuleMustBeExported
+'    - expected : 0 module is exported since it has not been added to the configuration
+'    - Test_vtkExportConfiguration_importedModuleMustNotBeExported
 '
+' - Source files are exported, 1 module is imported, added to the configuration manager, onlyModified = True
+'    - expected : 0 module is exported since it has not been added to the configuration itself.
+'    - Test_vtkExportConfiguration_importedModuleAddeToConfigurationManagerMustNotBeExported
 ' -------------------------------------------------------------------------
 Public Sub Test_vtkExportConfiguration_filesNotYetCreatedTrue()
+' Source files are not yet created, onlyModified = True => expected : all modules are exported
+    
     Dim retVal As Integer
     
     On Error GoTo Test_vtkExportConfiguration_filesNotYetCreatedTrue_Error
 
     retVal = vtkExportConfiguration(wbForTest.VBProject, testProjectName, testConf.name, onlyModified:=True)
     mAssert.Equals retVal, totalNumberOfModules, totalNumberOfModules & " should be exported as files do not yet exist."
+    
+    mAssert.Should fso.FileExists(VBAToolKit.vtkTestPath & "\" & testModule1FileName), testModule1FileName & " should have been created."
+    mAssert.Should fso.FileExists(VBAToolKit.vtkTestPath & "\" & testModule2FileName), testModule2FileName & " should have been created."
 
     On Error GoTo 0
     Exit Sub
@@ -167,12 +161,17 @@ Test_vtkExportConfiguration_filesNotYetCreatedTrue_Error:
 End Sub
 
 Public Sub Test_vtkExportConfiguration_filesNotYetCreatedFalse()
+' Source files are not yet created, onlyModified = False => expected : all modules are exported
+    
     Dim retVal As Integer
 
     On Error GoTo Test_vtkExportConfiguration_filesNotYetCreatedFalse_Error
 
     retVal = vtkExportConfiguration(wbForTest.VBProject, testProjectName, testConf.name, onlyModified:=False)
     mAssert.Equals retVal, totalNumberOfModules, totalNumberOfModules & " should be exported as files do not yet exist."
+
+    mAssert.Should fso.FileExists(VBAToolKit.vtkTestPath & "\" & testModule1FileName), testModule1FileName & " should have been created."
+    mAssert.Should fso.FileExists(VBAToolKit.vtkTestPath & "\" & testModule2FileName), testModule2FileName & " should have been created."
 
     On Error GoTo 0
     Exit Sub
@@ -183,51 +182,33 @@ Test_vtkExportConfiguration_filesNotYetCreatedFalse_Error:
 
 End Sub
 
-Public Sub Test_vtkExportConfiguration_filesNotYetCreatedFalseFilesAreCreated1()
-    Dim retVal As Integer
-
-    On Error GoTo Test_vtkExportConfiguration_filesNotYetCreatedFalseFilesAreCreated1_Error
-
-    retVal = vtkExportConfiguration(wbForTest.VBProject, testProjectName, testConf.name, onlyModified:=False)
-    mAssert.Should fso.FileExists(vtkPathToTestFolder & "\" & testModule1FileName), testModule1FileName & " should have been created."
-
-    On Error GoTo 0
-    Exit Sub
-
-Test_vtkExportConfiguration_filesNotYetCreatedFalseFilesAreCreated1_Error:
-    Debug.Print "Unexpected error " & Err.number & " (" & Err.Description & ") in procedure Test_vtkExportConfiguration_filesNotYetCreatedFalseFilesAreCreated of Class Module vtkExportConfigurationTester"
-    Resume Next
-
-End Sub
-
-
-Public Sub Test_vtkExportConfiguration_filesNotYetCreatedFalseFilesAreCreated2()
-    Dim retVal As Integer
-
-    On Error GoTo Test_vtkExportConfiguration_filesNotYetCreatedFalseFilesAreCreated2_Error
-
-    retVal = vtkExportConfiguration(wbForTest.VBProject, testProjectName, testConf.name, onlyModified:=False)
-    mAssert.Should fso.FileExists(vtkPathToTestFolder & "\" & testModule2FileName), testModule2FileName & " should have been created."
-
-    On Error GoTo 0
-    Exit Sub
-
-Test_vtkExportConfiguration_filesNotYetCreatedFalseFilesAreCreated2_Error:
-    Debug.Print "Unexpected error " & Err.number & " (" & Err.Description & ") in procedure Test_vtkExportConfiguration_filesNotYetCreatedFalseFilesAreCreated of Class Module vtkExportConfigurationTester"
-    Resume Next
-
-End Sub
 
 Public Sub Test_vtkExportConfiguration_filesJustExportedTrue()
+' Source files are created, onlyModified = True => expected : 0 modules are exported
+    
     Dim retVal As Integer
+    Dim oldFileSize1 As Long
+    Dim newFileSize1 As Long
+    Dim oldFileSize2 As Long
+    Dim newFileSize2 As Long
     
     On Error GoTo Test_vtkExportConfiguration_filesYetCreatedTrue_Error
 
-    vtkExportOneModule wbForTest.VBProject, testModule1Name, vtkPathToTestFolder & "\" & testModule1FileName
-    vtkExportOneModule wbForTest.VBProject, testModule2Name, vtkPathToTestFolder & "\" & testModule2FileName
+    vtkExportOneModule wbForTest.VBProject, testModule1Name, VBAToolKit.vtkTestPath & "\" & testModule1FileName
+    vtkExportOneModule wbForTest.VBProject, testModule2Name, VBAToolKit.vtkTestPath & "\" & testModule2FileName
+
+    oldFileSize1 = fso.GetFile(VBAToolKit.vtkTestPath & "\" & testModule1FileName).Size
+    oldFileSize2 = fso.GetFile(VBAToolKit.vtkTestPath & "\" & testModule2FileName).Size
 
     retVal = vtkExportConfiguration(wbForTest.VBProject, testProjectName, testConf.name, onlyModified:=True)
+    
+    newFileSize1 = fso.GetFile(VBAToolKit.vtkTestPath & "\" & testModule1FileName).Size
+    newFileSize2 = fso.GetFile(VBAToolKit.vtkTestPath & "\" & testModule2FileName).Size
+    
     mAssert.Equals retVal, 0, "No module should be exported as files yet exist and onlyModified = True"
+
+    mAssert.Should oldFileSize1 = newFileSize1, testModule1FileName & " must be the same size as before export as the corresponding module has not been exported."
+    mAssert.Should oldFileSize2 = newFileSize2, testModule2FileName & " must be the same size as before export as the corresponding module has not been exported."
 
     On Error GoTo 0
     Exit Sub
@@ -238,15 +219,32 @@ Test_vtkExportConfiguration_filesYetCreatedTrue_Error:
 End Sub
 
 Public Sub Test_vtkExportConfiguration_filesJustExportedFalse()
+' Source files are created, onlyModified = False => expected : all modules are exported
+    
     Dim retVal As Integer
+    Dim oldFileSize1 As Long
+    Dim newFileSize1 As Long
+    Dim oldFileSize2 As Long
+    Dim newFileSize2 As Long
     
     On Error GoTo Test_vtkExportConfiguration_filesJustExportedFalse_Error
     
-    vtkExportOneModule wbForTest.VBProject, testModule1Name, vtkPathToTestFolder & "\" & testModule1FileName
-    vtkExportOneModule wbForTest.VBProject, testModule2Name, vtkPathToTestFolder & "\" & testModule2FileName
+    vtkExportOneModule wbForTest.VBProject, testModule1Name, VBAToolKit.vtkTestPath & "\" & testModule1FileName
+    vtkExportOneModule wbForTest.VBProject, testModule2Name, VBAToolKit.vtkTestPath & "\" & testModule2FileName
+
+    oldFileSize1 = fso.GetFile(VBAToolKit.vtkTestPath & "\" & testModule1FileName).Size
+    oldFileSize2 = fso.GetFile(VBAToolKit.vtkTestPath & "\" & testModule2FileName).Size
 
     retVal = vtkExportConfiguration(wbForTest.VBProject, testProjectName, testConf.name, onlyModified:=False)
+    
+    newFileSize1 = fso.GetFile(VBAToolKit.vtkTestPath & "\" & testModule1FileName).Size
+    newFileSize2 = fso.GetFile(VBAToolKit.vtkTestPath & "\" & testModule2FileName).Size
+    
     mAssert.Equals retVal, totalNumberOfModules, totalNumberOfModules & " modules should be exported as onlyModified = False."
+
+    mAssert.Should oldFileSize1 = newFileSize1, testModule1FileName & " must be the same size after exporting since the corresponding module has not been modified."
+    mAssert.Should oldFileSize2 = newFileSize2, testModule2FileName & " must be the same size after exporting since the corresponding module has not been modified."
+
 
     On Error GoTo 0
     Exit Sub
@@ -257,17 +255,32 @@ Test_vtkExportConfiguration_filesJustExportedFalse_Error:
 End Sub
 
 Public Sub Test_vtkExportConfiguration_oneFileModifiedTrue()
+' Source files are exported, 1 module is modified, onlyModified = True => expected : 1 module is exported
+
     Dim retVal As Integer
+    Dim oldFileSize1 As Long
+    Dim newFileSize1 As Long
+    Dim oldFileSize2 As Long
+    Dim newFileSize2 As Long
     
     On Error GoTo Test_vtkExportConfiguration_oneFileModifiedTrue_Error
 
-    vtkExportOneModule wbForTest.VBProject, testModule1Name, vtkPathToTestFolder & "\" & testModule1FileName
-    vtkExportOneModule wbForTest.VBProject, testModule2Name, vtkPathToTestFolder & "\" & testModule2FileName
+    vtkExportOneModule wbForTest.VBProject, testModule1Name, VBAToolKit.vtkTestPath & "\" & testModule1FileName
+    vtkExportOneModule wbForTest.VBProject, testModule2Name, VBAToolKit.vtkTestPath & "\" & testModule2FileName
+
+    oldFileSize1 = fso.GetFile(VBAToolKit.vtkTestPath & "\" & testModule1FileName).Size
+    oldFileSize2 = fso.GetFile(VBAToolKit.vtkTestPath & "\" & testModule2FileName).Size
 
     insertDummyProcedureInCodeModule wbForTest.VBProject.VBComponents(testModule1Name).CodeModule, dummyInt:=1
     
     retVal = vtkExportConfiguration(wbForTest.VBProject, testProjectName, testConf.name, onlyModified:=True)
+    
+    newFileSize1 = fso.GetFile(VBAToolKit.vtkTestPath & "\" & testModule1FileName).Size
+    newFileSize2 = fso.GetFile(VBAToolKit.vtkTestPath & "\" & testModule2FileName).Size
+    
     mAssert.Equals retVal, 1, "1 module should be exported as 1 module has been modified and onlyModified = True"
+    mAssert.Should oldFileSize1 < newFileSize1, testModule1FileName & " must be bigger after adding code in the module and exporting."
+    mAssert.Should oldFileSize2 = newFileSize2, testModule2FileName & " must be the same after exporting since it has not been modified."
 
     On Error GoTo 0
     Exit Sub
@@ -280,18 +293,34 @@ End Sub
 
 
 Public Sub Test_vtkExportConfiguration_oneFileModifiedFalse()
+' Source files are exported, 1 module is modified, onlyModified = False => expected : all modules are exported
+    
     Dim retVal As Integer
+    Dim oldFileSize1 As Long
+    Dim newFileSize1 As Long
+    Dim oldFileSize2 As Long
+    Dim newFileSize2 As Long
     
     On Error GoTo Test_vtkExportConfiguration_oneFileModifiedFalse_Error
 
-    vtkExportOneModule wbForTest.VBProject, testModule1Name, vtkPathToTestFolder & "\" & testModule1FileName
-    vtkExportOneModule wbForTest.VBProject, testModule2Name, vtkPathToTestFolder & "\" & testModule2FileName
+    vtkExportOneModule wbForTest.VBProject, testModule1Name, VBAToolKit.vtkTestPath & "\" & testModule1FileName
+    vtkExportOneModule wbForTest.VBProject, testModule2Name, VBAToolKit.vtkTestPath & "\" & testModule2FileName
+
+    oldFileSize1 = fso.GetFile(VBAToolKit.vtkTestPath & "\" & testModule1FileName).Size
+    oldFileSize2 = fso.GetFile(VBAToolKit.vtkTestPath & "\" & testModule2FileName).Size
 
     insertDummyProcedureInCodeModule wbForTest.VBProject.VBComponents(testModule1Name).CodeModule, dummyInt:=1
     
     retVal = vtkExportConfiguration(wbForTest.VBProject, testProjectName, testConf.name, onlyModified:=False)
+    
+    newFileSize1 = fso.GetFile(VBAToolKit.vtkTestPath & "\" & testModule1FileName).Size
+    newFileSize2 = fso.GetFile(VBAToolKit.vtkTestPath & "\" & testModule2FileName).Size
+    
     mAssert.Equals retVal, totalNumberOfModules, totalNumberOfModules & " modules should be exported as onlyModified = False"
-
+    
+    mAssert.Should oldFileSize1 < newFileSize1, testModule1FileName & " must be bigger after adding code in the module and exporting."
+    mAssert.Should oldFileSize2 = newFileSize2, testModule2FileName & " must be the same after exporting since it has not been modified."
+    
     On Error GoTo 0
     Exit Sub
 
@@ -303,18 +332,34 @@ End Sub
 
 
 Public Sub Test_vtkExportConfiguration_twoFilesModifiedTrue()
+' Source files are exported, 2 modules are modified, onlyModified = True => expected : 2 modules are exported
+    
     Dim retVal As Integer
+    Dim oldFileSize1 As Long
+    Dim newFileSize1 As Long
+    Dim oldFileSize2 As Long
+    Dim newFileSize2 As Long
     
     On Error GoTo Test_vtkExportConfiguration_twoFilesModifiedTrue_Error
 
-    vtkExportOneModule wbForTest.VBProject, testModule1Name, vtkPathToTestFolder & "\" & testModule1FileName
-    vtkExportOneModule wbForTest.VBProject, testModule2Name, vtkPathToTestFolder & "\" & testModule2FileName
-
+    vtkExportOneModule wbForTest.VBProject, testModule1Name, VBAToolKit.vtkTestPath & "\" & testModule1FileName
+    vtkExportOneModule wbForTest.VBProject, testModule2Name, VBAToolKit.vtkTestPath & "\" & testModule2FileName
+    
+    oldFileSize1 = fso.GetFile(VBAToolKit.vtkTestPath & "\" & testModule1FileName).Size
+    oldFileSize2 = fso.GetFile(VBAToolKit.vtkTestPath & "\" & testModule2FileName).Size
+    
     insertDummyProcedureInCodeModule wbForTest.VBProject.VBComponents(testModule1Name).CodeModule, dummyInt:=1
     insertDummyProcedureInCodeModule wbForTest.VBProject.VBComponents(testModule2Name).CodeModule, dummyInt:=2
     
     retVal = vtkExportConfiguration(wbForTest.VBProject, testProjectName, testConf.name, onlyModified:=True)
+    
+    newFileSize1 = fso.GetFile(VBAToolKit.vtkTestPath & "\" & testModule1FileName).Size
+    newFileSize2 = fso.GetFile(VBAToolKit.vtkTestPath & "\" & testModule2FileName).Size
+    
     mAssert.Equals retVal, 2, "2 modules should be exported as 2 modules have been modified and onlyModified = True"
+
+    mAssert.Should oldFileSize1 < newFileSize1, testModule1FileName & " must be bigger after adding code in the module and exporting."
+    mAssert.Should oldFileSize2 < newFileSize2, testModule2FileName & " must be bigger after adding code in the module and exporting."
 
     On Error GoTo 0
     Exit Sub
@@ -326,18 +371,34 @@ Test_vtkExportConfiguration_twoFilesModifiedTrue_Error:
 End Sub
 
 Public Sub Test_vtkExportConfiguration_twoFilesModifiedFalse()
+' Source files are exported, 2 modules are modified, onlyModified = False => expected : all modules are exported
+    
     Dim retVal As Integer
+    Dim oldFileSize1 As Long
+    Dim newFileSize1 As Long
+    Dim oldFileSize2 As Long
+    Dim newFileSize2 As Long
     
     On Error GoTo Test_vtkExportConfiguration_twoFilesModifiedFalse_Error
 
-    vtkExportOneModule wbForTest.VBProject, testModule1Name, vtkPathToTestFolder & "\" & testModule1FileName
-    vtkExportOneModule wbForTest.VBProject, testModule2Name, vtkPathToTestFolder & "\" & testModule2FileName
+    vtkExportOneModule wbForTest.VBProject, testModule1Name, VBAToolKit.vtkTestPath & "\" & testModule1FileName
+    vtkExportOneModule wbForTest.VBProject, testModule2Name, VBAToolKit.vtkTestPath & "\" & testModule2FileName
+
+    oldFileSize1 = fso.GetFile(VBAToolKit.vtkTestPath & "\" & testModule1FileName).Size
+    oldFileSize2 = fso.GetFile(VBAToolKit.vtkTestPath & "\" & testModule2FileName).Size
 
     insertDummyProcedureInCodeModule wbForTest.VBProject.VBComponents(testModule1Name).CodeModule, dummyInt:=1
-    insertDummyProcedureInCodeModule wbForTest.VBProject.VBComponents(testModule1Name).CodeModule, dummyInt:=2
+    insertDummyProcedureInCodeModule wbForTest.VBProject.VBComponents(testModule2Name).CodeModule, dummyInt:=2
     
     retVal = vtkExportConfiguration(wbForTest.VBProject, testProjectName, testConf.name, onlyModified:=False)
+    
+    newFileSize1 = fso.GetFile(VBAToolKit.vtkTestPath & "\" & testModule1FileName).Size
+    newFileSize2 = fso.GetFile(VBAToolKit.vtkTestPath & "\" & testModule2FileName).Size
+    
     mAssert.Equals retVal, totalNumberOfModules, totalNumberOfModules & " modules should be exported as onlyModified = False"
+
+    mAssert.Should oldFileSize1 < newFileSize1, testModule1FileName & " must be bigger after adding code in the module and exporting."
+    mAssert.Should oldFileSize2 < newFileSize2, testModule2FileName & " must be bigger after adding code in the module and exporting."
 
     On Error GoTo 0
     Exit Sub
@@ -348,26 +409,65 @@ Test_vtkExportConfiguration_twoFilesModifiedFalse_Error:
 
 End Sub
 
-Public Sub Test_vtkExportConfiguration_importedModuleMustBeExported()
+Public Sub Test_vtkExportConfiguration_importedModuleMustNotBeExported()
+' Source files are exported, 1 module is imported, onlyModified = True => expected : no module is exported
+' since no module has been added to the configuration.
+    
     Dim retVal As Integer
 
-    On Error GoTo Test_vtkExportConfiguration_importedModuleMustBeExported_Error
+    On Error GoTo Test_vtkExportConfiguration_importedModuleMustNotBeExported_Error
 
     ' We export the modules already present so that they don't get exported again
-    vtkExportOneModule wbForTest.VBProject, testModule1Name, vtkPathToTestFolder & "\" & testModule1FileName
-    vtkExportOneModule wbForTest.VBProject, testModule1Name, vtkPathToTestFolder & "\" & testModule1FileName
+    vtkExportOneModule wbForTest.VBProject, testModule1Name, VBAToolKit.vtkTestPath & "\" & testModule1FileName
+    vtkExportOneModule wbForTest.VBProject, testModule2Name, VBAToolKit.vtkTestPath & "\" & testModule2FileName
+
+    retVal = vtkExportConfiguration(wbForTest.VBProject, testProjectName, testConf.name, onlyModified:=True)
 
     ' We import the module
-    vtkImportOneModule wbForTest.VBProject, importedModuleName, vtkPathToTestFolder & "\" & importedModuleFileName
-    
+    vtkImportOneModule wbForTest.VBProject, importedModuleName, VBAToolKit.vtkTestPath & "\" & importedModuleFileName
+        
     retVal = vtkExportConfiguration(wbForTest.VBProject, testProjectName, testConf.name, onlyModified:=True)
     
-    mAssert.Equals retVal, 1, "1 module should be exported as the others already exist and 1 module has been imported."
+    mAssert.Equals retVal, 0, "The module should not be exported as it has not been added to the configuration."
+    
+    mAssert.Should Not fso.FileExists(VBAToolKit.vtkTestPath & "\" & importedModuleFileName), importedModuleName & " should not have been created."
 
     On Error GoTo 0
     Exit Sub
 
-Test_vtkExportConfiguration_importedModuleMustBeExported_Error:
+Test_vtkExportConfiguration_importedModuleMustNotBeExported_Error:
+    mAssert.Should False, "Unexpected error " & Err.number & " (" & Err.Description & ") in procedure Test_vtkExportConfiguration_importedFileMustBeExported of Class Module vtkExportConfigurationTester"
+    Resume Next
+End Sub
+
+Public Sub Test_vtkExportConfiguration_importedModuleAddedToConfigurationManagerMustNotBeExported()
+' Source files are exported, 1 module is imported, added to the configuration manager, onlyModified = True => expected :
+' 0 module is exported since it has not been added to the configuration itself.
+    
+    Dim retVal As Integer
+
+    On Error GoTo Test_vtkExportConfiguration_importedModuleAddedToConfigurationManagerMustBeExported_Error
+
+    ' We export the modules already present so that they don't get exported again
+    vtkExportOneModule wbForTest.VBProject, testModule1Name, VBAToolKit.vtkTestPath & "\" & testModule1FileName
+    vtkExportOneModule wbForTest.VBProject, testModule2Name, VBAToolKit.vtkTestPath & "\" & testModule2FileName
+
+    retVal = vtkExportConfiguration(wbForTest.VBProject, testProjectName, testConf.name, onlyModified:=True)
+
+    ' We import the module
+    vtkImportOneModule wbForTest.VBProject, importedModuleName, VBAToolKit.vtkTestPath & "\" & importedModuleFileName
+    cm.addModule (importedModuleName)
+    
+    retVal = vtkExportConfiguration(wbForTest.VBProject, testProjectName, testConf.name, onlyModified:=True)
+    
+    mAssert.Equals retVal, 0, "No module should be exported as none has been added to the configuration."
+    
+    mAssert.Should Not fso.FileExists(VBAToolKit.vtkTestPath & "\" & importedModuleFileName), importedModuleName & " should not have been created."
+
+    On Error GoTo 0
+    Exit Sub
+
+Test_vtkExportConfiguration_importedModuleAddedToConfigurationManagerMustBeExported_Error:
     mAssert.Should False, "Unexpected error " & Err.number & " (" & Err.Description & ") in procedure Test_vtkExportConfiguration_importedFileMustBeExported of Class Module vtkExportConfigurationTester"
     Resume Next
 End Sub
@@ -377,30 +477,28 @@ Private Function ITest_Suite() As TestSuite
     Set ITest_Suite = New TestSuite
     ITest_Suite.AddTest ITest_Manager.ClassName, "Test_vtkExportConfiguration_filesNotYetCreatedTrue"
     ITest_Suite.AddTest ITest_Manager.ClassName, "Test_vtkExportConfiguration_filesNotYetCreatedFalse"
-    ITest_Suite.AddTest ITest_Manager.ClassName, "Test_vtkExportConfiguration_filesNotYetCreatedFalseFilesAreCreated1"
-    ITest_Suite.AddTest ITest_Manager.ClassName, "Test_vtkExportConfiguration_filesNotYetCreatedFalseFilesAreCreated2"
     ITest_Suite.AddTest ITest_Manager.ClassName, "Test_vtkExportConfiguration_filesJustExportedTrue"
     ITest_Suite.AddTest ITest_Manager.ClassName, "Test_vtkExportConfiguration_filesJustExportedFalse"
     ITest_Suite.AddTest ITest_Manager.ClassName, "Test_vtkExportConfiguration_oneFileModifiedTrue"
     ITest_Suite.AddTest ITest_Manager.ClassName, "Test_vtkExportConfiguration_oneFileModifiedFalse"
     ITest_Suite.AddTest ITest_Manager.ClassName, "Test_vtkExportConfiguration_twoFilesModifiedTrue"
     ITest_Suite.AddTest ITest_Manager.ClassName, "Test_vtkExportConfiguration_twoFilesModifiedFalse"
-    ITest_Suite.AddTest ITest_Manager.ClassName, "Test_vtkExportConfiguration_importedModuleMustBeExported"
+    ITest_Suite.AddTest ITest_Manager.ClassName, "Test_vtkExportConfiguration_importedModuleMustNotBeExported"
+    ITest_Suite.AddTest ITest_Manager.ClassName, "Test_vtkExportConfiguration_importedModuleAddedToConfigurationManagerMustNotBeExported"
 End Function
 
 Private Sub ITestCase_RunTest()
     Select Case mManager.methodName
         Case "Test_vtkExportConfiguration_filesNotYetCreatedTrue": Test_vtkExportConfiguration_filesNotYetCreatedTrue
         Case "Test_vtkExportConfiguration_filesNotYetCreatedFalse": Test_vtkExportConfiguration_filesNotYetCreatedFalse
-        Case "Test_vtkExportConfiguration_filesNotYetCreatedFalseFilesAreCreated1": Test_vtkExportConfiguration_filesNotYetCreatedFalseFilesAreCreated1
-        Case "Test_vtkExportConfiguration_filesNotYetCreatedFalseFilesAreCreated2": Test_vtkExportConfiguration_filesNotYetCreatedFalseFilesAreCreated2
         Case "Test_vtkExportConfiguration_filesJustExportedTrue": Test_vtkExportConfiguration_filesJustExportedTrue
         Case "Test_vtkExportConfiguration_filesJustExportedFalse": Test_vtkExportConfiguration_filesJustExportedFalse
         Case "Test_vtkExportConfiguration_oneFileModifiedTrue": Test_vtkExportConfiguration_oneFileModifiedTrue
         Case "Test_vtkExportConfiguration_oneFileModifiedFalse": Test_vtkExportConfiguration_oneFileModifiedFalse
         Case "Test_vtkExportConfiguration_twoFilesModifiedTrue": Test_vtkExportConfiguration_twoFilesModifiedTrue
         Case "Test_vtkExportConfiguration_twoFilesModifiedFalse": Test_vtkExportConfiguration_twoFilesModifiedFalse
-        Case "Test_vtkExportConfiguration_importedModuleMustBeExported": Test_vtkExportConfiguration_importedModuleMustBeExported
+        Case "Test_vtkExportConfiguration_importedModuleMustNotBeExported": Test_vtkExportConfiguration_importedModuleMustNotBeExported
+        Case "Test_vtkExportConfiguration_importedModuleAddedToConfigurationManagerMustNotBeExported": Test_vtkExportConfiguration_importedModuleAddedToConfigurationManagerMustNotBeExported
         Case Else: mAssert.Should False, "Invalid test name: " & mManager.methodName
     End Select
 End Sub

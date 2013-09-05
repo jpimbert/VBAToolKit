@@ -151,7 +151,7 @@ Public Sub TestReferencesOfDevWorkbookWasActivated()
 returnvalue = vtkCreateProject(path:=VBAToolKit.vtkTestPath, name:=vtkTestProjectName, displayError:=False)
     OpenDeliveryProject
  
-    For i = 1 To Workbooks(vtkTestProjectName & "_DEV.xlsm").VBProject.References.Count
+    For i = 1 To Workbooks(vtkTestProjectName & "_DEV.xlsm").VBProject.References.count
         If ((Workbooks(vtkTestProjectName & "_DEV.xlsm").VBProject.References(i).GUID) = "{420B2830-E718-11CF-893D-00A0C9054228}") Or (Workbooks(vtkTestProjectName & "_DEV.xlsm").VBProject.References(i).GUID = "{0002E157-0000-0000-C000-000000000046}") Then
         j = j + 1
         End If
@@ -169,7 +169,7 @@ Public Sub TestReferencesOfDeliveryWorkbookWasActivated()
 returnvalue = vtkCreateProject(path:=VBAToolKit.vtkTestPath, name:=vtkTestProjectName, displayError:=False)
     OpenDeliveryProject
     
-    For i = 1 To Workbooks(vtkTestProjectName & ".xlsm").VBProject.References.Count
+    For i = 1 To Workbooks(vtkTestProjectName & ".xlsm").VBProject.References.count
         If ((Workbooks(vtkTestProjectName & ".xlsm").VBProject.References(i).GUID) = "{420B2830-E718-11CF-893D-00A0C9054228}") Or (Workbooks(vtkTestProjectName & ".xlsm").VBProject.References(i).GUID = "{0002E157-0000-0000-C000-000000000046}") Then
         j = j + 1
         End If

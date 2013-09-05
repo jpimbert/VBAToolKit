@@ -64,7 +64,7 @@ Private Sub ITestCase_SetUp(Assert As IAssert)
 End Sub
 
 Private Sub ITestCase_TearDown()
-    vtkCloseAndKillWorkbook wb:=initializedWorkbook ' close the existing Excel project
+    vtkCloseAndKillWorkbook Wb:=initializedWorkbook ' close the existing Excel project
     vtkResetConfigurationManagers             ' reset all configuration managers
 End Sub
 
@@ -72,7 +72,7 @@ Public Sub Test_ConfigurationCollection_Count()
     ' This test verifies the count of configurations collection property of Configuration Management
     ' just initialized from an Excel worlbook
     
-    mAssert.Equals confManager.configurations.Count, 1, "Number of configurations in the Test workbook"
+    mAssert.Equals confManager.configurations.count, 1, "Number of configurations in the Test workbook"
 End Sub
 
 Public Sub Test_AddedConfigurationCollection_Count()
@@ -81,7 +81,7 @@ Public Sub Test_AddedConfigurationCollection_Count()
     
     confManager.addConfiguration ("NewConfiguration")
     
-    mAssert.Equals confManager.configurations.Count, 2, "Number of configurations in the Test workbook with added configuration"
+    mAssert.Equals confManager.configurations.count, 2, "Number of configurations in the Test workbook with added configuration"
 End Sub
 
 Public Sub Test_ConfigurationCollection_Parent()
@@ -131,7 +131,7 @@ Public Sub Test_ConfigurationGetName()
    Exit Sub
 
 M_Error:
-    mAssert.Should False, "Unexpected Error (" & err.number & "): " & err.Description
+    mAssert.Should False, "Unexpected Error (" & Err.number & "): " & Err.Description
 End Sub
 
 Public Sub Test_ConfigurationGetPath()
@@ -147,7 +147,7 @@ Public Sub Test_ConfigurationGetPath()
    Exit Sub
 
 M_Error:
-    mAssert.Should False, "Unexpected Error (" & err.number & "): " & err.Description
+    mAssert.Should False, "Unexpected Error (" & Err.number & "): " & Err.Description
 End Sub
 
 Public Sub Test_ConfigurationSetPath()
@@ -164,7 +164,7 @@ Public Sub Test_ConfigurationSetPath()
    Exit Sub
 
 M_Error:
-    mAssert.Should False, "Unexpected Error (" & err.number & "): " & err.Description
+    mAssert.Should False, "Unexpected Error (" & Err.number & "): " & Err.Description
 End Sub
 
 Public Sub Test_ConfigurationModules_Initialized()
@@ -172,7 +172,7 @@ Public Sub Test_ConfigurationModules_Initialized()
     ' collection just initialized from an Excel worlbook
 
    On Error GoTo M_Error
-    mAssert.Equals confManager.configurations(1).modules.Count, 4, "Number of modules in the Configuration"
+    mAssert.Equals confManager.configurations(1).modules.count, 4, "Number of modules in the Configuration"
     mAssert.Equals confManager.configurations(1).modules(1).name, "TestModule", "Name of the first module in the configuration"
     mAssert.Equals confManager.configurations(1).modules(2).name, "TestClass", "Name of the second module in the configuration"
     mAssert.Equals confManager.configurations(1).modules(3).name, "TestForm", "Name of the third module in the configuration"
@@ -182,7 +182,7 @@ Public Sub Test_ConfigurationModules_Initialized()
    Exit Sub
 
 M_Error:
-    mAssert.Should False, "Unexpected Error (" & err.number & "): " & err.Description
+    mAssert.Should False, "Unexpected Error (" & Err.number & "): " & Err.Description
 End Sub
 
 Public Sub Test_ConfigurationModules_NewEmpty()
@@ -192,13 +192,13 @@ Public Sub Test_ConfigurationModules_NewEmpty()
     confManager.addConfiguration ("NewConfiguration")
 
    On Error GoTo M_Error
-    mAssert.Equals confManager.configurations("NewConfiguration").modules.Count, 0, "Number of modules in the Configuration"
+    mAssert.Equals confManager.configurations("NewConfiguration").modules.count, 0, "Number of modules in the Configuration"
 
    On Error GoTo 0
    Exit Sub
 
 M_Error:
-    mAssert.Should False, "Unexpected Error (" & err.number & "): " & err.Description
+    mAssert.Should False, "Unexpected Error (" & Err.number & "): " & Err.Description
 End Sub
 
 Public Sub Test_ConfigurationModules_NewNotEmpty()
@@ -209,13 +209,13 @@ Public Sub Test_ConfigurationModules_NewNotEmpty()
     confManager.setModulePathWithNumber "newPath", 3, 2
 
    On Error GoTo M_Error
-    mAssert.Equals confManager.configurations("NewConfiguration").modules.Count, 1, "Number of modules in the Configuration"
+    mAssert.Equals confManager.configurations("NewConfiguration").modules.count, 1, "Number of modules in the Configuration"
 
    On Error GoTo 0
    Exit Sub
 
 M_Error:
-    mAssert.Should False, "Unexpected Error (" & err.number & "): " & err.Description
+    mAssert.Should False, "Unexpected Error (" & Err.number & "): " & Err.Description
 End Sub
 
 Private Function ITest_Suite() As TestSuite
