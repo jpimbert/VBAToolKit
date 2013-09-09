@@ -409,13 +409,13 @@ Test_vtkExportConfiguration_twoFilesModifiedFalse_Error:
 
 End Sub
 
-Public Sub Test_vtkExportConfiguration_importedModuleMustNotBeExported()
+Public Sub Test_vtkExportConfiguration_notReferencedModuleMustNotBeExported()
 ' Source files are exported, 1 module is imported, onlyModified = True => expected : no module is exported
 ' since no module has been added to the configuration.
     
     Dim retVal As Integer
 
-    On Error GoTo Test_vtkExportConfiguration_importedModuleMustNotBeExported_Error
+    On Error GoTo Test_vtkExportConfiguration_notReferencedModuleMustNotBeExported_Error
 
     ' We export the modules already present so that they don't get exported again
     vtkExportOneModule wbForTest.VBProject, testModule1Name, VBAToolKit.vtkTestPath & "\" & testModule1FileName
@@ -435,7 +435,7 @@ Public Sub Test_vtkExportConfiguration_importedModuleMustNotBeExported()
     On Error GoTo 0
     Exit Sub
 
-Test_vtkExportConfiguration_importedModuleMustNotBeExported_Error:
+Test_vtkExportConfiguration_notReferencedModuleMustNotBeExported_Error:
     mAssert.Should False, "Unexpected error " & Err.number & " (" & Err.Description & ") in procedure Test_vtkExportConfiguration_importedFileMustBeExported of Class Module vtkExportConfigurationTester"
     Resume Next
 End Sub

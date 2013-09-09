@@ -38,11 +38,11 @@ Public Function vtkInitializeVbaUnitNamesAndPathes(project As String) As Boolean
     nc = cm.getConfigurationNumber(vtkProjectForName(project).projectDEVName)
     ret = (nc > 0)
     
-    For i = 1 To vtkVBAUnitModulesList.Count
+    For i = 1 To vtkVBAUnitModulesList.count
         moduleName = vtkVBAUnitModulesList.Item(i)
         Set module = ThisWorkbook.VBProject.VBComponents(moduleName)
         
-        nm = cm.AddModule(moduleName)
+        nm = cm.addModule(moduleName)
         ret = ret And (nm > 0)
         
         cm.setModulePathWithNumber path:=vtkStandardPathForModule(module), numModule:=nm, numConfiguration:=nc
@@ -81,4 +81,15 @@ Public Sub vtkDisplayActivatedReferencesGuid()
     For Each r In ActiveWorkbook.VBProject.References
         Debug.Print r.name, r.GUID
     Next
+End Sub
+
+
+'---------------------------------------------------------------------------------------
+' Procedure : vtkAddBeforeSaveHandlerInDEVWorkbook
+' Author    : Lucas Vitorino
+' Purpose   : Adds a Workbook_BeforeSave handler in a DEV workbook.
+'---------------------------------------------------------------------------------------
+'
+Public Sub vtkAddBeforeSaveHandlerInDEVWorkbook(wb As Workbook, confName As String)
+
 End Sub
