@@ -87,9 +87,46 @@ End Sub
 '---------------------------------------------------------------------------------------
 ' Procedure : vtkAddBeforeSaveHandlerInDEVWorkbook
 ' Author    : Lucas Vitorino
-' Purpose   : Adds a Workbook_BeforeSave handler in a DEV workbook.
+' Purpose   : - Adds a Workbook_BeforeSave handler in a DEV workbook. This handler exports
+'               the modified modules of the _DEV configuration associated to this workbook.
+'             - The handler will call vtkExportConfiguration on
+'                 - the project of the current workbook
+'                 - a project name that is the name of the worbook without "_DEV.xlsm"
+'                 - a confname that is the name of the workbook without ".xslm"
+'             - It works on any workbook, but shouldn't be used on something else than
+'               a proper _DEV workbook of a VTKProject. Most probably, when saving the workbook,
+'               an error will occur.
 '---------------------------------------------------------------------------------------
 '
-Public Sub vtkAddBeforeSaveHandlerInDEVWorkbook(wb As Workbook, confName As String)
+Public Sub vtkAddBeforeSaveHandlerInDEVWorkbook(wb As Workbook)
+    
+    On Error GoTo vtkAddBeforeSaveHandlerInDEVWorkbook_Error
+    
+    Dim projectName As String
+    projectName = Split(wb.name, "_")(0)
+    Dim confName As String
+    confName = Split(wb.name, ".")(0)
+    
+    Dim handlerString As String
+    
+    ' For the test environment, call the function in VBAToolKit_DEV
+    handlerString = _
+    "Private Sub Workbook_BeforeSave(ByVal SaveAsUI As Boolean, Cancel As Boolean)" & vbNewLine & _
+    "   VBAToolKit_DEV.vtkExportConfiguration projectWithModules:=ThisWorkbook.VBProject, projectName:=" & """" & projectName & """" & _
+                                                                    " , confName:=" & """" & confName & """" & _
+                                                                    " , onlyModified:=True" & _
+                                                                    vbNewLine & _
+    "End Sub" & vbNewLine
+    
+    With wb.VBProject.VBComponents("ThisWorkbook").CodeModule
+        .InsertLines .CountOfLines + 1, handlerString
+    End With
+    
+    On Error GoTo 0
+    Exit Sub
 
+vtkAddBeforeSaveHandlerInDEVWorkbook_Error:
+    Err.Raise VTK_UNEXPECTED_ERROR, "vtkAddBeforeSaveHandlerInDEVWorkBook", Err.Description
+    Resume Next
 End Sub
+
