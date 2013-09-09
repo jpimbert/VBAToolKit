@@ -44,9 +44,8 @@ Private Const testWorkbookName As String = testProjectName & "_DEV.xlsm"
 Private testWorkbook As Workbook
 
 Private Const existingProjectName As String = "ExistingProject"
-Private Const existingProjectWorkbookName As String = "WorkBookForCOnfigurationsTests.xlsm"
+Private Const existingProjectWorkbookName As String = "WorkBookForConfigurationsTests.xlsm"
 Private existingProjectWorkbook As Workbook
-
 
 Private Const testModule1FileName As String = "TestModule1.bas"
 Private Const testModule2FileName As String = "TestModule2.bas"
@@ -79,6 +78,7 @@ Private Sub ITestCase_TearDown()
     
     On Error Resume Next
     
+    vtkResetConfigurationManagers
     vtkCloseAndKillWorkbook wb:=testWorkbook
     vtkCloseAndKillWorkbook wb:=existingProjectWorkbook
     vtkCleanFolder VBAToolKit.vtkTestPath
@@ -107,7 +107,6 @@ End Sub
 ' Adding the handler
 '
 '   - adding the handler in a valid workbook, modifying one module, saving => 1 module is exported
-'   - adding the handler in a workbook whose name is not valid because it is not finished by DEV => forbidden parameter error
 '
 '----------------------------------------------------------------
 
@@ -119,64 +118,47 @@ Public Sub Test_vtkAddBeforeSaveHandlerInDEVWorkbook_validWorkbook()
     Dim oldSize2 As Integer
     Dim newSize1 As Integer
     Dim newSize2 As Integer
-    
+
     On Error GoTo Test_vtkAddBeforeSaveHandlerInDEVWorkbook_validWorkbook_Error
     
     ' Open the relevant workbook from the templates
     Set testWorkbook = VBAToolKit.getTestFileFromTemplate(fileName:=testWorkbookName, openExcel:=True)
     
+    ' Create a configuration manager
+    Dim cm As vtkConfigurationManager
+    Set cm = vtkConfigurationManagerForProject(testProjectName)
+              
     ' Export the modules already in the project
     vtkExportOneModule testWorkbook.VBProject, testModule1Name, VBAToolKit.vtkTestPath & "\" & testModule1FileName
     vtkExportOneModule testWorkbook.VBProject, testModule2Name, VBAToolKit.vtkTestPath & "\" & testModule2FileName
-    
+
     ' Get the size of the exported modules before the save
     oldSize1 = fso.GetFile(VBAToolKit.vtkTestPath & "\" & testModule1FileName).Size
     oldSize2 = fso.GetFile(VBAToolKit.vtkTestPath & "\" & testModule2FileName).Size
-    
+
     ' Add the handler
     vtkAddBeforeSaveHandlerInDEVWorkbook testWorkbook
 
     ' Modify a module
     insertDummyProcedureInCodeModule testWorkbook.VBProject.VBComponents(testModule1Name).CodeModule, dummyInt:=1
-    
+
     ' Save the workbook
     testWorkbook.Save
-    
+
     ' Get the new size of the exported modules
     newSize1 = fso.GetFile(VBAToolKit.vtkTestPath & "\" & testModule1FileName).Size
     newSize2 = fso.GetFile(VBAToolKit.vtkTestPath & "\" & testModule2FileName).Size
 
     mAssert.Should oldSize1 < newSize1, testModule1FileName & " must be bigger after the save."
-    mAssert.Should oldSize1 = newSize1, testModule2FileName & " must be of equal size after the save."
+    mAssert.Should oldSize2 = newSize2, testModule2FileName & " must be of equal size after the save."
 
     On Error GoTo 0
     Exit Sub
 
 Test_vtkAddBeforeSaveHandlerInDEVWorkbook_validWorkbook_Error:
     mAssert.Should False, "Unexpected error " & Err.number & " (" & Err.Description & ") in procedure Test_vtkAddBeforeSaveHandlerInDEVWorkbook_validWorkbook of Class Module vtkBeforeSaveHandlerTester"
-    Resume Next
-End Sub
-
-Public Sub Test_vtkAddBeforeSaveHandlerInDEVWorkbook_noDEVInName()
-    
-    Dim error As Integer: error = -1
-    
-    On Error GoTo Test_vtkAddBeforeSaveHandlerInDevWorkbook_noDEVInName_Error
-    
-    ' Import relevant workbook from the templates folder
-    Set existingProjectWorkbook = VBAToolKit.getTestFileFromTemplate(fileName:=existingProjectWorkbookName, openExcel:=True)
-
-    ' Try to add the before save handler
-    vtkAddBeforeSaveHandlerInDEVWorkbook existingProjectWorkbook
-
-    mAssert.Equals error, VTK_FORBIDDEN_PARAMETER, "The call must return a VTK_FORBIDDEN_PARAMETER error."
-
-    On Error GoTo 0
+    ITestCase_TearDown
     Exit Sub
-
-Test_vtkAddBeforeSaveHandlerInDevWorkbook_noDEVInName_Error:
-    error = Err.number
-    Resume Next
     
 End Sub
 
@@ -184,13 +166,11 @@ End Sub
 Private Function ITest_Suite() As TestSuite
     Set ITest_Suite = New TestSuite
     ITest_Suite.AddTest ITest_Manager.ClassName, "Test_vtkAddBeforeSaveHandlerInDEVWorkbook_validWorkbook"
-    ITest_Suite.AddTest ITest_Manager.ClassName, "Test_vtkAddBeforeSaveHandlerInDEVWorkbook_noDEVInName"
 End Function
 
 Private Sub ITestCase_RunTest()
     Select Case mManager.methodName
         Case "Test_vtkAddBeforeSaveHandlerInDEVWorkbook_validWorkbook": Test_vtkAddBeforeSaveHandlerInDEVWorkbook_validWorkbook
-        Case "Test_vtkAddBeforeSaveHandlerInDEVWorkbook_noDEVInName": Test_vtkAddBeforeSaveHandlerInDEVWorkbook_noDEVInName
         Case Else: mAssert.Should False, "Invalid test name: " & mManager.methodName
     End Select
 End Sub
