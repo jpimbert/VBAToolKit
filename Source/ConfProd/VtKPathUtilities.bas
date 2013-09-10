@@ -162,11 +162,12 @@ Public Function vtkStripPathOrNameOfVtkExtension(projectNameOrPath As String, ex
 
     ' Get the name with or without the "_"
     Dim substring As String
-    substring = vtkStripFileNameOfExtension(projectNameOrPath)
+    substring = vtkStripFilePathOrNameOfExtension(projectNameOrPath)
     
     ' Strip from the last "_" if the part after corresponds to the specified extension
     Dim underscorePosition As Integer
-    If Mid(substring, undescorePosition + 1) Like extension Then
+    underscorePosition = InStrRev(substring, "_")
+    If Mid(substring, underscorePosition + 1) Like extension Then
         substring = Left(substring, underscorePosition - 1)
     End If
     

@@ -368,23 +368,23 @@ End Sub
 '---------------------------------------------------------------------------------------
 '
 Public Sub vtkRecreateConfiguration(projectName As String, configurationName As String)
-    Dim cm As vtkConfigurationManager, rootPath As String, wbPath As String, Wb As Workbook
+    Dim cm As vtkConfigurationManager, rootPath As String, wbPath As String, wb As Workbook
     ' Get the project and the rootPath of the project
     Set cm = vtkConfigurationManagerForProject(projectName)
     rootPath = cm.rootPath
     ' Get the configuration number in the project and the path of the file
     wbPath = cm.getConfigurationPath(configuration:=configurationName)
     ' Create a new Excel file
-    Set Wb = vtkCreateExcelWorkbook()
+    Set wb = vtkCreateExcelWorkbook()
     ' Set the projectName
-    Wb.VBProject.name = configurationName
+    wb.VBProject.name = configurationName
     ' Import all modules for this configuration from the source directory
-    vtkImportModulesInAnotherProject projectForModules:=Wb.VBProject, projectName:=projectName, confName:=configurationName
+    vtkImportModulesInAnotherProject projectForModules:=wb.VBProject, projectName:=projectName, confName:=configurationName
     ' Recreate references in the new Excel File
-    VtkActivateReferences Wb:=Wb
+    VtkActivateReferences wb:=wb
     ' Set attribute properties WARNING - only for Delivery VBAToolKit
-    Wb.BuiltinDocumentProperties("Title").Value = "VBAToolKit"
-    Wb.BuiltinDocumentProperties("Comments").Value = "Toolkit improving IDE for VBA projects"
+    wb.BuiltinDocumentProperties("Title").Value = "VBAToolKit"
+    wb.BuiltinDocumentProperties("Comments").Value = "Toolkit improving IDE for VBA projects"
     ' Deactivate AddIn if the current Excel file is AddIn and installed
     Dim fso As New FileSystemObject, fileName As String, addInWasActivated As Boolean, wbIsAddin As Boolean
     fileName = fso.GetFileName(wbPath)
@@ -398,8 +398,8 @@ Public Sub vtkRecreateConfiguration(projectName As String, configurationName As 
     End If
    On Error GoTo 0
     ' Save the Excel file with the good type and erase the previous one (a message is displayed to the user)
-    Wb.SaveAs fileName:=rootPath & "\" & wbPath, FileFormat:=vtkDefaultFileFormat(wbPath)
-    Wb.Close savechanges:=False
+    wb.SaveAs fileName:=rootPath & "\" & wbPath, FileFormat:=vtkDefaultFileFormat(wbPath)
+    wb.Close savechanges:=False
     ' Copy the AddIn in App Data folder (Only Excel 2007 at the moment)
     Dim appPath As String
     appPath = ""
@@ -434,26 +434,22 @@ Public Function vtkExportConfiguration(projectWithModules As VBProject, projectN
     
     ' Export all modules for this configuration from the projectWithModules
     Set cm = vtkConfigurationManagerForProject(projectName)
+    
     For Each mo In cm.configurations(confName).modules
         
-        ' If the module is in the configuration
-        If Not mo.path Like "" Then
-        
-            Dim modulePath As String
-            modulePath = cm.rootPath & "\" & mo.path
-            
-            If onlyModified = True And fso.FileExists(modulePath) = True Then
-                If mo.VBAModule.Saved = False Then
-                    vtkExportOneModule projectWithModules, mo.name, modulePath
-                    exportedModulesCount = exportedModulesCount + 1
-                End If
-            Else
+        Dim modulePath As String
+        modulePath = cm.rootPath & "\" & mo.path
+                   
+        If onlyModified And fso.FileExists(modulePath) Then
+            If mo.VBAModule.Saved = False Then
                 vtkExportOneModule projectWithModules, mo.name, modulePath
                 exportedModulesCount = exportedModulesCount + 1
             End If
-            
+        Else
+            vtkExportOneModule projectWithModules, mo.name, modulePath
+            exportedModulesCount = exportedModulesCount + 1
         End If
-        
+            
     Next
     
     On Error GoTo 0

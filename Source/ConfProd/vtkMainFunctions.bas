@@ -67,6 +67,8 @@ Public Function vtkCreateProject(path As String, name As String, Optional displa
     Workbooks(project.workbookDEVName).VBProject.name = project.projectDEVName
     'call function who activate references
     VtkActivateReferences wb:=Workbooks(project.workbookDEVName)
+    ' Activate reference to current worbook
+    vtkActivateReferenceToCurrentWorkbook wb:=Workbooks(project.workbookDEVName)
     'initialize configuration Sheet with VBAUnit modules
     vtkInitializeVbaUnitNamesAndPathes project:=project.projectName
     ' Save Development Project Workbook
@@ -95,7 +97,7 @@ Public Function vtkCreateProject(path As String, name As String, Optional displa
     ' Insert the BeforeSave handler in the newly created project
     vtkAddBeforeSaveHandlerInDEVWorkbook wb
     ' Save configured and updated project for test
-    'wb.Save
+    wb.Save
         
     ' Initialize git
     On Error GoTo vtkCreateProject_ErrorGit

@@ -65,8 +65,22 @@ Public Sub VtkActivateReferences(wb As Workbook)
         wb.VBProject.References.AddFromGuid "{0002E157-0000-0000-C000-000000000046}", 0, 0  ' VBIDE : Microsoft visual basic for applications extensibility 5.3
         wb.VBProject.References.AddFromGuid "{50A7E9B0-70EF-11D1-B75A-00A0C90564FE}", 0, 0  ' Shell32 : Microsoft Shell Controls and Automation
         wb.VBProject.References.AddFromGuid "{F5078F18-C551-11D3-89B9-0000F81FE221}", 0, 0  ' MSXML2 : Microsoft XML V5.0
-        wb.VBProject.References.AddFromFile ThisWorkbook.path & "\" & ThisWorkbook.name ' VBAToolKit or VBAToolKit_DEV according to which one runs this function
        On Error GoTo 0
+    End If
+End Sub
+
+
+'---------------------------------------------------------------------------------------
+' Procedure : vtkActivateReferenceToCurrentWorkbook
+' Author    : Lucas Vitorino
+' Purpose   : Check that the target workbook is open, and activates a reference to the current workbook.
+'---------------------------------------------------------------------------------------
+'
+Public Sub vtkActivateReferenceToCurrentWorkbook(wb As Workbook)
+    If VtkWorkbookIsOpen(wb.name) = True Then     'if the workbook is opened
+        On Error Resume Next ' if an extention is already activated, we will try to activate the next one
+            wb.VBProject.References.AddFromFile ThisWorkbook.path & "\" & ThisWorkbook.name ' VBAToolKit or VBAToolKit_DEV according to which one runs this function
+        On Error GoTo 0
     End If
 End Sub
 
