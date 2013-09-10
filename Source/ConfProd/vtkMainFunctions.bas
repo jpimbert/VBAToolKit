@@ -70,7 +70,8 @@ Public Function vtkCreateProject(path As String, name As String, Optional displa
     'initialize configuration Sheet with VBAUnit modules
     vtkInitializeVbaUnitNamesAndPathes project:=project.projectName
     ' Save Development Project Workbook
-    Workbooks(project.workbookDEVName).save
+    Workbooks(project.workbookDEVName).Save
+    
     
     'Create delivery workbook
     Workbooks.Add.SaveAs (rootPath & "\" & project.projectStandardRelativePath), FileFormat:=(52) '52 is xlsm format
@@ -90,9 +91,11 @@ Public Function vtkCreateProject(path As String, name As String, Optional displa
     vtkExportModulesFromAnotherProject projectWithModules:=ThisWorkbook.VBProject, projectName:=project.projectName, confName:=project.projectDEVName
     ' Import VBAUnit (and lib ?) modules in the new Excel file project
     vtkImportModulesInAnotherProject projectForModules:=wb.VBProject, projectName:=project.projectName, confName:=project.projectDEVName
- 
-   ' Save configured and updated project for test
-    wb.save
+    
+    ' Insert the BeforeSave handler in the newly created project
+    vtkAddBeforeSaveHandlerInDEVWorkbook wb
+    ' Save configured and updated project for test
+    'wb.Save
         
     ' Initialize git
     On Error GoTo vtkCreateProject_ErrorGit
@@ -104,13 +107,13 @@ Public Function vtkCreateProject(path As String, name As String, Optional displa
 
 vtkCreateProject_ErrorTreeFolder:
     vtkCreateProject = internalError
-    If displayError Then MsgBox "Error " & err.number & " (" & err.Description & ") in procedure vtkCreateProject of Module MainFunctions"
+    If displayError Then MsgBox "Error " & Err.number & " (" & Err.Description & ") in procedure vtkCreateProject of Module MainFunctions"
     Exit Function
 vtkCreateProject_Error:
-    vtkCreateProject = err.number
-    If displayError Then MsgBox "Error " & err.number & " (" & err.Description & ") in procedure vtkCreateProject of Module MainFunctions"
+    vtkCreateProject = Err.number
+    If displayError Then MsgBox "Error " & Err.number & " (" & Err.Description & ") in procedure vtkCreateProject of Module MainFunctions"
 vtkCreateProject_ErrorGit:
-    vtkCreateProject = err.number
-    If displayError Then MsgBox "Error " & err.number & " (" & err.Description & ") in procedure vtkCreateProject of Module MainFunctions"
+    vtkCreateProject = Err.number
+    If displayError Then MsgBox "Error " & Err.number & " (" & Err.Description & ") in procedure vtkCreateProject of Module MainFunctions"
 
 End Function

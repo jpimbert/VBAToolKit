@@ -34,8 +34,8 @@ Implements ITestCase
 Private mManager As TestCaseManager
 Private mAssert As IAssert
 
-Private Const testProjectFileName As String = "TestProject_DEV.xlsm"
 Private Const testProjectName As String = "TestProject"
+Private Const testProjectFileName As String = testProjectName & "_DEV.xlsm"
 Private Const testModule1FileName As String = "TestModule1.bas"
 Private Const testModule2FileName As String = "TestModule2.bas"
 Private Const importedModuleFileName As String = "TestModule.bas"
@@ -44,10 +44,16 @@ Private Const testModule2Name As String = "TestModule2"
 Private Const importedModuleName As String = "TestModule"
 Private Const totalNumberOfModules As Integer = 2
 
+Private Const newlyCreatedProjectName As String = "NewlyCreated"
+Private Const newlyCreatedProjectFileName As String = newlyCreatedProjectName & "_DEV.xlsm"
+
 Private cm As vtkConfigurationManager
 Private testConf As vtkConfiguration
 
-Private testWorkbook As Workbook, fso As New FileSystemObject
+Private testWorkbook As Workbook
+Private newlyCreatedWorkbook As Workbook
+
+Private fso As New FileSystemObject
 
 Private Sub Class_Initialize()
     Set mManager = New TestCaseManager
@@ -73,9 +79,11 @@ Private Sub ITestCase_SetUp(Assert As IAssert)
 End Sub
 
 Private Sub ITestCase_TearDown()
+    On Error Resume Next
     
     vtkResetConfigurationManagers
     vtkCloseAndKillWorkbook wb:=testWorkbook
+    vtkCloseAndKillWorkbook wb:=newlyCreatedWorkbook
     vtkCleanFolder VBAToolKit.vtkTestPath
 
 End Sub
@@ -523,6 +531,54 @@ Test_vtkAddBeforeSaveHandlerInDEVWorkbook_validWorkbook_Error:
     
 End Sub
 
+
+Public Sub Test_vtkCreateProject_handlerAddedInDEVWorkbook()
+' creating a project, modifying an existing module in the DEV workbook, save => module must be exported
+    
+    Dim retVal As Integer
+    Dim oldSize1 As Integer
+    Dim oldSize2 As Integer
+    Dim newSize1 As Integer
+    Dim newSize2 As Integer
+
+    Dim projectName As String
+
+    On Error GoTo Test_vtkAddBeforeSaveHandlerInDEVWorkbook_justCreatedWorkbook_Error
+
+    vtkCreateProject VBAToolKit.vtkTestPath, newlyCreatedProjectName
+
+    Set newlyCreatedWorkbook = Workbooks(newlyCreatedProjectFileName)
+
+    ' Get the size of the exported modules before the save
+    oldSize1 = fso.GetFile(VBAToolKit.vtkTestPath & "\" & newlyCreatedProjectName & "\Source\VbaUnit\VbaUnitMain.bas").Size
+    oldSize2 = fso.GetFile(VBAToolKit.vtkTestPath & "\" & newlyCreatedProjectName & "\Source\VbaUnit\Assert.cls").Size
+
+    ' Modify a module
+    insertDummyProcedureInCodeModule newlyCreatedWorkbook.VBProject.VBComponents("VbaUnitMain").CodeModule, dummyInt:=1
+
+    ' Save the workbook
+    newlyCreatedWorkbook.Save
+
+    ' Get the new size of the exported modules
+    newSize1 = fso.GetFile(VBAToolKit.vtkTestPath & "\" & newlyCreatedProjectName & "\Source\VbaUnit\VbaUnitMain.bas").Size
+    newSize2 = fso.GetFile(VBAToolKit.vtkTestPath & "\" & newlyCreatedProjectName & "\Source\VbaUnit\Assert.cls").Size
+    
+    Debug.Print "VbaUnitMain.bas : old size = " & oldSize1 & " , new size = " & newSize1
+    Debug.Print "Assert.cls : old size = " & oldSize2 & " , new size = " & newSize2
+    
+    mAssert.Should oldSize1 < newSize1, "VbaUnitMain.bas must be bigger after the save."
+    mAssert.Should oldSize2 = newSize2, "Assert.cls must be of equal size after the save."
+
+    On Error GoTo 0
+    Exit Sub
+
+Test_vtkAddBeforeSaveHandlerInDEVWorkbook_justCreatedWorkbook_Error:
+    mAssert.Should False, "Unexpected error " & Err.number & " (" & Err.Description & ") in procedure Test_vtkAddBeforeSaveHandlerInDEVWorkbook_justCreatedWorkbook of Class Module vtkBeforeSaveHandlerTester"
+    ITestCase_TearDown
+    Exit Sub
+    
+End Sub
+
 Private Function ITest_Suite() As TestSuite
     Set ITest_Suite = New TestSuite
     ITest_Suite.AddTest ITest_Manager.ClassName, "Test_vtkExportConfiguration_filesNotYetCreatedTrue"
@@ -536,6 +592,7 @@ Private Function ITest_Suite() As TestSuite
     ITest_Suite.AddTest ITest_Manager.ClassName, "Test_vtkExportConfiguration_notReferencedModuleMustNotBeExported"
     ITest_Suite.AddTest ITest_Manager.ClassName, "Test_vtkExportConfiguration_importedModuleAddedToConfigurationManagerMustNotBeExported"
     ITest_Suite.AddTest ITest_Manager.ClassName, "Test_vtkAddBeforeSaveHandlerInDEVWorkbook_validWorkbook"
+    ITest_Suite.AddTest ITest_Manager.ClassName, "Test_vtkCreateProject_handlerAddedInDEVWorkbook"
 End Function
 
 Private Sub ITestCase_RunTest()
@@ -551,6 +608,7 @@ Private Sub ITestCase_RunTest()
         Case "Test_vtkExportConfiguration_notReferencedModuleMustNotBeExported": Test_vtkExportConfiguration_notReferencedModuleMustNotBeExported
         Case "Test_vtkExportConfiguration_importedModuleAddedToConfigurationManagerMustNotBeExported": Test_vtkExportConfiguration_importedModuleAddedToConfigurationManagerMustNotBeExported
         Case "Test_vtkAddBeforeSaveHandlerInDEVWorkbook_validWorkbook": Test_vtkAddBeforeSaveHandlerInDEVWorkbook_validWorkbook
+        Case "Test_vtkCreateProject_handlerAddedInDEVWorkbook": Test_vtkCreateProject_handlerAddedInDEVWorkbook
         Case Else: mAssert.Should False, "Invalid test name: " & mManager.methodName
     End Select
 End Sub

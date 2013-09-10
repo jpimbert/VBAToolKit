@@ -65,6 +65,7 @@ Public Sub VtkActivateReferences(wb As Workbook)
         wb.VBProject.References.AddFromGuid "{0002E157-0000-0000-C000-000000000046}", 0, 0  ' VBIDE : Microsoft visual basic for applications extensibility 5.3
         wb.VBProject.References.AddFromGuid "{50A7E9B0-70EF-11D1-B75A-00A0C90564FE}", 0, 0  ' Shell32 : Microsoft Shell Controls and Automation
         wb.VBProject.References.AddFromGuid "{F5078F18-C551-11D3-89B9-0000F81FE221}", 0, 0  ' MSXML2 : Microsoft XML V5.0
+        wb.VBProject.References.AddFromFile ThisWorkbook.path & "\" & ThisWorkbook.name ' VBAToolKit or VBAToolKit_DEV according to which one runs this function
        On Error GoTo 0
     End If
 End Sub
@@ -103,16 +104,14 @@ Public Sub vtkAddBeforeSaveHandlerInDEVWorkbook(wb As Workbook)
     On Error GoTo vtkAddBeforeSaveHandlerInDEVWorkbook_Error
     
     Dim projectName As String
-    projectName = Split(wb.name, "_")(0)
+    projectName = vtkStripPathOrNameOfVtkExtension(wb.name, "DEV")
     Dim confName As String
-    confName = Split(wb.name, ".")(0)
-    
+    confName = vtkStripFilePathOrNameOfExtension(wb.name)
+          
     Dim handlerString As String
-    
-    ' For the test environment, call the function in VBAToolKit_DEV
     handlerString = _
     "Private Sub Workbook_BeforeSave(ByVal SaveAsUI As Boolean, Cancel As Boolean)" & vbNewLine & _
-    "   VBAToolKit_DEV.vtkExportConfiguration projectWithModules:=ThisWorkbook.VBProject, projectName:=" & """" & projectName & """" & _
+    "   " & vtkStripFilePathOrNameOfExtension(ThisWorkbook.name) & ".vtkExportConfiguration projectWithModules:=ThisWorkbook.VBProject, projectName:=" & """" & projectName & """" & _
                                                                     " , confName:=" & """" & confName & """" & _
                                                                     " , onlyModified:=True" & _
                                                                     vbNewLine & _
