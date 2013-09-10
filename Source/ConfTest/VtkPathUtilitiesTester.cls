@@ -99,6 +99,84 @@ Public Sub TestFileExtensionWithJustAnExtension()
     mAssert.Equals vtkGetFileExtension(".FileName"), "FileName", "FileName is the extension"
 End Sub
 
+Public Sub Test_vtkStripFilePathOrNameOfExtension_fileNameExtension()
+    mAssert.Equals vtkStripFilePathOrNameOfExtension("dummy.dummy"), "dummy", "dummy is the file name."
+End Sub
+
+Public Sub Test_vtkStripFilePathOrNameOfExtension_fileNameNoExtension()
+    mAssert.Equals vtkStripFilePathOrNameOfExtension("dummy"), "dummy", "dummy is the file name."
+End Sub
+
+Public Sub Test_vtkStripFilePathOrNameOfExtension_fileNameEmptyExtension()
+    mAssert.Equals vtkStripFilePathOrNameOfExtension("dummy."), "dummy", "dummy is the file name."
+End Sub
+
+Public Sub Test_vtkStripFilePathOrNameOfExtension_pathExtension()
+    mAssert.Equals vtkStripFilePathOrNameOfExtension("dummy1\dummy.extension"), "dummy", "dummy is the file name."
+End Sub
+
+Public Sub Test_vtkStripFilePathOrNameOfExtension_pathNoExtension()
+    mAssert.Equals vtkStripFilePathOrNameOfExtension("dummy1\dummy"), "dummy", "dummy is the file name."
+End Sub
+
+Public Sub Test_vtkStripFilePathOrNameOfExtension_fileNameDoubleExtension()
+    mAssert.Equals vtkStripFilePathOrNameOfExtension("dummy.ext1.ext2"), "dummy.ext1", "dummy.ext1 is the file name."
+End Sub
+
+Public Sub Test_vtkStripFilePathOrNameOfExtension_pathDoubleExtension()
+    mAssert.Equals vtkStripFilePathOrNameOfExtension("dummy1\dummy.ext1.ext2"), "dummy.ext1", "dummy.ext1 is the file name."
+End Sub
+
+Public Sub Test_vtkStripFilePathOrNameOfExtension_fileNameTripleExtensionEmptyThird()
+    mAssert.Equals vtkStripFilePathOrNameOfExtension("dummy.ext1.ext2."), "dummy.ext1.ext2", "dummy.ext1 is the file name."
+End Sub
+
+Public Sub Test_vtkStripFilePathOrNameOfExtension_pathTripleExtensionEmptyThird()
+    mAssert.Equals vtkStripFilePathOrNameOfExtension("dummy\dummy.ext1.ext2."), "dummy.ext1.ext2", "dummy.ext1 is the file name."
+End Sub
+
+
+Public Sub Test_vtkStripPathOrNameFromVtkExtension_fileNameNoVtkExtension()
+    mAssert.Equals vtkStripPathOrNameFromVtkExtension("dummy.extension", "VTKEXT"), "dummy"
+End Sub
+
+Public Sub Test_vtkStripPathOrNameFromVtkExtension_pathNoVtkExtension()
+    mAssert.Equals vtkStripPathOrNameFromVtkExtension("dummy1\dummy.extension", "VTKEXT"), "dummy"
+End Sub
+
+Public Sub Test_vtkStripPathOrNameFromVtkExtension_fileNameVtkExtension()
+    mAssert.Equals vtkStripPathOrNameFromVtkExtension("dummy_VTKEXT.extension", "VTKEXT"), "dummy"
+End Sub
+
+Public Sub Test_vtkStripPathOrNameFromVtkExtension_pathVtkExtension()
+    mAssert.Equals vtkStripPathOrNameFromVtkExtension("dummy1\dummy_VTKEXT.extension", "VTKEXT"), "dummy"
+End Sub
+
+Public Sub Test_vtkStripPathOrNameFromVtkExtension_nameVtkExtension()
+    mAssert.Equals vtkStripPathOrNameFromVtkExtension("dummy_VTKEXT", "VTKEXT"), "dummy"
+End Sub
+
+Public Sub Test_vtkStripPathOrNameFromVtkExtension_fileNameEmptyVtkExtension()
+    mAssert.Equals vtkStripPathOrNameFromVtkExtension("dummy_.extension", ""), "dummy_"
+End Sub
+
+Public Sub Test_vtkStripPathOrNameFromVtkExtension_pathEmptyVtkExtension()
+    mAssert.Equals vtkStripPathOrNameFromVtkExtension("dummy1\dummy_.extension", ""), "dummy_"
+End Sub
+
+Public Sub Test_vtkStripPathOrNameFromVtkExtension_nameEmptyVtkExtension()
+    mAssert.Equals vtkStripPathOrNameFromVtkExtension("dummy_", "VTKEXT"), "dummy_"
+End Sub
+
+Public Sub Test_vtkStripPathOrNameFromVtkExtension_fileNameVtkExtensionMistake()
+    mAssert.Equals vtkStripPathOrNameFromVtkExtension("dummy_VTKEXT.extension", "VTKEXTMISTAKE"), "dummy_VTKEXT"
+End Sub
+
+Public Sub Test_vtkStripPathOrNameFromVtkExtension_pathVtkExtensionMistake()
+    mAssert.Equals vtkStripPathOrNameFromVtkExtension("dummy1\dummy_VTKEXT.extension", "VTKEXTMISTAKE"), "dummy_VTKEXT"
+End Sub
+
+
 Private Function ITest_Suite() As TestSuite
     Set ITest_Suite = New TestSuite
     ITest_Suite.AddTest ITest_Manager.ClassName, "TestPathToTestFolder"

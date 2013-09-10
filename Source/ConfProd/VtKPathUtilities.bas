@@ -102,6 +102,87 @@ Public Function vtkGetFileExtension(filePath As String) As String
 End Function
 
 '---------------------------------------------------------------------------------------
+' Procedure : vtkStripPathOrNameOfExtension
+' Author    : Lucas Vitorino
+' Purpose   : - Returns a String containing the name of the file, that is to say without the first extension.
+'             - Works with a path too.
+' Examples  : "dummy.dummy" -> "dummy"
+'             "dummy" -> "dummy"
+'             "dummy\dummy" -> "dummy"
+'             "dummy\dummy.dummy" -> "dummy"
+'             "dummy.dummy.dummy" -> "dummy.dummy"
+'---------------------------------------------------------------------------------------
+'
+Public Function vtkStripFilePathOrNameOfExtension(fileNameOrPath As String) As String
+
+    On Error GoTo vtkStripFilePathOrNameOfExtension_Error
+
+    Dim backslashPosition As Integer
+    backslashPosition = InStrRev(fileNameOrPath, "\")
+    
+    ' Get the filename in the path
+    Dim substring As String
+    substring = Mid(fileNameOrPath, backslashPosition + 1)
+    
+    ' Remove the part after the last dot
+    Dim dotPosition As Integer
+    dotPosition = InStrRev(substring, ".")
+    If dotPosition <> 0 Then
+        substring = Left(substring, dotPosition - 1)
+    End If
+    
+    vtkStripFilePathOrNameOfExtension = substring
+
+    On Error GoTo 0
+    Exit Function
+
+vtkStripFilePathOrNameOfExtension_Error:
+    Err.Raise VTK_UNEXPECTED_ERROR, "vtkStripFileNameOfExtension", Err.Description
+    Resume Next
+
+End Function
+
+'---------------------------------------------------------------------------------------
+' Procedure : vtkStripVtkExtensionOfPathOrName
+' Author    : Lucas Vitorino
+' Purpose   : - Returns the vtkProjectName associated with a workbook path or name or a configuration name.
+'
+' Examples  : "Dummy_DEV", "DEV" -> "Dummy"
+'             "Dummy_DEV.dummy", "DEV" -> "Dummy"
+'             "Dummy.dummy" -> "Dummy"
+'             "dummy\Dummy_DEV.dummy", "DEV" -> "Dummy"
+'             "Dummy_DEV", "DEEV" -> "Dummy_DEV"
+'             "Dummy_Dummy_DEV", "DEV", -> "Dummy_Dummy"
+'             "Dummy_Dummy"_DEV", "Dummy" -> "Dummy_Dummy_DEV"
+'---------------------------------------------------------------------------------------
+'
+Public Function vtkStripPathOrNameOfVtkExtension(projectNameOrPath As String, extension As String) As String
+
+    On Error GoTo vtkStripPathOrNameOfVtkExtension_Error
+
+    ' Get the name with or without the "_"
+    Dim substring As String
+    substring = vtkStripFileNameOfExtension(projectNameOrPath)
+    
+    ' Strip from the last "_" if the part after corresponds to the specified extension
+    Dim underscorePosition As Integer
+    If Mid(substring, undescorePosition + 1) Like extension Then
+        substring = Left(substring, underscorePosition - 1)
+    End If
+    
+    vtkStripPathOrNameOfVtkExtension = substring
+
+    On Error GoTo 0
+    Exit Function
+
+vtkStripPathOrNameOfVtkExtension_Error:
+    Err.Raise VTK_UNEXPECTED_ERROR, "vtkStripPathOrNameOfVtkExtension", Err.Description
+    Resume Next
+
+End Function
+
+
+'---------------------------------------------------------------------------------------
 ' Function  : vtkCreateTreeFolder
 ' Author    : Jean-Pierre Imbert
 ' Date      : 06/08/2013
@@ -128,8 +209,8 @@ Public Function vtkCreateTreeFolder(rootPath As String)
    Exit Function
    
 vtkCreateTreeFolder_Error:
-    vtkCreateTreeFolder = err.number
-    err.Raise err.number, "Module vtkFileSystemUtilities : Function vtkCreateTreeFolder", err.Description
+    vtkCreateTreeFolder = Err.number
+    Err.Raise Err.number, "Module vtkFileSystemUtilities : Function vtkCreateTreeFolder", Err.Description
 End Function
 
 '---------------------------------------------------------------------------------------
