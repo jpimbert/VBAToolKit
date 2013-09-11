@@ -177,7 +177,7 @@ Public Sub Test_vtkInitializeGit_correctPathLogFileIsDeleted()
     On Error GoTo Test_vtkInitializeGit_correctPathLogFileIsDeleted_Error
 
     vtkInitializeGit VBAToolKit.vtkTestPath
-    mAssert.Equals fso.FileExists(VBAToolKit.vtkTestPath & "\initialize.log"), False
+    mAssert.Equals fso.fileExists(VBAToolKit.vtkTestPath & "\initialize.log"), False
 
     On Error GoTo 0
     Exit Sub
@@ -207,7 +207,7 @@ Public Sub Test_vtkInitializeGit_correctPathCustomLogFileExists()
     On Error GoTo Test_vtkInitializeGit_correctPathCustomLogFileExists_Error
 
     vtkInitializeGit VBAToolKit.vtkTestPath, "initialize.log"
-    mAssert.Equals fso.FileExists(VBAToolKit.vtkTestPath & "\initialize.log"), True
+    mAssert.Equals fso.fileExists(VBAToolKit.vtkTestPath & "\initialize.log"), True
 
     On Error GoTo 0
     Exit Sub

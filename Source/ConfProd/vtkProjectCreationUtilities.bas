@@ -79,7 +79,7 @@ End Sub
 Public Sub vtkActivateReferenceToCurrentWorkbook(wb As Workbook)
     If VtkWorkbookIsOpen(wb.name) = True Then     'if the workbook is opened
         On Error Resume Next ' if an extention is already activated, we will try to activate the next one
-            wb.VBProject.References.AddFromFile ThisWorkbook.path & "\" & ThisWorkbook.name ' VBAToolKit or VBAToolKit_DEV according to which one runs this function
+            wb.VBProject.References.AddFromFile ThisWorkbook.FullName ' VBAToolKit or VBAToolKit_DEV according to which one runs this function
         On Error GoTo 0
     End If
 End Sub
@@ -113,14 +113,9 @@ End Sub
 '               an error will occur.
 '---------------------------------------------------------------------------------------
 '
-Public Sub vtkAddBeforeSaveHandlerInDEVWorkbook(wb As Workbook)
+Public Sub vtkAddBeforeSaveHandlerInDEVWorkbook(wb As Workbook, projectName As String, confName As String)
     
     On Error GoTo vtkAddBeforeSaveHandlerInDEVWorkbook_Error
-    
-    Dim projectName As String
-    projectName = vtkStripPathOrNameOfVtkExtension(wb.name, "DEV")
-    Dim confName As String
-    confName = vtkStripFilePathOrNameOfExtension(wb.name)
           
     Dim handlerString As String
     handlerString = _

@@ -257,7 +257,7 @@ Public Sub vtkExportOneModule(project As VBProject, moduleName As String, filePa
     Set m = project.VBComponents(moduleName)
         
     ' Kill file if it already exists only AFTER get the module, if it not exists the file must not be deleted
-    If fso.FileExists(filePath) Then fso.DeleteFile fileSpec:=filePath
+    If fso.fileExists(filePath) Then fso.DeleteFile fileSpec:=filePath
     
     ' Export module
     m.Export fileName:=filePath
@@ -425,13 +425,12 @@ Public Function vtkExportConfiguration(projectWithModules As VBProject, projectN
         Optional onlyModified As Boolean = False) As Integer
     
     Dim cm As vtkConfigurationManager, rootPath As String
-    Dim cn As Integer, filePath As String, i As Integer
     Dim mo As vtkModule
     Dim exportedModulesCount As Integer: exportedModulesCount = 0
     Dim fso As New FileSystemObject
+    
     On Error GoTo vtkExportConfiguration_Error
 
-    
     ' Export all modules for this configuration from the projectWithModules
     Set cm = vtkConfigurationManagerForProject(projectName)
     
@@ -440,7 +439,10 @@ Public Function vtkExportConfiguration(projectWithModules As VBProject, projectN
         Dim modulePath As String
         modulePath = cm.rootPath & "\" & mo.path
                    
-        If onlyModified And fso.FileExists(modulePath) Then
+        ' The conditon to export could be simplified in
+        '   If Not (onlyModified And fso.FileExists(modulePath) And mo.VBAModule) Then <export>
+        ' but it doesn't seem to work, so we stick to this code.
+        If onlyModified And fso.fileExists(modulePath) Then
             If mo.VBAModule.Saved = False Then
                 vtkExportOneModule projectWithModules, mo.name, modulePath
                 exportedModulesCount = exportedModulesCount + 1
@@ -449,7 +451,7 @@ Public Function vtkExportConfiguration(projectWithModules As VBProject, projectN
             vtkExportOneModule projectWithModules, mo.name, modulePath
             exportedModulesCount = exportedModulesCount + 1
         End If
-            
+        
     Next
     
     On Error GoTo 0
