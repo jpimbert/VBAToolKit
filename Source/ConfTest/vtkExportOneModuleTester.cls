@@ -83,7 +83,7 @@ End Sub
 Private Sub ITestCase_TearDown()
     On Error Resume Next
     
-    vtkCloseAndKillWorkbook Wb:=wbForTest
+    vtkCloseAndKillWorkbook wb:=wbForTest
 
     Kill PathName:=vtkPathToTestFolder & "\" & existingWorkbookName
     Kill PathName:=vtkPathToTestFolder & "\" & moduleToImport

@@ -143,7 +143,7 @@ Public Sub TestImportInexistantFileDoesNothing()
     vtkImportOneModule project:=wbForTest.VBProject, moduleName:="TestModule", filePath:="DummyFile.xxx"
     
     mAssert.Equals wbForTest.VBProject.VBComponents("TestModule").CodeModule.CountOfLines, 5, "The TestModule of the Test Workbook must not have been modified. It contains 5 code lines"
-    vtkCloseAndKillWorkbook Wb:=wbForTest
+    vtkCloseAndKillWorkbook wb:=wbForTest
 End Sub
 
 Public Sub TestImportExistantFileInExistingModule()
@@ -154,7 +154,7 @@ Public Sub TestImportExistantFileInExistingModule()
     vtkImportOneModule project:=wbForTest.VBProject, moduleName:="TestModule", filePath:=vtkPathToTestFolder & "\" & moduleToImport
     
     mAssert.Equals wbForTest.VBProject.VBComponents("TestModule").CodeModule.CountOfLines, 9, "The TestModule of the Test Workbook must not have been modified. It contains now 9 code lines"
-    vtkCloseAndKillWorkbook Wb:=wbForTest
+    vtkCloseAndKillWorkbook wb:=wbForTest
 End Sub
 
 Public Sub TestImportExistantFileInExistingModuleWithNewName()
@@ -166,7 +166,7 @@ Public Sub TestImportExistantFileInExistingModuleWithNewName()
     
     mAssert.Equals wbForTest.VBProject.VBComponents("TestModule").CodeModule.CountOfLines, 5, "The TestModule of the Test Workbook must not have been modified. It contains 5 code lines"
     mAssert.Equals wbForTest.VBProject.VBComponents("NewModule").CodeModule.CountOfLines, 8, "The NewModule had to be added to the test Workbook. It contains 8 code lines"
-    vtkCloseAndKillWorkbook Wb:=wbForTest
+    vtkCloseAndKillWorkbook wb:=wbForTest
 End Sub
 
 Public Sub TestImportExistantFileInExistingClassModule()
@@ -177,7 +177,7 @@ Public Sub TestImportExistantFileInExistingClassModule()
     vtkImportOneModule project:=wbForTest.VBProject, moduleName:="TestClass", filePath:=vtkPathToTestFolder & "\" & classToImport
     
     mAssert.Equals wbForTest.VBProject.VBComponents("TestClass").CodeModule.CountOfLines, 123, "The TestClass of the Test Workbook must have been modified. It must contain 123 code lines"
-    vtkCloseAndKillWorkbook Wb:=wbForTest
+    vtkCloseAndKillWorkbook wb:=wbForTest
 End Sub
 
 Public Sub TestImportExistantFileInExistingSheetModule()
@@ -188,7 +188,7 @@ Public Sub TestImportExistantFileInExistingSheetModule()
     vtkImportOneModule project:=wbForTest.VBProject, moduleName:="Feuil1", filePath:=vtkPathToTestFolder & "\" & sheetToImport
     
     mAssert.Equals wbForTest.VBProject.VBComponents("Feuil1").CodeModule.CountOfLines, 13, "The Sheet1 code of the Test Workbook must have been modified. It must contain 13 code lines"
-    vtkCloseAndKillWorkbook Wb:=wbForTest
+    vtkCloseAndKillWorkbook wb:=wbForTest
 End Sub
 
 Public Sub TestImportExistantFileInExistingWorkbookModule()
@@ -199,7 +199,7 @@ Public Sub TestImportExistantFileInExistingWorkbookModule()
     vtkImportOneModule project:=wbForTest.VBProject, moduleName:="ThisWorkbook", filePath:=vtkPathToTestFolder & "\" & workbookToImport
     
     mAssert.Equals wbForTest.VBProject.VBComponents("ThisWorkbook").CodeModule.CountOfLines, 20, "The ThisWorkbook code of the Test Workbook must have been modified. It must contain 20 code lines"
-    vtkCloseAndKillWorkbook Wb:=wbForTest
+    vtkCloseAndKillWorkbook wb:=wbForTest
 End Sub
 
 Public Sub TestImportExistantFileInExistingUserFormCode()
@@ -210,7 +210,7 @@ Public Sub TestImportExistantFileInExistingUserFormCode()
     vtkImportOneModule project:=wbForTest.VBProject, moduleName:="TestForm", filePath:=vtkPathToTestFolder & "\" & formToImport
     
     mAssert.Equals wbForTest.VBProject.VBComponents("TestForm").CodeModule.CountOfLines, 4, "The TestForm code of the Test Workbook must have been modified. It must contain 4 code lines"
-    vtkCloseAndKillWorkbook Wb:=wbForTest
+    vtkCloseAndKillWorkbook wb:=wbForTest
 End Sub
 
 Private Function ITest_Suite() As TestSuite

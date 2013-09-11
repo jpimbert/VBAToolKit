@@ -62,7 +62,7 @@ Private Sub ITestCase_SetUp(Assert As IAssert)
 End Sub
 
 Private Sub ITestCase_TearDown()
-    vtkCloseAndKillWorkbook Wb:=wbForTest
+    vtkCloseAndKillWorkbook wb:=wbForTest
     On Error Resume Next
     Kill PathName:=vtkPathToTestFolder & "\" & uninitializedWorkbookName
     Kill PathName:=vtkPathToTestFolder & "\" & existingWorkbookName
@@ -85,7 +85,7 @@ Public Sub TestConfigurationManagersAreDifferentForTwoProjects()
     Dim secondWb As Workbook
     Set secondWb = vtkCreateExcelWorkbookForTestWithProjectName("SecondTest")    ' create a second Excel project for test
     mAssert.Should Not vtkConfigurationManagerForProject(projectName) Is vtkConfigurationManagerForProject("SecondTest"), "Two configuration managers must not be equal"
-    vtkCloseAndKillWorkbook Wb:=secondWb
+    vtkCloseAndKillWorkbook wb:=secondWb
 End Sub
 
 Public Sub TestConfigurationManagerIsInvariant()
@@ -99,7 +99,7 @@ Public Sub TestInoperantProjectConfigurationSheetInitializationForExistingProjec
     '   Verifies that the configuration sheet initialization does nothing on existing project
     
     ' Active an existing VBAToolKit project
-    vtkCloseAndKillWorkbook Wb:=wbForTest
+    vtkCloseAndKillWorkbook wb:=wbForTest
     Set wbForTest = Workbooks.Open(fileName:=vtkPathToTestFolder & "\" & existingWorkbookName)
     
     ' Try to Initialize workbook
@@ -115,7 +115,7 @@ Public Sub TestProjectNameAfterProjectConfigurationSheetInitialization()
     '   This specific test verifies the project name modification of the active workbook
     
     ' Open uninitialized workbook
-    vtkCloseAndKillWorkbook Wb:=wbForTest
+    vtkCloseAndKillWorkbook wb:=wbForTest
     Set wbForTest = Workbooks.Open(fileName:=vtkPathToTestFolder & "\" & uninitializedWorkbookName)
     
     ' Initialize workbook
@@ -131,7 +131,7 @@ Public Sub TestWorkbookNameAfterProjectConfigurationSheetInitialization()
     '   This specific test verifies the workbook name modification of the active workbook
     
     ' Open uninitialized workbook
-    vtkCloseAndKillWorkbook Wb:=wbForTest
+    vtkCloseAndKillWorkbook wb:=wbForTest
     Set wbForTest = Workbooks.Open(fileName:=vtkPathToTestFolder & "\" & uninitializedWorkbookName)
     
     ' Initialize workbook
@@ -148,7 +148,7 @@ Public Sub TestConfigurationAfterProjectConfigurationSheetInitialization()
     
     ' Open uninitialized workbook
     Dim pName As String
-    vtkCloseAndKillWorkbook Wb:=wbForTest
+    vtkCloseAndKillWorkbook wb:=wbForTest
     Set wbForTest = Workbooks.Open(fileName:=vtkPathToTestFolder & "\" & uninitializedWorkbookName)
     pName = wbForTest.VBProject.name
     

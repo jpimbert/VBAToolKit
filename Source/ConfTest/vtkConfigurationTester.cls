@@ -64,7 +64,7 @@ Private Sub ITestCase_SetUp(Assert As IAssert)
 End Sub
 
 Private Sub ITestCase_TearDown()
-    vtkCloseAndKillWorkbook Wb:=initializedWorkbook ' close the existing Excel project
+    vtkCloseAndKillWorkbook wb:=initializedWorkbook ' close the existing Excel project
     vtkResetConfigurationManagers             ' reset all configuration managers
 End Sub
 

@@ -563,9 +563,6 @@ Public Sub Test_vtkCreateProject_handlerAddedInDEVWorkbook()
     newSize1 = fso.GetFile(VBAToolKit.vtkTestPath & "\" & newlyCreatedProjectName & "\Source\VbaUnit\VbaUnitMain.bas").Size
     newSize2 = fso.GetFile(VBAToolKit.vtkTestPath & "\" & newlyCreatedProjectName & "\Source\VbaUnit\Assert.cls").Size
     
-    Debug.Print "VbaUnitMain.bas : old size = " & oldSize1 & " , new size = " & newSize1
-    Debug.Print "Assert.cls : old size = " & oldSize2 & " , new size = " & newSize2
-    
     mAssert.Should oldSize1 < newSize1, "VbaUnitMain.bas must be bigger after the save."
     mAssert.Should oldSize2 = newSize2, "Assert.cls must be of equal size after the save."
 
