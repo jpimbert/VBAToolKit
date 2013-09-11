@@ -120,7 +120,7 @@ Public Sub vtkAddBeforeSaveHandlerInDEVWorkbook(wb As Workbook, projectName As S
     Dim handlerString As String
     handlerString = _
     "Private Sub Workbook_BeforeSave(ByVal SaveAsUI As Boolean, Cancel As Boolean)" & vbNewLine & _
-    "   " & vtkStripFilePathOrNameOfExtension(ThisWorkbook.name) & ".vtkExportConfiguration projectWithModules:=ThisWorkbook.VBProject, projectName:=" & """" & projectName & """" & _
+    "   " & ThisWorkbook.VBProject.name & ".vtkExportConfiguration projectWithModules:=ThisWorkbook.VBProject, projectName:=" & """" & projectName & """" & _
                                                                     " , confName:=" & """" & confName & """" & _
                                                                     " , onlyModified:=True" & _
                                                                     vbNewLine & _
