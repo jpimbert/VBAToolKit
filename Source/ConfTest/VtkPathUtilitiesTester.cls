@@ -99,6 +99,120 @@ Public Sub TestFileExtensionWithJustAnExtension()
     mAssert.Equals vtkGetFileExtension(".FileName"), "FileName", "FileName is the extension"
 End Sub
 
+Public Sub Test_vtkStripFilePathOrNameOfExtension_fileNameExtension()
+    mAssert.Equals vtkStripFilePathOrNameOfExtension("dummy.dummy"), "dummy", "The extension must be stripped off."
+End Sub
+
+Public Sub Test_vtkStripFilePathOrNameOfExtension_fileNameNoExtension()
+    mAssert.Equals vtkStripFilePathOrNameOfExtension("dummy"), "dummy", "No extension nor path : the file name must be returned as is."
+End Sub
+
+Public Sub Test_vtkStripFilePathOrNameOfExtension_fileNameEmptyExtension()
+    mAssert.Equals vtkStripFilePathOrNameOfExtension("dummy."), "dummy", "The empty extension must be stripped off."
+End Sub
+
+Public Sub Test_vtkStripFilePathOrNameOfExtension_pathExtension()
+    mAssert.Equals vtkStripFilePathOrNameOfExtension("dummyFolder\dummy.extension"), "dummy", "The extension and the path must be stripped off"
+End Sub
+
+Public Sub Test_vtkStripFilePathOrNameOfExtension_pathNoExtension()
+    mAssert.Equals vtkStripFilePathOrNameOfExtension("dummyFolder\dummy"), "dummy", "The path must be stripped off."
+End Sub
+
+Public Sub Test_vtkStripFilePathOrNameOfExtension_fileNameDoubleExtension()
+    mAssert.Equals vtkStripFilePathOrNameOfExtension("dummy.ext1.ext2"), "dummy.ext1", "The last extension must be stripped off."
+End Sub
+
+Public Sub Test_vtkStripFilePathOrNameOfExtension_pathDoubleExtension()
+    mAssert.Equals vtkStripFilePathOrNameOfExtension("dummyFolder\dummy.ext1.ext2"), "dummy.ext1", "The last  extension and the path must be stripped off."
+End Sub
+
+Public Sub Test_vtkStripFilePathOrNameOfExtension_fileNameTripleExtensionEmptyThird()
+    mAssert.Equals vtkStripFilePathOrNameOfExtension("dummy.ext1.ext2."), "dummy.ext1.ext2", "The last extension (empty) must be stripped off."
+End Sub
+
+Public Sub Test_vtkStripFilePathOrNameOfExtension_pathTripleExtensionEmptyThird()
+    mAssert.Equals vtkStripFilePathOrNameOfExtension("dummy\dummy.ext1.ext2."), "dummy.ext1.ext2", "The last extension (empty) and the path must be stripped off."
+End Sub
+
+
+Public Sub Test_vtkStripPathOrNameOfVtkExtension_fileNameNoVtkExtension()
+    mAssert.Equals vtkStripPathOrNameOfVtkExtension("dummy.extension", "VTKEXT"), "dummy"
+End Sub
+
+Public Sub Test_vtkStripPathOrNameOfVtkExtension_pathNoVtkExtension()
+    mAssert.Equals vtkStripPathOrNameOfVtkExtension("dummyFolder\dummy.extension", "VTKEXT"), "dummy"
+End Sub
+
+Public Sub Test_vtkStripPathOrNameOfVtkExtension_fileNameVtkExtension()
+    mAssert.Equals vtkStripPathOrNameOfVtkExtension("dummy_VTKEXT.extension", "VTKEXT"), "dummy"
+End Sub
+
+Public Sub Test_vtkStripPathOrNameOfVtkExtension_pathVtkExtension()
+    mAssert.Equals vtkStripPathOrNameOfVtkExtension("dummyFolder\dummy_VTKEXT.extension", "VTKEXT"), "dummy"
+End Sub
+
+Public Sub Test_vtkStripPathOrNameOfVtkExtension_nameVtkExtension()
+    mAssert.Equals vtkStripPathOrNameOfVtkExtension("dummy_VTKEXT", "VTKEXT"), "dummy"
+End Sub
+
+Public Sub Test_vtkStripPathOrNameOfVtkExtension_fileNameDoubleVtkExtension1()
+    mAssert.Equals vtkStripPathOrNameOfVtkExtension("dummy_VTKEXT_OTHER.extension", "VTKEXT"), "dummy_VTKEXT_OTHER"
+End Sub
+
+Public Sub Test_vtkStripPathOrNameOfVtkExtension_fileNameDoubleVtkExtension2()
+    mAssert.Equals vtkStripPathOrNameOfVtkExtension("dummy_OTHER_VTKEXT.extension", "VTKEXT"), "dummy_OTHER"
+End Sub
+
+Public Sub Test_vtkStripPathOrNameOfVtkExtension_fileNameDoubleVtkExtension3()
+    mAssert.Equals vtkStripPathOrNameOfVtkExtension("dummy_VTKEXT_VTKEXT.extension", "VTKEXT"), "dummy_VTKEXT"
+End Sub
+
+Public Sub Test_vtkStripPathOrNameOfVtkExtension_pathDoubleVtkExtension1()
+    mAssert.Equals vtkStripPathOrNameOfVtkExtension("dummyFolder\dummy_VTKEXT_OTHER.extension", "VTKEXT"), "dummy_VTKEXT_OTHER"
+End Sub
+
+Public Sub Test_vtkStripPathOrNameOfVtkExtension_pathDoubleVtkExtension2()
+    mAssert.Equals vtkStripPathOrNameOfVtkExtension("dummyFolder\dummy_OTHER_VTKEXT.extension", "VTKEXT"), "dummy_OTHER"
+End Sub
+
+Public Sub Test_vtkStripPathOrNameOfVtkExtension_pathDoubleVtkExtension3()
+    mAssert.Equals vtkStripPathOrNameOfVtkExtension("dummyFolder\dummy_VTKEXT_VTKEXT.extension", "VTKEXT"), "dummy_VTKEXT"
+End Sub
+
+Public Sub Test_vtkStripPathOrNameOfVtkExtension_nameDoubleVtkExtension1()
+    mAssert.Equals vtkStripPathOrNameOfVtkExtension("dummy_VTKEXT_OTHER", "VTKEXT"), "dummy_VTKEXT_OTHER"
+End Sub
+
+Public Sub Test_vtkStripPathOrNameOfVtkExtension_nameDoubleVtkExtension2()
+    mAssert.Equals vtkStripPathOrNameOfVtkExtension("dummy_OTHER_VTKEXT", "VTKEXT"), "dummy_OTHER"
+End Sub
+
+Public Sub Test_vtkStripPathOrNameOfVtkExtension_nameDoubleVtkExtension3()
+    mAssert.Equals vtkStripPathOrNameOfVtkExtension("dummy_VTKEXT_VTKEXT", "VTKEXT"), "dummy_VTKEXT"
+End Sub
+
+Public Sub Test_vtkStripPathOrNameOfVtkExtension_fileNameEmptyVtkExtension()
+    mAssert.Equals vtkStripPathOrNameOfVtkExtension("dummy_.extension", ""), "dummy"
+End Sub
+
+Public Sub Test_vtkStripPathOrNameOfVtkExtension_pathEmptyVtkExtension()
+    mAssert.Equals vtkStripPathOrNameOfVtkExtension("dummyFolder\dummy_.extension", ""), "dummy"
+End Sub
+
+Public Sub Test_vtkStripPathOrNameOfVtkExtension_nameEmptyVtkExtension()
+    mAssert.Equals vtkStripPathOrNameOfVtkExtension("dummy_", ""), "dummy"
+End Sub
+
+Public Sub Test_vtkStripPathOrNameOfVtkExtension_fileNameVtkExtensionMistake()
+    mAssert.Equals vtkStripPathOrNameOfVtkExtension("dummy_VTKEXT.extension", "VTKEXTMISTAKE"), "dummy_VTKEXT"
+End Sub
+
+Public Sub Test_vtkStripPathOrNameOfVtkExtension_pathVtkExtensionMistake()
+    mAssert.Equals vtkStripPathOrNameOfVtkExtension("dummyFolder\dummy_VTKEXT.extension", "VTKEXTMISTAKE"), "dummy_VTKEXT"
+End Sub
+
+
 Private Function ITest_Suite() As TestSuite
     Set ITest_Suite = New TestSuite
     ITest_Suite.AddTest ITest_Manager.ClassName, "TestPathToTestFolder"
@@ -110,6 +224,34 @@ Private Function ITest_Suite() As TestSuite
     ITest_Suite.AddTest ITest_Manager.ClassName, "TestFileExtensionWithEmptyExtension"
     ITest_Suite.AddTest ITest_Manager.ClassName, "TestFileExtensionWithNoExtension"
     ITest_Suite.AddTest ITest_Manager.ClassName, "TestFileExtensionWithJustAnExtension"
+    ITest_Suite.AddTest ITest_Manager.ClassName, "Test_vtkStripFilePathOrNameOfExtension_fileNameExtension"
+    ITest_Suite.AddTest ITest_Manager.ClassName, "Test_vtkStripFilePathOrNameOfExtension_fileNameNoExtension"
+    ITest_Suite.AddTest ITest_Manager.ClassName, "Test_vtkStripFilePathOrNameOfExtension_fileNameEmptyExtension"
+    ITest_Suite.AddTest ITest_Manager.ClassName, "Test_vtkStripFilePathOrNameOfExtension_pathExtension"
+    ITest_Suite.AddTest ITest_Manager.ClassName, "Test_vtkStripFilePathOrNameOfExtension_pathNoExtension"
+    ITest_Suite.AddTest ITest_Manager.ClassName, "Test_vtkStripFilePathOrNameOfExtension_fileNameDoubleExtension"
+    ITest_Suite.AddTest ITest_Manager.ClassName, "Test_vtkStripFilePathOrNameOfExtension_pathDoubleExtension"
+    ITest_Suite.AddTest ITest_Manager.ClassName, "Test_vtkStripFilePathOrNameOfExtension_fileNameTripleExtensionEmptyThird"
+    ITest_Suite.AddTest ITest_Manager.ClassName, "Test_vtkStripFilePathOrNameOfExtension_pathTripleExtensionEmptyThird"
+    ITest_Suite.AddTest ITest_Manager.ClassName, "Test_vtkStripPathOrNameOfVtkExtension_fileNameNoVtkExtension"
+    ITest_Suite.AddTest ITest_Manager.ClassName, "Test_vtkStripPathOrNameOfVtkExtension_pathNoVtkExtension"
+    ITest_Suite.AddTest ITest_Manager.ClassName, "Test_vtkStripPathOrNameOfVtkExtension_fileNameVtkExtension"
+    ITest_Suite.AddTest ITest_Manager.ClassName, "Test_vtkStripPathOrNameOfVtkExtension_pathVtkExtension"
+    ITest_Suite.AddTest ITest_Manager.ClassName, "Test_vtkStripPathOrNameOfVtkExtension_nameVtkExtension"
+    ITest_Suite.AddTest ITest_Manager.ClassName, "Test_vtkStripPathOrNameOfVtkExtension_fileNameDoubleVtkExtension1"
+    ITest_Suite.AddTest ITest_Manager.ClassName, "Test_vtkStripPathOrNameOfVtkExtension_fileNameDoubleVtkExtension2"
+    ITest_Suite.AddTest ITest_Manager.ClassName, "Test_vtkStripPathOrNameOfVtkExtension_fileNameDoubleVtkExtension3"
+    ITest_Suite.AddTest ITest_Manager.ClassName, "Test_vtkStripPathOrNameOfVtkExtension_pathDoubleVtkExtension1"
+    ITest_Suite.AddTest ITest_Manager.ClassName, "Test_vtkStripPathOrNameOfVtkExtension_pathDoubleVtkExtension2"
+    ITest_Suite.AddTest ITest_Manager.ClassName, "Test_vtkStripPathOrNameOfVtkExtension_pathDoubleVtkExtension3"
+    ITest_Suite.AddTest ITest_Manager.ClassName, "Test_vtkStripPathOrNameOfVtkExtension_nameDoubleVtkExtension1"
+    ITest_Suite.AddTest ITest_Manager.ClassName, "Test_vtkStripPathOrNameOfVtkExtension_nameDoubleVtkExtension2"
+    ITest_Suite.AddTest ITest_Manager.ClassName, "Test_vtkStripPathOrNameOfVtkExtension_nameDoubleVtkExtension3"
+    ITest_Suite.AddTest ITest_Manager.ClassName, "Test_vtkStripPathOrNameOfVtkExtension_fileNameEmptyVtkExtension"
+    ITest_Suite.AddTest ITest_Manager.ClassName, "Test_vtkStripPathOrNameOfVtkExtension_pathEmptyVtkExtension"
+    ITest_Suite.AddTest ITest_Manager.ClassName, "Test_vtkStripPathOrNameOfVtkExtension_nameEmptyVtkExtension"
+    ITest_Suite.AddTest ITest_Manager.ClassName, "Test_vtkStripPathOrNameOfVtkExtension_fileNameVtkExtensionMistake"
+    ITest_Suite.AddTest ITest_Manager.ClassName, "Test_vtkStripPathOrNameOfVtkExtension_pathVtkExtensionMistake"
 End Function
 
 Private Sub ITestCase_RunTest()
@@ -123,6 +265,34 @@ Private Sub ITestCase_RunTest()
         Case "TestFileExtensionWithEmptyExtension": TestFileExtensionWithEmptyExtension
         Case "TestFileExtensionWithNoExtension": TestFileExtensionWithNoExtension
         Case "TestFileExtensionWithJustAnExtension": TestFileExtensionWithJustAnExtension
+        Case "Test_vtkStripFilePathOrNameOfExtension_fileNameExtension": Test_vtkStripFilePathOrNameOfExtension_fileNameExtension
+        Case "Test_vtkStripFilePathOrNameOfExtension_fileNameNoExtension": Test_vtkStripFilePathOrNameOfExtension_fileNameNoExtension
+        Case "Test_vtkStripFilePathOrNameOfExtension_fileNameEmptyExtension": Test_vtkStripFilePathOrNameOfExtension_fileNameEmptyExtension
+        Case "Test_vtkStripFilePathOrNameOfExtension_pathExtension": Test_vtkStripFilePathOrNameOfExtension_pathExtension
+        Case "Test_vtkStripFilePathOrNameOfExtension_pathNoExtension": Test_vtkStripFilePathOrNameOfExtension_pathNoExtension
+        Case "Test_vtkStripFilePathOrNameOfExtension_fileNameDoubleExtension": Test_vtkStripFilePathOrNameOfExtension_fileNameDoubleExtension
+        Case "Test_vtkStripFilePathOrNameOfExtension_pathDoubleExtension": Test_vtkStripFilePathOrNameOfExtension_pathDoubleExtension
+        Case "Test_vtkStripFilePathOrNameOfExtension_fileNameTripleExtensionEmptyThird": Test_vtkStripFilePathOrNameOfExtension_fileNameTripleExtensionEmptyThird
+        Case "Test_vtkStripFilePathOrNameOfExtension_pathTripleExtensionEmptyThird": Test_vtkStripFilePathOrNameOfExtension_pathTripleExtensionEmptyThird
+        Case "Test_vtkStripPathOrNameOfVtkExtension_fileNameNoVtkExtension": Test_vtkStripPathOrNameOfVtkExtension_fileNameNoVtkExtension
+        Case "Test_vtkStripPathOrNameOfVtkExtension_pathNoVtkExtension": Test_vtkStripPathOrNameOfVtkExtension_pathNoVtkExtension
+        Case "Test_vtkStripPathOrNameOfVtkExtension_fileNameVtkExtension": Test_vtkStripPathOrNameOfVtkExtension_fileNameVtkExtension
+        Case "Test_vtkStripPathOrNameOfVtkExtension_pathVtkExtension": Test_vtkStripPathOrNameOfVtkExtension_pathVtkExtension
+        Case "Test_vtkStripPathOrNameOfVtkExtension_nameVtkExtension": Test_vtkStripPathOrNameOfVtkExtension_nameVtkExtension
+        Case "Test_vtkStripPathOrNameOfVtkExtension_fileNameDoubleVtkExtension1": Test_vtkStripPathOrNameOfVtkExtension_fileNameDoubleVtkExtension1
+        Case "Test_vtkStripPathOrNameOfVtkExtension_fileNameDoubleVtkExtension2": Test_vtkStripPathOrNameOfVtkExtension_fileNameDoubleVtkExtension2
+        Case "Test_vtkStripPathOrNameOfVtkExtension_fileNameDoubleVtkExtension3": Test_vtkStripPathOrNameOfVtkExtension_fileNameDoubleVtkExtension3
+        Case "Test_vtkStripPathOrNameOfVtkExtension_pathDoubleVtkExtension1": Test_vtkStripPathOrNameOfVtkExtension_pathDoubleVtkExtension1
+        Case "Test_vtkStripPathOrNameOfVtkExtension_pathDoubleVtkExtension2": Test_vtkStripPathOrNameOfVtkExtension_pathDoubleVtkExtension2
+        Case "Test_vtkStripPathOrNameOfVtkExtension_pathDoubleVtkExtension3": Test_vtkStripPathOrNameOfVtkExtension_pathDoubleVtkExtension3
+        Case "Test_vtkStripPathOrNameOfVtkExtension_nameDoubleVtkExtension1": Test_vtkStripPathOrNameOfVtkExtension_nameDoubleVtkExtension1
+        Case "Test_vtkStripPathOrNameOfVtkExtension_nameDoubleVtkExtension2": Test_vtkStripPathOrNameOfVtkExtension_nameDoubleVtkExtension2
+        Case "Test_vtkStripPathOrNameOfVtkExtension_nameDoubleVtkExtension3": Test_vtkStripPathOrNameOfVtkExtension_nameDoubleVtkExtension3
+        Case "Test_vtkStripPathOrNameOfVtkExtension_fileNameEmptyVtkExtension": Test_vtkStripPathOrNameOfVtkExtension_fileNameEmptyVtkExtension
+        Case "Test_vtkStripPathOrNameOfVtkExtension_pathEmptyVtkExtension": Test_vtkStripPathOrNameOfVtkExtension_pathEmptyVtkExtension
+        Case "Test_vtkStripPathOrNameOfVtkExtension_nameEmptyVtkExtension": Test_vtkStripPathOrNameOfVtkExtension_nameEmptyVtkExtension
+        Case "Test_vtkStripPathOrNameOfVtkExtension_fileNameVtkExtensionMistake": Test_vtkStripPathOrNameOfVtkExtension_fileNameVtkExtensionMistake
+        Case "Test_vtkStripPathOrNameOfVtkExtension_pathVtkExtensionMistake": Test_vtkStripPathOrNameOfVtkExtension_pathVtkExtensionMistake
         Case Else: mAssert.Should False, "Invalid test name: " & mManager.methodName
     End Select
 End Sub

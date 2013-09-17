@@ -45,3 +45,9 @@ End Sub
 Private Sub Workbook_AddinUninstall()
     VBAToolKit_DEV.vtkToolBars.vtkDeleteToolbars
 End Sub
+
+Private Sub Workbook_BeforeSave(ByVal SaveAsUI As Boolean, Cancel As Boolean)
+    VBAToolKit_DEV.vtkExportConfiguration ThisWorkbook.VBProject, "VBAToolKit", "VBAToolKit_DEV", True
+End Sub
+
+

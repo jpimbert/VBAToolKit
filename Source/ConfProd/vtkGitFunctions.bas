@@ -61,18 +61,18 @@ Public Function vtkInitializeGit(folderPath As String, Optional logFile As Strin
     On Error GoTo vtkInitializeGit_Err
         
     If InStr(UCase(Environ("PATH")), UCase("Git\cmd")) = False Then
-        err.Raise VTK_GIT_NOT_INSTALLED, "", "Git not installed."
+        Err.Raise VTK_GIT_NOT_INSTALLED, "", "Git not installed."
     End If
     
     ' Potentially raise VTK_FORBIDDEN_PARAMETER
     convertedFolderPath = vtkGitConvertWinPath(folderPath)
     
     If vtkDoesFolderExist(folderPath) = False Then
-        err.Raise VTK_WRONG_FOLDER_PATH, "", "Folder path not found."
+        Err.Raise VTK_WRONG_FOLDER_PATH, "", "Folder path not found."
     End If
     
     If vtkDoesFolderExist(folderPath & "\.git") = True Then
-        err.Raise VTK_GIT_ALREADY_INITIALIZED_IN_FOLDER, "", "Git has already been initialized in the folder " & folderPath
+        Err.Raise VTK_GIT_ALREADY_INITIALIZED_IN_FOLDER, "", "Git has already been initialized in the folder " & folderPath
     End If
     
     ' Get the path of the log file that will be used
@@ -98,7 +98,7 @@ Public Function vtkInitializeGit(folderPath As String, Optional logFile As Strin
     Dim logFileContent As String
     logFileContent = vtkTextFileReader(folderPath & "\" & tmpLogFileName)
     If Left(logFileContent, 12) <> Chr(10) & "Initialized" Then
-        err.Raise VTK_GIT_PROBLEM_DURING_INITIALIZATION, , "There was a problem during Git initialization." _
+        Err.Raise VTK_GIT_PROBLEM_DURING_INITIALIZATION, , "There was a problem during Git initialization." _
         & vbCrLf & "Content of the log file : " & logFileContent
     End If
     
@@ -132,15 +132,15 @@ Public Function vtkInitializeGit(folderPath As String, Optional logFile As Strin
     
     
 vtkInitializeGit_Err:
-    If ((err.Number = VTK_GIT_NOT_INSTALLED) _
-        Or (err.Number = VTK_GIT_ALREADY_INITIALIZED_IN_FOLDER) _
-        Or (err.Number = VTK_FORBIDDEN_PARAMETER) _
-        Or (err.Number = VTK_GIT_PROBLEM_DURING_INITIALIZATION) _
-        Or (err.Number = VTK_WRONG_FOLDER_PATH)) Then
-        err.Raise err.Number, "Module vktGitFuntions : Function vtkGitInitialize", err.Description
+    If ((Err.number = VTK_GIT_NOT_INSTALLED) _
+        Or (Err.number = VTK_GIT_ALREADY_INITIALIZED_IN_FOLDER) _
+        Or (Err.number = VTK_FORBIDDEN_PARAMETER) _
+        Or (Err.number = VTK_GIT_PROBLEM_DURING_INITIALIZATION) _
+        Or (Err.number = VTK_WRONG_FOLDER_PATH)) Then
+        Err.Raise Err.number, "Module vktGitFuntions : Function vtkGitInitialize", Err.Description
     Else
-        Debug.Print "ERR IN INITIALIZE : " & err.Number & err.Description
-        err.Raise VTK_UNEXPECTED_ERROR, "Module vktGitFuntions : Function vtkGitInitialize", err.Description
+        Debug.Print "ERR IN INITIALIZE : " & Err.number & Err.Description
+        Err.Raise VTK_UNEXPECTED_ERROR, "Module vktGitFuntions : Function vtkGitInitialize", Err.Description
     End If
      
     Exit Function
@@ -173,7 +173,7 @@ Public Function vtkGitConvertWinPath(winPath As String) As String
     
     ' Only allows absolute paths on the C: drive
     If convertedSplittedPath(LBound(convertedSplittedPath)) <> "C" Then
-        err.Raise VTK_FORBIDDEN_PARAMETER, "", "Parameter is invalid."
+        Err.Raise VTK_FORBIDDEN_PARAMETER, "", "Parameter is invalid."
     End If
 
     convertedPath = convertedSplittedPath(LBound(convertedSplittedPath) + 1)
@@ -188,11 +188,11 @@ Public Function vtkGitConvertWinPath(winPath As String) As String
     
 
 vtkGitConvertWinPath_Error:
-    If (err.Number = VTK_FORBIDDEN_PARAMETER) Then
-        err.Raise err.Number, "Module vtkGitFunctions ; Function vtkGitConvertWinPath", err.Description
+    If (Err.number = VTK_FORBIDDEN_PARAMETER) Then
+        Err.Raise Err.number, "Module vtkGitFunctions ; Function vtkGitConvertWinPath", Err.Description
     Else
         'Debug.Print "ERR IN CONVERT : " & Err.Number & Err.Description
-        err.Raise VTK_UNEXPECTED_ERROR, "Module vtkGitFunctions ; Function vtkGitConvertWinPath", err.Description
+        Err.Raise VTK_UNEXPECTED_ERROR, "Module vtkGitFunctions ; Function vtkGitConvertWinPath", Err.Description
     End If
     Exit Function
 

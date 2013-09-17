@@ -72,7 +72,7 @@ Public Sub Test_ModuleCollection_Count()
     ' This test verifies the count of modules collection property of Configuration Management
     ' just initialized from an Excel worlbook
     
-    mAssert.Equals confManager.modules.Count, 4, "Number of modules in the Test workbook"
+    mAssert.Equals confManager.modules.count, 4, "Number of modules in the Test workbook"
 End Sub
 
 Public Sub Test_AddedConfigurationCollection_Count()
@@ -81,7 +81,7 @@ Public Sub Test_AddedConfigurationCollection_Count()
     
     confManager.addModule ("NewModule")
     
-    mAssert.Equals confManager.modules.Count, 5, "Number of modules in the Test workbook with added module"
+    mAssert.Equals confManager.modules.count, 5, "Number of modules in the Test workbook with added module"
 End Sub
 
 Public Sub Test_ModuleCollection_Parent()
@@ -134,7 +134,7 @@ Public Sub Test_ModuleGetName()
    Exit Sub
 
 M_Error:
-    mAssert.Should False, "Unexpected Error (" & err.number & "): " & err.Description
+    mAssert.Should False, "Unexpected Error (" & Err.number & "): " & Err.Description
 End Sub
 
 Public Sub Test_GetPathForConfiguration_ExistingConfiguration()
@@ -150,7 +150,7 @@ Public Sub Test_GetPathForConfiguration_ExistingConfiguration()
    Exit Sub
 
 M_Error:
-    mAssert.Should False, "Unexpected Error (" & err.number & "): " & err.Description
+    mAssert.Should False, "Unexpected Error (" & Err.number & "): " & Err.Description
 End Sub
 
 Public Sub Test_GetPathForConfiguration_InexistingConfigurationRaiseError()
@@ -167,7 +167,7 @@ Public Sub Test_GetPathForConfiguration_InexistingConfigurationRaiseError()
    Exit Sub
 
 M_Error:
-    mAssert.Equals err.number, VTK_INEXISTANT_CONFIGURATION, "Error raised"
+    mAssert.Equals Err.number, VTK_INEXISTANT_CONFIGURATION, "Error raised"
 End Sub
 
 Public Sub Test_GetPathForConfiguration_InexistingConfigurationNullPath()
@@ -194,7 +194,7 @@ Public Sub Test_SetPathForConfiguration_ExistingConfiguration()
    Exit Sub
 
 M_Error:
-    mAssert.Should False, "Unexpected Error (" & err.number & "): " & err.Description
+    mAssert.Should False, "Unexpected Error (" & Err.number & "): " & Err.Description
 End Sub
 
 Public Sub Test_SetPathForConfiguration_InexistingConfigurationRaiseError()
@@ -209,7 +209,7 @@ Public Sub Test_SetPathForConfiguration_InexistingConfigurationRaiseError()
    Exit Sub
 
 M_Error:
-    mAssert.Equals err.number, VTK_INEXISTANT_CONFIGURATION, "Error raised"
+    mAssert.Equals Err.number, VTK_INEXISTANT_CONFIGURATION, "Error raised"
 End Sub
 
 Public Sub Test_Configuration_Attached()
@@ -223,7 +223,7 @@ Public Sub Test_Configuration_Attached()
    Exit Sub
 
 M_Error:
-    mAssert.Should False, "Unexpected Error (" & err.number & "): " & err.Description
+    mAssert.Should False, "Unexpected Error (" & Err.number & "): " & Err.Description
 End Sub
 
 Public Sub Test_Configuration_NotAttachedErrorRaised()
@@ -238,7 +238,7 @@ Public Sub Test_Configuration_NotAttachedErrorRaised()
    Exit Sub
 
 M_Error:
-    mAssert.Equals err.number, VTK_MODULE_NOTATTACHED, "Error raised"
+    mAssert.Equals Err.number, VTK_MODULE_NOTATTACHED, "Error raised"
 End Sub
 
 Public Sub Test_Configuration_NotAttachedNoError()
@@ -247,7 +247,7 @@ Public Sub Test_Configuration_NotAttachedNoError()
     
    On Error Resume Next
     mAssert.Equals confManager.modules(2).configuration, "", "Name of configuration"
-    mAssert.Equals err.number, VTK_MODULE_NOTATTACHED, "Error raised"
+    mAssert.Equals Err.number, VTK_MODULE_NOTATTACHED, "Error raised"
 End Sub
 
 Public Sub Test_Path_Attached()
@@ -261,7 +261,7 @@ Public Sub Test_Path_Attached()
    Exit Sub
 
 M_Error:
-    mAssert.Should False, "Unexpected Error (" & err.number & "): " & err.Description
+    mAssert.Should False, "Unexpected Error (" & Err.number & "): " & Err.Description
 End Sub
 
 Public Sub Test_Path_NotAttachedErrorRaised()
@@ -276,7 +276,7 @@ Public Sub Test_Path_NotAttachedErrorRaised()
    Exit Sub
 
 M_Error:
-    mAssert.Equals err.number, VTK_MODULE_NOTATTACHED, "Error raised"
+    mAssert.Equals Err.number, VTK_MODULE_NOTATTACHED, "Error raised"
 End Sub
 
 Public Sub Test_Path_NotAttachedNoError()
@@ -285,7 +285,7 @@ Public Sub Test_Path_NotAttachedNoError()
     
    On Error Resume Next
     mAssert.Equals confManager.modules(2).path, "", "Path of module"
-    mAssert.Equals err.number, VTK_MODULE_NOTATTACHED, "Error raised"
+    mAssert.Equals Err.number, VTK_MODULE_NOTATTACHED, "Error raised"
 End Sub
 
 Public Sub Test_VBAModule_Attached()
@@ -299,7 +299,7 @@ Public Sub Test_VBAModule_Attached()
    Exit Sub
 
 M_Error:
-    mAssert.Should False, "Unexpected Error (" & err.number & "): " & err.Description
+    mAssert.Should False, "Unexpected Error (" & Err.number & "): " & Err.Description
 End Sub
 
 Public Sub Test_VBAModule_NotAttachedErrorRaised()
@@ -314,7 +314,7 @@ Public Sub Test_VBAModule_NotAttachedErrorRaised()
    Exit Sub
 
 M_Error:
-    mAssert.Equals err.number, VTK_MODULE_NOTATTACHED, "Error raised"
+    mAssert.Equals Err.number, VTK_MODULE_NOTATTACHED, "Error raised"
 End Sub
 
 Public Sub Test_VBAModule_NotAttachedNoError()
@@ -323,7 +323,7 @@ Public Sub Test_VBAModule_NotAttachedNoError()
     
    On Error Resume Next
     mAssert.Equals confManager.modules(4).VBAModule.name, "", "Name of VBComponent"
-    mAssert.Equals err.number, VTK_MODULE_NOTATTACHED, "Error raised"
+    mAssert.Equals Err.number, VTK_MODULE_NOTATTACHED, "Error raised"
 End Sub
 
 Public Sub Test_VBAModule_NotOpen()
@@ -340,7 +340,7 @@ Public Sub Test_VBAModule_NotOpen()
    Exit Sub
 
 M_Error:
-    mAssert.Equals err.number, VTK_WORKBOOK_NOTOPEN, "Error raised"
+    mAssert.Equals Err.number, VTK_WORKBOOK_NOTOPEN, "Error raised"
 End Sub
 
 Public Sub Test_VBAModule_NoModule()
@@ -356,7 +356,7 @@ Public Sub Test_VBAModule_NoModule()
    Exit Sub
 
 M_Error:
-    mAssert.Should False, "Unexpected Error (" & err.number & "): " & err.Description
+    mAssert.Should False, "Unexpected Error (" & Err.number & "): " & Err.Description
 End Sub
 
 Private Function ITest_Suite() As TestSuite
@@ -383,6 +383,7 @@ Private Function ITest_Suite() As TestSuite
     ITest_Suite.AddTest ITest_Manager.ClassName, "Test_VBAModule_NotAttachedErrorRaised"
     ITest_Suite.AddTest ITest_Manager.ClassName, "Test_VBAModule_NotAttachedNoError"
     ITest_Suite.AddTest ITest_Manager.ClassName, "Test_VBAModule_NotOpen"
+    ITest_Suite.AddTest ITest_Manager.ClassName, "Test_VBAModule_NoModule"
 End Function
 
 Private Sub ITestCase_RunTest()
@@ -409,6 +410,7 @@ Private Sub ITestCase_RunTest()
         Case "Test_VBAModule_NotAttachedErrorRaised": Test_VBAModule_NotAttachedErrorRaised
         Case "Test_VBAModule_NotAttachedNoError": Test_VBAModule_NotAttachedNoError
         Case "Test_VBAModule_NotOpen": Test_VBAModule_NotOpen
+        Case "Test_VBAModule_NoModule": Test_VBAModule_NoModule
         Case Else: mAssert.Should False, "Invalid test name: " & mManager.methodName
     End Select
 End Sub

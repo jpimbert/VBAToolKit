@@ -98,7 +98,7 @@ Public Function vtkStandardCategoryForModuleName(moduleName As String) As String
    On Error Resume Next
     Dim ret As String
     ret = vtkVBAUnitModulesList.Item(moduleName)
-    If err.number = 0 Then
+    If Err.number = 0 Then
         vtkStandardCategoryForModuleName = "VBAUnit"
        On Error GoTo 0
         Exit Function
@@ -225,7 +225,7 @@ Public Sub vtkImportOneModule(project As VBProject, moduleName As String, filePa
             code = code & vbCrLf & buf.ReadAll
             
             ' Replace the code
-            oldModule.CodeModule.DeleteLines StartLine:=1, Count:=oldModule.CodeModule.CountOfLines
+            oldModule.CodeModule.DeleteLines StartLine:=1, count:=oldModule.CodeModule.CountOfLines
             oldModule.CodeModule.InsertLines 1, code
         End If
         Set fso = Nothing
@@ -257,7 +257,7 @@ Public Sub vtkExportOneModule(project As VBProject, moduleName As String, filePa
     Set m = project.VBComponents(moduleName)
         
     ' Kill file if it already exists only AFTER get the module, if it not exists the file must not be deleted
-    If fso.FileExists(filePath) Then fso.DeleteFile fileSpec:=filePath
+    If fso.fileExists(filePath) Then fso.DeleteFile fileSpec:=filePath
     
     ' Export module
     m.Export fileName:=filePath
@@ -266,10 +266,10 @@ Public Sub vtkExportOneModule(project As VBProject, moduleName As String, filePa
     Exit Sub
 
 vtkExportOneModule_Error:
-    If err.number = 9 Then
-        err.Raise number:=VTK_UNKNOWN_MODULE, source:="ExportOneModule", Description:="Module to export doesn't exist : " & moduleName
+    If Err.number = 9 Then
+        Err.Raise number:=VTK_UNKNOWN_MODULE, source:="ExportOneModule", Description:="Module to export doesn't exist : " & moduleName
        Else
-        err.Raise number:=VTK_UNEXPECTED_ERROR, source:="ExportOneModule", Description:="Unexpected error when exporting " & moduleName & " : " & err.Description
+        Err.Raise number:=VTK_UNEXPECTED_ERROR, source:="ExportOneModule", Description:="Unexpected error when exporting " & moduleName & " : " & Err.Description
     End If
 End Sub
 
@@ -305,7 +305,7 @@ Public Sub vtkExportModulesFromAnotherProject(projectWithModules As VBProject, p
    Exit Sub
 
 vtkExportModulesFromAnotherProject_Error:
-    err.Raise VTK_UNEXPECTED_ERROR, "vtkExportModulesFromAnotherProject", "Unexpected error when exporting modules from " & projectWithModules.name & " : " & err.Description
+    Err.Raise VTK_UNEXPECTED_ERROR, "vtkExportModulesFromAnotherProject", "Unexpected error when exporting modules from " & projectWithModules.name & " : " & Err.Description
 End Sub
 
 '---------------------------------------------------------------------------------------
@@ -339,7 +339,7 @@ Public Sub vtkImportModulesInAnotherProject(projectForModules As VBProject, proj
    Exit Sub
 
 vtkImportModulesInAnotherProject_Error:
-    err.Raise VTK_UNEXPECTED_ERROR, "vtkImportModulesInAnotherProject_Error", "Unexpected error when importing modules into " & projectForModules.name & " : " & err.Description
+    Err.Raise VTK_UNEXPECTED_ERROR, "vtkImportModulesInAnotherProject_Error", "Unexpected error when importing modules into " & projectForModules.name & " : " & Err.Description
 End Sub
 
 '---------------------------------------------------------------------------------------
@@ -390,7 +390,7 @@ Public Sub vtkRecreateConfiguration(projectName As String, configurationName As 
     fileName = fso.GetFileName(wbPath)
    On Error Resume Next
     wbIsAddin = Workbooks(fileName).IsAddin
-    If err.number = 0 And wbIsAddin Then
+    If Err.number = 0 And wbIsAddin Then
         addInWasActivated = AddIns(configurationName).Installed
         AddIns(configurationName).Installed = False
        Else
@@ -408,6 +408,61 @@ Public Sub vtkRecreateConfiguration(projectName As String, configurationName As 
     ' Reactivate The AddIn if it was activated
     If addInWasActivated Then AddIns(configurationName).Installed = True
 End Sub
+
+'---------------------------------------------------------------------------------------
+' Procedure : vtkExportConfiguration
+' Author    : Lucas Vitorino
+' Purpose   : - Export all the modules of a configuration to their respective paths, and returns the number
+'               of exported modules.
+'             - Optionally, export only the modules modified since last save
+' Behaviour : - If onlyModified = True, export modules whose source file does not yet exist and modules whose file
+'               exists but that have been modified since last save.
+'             - If onlyModified = False, export every module of the configuration.
+' Returns   : Integer
+'---------------------------------------------------------------------------------------
+'
+Public Function vtkExportConfiguration(projectWithModules As VBProject, projectName As String, confName As String, _
+        Optional onlyModified As Boolean = False) As Integer
+    
+    Dim cm As vtkConfigurationManager, rootPath As String
+    Dim mo As vtkModule
+    Dim exportedModulesCount As Integer: exportedModulesCount = 0
+    Dim fso As New FileSystemObject
+    
+    On Error GoTo vtkExportConfiguration_Error
+
+    ' Export all modules for this configuration from the projectWithModules
+    Set cm = vtkConfigurationManagerForProject(projectName)
+    
+    For Each mo In cm.configurations(confName).modules
+        
+        Dim modulePath As String
+        modulePath = cm.rootPath & "\" & mo.path
+                   
+        ' The conditon to export could be simplified in
+        '   If Not (onlyModified And fso.FileExists(modulePath) And mo.VBAModule) Then <export>
+        ' but it doesn't seem to work, so we stick to this code.
+        If onlyModified And fso.fileExists(modulePath) Then
+            If mo.VBAModule.Saved = False Then
+                vtkExportOneModule projectWithModules, mo.name, modulePath
+                exportedModulesCount = exportedModulesCount + 1
+            End If
+        Else
+            vtkExportOneModule projectWithModules, mo.name, modulePath
+            exportedModulesCount = exportedModulesCount + 1
+        End If
+        
+    Next
+    
+    On Error GoTo 0
+    vtkExportConfiguration = exportedModulesCount
+    Exit Function
+
+vtkExportConfiguration_Error:
+    Err.Raise Err.number, "procedure vtkExportConfiguration of Module vtkImportExportUtilities", Err.source
+    Resume Next
+
+End Function
 
 '
 ''---------------------------------------------------------------------------------------

@@ -35,6 +35,11 @@ Option Explicit
 '               - Initialize the Git repository for the project
 '               - Create Xlsm Dev and Delivery workbooks
 '               - Activate needed VB References
+'                   - in the DEV workbook, a reference to the VBAToolKit workbook creating the project is also activated.
+'                     During normal use of VBAToolKit, the reference is made to the add-in.
+'                     During tests while developing VBAToolKit, the reference is made to the VBAToolKit_DEV workbook.
+'                   - the Delivery workbook does not need a reference to VBAToolKit.
+'
 ' Parameters :
 '             - path, string containing the path of folder in which to create the project
 '             - name, string containing the name of the project to create
@@ -61,26 +66,27 @@ Public Function vtkCreateProject(path As String, name As String, Optional displa
     internalError = vtkCreateTreeFolder(rootPath)
     If internalError <> VTK_OK Then GoTo vtkCreateProject_ErrorTreeFolder
      
-    'Save created project with xlsm extention
+    ' Create DEV workbook with xlsm extension
     Workbooks.Add.SaveAs (rootPath & "\" & project.projectDEVStandardRelativePath), FileFormat:=xlOpenXMLWorkbookMacroEnabled
-    'Rename Project
+    ' Rename the VBProject of the DEV workbook
     Workbooks(project.workbookDEVName).VBProject.name = project.projectDEVName
-    'call function who activate references
-    VtkActivateReferences wb:=Workbooks(project.workbookDEVName)
-    'initialize configuration Sheet with VBAUnit modules
+    ' Activate references and reference to the current workbook (the VBAToolKit add-in)
+    VtkActivateReferences wb:=Workbooks(project.workbookDEVName), toSelf:=True
+    ' Initialize configuration Sheet with VBAUnit modules
     vtkInitializeVbaUnitNamesAndPathes project:=project.projectName
-    ' Save Development Project Workbook
-    Workbooks(project.workbookDEVName).save
+    ' Save DEV Workbook
+    Workbooks(project.workbookDEVName).Save
     
-    'Create delivery workbook
+    
+    ' Create Delivery workbook with xlsm extension
     Workbooks.Add.SaveAs (rootPath & "\" & project.projectStandardRelativePath), FileFormat:=(52) '52 is xlsm format
-    'Rename Project
+    ' Rename the VBProject of the Delivery workbook
     Workbooks(project.workbookName).VBProject.name = project.projectName
-    'call function who activate references
-    VtkActivateReferences wb:=Workbooks(project.workbookName)
+    ' Activate references
+    VtkActivateReferences wb:=Workbooks(project.workbookName), toSelf:=False
     ' A module must be added in the Excel File for the project parameters to be saved
     Workbooks(project.workbookName).VBProject.VBComponents.Add ComponentType:=vbext_ct_StdModule
-    ' Save and Close Delivery Project WorkBook
+    ' Save and Close Delivery Workbook
     Workbooks(project.workbookName).Close savechanges:=True
     
     Dim wb As Workbook
@@ -90,9 +96,11 @@ Public Function vtkCreateProject(path As String, name As String, Optional displa
     vtkExportModulesFromAnotherProject projectWithModules:=ThisWorkbook.VBProject, projectName:=project.projectName, confName:=project.projectDEVName
     ' Import VBAUnit (and lib ?) modules in the new Excel file project
     vtkImportModulesInAnotherProject projectForModules:=wb.VBProject, projectName:=project.projectName, confName:=project.projectDEVName
- 
-   ' Save configured and updated project for test
-    wb.save
+    
+    ' Insert the BeforeSave handler in the newly created project
+    vtkAddBeforeSaveHandlerInDEVWorkbook wb:=wb, projectName:=project.projectName, confName:=project.projectDEVName
+    ' Save configured and updated project for test
+    wb.Save
         
     ' Initialize git
     On Error GoTo vtkCreateProject_ErrorGit
@@ -104,13 +112,13 @@ Public Function vtkCreateProject(path As String, name As String, Optional displa
 
 vtkCreateProject_ErrorTreeFolder:
     vtkCreateProject = internalError
-    If displayError Then MsgBox "Error " & err.number & " (" & err.Description & ") in procedure vtkCreateProject of Module MainFunctions"
+    If displayError Then MsgBox "Error " & Err.number & " (" & Err.Description & ") in procedure vtkCreateProject of Module MainFunctions"
     Exit Function
 vtkCreateProject_Error:
-    vtkCreateProject = err.number
-    If displayError Then MsgBox "Error " & err.number & " (" & err.Description & ") in procedure vtkCreateProject of Module MainFunctions"
+    vtkCreateProject = Err.number
+    If displayError Then MsgBox "Error " & Err.number & " (" & Err.Description & ") in procedure vtkCreateProject of Module MainFunctions"
 vtkCreateProject_ErrorGit:
-    vtkCreateProject = err.number
-    If displayError Then MsgBox "Error " & err.number & " (" & err.Description & ") in procedure vtkCreateProject of Module MainFunctions"
+    vtkCreateProject = Err.number
+    If displayError Then MsgBox "Error " & Err.number & " (" & Err.Description & ") in procedure vtkCreateProject of Module MainFunctions"
 
 End Function

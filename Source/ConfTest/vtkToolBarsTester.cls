@@ -192,7 +192,7 @@ Public Sub Test_ExcelToolBarButtonDelete()
    On Error Resume Next
     vtkDeleteToolbars
     realCaption = button.caption
-    errNum = err.Number
+    errNum = Err.number
    On Error GoTo 0
     
     mAssert.Equals errNum, 424, "No Button must be present if the Excel ToolBar is deleted"
@@ -210,7 +210,7 @@ Public Sub Test_VBEToolBarButtonDelete()
    On Error Resume Next
     vtkDeleteToolbars
     realCaption = button.caption
-    errNum = err.Number
+    errNum = Err.number
    On Error GoTo 0
     
     mAssert.Equals errNum, 424, "No Button must be present if the VBE ToolBar is deleted"
