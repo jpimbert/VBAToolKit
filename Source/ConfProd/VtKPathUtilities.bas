@@ -31,11 +31,16 @@ Option Explicit
 ' Date      : 18/04/2013
 ' Purpose   : Return the path of the current project
 '               - Application.ThisWorbook is the workbook containing the running code
+'               - if a Workbook is given as parameter, return the root path of this project workbook
 '---------------------------------------------------------------------------------------
 '
-Public Function vtkPathOfCurrentProject() As String
+Public Function vtkPathOfCurrentProject(Optional wb As Workbook) As String
     Dim fso As New FileSystemObject
-    vtkPathOfCurrentProject = fso.GetParentFolderName(ThisWorkbook.path)
+    If wb Is Nothing Then
+        vtkPathOfCurrentProject = fso.GetParentFolderName(ThisWorkbook.path)
+       Else
+        vtkPathOfCurrentProject = fso.GetParentFolderName(wb.path)
+    End If
 End Function
 
 '---------------------------------------------------------------------------------------
@@ -44,11 +49,12 @@ End Function
 ' Date      : 18/04/2013
 ' Purpose   : Return the path of the Test Folder of the current project
 '               - create the folder if it doesn't exist (in case of fresh Git check out)
+'               - if a Workbook is given as parameter, return the test path of this project workbook
 '---------------------------------------------------------------------------------------
 
-Public Function vtkPathToTestFolder() As String '\VBAToolKit\Tests
+Public Function vtkPathToTestFolder(Optional wb As Workbook) As String '\VBAToolKit\Tests
     Dim path As String
-    path = vtkPathOfCurrentProject & "\Tests"
+    path = vtkPathOfCurrentProject(wb) & "\Tests"
     If Dir(path, vbDirectory) = vbNullString Then MkDir (path)
     vtkPathToTestFolder = path
 End Function
@@ -58,10 +64,11 @@ End Function
 ' Author    : Jean-Pierre Imbert
 ' Date      : 18/04/2013
 ' Purpose   : Return the path of the Source Folder of the current project
+'               - if a Workbook is given as parameter, return the source path of this project workbook
 '---------------------------------------------------------------------------------------
 '
-Public Function vtkPathToSourceFolder() As String 'VBAToolKit\Source
-   vtkPathToSourceFolder = vtkPathOfCurrentProject & "\Source"
+Public Function vtkPathToSourceFolder(Optional wb As Workbook) As String 'VBAToolKit\Source
+   vtkPathToSourceFolder = vtkPathOfCurrentProject(wb) & "\Source"
 End Function
 
 '---------------------------------------------------------------------------------------
@@ -69,10 +76,11 @@ End Function
 ' Author    : Jean-Pierre Imbert
 ' Date      : 25/05/2013
 ' Purpose   : Return the path of the Template Folder of the current project
+'               - if a Workbook is given as parameter, return the template path of this project workbook
 '---------------------------------------------------------------------------------------
 '
-Public Function vtkPathToTemplateFolder() As String 'VBAToolKit\Source
-   vtkPathToTemplateFolder = vtkPathOfCurrentProject & "\Templates"
+Public Function vtkPathToTemplateFolder(Optional wb As Workbook) As String 'VBAToolKit\Source
+   vtkPathToTemplateFolder = vtkPathOfCurrentProject(wb) & "\Templates"
 End Function
 
 '---------------------------------------------------------------------------------------
@@ -120,8 +128,8 @@ Public Function vtkCreateTreeFolder(rootPath As String)
    Exit Function
    
 vtkCreateTreeFolder_Error:
-    vtkCreateTreeFolder = err.Number
-    err.Raise err.Number, "Module vtkFileSystemUtilities : Function vtkCreateTreeFolder", err.Description
+    vtkCreateTreeFolder = err.number
+    err.Raise err.number, "Module vtkFileSystemUtilities : Function vtkCreateTreeFolder", err.Description
 End Function
 
 '---------------------------------------------------------------------------------------

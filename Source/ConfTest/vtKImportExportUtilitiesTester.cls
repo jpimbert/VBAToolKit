@@ -2,13 +2,13 @@ VERSION 1.0 CLASS
 BEGIN
   MultiUse = -1  'True
 END
-Attribute VB_Name = "vtKImportExportUtilitiesTester"
+Attribute VB_Name = "vtkImportExportUtilitiesTester"
 Attribute VB_GlobalNameSpace = False
 Attribute VB_Creatable = False
 Attribute VB_PredeclaredId = False
 Attribute VB_Exposed = False
 '---------------------------------------------------------------------------------------
-' Module    : vtKImportExportUtilitiesTester
+' Module    : vtkImportExportUtilitiesTester
 ' Author    : Jean-Pierre Imbert
 ' Date      : 21/08/2013
 ' Purpose   : Test the vtkImportExportUtilities module functions

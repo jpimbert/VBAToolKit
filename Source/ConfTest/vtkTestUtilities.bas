@@ -22,6 +22,18 @@ Option Explicit
 '   limitations under the License.
 '---------------------------------------------------------------------------------------
 
+Public pWorkBook As Workbook
+
+'---------------------------------------------------------------------------------------
+' Procedure : prepare
+' Author    : Jean-Pierre IMBERT
+' Date      : 31/08/2013
+' Purpose   : Prepare the module before use in test
+'---------------------------------------------------------------------------------------
+'
+Public Sub prepare()
+    Set pWorkBook = ActiveWorkbook    ' VBAToolKit works on Active Workbook by default
+End Sub
 
 '---------------------------------------------------------------------------------------
 ' Procedure : vtkTestPath
@@ -31,7 +43,7 @@ Option Explicit
 '---------------------------------------------------------------------------------------
 '
 Public Function vtkTestPath() As String
-    vtkTestPath = vtkPathToTestFolder
+    vtkTestPath = vtkPathToTestFolder(pWorkBook)
 End Function
 
 '---------------------------------------------------------------------------------------
@@ -53,7 +65,7 @@ Public Function getTestFileFromTemplate(fileName As String, Optional destination
     Dim source As String, destination As String, errCount As Integer
     
     ' Copy file
-    source = vtkPathToTemplateFolder & "\" & fileName
+    source = vtkPathToTemplateFolder(pWorkBook) & "\" & fileName
     If destinationName Like "" Then
         destination = vtkTestPath & "\" & fileName
        Else
@@ -73,7 +85,7 @@ Public Function getTestFileFromTemplate(fileName As String, Optional destination
 
 M_Error:
     errCount = errCount + 1
-    If err.Number = 1004 And errCount < 5 Then Resume    ' It's possible that the file is not ready, just after copy : in this case retry
+    If Err.number = 1004 And errCount < 5 Then Resume    ' It's possible that the file is not ready, just after copy : in this case retry
     Set getTestFileFromTemplate = Nothing
-    err.Raise Number:=err.Number, source:=err.source, Description:=err.Description
+    Err.Raise number:=Err.number, source:=Err.source, Description:=Err.Description
 End Function
