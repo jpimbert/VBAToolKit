@@ -22,7 +22,7 @@ Option Explicit
 '   limitations under the License.
 '---------------------------------------------------------------------------------------
 
-Public pWorkBook As Workbook
+Private pWorkBook As Workbook
 
 '---------------------------------------------------------------------------------------
 ' Procedure : prepare
@@ -31,8 +31,8 @@ Public pWorkBook As Workbook
 ' Purpose   : Prepare the module before use in test
 '---------------------------------------------------------------------------------------
 '
-Public Sub prepare()
-    Set pWorkBook = ActiveWorkbook    ' VBAToolKit works on Active Workbook by default
+Public Sub prepare(wb As Workbook)
+    Set pWorkBook = wb    ' VBAToolKit works on Active Workbook by default
 End Sub
 
 '---------------------------------------------------------------------------------------
@@ -43,7 +43,7 @@ End Sub
 '---------------------------------------------------------------------------------------
 '
 Public Function vtkTestPath() As String
-    vtkTestPath = vtkPathToTestFolder(pWorkBook)
+    vtkTestPath = vtkPathToTestFolder(ActiveWorkbook)
 End Function
 
 '---------------------------------------------------------------------------------------

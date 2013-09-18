@@ -57,32 +57,68 @@ End Sub
 
 Public Sub Test_vtkTestPath()
     ' get the path of a project that is not the active one
-    Dim wb1 As Workbook, wb2 As Workbook, p1 As vtkProject, p2 As vtkProject, VerificationUrl As Boolean
+    Dim wb1 As Workbook, wb2 As Workbook, p1 As vtkProject, p2 As vtkProject
+    
+    On Error GoTo Test_vtkTestPath_Error
     
     Set p1 = vtkProjectForName("TestProject1")
     Set p2 = vtkProjectForName("TestProject2")
-    vtkCreateProject path:=VBAToolKit.vtkTestPath, name:="TestProject1", displayError:=False
+    vtkCreateProject path:=VBAToolKit.vtkTestPath, name:="TestProject1", displayError:=True
     Set wb1 = Workbooks(p1.workbookDEVName)
     vtkCreateProject path:=VBAToolKit.vtkTestPath, name:="TestProject2", displayError:=False
     Set wb2 = Workbooks(p2.workbookDEVName)
     
     wb2.Activate
-    vtkTestUtilities.prepare
+    vtkTestUtilities.prepare ThisWorkbook
     wb1.Activate
     
-    If vtkTestPath Like "*TestProject1\Tests" Then VerificationUrl = True
+    mAssert.Should (vtkTestPath Like "*TestProject1\Tests"), "Bad Test path for TestProject1 (" & vtkTestPath & "), should end with TestProject1\Tests"
     
-    mAssert.Should VerificationUrl, "error path found isn't the same as that of active project"
+    wb1.Close
+    wb2.Close
+    
+    vtkCleanFolder VBAToolKit.vtkTestPath
+
+    On Error GoTo 0
+    Exit Sub
+    
+Test_vtkTestPath_Error:
+    mAssert.Should False, "Unexpected error " & Err.number & " (" & Err.Description & ") in procedure Test_vtkTestPath of Class Module vtkTestUtilitiesTester"
+    Resume Next
+    
 End Sub
+
+Public Sub Test_vtkGetFileFromTemplate()
+    'Verify the copy file from template in the folder test
+    Dim wbb As Workbook
+    
+    On Error GoTo Test_vtkGetFileFromTemplate_Error
+    
+    Set wbb = getTestFileFromTemplate(fileName:="TestModule.bas")
+    mAssert.Equals Dir(vtkTestPath & "\" & "TestModule.bas"), "TestModule.bas", "Bad test the file TestModule hasn't been copied in folder Test"
+    
+    vtkCleanFolder VBAToolKit.vtkTestPath
+    
+    On Error GoTo 0
+    Exit Sub
+    
+Test_vtkGetFileFromTemplate_Error:
+    mAssert.Should False, "Unexpected error " & Err.number & " (" & Err.Description & ") in procedure Test_vtkGetFileFromTemplate of Class Module vtkTestUtilitiesTester"
+    Resume Next
+    
+End Sub
+
 
 Private Function ITest_Suite() As TestSuite
     Set ITest_Suite = New TestSuite
     ITest_Suite.AddTest ITest_Manager.ClassName, "Test_vtkTestPath"
+    ITest_Suite.AddTest ITest_Manager.ClassName, "Test_vtkGetFileFromTemplate"
 End Function
 
 Private Sub ITestCase_RunTest()
     Select Case mManager.methodName
         Case "Test_vtkTestPath": Test_vtkTestPath
+        Case "Test_vtkGetFileFromTemplate": Test_vtkGetFileFromTemplate
         Case Else: mAssert.Should False, "Invalid test name: " & mManager.methodName
     End Select
 End Sub
