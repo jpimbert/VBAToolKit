@@ -68,15 +68,16 @@ Public Sub Test_vtkTestPath()
     vtkCreateProject path:=VBAToolKit.vtkTestPath, name:="TestProject2", displayError:=False
     Set wb2 = Workbooks(p2.workbookDEVName)
     
-    wb2.Activate
-    vtkTestUtilities.prepare ThisWorkbook
     wb1.Activate
+    vtkTestUtilities.prepare ActiveWorkbook
+    wb2.Activate
     
     mAssert.Should (vtkTestPath Like "*TestProject1\Tests"), "Bad Test path for TestProject1 (" & vtkTestPath & "), should end with TestProject1\Tests"
     
+    'Close file Excel and deleting the project "TestProject1" and "TestProject2"
     wb1.Close
     wb2.Close
-    
+    vtkTestUtilities.prepare ThisWorkbook
     vtkCleanFolder VBAToolKit.vtkTestPath
 
     On Error GoTo 0
