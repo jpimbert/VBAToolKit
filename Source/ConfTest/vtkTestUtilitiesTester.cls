@@ -63,7 +63,7 @@ Public Sub Test_vtkTestPath()
     
     Set p1 = vtkProjectForName("TestProject1")
     Set p2 = vtkProjectForName("TestProject2")
-    vtkCreateProject path:=VBAToolKit.vtkTestPath, name:="TestProject1", displayError:=True
+    vtkCreateProject path:=VBAToolKit.vtkTestPath, name:="TestProject1", displayError:=False
     Set wb1 = Workbooks(p1.workbookDEVName)
     vtkCreateProject path:=VBAToolKit.vtkTestPath, name:="TestProject2", displayError:=False
     Set wb2 = Workbooks(p2.workbookDEVName)

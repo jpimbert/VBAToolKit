@@ -43,7 +43,7 @@ End Sub
 '---------------------------------------------------------------------------------------
 '
 Public Function vtkTestPath() As String
-    vtkTestPath = vtkPathToTestFolder(ActiveWorkbook)
+    vtkTestPath = vtkPathToTestFolder(pWorkBook)
 End Function
 
 '---------------------------------------------------------------------------------------
