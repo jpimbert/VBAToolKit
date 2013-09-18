@@ -89,3 +89,35 @@ M_Error:
     Set getTestFileFromTemplate = Nothing
     Err.Raise number:=Err.number, source:=Err.source, Description:=Err.Description
 End Function
+
+
+'---------------------------------------------------------------------------------------
+' Procedure : insertDummyProcedureInCodeModule
+' Author    : Lucas Vitorino
+' Purpose   : - Insert a dummy procedure at the end of a VBIDE.CodeModule object
+'             - The optional argument allows adding a number to the name of the procedure
+'               so as to avoid same-name procedures in the same module.
+'---------------------------------------------------------------------------------------
+'
+Public Sub insertDummyProcedureInCodeModule(codemo As VBIDE.CodeModule, Optional dummyInt As Integer = 0)
+    Dim dummyProcedure As String
+    
+    On Error GoTo insertDummyProcedureInCodeModule_Error
+
+    dummyProcedure = _
+    "Public Sub dummyProcedure" & dummyInt & "()" & vbNewLine & _
+    "End Sub" & vbNewLine
+    
+    With codemo
+        .InsertLines .CountOfLines + 1, dummyProcedure
+    End With
+
+    On Error GoTo 0
+    Exit Sub
+
+insertDummyProcedureInCodeModule_Error:
+    Err.Raise VTK_UNEXPECTED_ERROR, "sub insertDummyProcedureInCodeModule of module vtkTestUtilities", Err.Description
+    Resume Next
+
+End Sub
+
