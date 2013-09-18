@@ -132,8 +132,8 @@ Public Sub Test_ModuleAndFileDoesntExist()
    On Error GoTo 0
    
 Test_Error:
-    mAssert.Equals err.Number, VTK_UNKNOWN_MODULE, "Export doesn't work when module is inexistant"
-    mAssert.Should Not fso.FileExists(filePath), "File must not be created when exported module is inexistant"
+    mAssert.Equals Err.number, VTK_UNKNOWN_MODULE, "Export doesn't work when module is inexistant"
+    mAssert.Should Not fso.fileExists(filePath), "File must not be created when exported module is inexistant"
 End Sub
 
 Public Sub Test_ModuleDoesntExistAndFileExists()
@@ -149,8 +149,8 @@ Public Sub Test_ModuleDoesntExistAndFileExists()
    
 Test_Error:
     sizeAfter = fso.GetFile(filePath).Size
-    mAssert.Equals err.Number, VTK_UNKNOWN_MODULE, "Export doesn't work when module is inexistant"
-    mAssert.Should fso.FileExists(filePath), "File is not deleted when exported module is inexistant"
+    mAssert.Equals Err.number, VTK_UNKNOWN_MODULE, "Export doesn't work when module is inexistant"
+    mAssert.Should fso.fileExists(filePath), "File is not deleted when exported module is inexistant"
     mAssert.Equals sizeAfter, sizeBefore, "The size of the file must not be changed when exported module is inexistant"
 End Sub
 
@@ -163,13 +163,13 @@ Public Sub Test_StandardModuleExistsAndFileDoesntExist()
 
    On Error GoTo Test_Error
     vtkExportOneModule project:=wbForTest.VBProject, moduleName:=moduleName, filePath:=newFilePath
-    mAssert.Should fso.FileExists(newFilePath), "File must be created when exported existant module"
+    mAssert.Should fso.fileExists(newFilePath), "File must be created when exported existant module"
     mAssert.Should Not (fso.GetFile(existingFilePath).Size = fso.GetFile(newFilePath).Size), "Size of Exported module must be different than the existing file"
    On Error GoTo 0
     Exit Sub
     
 Test_Error:
-    mAssert.Equals err.Number, 0, "No error must be thrown when Module exists"
+    mAssert.Equals Err.number, 0, "No error must be thrown when Module exists"
 End Sub
 
 Public Sub Test_ClassModuleExistsAndFileDoesntExist()
@@ -181,12 +181,12 @@ Public Sub Test_ClassModuleExistsAndFileDoesntExist()
 
    On Error GoTo Test_Error
     vtkExportOneModule project:=wbForTest.VBProject, moduleName:=moduleName, filePath:=newFilePath
-    mAssert.Should fso.FileExists(newFilePath), "File must be created when exported existant module"
+    mAssert.Should fso.fileExists(newFilePath), "File must be created when exported existant module"
    On Error GoTo 0
     Exit Sub
     
 Test_Error:
-    mAssert.Equals err.Number, 0, "No error must be thrown when Module exists"
+    mAssert.Equals Err.number, 0, "No error must be thrown when Module exists"
 End Sub
 
 Public Sub Test_StandardModuleExistsAndFileExists()
@@ -199,13 +199,13 @@ Public Sub Test_StandardModuleExistsAndFileExists()
     sizeBefore = fso.GetFile(filePath).Size
     vtkExportOneModule project:=wbForTest.VBProject, moduleName:=moduleName, filePath:=filePath
     sizeAfter = fso.GetFile(filePath).Size
-    mAssert.Should fso.FileExists(filePath), "File must exist when exported existant module"
+    mAssert.Should fso.fileExists(filePath), "File must exist when exported existant module"
     mAssert.Should sizeAfter <> sizeBefore, "Size of new file (" & sizeAfter & ") must be different than size of old file (" & sizeBefore & ")"
    On Error GoTo 0
     Exit Sub
     
 Test_Error:
-    mAssert.Equals err.Number, 0, "No error must be thrown when Module exists"
+    mAssert.Equals Err.number, 0, "No error must be thrown when Module exists"
 End Sub
 
 Public Sub Test_SheetModuleExistsAndFileExists()
@@ -218,13 +218,13 @@ Public Sub Test_SheetModuleExistsAndFileExists()
     sizeBefore = fso.GetFile(filePath).Size
     vtkExportOneModule project:=wbForTest.VBProject, moduleName:=moduleName, filePath:=filePath
     sizeAfter = fso.GetFile(filePath).Size
-    mAssert.Should fso.FileExists(filePath), "File must exist when exported existant module"
+    mAssert.Should fso.fileExists(filePath), "File must exist when exported existant module"
     mAssert.Should sizeAfter <> sizeBefore, "Size of new file (" & sizeAfter & ") must be different than size of old file (" & sizeBefore & ")"
    On Error GoTo 0
     Exit Sub
     
 Test_Error:
-    mAssert.Equals err.Number, 0, "No error must be thrown when Module exists"
+    mAssert.Equals Err.number, 0, "No error must be thrown when Module exists"
 End Sub
 
 Public Sub Test_FormModuleExistsAndFRMFileExists()
@@ -238,14 +238,14 @@ Public Sub Test_FormModuleExistsAndFRMFileExists()
     sizeBefore = fso.GetFile(filePath).Size
     vtkExportOneModule project:=wbForTest.VBProject, moduleName:=moduleName, filePath:=filePath
     sizeAfter = fso.GetFile(filePath).Size
-    mAssert.Should fso.FileExists(filePath), "File must exist when exported existant module"
-    mAssert.Should fso.FileExists(secondFilePath), "File must exist when exported existant module"
+    mAssert.Should fso.fileExists(filePath), "File must exist when exported existant module"
+    mAssert.Should fso.fileExists(secondFilePath), "File must exist when exported existant module"
     mAssert.Should sizeAfter <> sizeBefore, "Size of new file (" & sizeAfter & ") must be different than size of old file (" & sizeBefore & ")"
    On Error GoTo 0
     Exit Sub
     
 Test_Error:
-    mAssert.Equals err.Number, 0, "No error must be thrown when Module exists"
+    mAssert.Equals Err.number, 0, "No error must be thrown when Module exists"
 End Sub
 
 Public Sub Test_FormModuleExistsAndFRXFileExists()
@@ -261,14 +261,14 @@ Public Sub Test_FormModuleExistsAndFRXFileExists()
     sizeBefore = fso.GetFile(secondFilePath).Size
     vtkExportOneModule project:=wbForTest.VBProject, moduleName:=moduleName, filePath:=filePath
     sizeAfter = fso.GetFile(secondFilePath).Size
-    mAssert.Should fso.FileExists(filePath), "File must exist when exported existant module"
-    mAssert.Should fso.FileExists(secondFilePath), "File must exist when exported existant module"
+    mAssert.Should fso.fileExists(filePath), "File must exist when exported existant module"
+    mAssert.Should fso.fileExists(secondFilePath), "File must exist when exported existant module"
     mAssert.Should sizeAfter <> sizeBefore, "Size of new file (" & sizeAfter & ") must be different than size of old file (" & sizeBefore & ")"
    On Error GoTo 0
     Exit Sub
     
 Test_Error:
-    mAssert.Equals err.Number, 0, "No error must be thrown when Module exists"
+    mAssert.Equals Err.number, 0, "No error must be thrown when Module exists"
 End Sub
 
 Private Function ITest_Suite() As TestSuite

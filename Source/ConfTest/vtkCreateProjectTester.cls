@@ -151,7 +151,7 @@ Public Sub TestReferencesOfDevWorkbookWasActivated()
 returnvalue = vtkCreateProject(path:=VBAToolKit.vtkTestPath, name:=vtkTestProjectName, displayError:=False)
     OpenDeliveryProject
  
-    For i = 1 To Workbooks(vtkTestProjectName & "_DEV.xlsm").VBProject.References.Count
+    For i = 1 To Workbooks(vtkTestProjectName & "_DEV.xlsm").VBProject.References.count
         If ((Workbooks(vtkTestProjectName & "_DEV.xlsm").VBProject.References(i).GUID) = "{420B2830-E718-11CF-893D-00A0C9054228}") Or (Workbooks(vtkTestProjectName & "_DEV.xlsm").VBProject.References(i).GUID = "{0002E157-0000-0000-C000-000000000046}") Then
         j = j + 1
         End If
@@ -169,7 +169,7 @@ Public Sub TestReferencesOfDeliveryWorkbookWasActivated()
 returnvalue = vtkCreateProject(path:=VBAToolKit.vtkTestPath, name:=vtkTestProjectName, displayError:=False)
     OpenDeliveryProject
     
-    For i = 1 To Workbooks(vtkTestProjectName & ".xlsm").VBProject.References.Count
+    For i = 1 To Workbooks(vtkTestProjectName & ".xlsm").VBProject.References.count
         If ((Workbooks(vtkTestProjectName & ".xlsm").VBProject.References(i).GUID) = "{420B2830-E718-11CF-893D-00A0C9054228}") Or (Workbooks(vtkTestProjectName & ".xlsm").VBProject.References(i).GUID = "{0002E157-0000-0000-C000-000000000046}") Then
         j = j + 1
         End If
@@ -183,7 +183,7 @@ Public Sub Test_VBAUnitModulesExportation()
     
     returnvalue = vtkCreateProject(path:=VBAToolKit.vtkTestPath, name:=vtkTestProjectName, displayError:=False)
     
-    mAssert.Should fso.FileExists(VBAToolKit.vtkTestPath & "\" & vtkTestProjectName & "\" & "Source\VbaUnit\" & "VbaUnitMain.bas"), "VBAUnitMain module have to be exported"
+    mAssert.Should fso.fileExists(VBAToolKit.vtkTestPath & "\" & vtkTestProjectName & "\" & "Source\VbaUnit\" & "VbaUnitMain.bas"), "VBAUnitMain module have to be exported"
 End Sub
 
 Public Sub Test_VBAUnitModulesImportation()
@@ -222,6 +222,49 @@ Test_vtkCreateProject_correctPathGitFolderIsCreated_Error:
     Resume Next
 End Sub
 
+Public Sub Test_vtkCreateProject_handlerAddedInDEVWorkbook()
+' creating a project, modifying an existing module in the DEV workbook, save => module must be exported
+    
+    Dim retVal As Integer
+    Dim oldSize1 As Integer
+    Dim oldSize2 As Integer
+    Dim newSize1 As Integer
+    Dim newSize2 As Integer
+    Dim newlyCreatedWorkbook As Workbook
+    Dim fso As New FileSystemObject
+    
+    On Error GoTo Test_vtkAddBeforeSaveHandlerInDEVWorkbook_justCreatedWorkbook_Error
+
+    vtkCreateProject VBAToolKit.vtkTestPath, vtkTestProjectName
+
+    Set newlyCreatedWorkbook = Workbooks(vtkTestProjectName & "_DEV.xlsm")
+
+    ' Get the size of the exported modules before the save
+    oldSize1 = fso.GetFile(VBAToolKit.vtkTestPath & "\" & vtkTestProjectName & "\Source\VbaUnit\VbaUnitMain.bas").Size
+    oldSize2 = fso.GetFile(VBAToolKit.vtkTestPath & "\" & vtkTestProjectName & "\Source\VbaUnit\Assert.cls").Size
+
+    ' Modify a module
+    insertDummyProcedureInCodeModule newlyCreatedWorkbook.VBProject.VBComponents("VbaUnitMain").CodeModule, dummyInt:=1
+
+    ' Save the workbook
+    newlyCreatedWorkbook.Save
+
+    ' Get the new size of the exported modules
+    newSize1 = fso.GetFile(VBAToolKit.vtkTestPath & "\" & vtkTestProjectName & "\Source\VbaUnit\VbaUnitMain.bas").Size
+    newSize2 = fso.GetFile(VBAToolKit.vtkTestPath & "\" & vtkTestProjectName & "\Source\VbaUnit\Assert.cls").Size
+    
+    mAssert.Should oldSize1 < newSize1, "VbaUnitMain.bas must be bigger after the save."
+    mAssert.Should oldSize2 = newSize2, "Assert.cls must be of equal size after the save."
+
+    On Error GoTo 0
+    Exit Sub
+
+Test_vtkAddBeforeSaveHandlerInDEVWorkbook_justCreatedWorkbook_Error:
+    mAssert.Should False, "Unexpected error " & Err.number & " (" & Err.Description & ") in procedure Test_vtkAddBeforeSaveHandlerInDEVWorkbook_justCreatedWorkbook of Class Module vtkBeforeSaveHandlerTester"
+    ITestCase_TearDown
+    Exit Sub
+    
+End Sub
 
 Private Function ITest_Suite() As TestSuite
     Set ITest_Suite = New TestSuite
@@ -238,6 +281,7 @@ Private Function ITest_Suite() As TestSuite
     ITest_Suite.AddTest ITest_Manager.ClassName, "Test_VBAUnitModulesExportation"
     ITest_Suite.AddTest ITest_Manager.ClassName, "Test_VBAUnitModulesImportation"
     ITest_Suite.AddTest ITest_Manager.ClassName, "Test_vtkCreateProject_correctPathGitFolderIsCreated"
+    ITest_Suite.AddTest ITest_Manager.ClassName, "Test_vtkCreateProject_handlerAddedInDEVWorkbook"
 End Function
 
 Private Sub ITestCase_RunTest()
@@ -255,6 +299,7 @@ Private Sub ITestCase_RunTest()
         Case "Test_VBAUnitModulesExportation": Test_VBAUnitModulesExportation
         Case "Test_VBAUnitModulesImportation": Test_VBAUnitModulesImportation
         Case "Test_vtkCreateProject_correctPathGitFolderIsCreated": Test_vtkCreateProject_correctPathGitFolderIsCreated
+        Case "Test_vtkCreateProject_handlerAddedInDEVWorkbook": Test_vtkCreateProject_handlerAddedInDEVWorkbook
         Case Else: mAssert.Should False, "Invalid test name: " & mManager.methodName
     End Select
 End Sub

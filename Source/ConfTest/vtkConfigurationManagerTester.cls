@@ -129,7 +129,7 @@ Public Sub TestConfigurationSheetCreationForNewProject()
     Dim ws As Worksheet
     On Error Resume Next
     Set ws = newWorkBook.Sheets("vtkConfigurations")
-    mAssert.Equals err, 0, "A configuration manager must create a Configuration sheet"
+    mAssert.Equals Err, 0, "A configuration manager must create a Configuration sheet"
     On Error GoTo 0
     mAssert.Should newWorkBook.Sheets("vtkConfigurations") Is newConfManager.configurationSheet, "The configurationSheet property of the conf manager must be equal to the configuration sheet of the workbook"
 End Sub
@@ -139,7 +139,7 @@ Public Sub TestConfigurationSheetRetrievalForExistingProject()
     Dim ws As Worksheet
     On Error Resume Next
     Set ws = existingWorkbook.Sheets("vtkConfigurations")
-    mAssert.Equals err, 0, "A configuration manager must be accessible in an existing project"
+    mAssert.Equals Err, 0, "A configuration manager must be accessible in an existing project"
     On Error GoTo 0
     mAssert.Should existingWorkbook.Sheets("vtkConfigurations") Is existingConfManager.configurationSheet, "The configurationSheet property of the conf manager must be equal to the configuration sheet of the workbook"
 End Sub
