@@ -109,17 +109,35 @@ Test_vtkGetFileFromTemplate_Error:
     
 End Sub
 
+Public Sub Test_vtkGetNotFileFromTemplate()
+    'Verifying an error is displayed if one doesn't possess the file template
+    Dim wbb As Workbook
+    
+    On Error GoTo Test_vtkGetNotFileFromTemplate_Error
+    Set wbb = getTestFileFromTemplate(fileName:="Error.bas")
+    mAssert.Equals Dir(vtkTestPath & "\" & "Error.bas"), "", "Bad test the file Error doesn't exist from template"
+    On Error GoTo 0
+    Exit Sub
+    
+Test_vtkGetNotFileFromTemplate_Error:
+    If Err.number <> 53 Then mAssert.Should False, "Unexpected error " & Err.number & " (" & Err.Description & ") in procedure Test_vtkGetNotFileFromTemplate of Class Module vtkTestUtilitiesTester"
+    Resume Next
+    
+End Sub
+
 
 Private Function ITest_Suite() As TestSuite
     Set ITest_Suite = New TestSuite
     ITest_Suite.AddTest ITest_Manager.ClassName, "Test_vtkTestPath"
     ITest_Suite.AddTest ITest_Manager.ClassName, "Test_vtkGetFileFromTemplate"
+    ITest_Suite.AddTest ITest_Manager.ClassName, "Test_vtkGetNotFileFromTemplate"
 End Function
 
 Private Sub ITestCase_RunTest()
     Select Case mManager.methodName
         Case "Test_vtkTestPath": Test_vtkTestPath
         Case "Test_vtkGetFileFromTemplate": Test_vtkGetFileFromTemplate
+        Case "Test_vtkGetNotFileFromTemplate": Test_vtkGetNotFileFromTemplate
         Case Else: mAssert.Should False, "Invalid test name: " & mManager.methodName
     End Select
 End Sub
