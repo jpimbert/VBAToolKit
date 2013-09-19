@@ -78,7 +78,8 @@ End Sub
 ' TESTS TO DO
 ' Normalize token
 '   token in list, wrong case : case is proper
-'   token in list, wrong case : case in proper
+'   token in list, wrong case : case is proper
+'   token containing a token in list : case unchanged
 '   token not in list : not modified
 '   list is empty : no token modified
 '
@@ -122,6 +123,10 @@ Public Sub Test_vtkNormalizeToken_wrongCase2()
 Test_vtkNormalizeToken_wrongCase2_Error:
     Debug.Print "Unexpected error " & Err.number & " (" & Err.Description & ") in procedure Test_vtkNormalizeToken_wrongCase2 of Class Module vtkNormalizeTester"
     Resume Next
+End Sub
+
+Public Sub Test_vtkNormalizeToken_wrongCase3()
+
 End Sub
 
 Private Function ITest_Suite() As TestSuite
