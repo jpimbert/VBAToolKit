@@ -49,10 +49,11 @@ End Property
 
 Private Sub ITestCase_SetUp(Assert As IAssert)
     Set mAssert = Assert
+    vtkTestUtilities.prepare ThisWorkbook
 End Sub
 
 Private Sub ITestCase_TearDown()
-
+    vtkCleanFolder VBAToolKit.vtkTestPath
 End Sub
 
 Public Sub Test_vtkTestPath()
@@ -75,11 +76,9 @@ Public Sub Test_vtkTestPath()
     mAssert.Should (vtkTestPath Like "*TestProject1\Tests"), "Bad Test path for TestProject1 (" & vtkTestPath & "), should end with TestProject1\Tests"
     
     'Close file Excel and deleting the project "TestProject1" and "TestProject2"
-    wb1.Close
-    wb2.Close
-    vtkTestUtilities.prepare ThisWorkbook
-    vtkCleanFolder VBAToolKit.vtkTestPath
-
+    wb1.Close (False)
+    wb2.Close (False)
+    
     On Error GoTo 0
     Exit Sub
     
@@ -96,9 +95,7 @@ Public Sub Test_vtkGetFileFromTemplate()
     On Error GoTo Test_vtkGetFileFromTemplate_Error
     
     Set wbb = getTestFileFromTemplate(fileName:="TestModule.bas")
-    mAssert.Equals Dir(vtkTestPath & "\" & "TestModule.bas"), "TestModule.bas", "Bad test the file TestModule hasn't been copied in folder Test"
-    
-    vtkCleanFolder VBAToolKit.vtkTestPath
+    mAssert.Equals Dir(VBAToolKit.vtkTestPath & "\" & "TestModule.bas"), "TestModule.bas", "Bad test the file TestModule hasn't been copied in folder Test"
     
     On Error GoTo 0
     Exit Sub
@@ -114,13 +111,35 @@ Public Sub Test_vtkGetNotFileFromTemplate()
     Dim wbb As Workbook
     
     On Error GoTo Test_vtkGetNotFileFromTemplate_Error
+    
     Set wbb = getTestFileFromTemplate(fileName:="Error.bas")
-    mAssert.Equals Dir(vtkTestPath & "\" & "Error.bas"), "", "Bad test the file Error doesn't exist from template"
+    mAssert.Equals Dir(VBAToolKit.vtkTestPath & "\" & "Error.bas"), "", "Bad test the file Error doesn't exist from template"
+    On Error GoTo 0
+    Exit Sub
+Test_vtkGetNotFileFromTemplate_Error:
+    If Err.number <> VTK_FILE_NOT_FOUND Then mAssert.Should False, "Unexpected error " & Err.number & " (" & Err.Description & ") in procedure Test_vtkGetNotFileFromTemplate of Class Module vtkTestUtilitiesTester"
+    Resume Next
+    
+End Sub
+
+Public Sub Test_vtkGetReplaceFileFromTemplate()
+    Dim fso As FileSystemObject, wbb As Workbook
+
+    Set fso = CreateObject("Scripting.FileSystemObject")
+    
+    On Error GoTo Test_vtkGetReplaceFileFromTemplate_Error
+    
+    fso.CreateTextFile (VBAToolKit.vtkTestPath & "\" & "TestModule.bas")
+    
+    Set wbb = getTestFileFromTemplate(fileName:="TestModule.bas")
+    
+    mAssert.Should vtkTextFileReader(VBAToolKit.vtkTestPath & "\" & "TestModule.bas") <> "", "the copied file doesn't replace the existing file"
+    
     On Error GoTo 0
     Exit Sub
     
-Test_vtkGetNotFileFromTemplate_Error:
-    If Err.number <> 53 Then mAssert.Should False, "Unexpected error " & Err.number & " (" & Err.Description & ") in procedure Test_vtkGetNotFileFromTemplate of Class Module vtkTestUtilitiesTester"
+Test_vtkGetReplaceFileFromTemplate_Error:
+    mAssert.Should False, "Unexpected error " & Err.number & " (" & Err.Description & ") in procedure Test_vtkGetReplaceFileFromTemplate of Class Module vtkTestUtilitiesTester"
     Resume Next
     
 End Sub
@@ -131,6 +150,7 @@ Private Function ITest_Suite() As TestSuite
     ITest_Suite.AddTest ITest_Manager.ClassName, "Test_vtkTestPath"
     ITest_Suite.AddTest ITest_Manager.ClassName, "Test_vtkGetFileFromTemplate"
     ITest_Suite.AddTest ITest_Manager.ClassName, "Test_vtkGetNotFileFromTemplate"
+    ITest_Suite.AddTest ITest_Manager.ClassName, "Test_vtkGetReplaceFileFromTemplate"
 End Function
 
 Private Sub ITestCase_RunTest()
@@ -138,6 +158,7 @@ Private Sub ITestCase_RunTest()
         Case "Test_vtkTestPath": Test_vtkTestPath
         Case "Test_vtkGetFileFromTemplate": Test_vtkGetFileFromTemplate
         Case "Test_vtkGetNotFileFromTemplate": Test_vtkGetNotFileFromTemplate
+        Case "Test_vtkGetReplaceFileFromTemplate": Test_vtkGetReplaceFileFromTemplate
         Case Else: mAssert.Should False, "Invalid test name: " & mManager.methodName
     End Select
 End Sub

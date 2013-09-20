@@ -59,11 +59,16 @@ End Function
 '
 ' Note      : In case of Err 1004, 5 retries are attempted before return Nothing
 '             The Err 1004 can be raised if the file copy is not completely performed before opening
+' Error raised :
+'           - VTK_FILE_NOT_FOUND, in case of file name not found in template folder
+'           - VTK_UNEXPECTED_ERROR, all other case
 '---------------------------------------------------------------------------------------
 '
 Public Function getTestFileFromTemplate(fileName As String, Optional destinationName As String = "", Optional openExcel As Boolean = False) As Workbook
     Dim source As String, destination As String, errCount As Integer
     
+   On Error GoTo M_Error
+   
     ' Copy file
     source = vtkPathToTemplateFolder(pWorkBook) & "\" & fileName
     If destinationName Like "" Then
@@ -77,17 +82,21 @@ Public Function getTestFileFromTemplate(fileName As String, Optional destination
     Set getTestFileFromTemplate = Nothing
     If openExcel Then
         errCount = 0
-       On Error GoTo M_Error
         Set getTestFileFromTemplate = Workbooks.Open(destination)
-       On Error GoTo 0
     End If
+    
+   On Error GoTo 0
     Exit Function
 
 M_Error:
     errCount = errCount + 1
     If Err.number = 1004 And errCount < 5 Then Resume    ' It's possible that the file is not ready, just after copy : in this case retry
     Set getTestFileFromTemplate = Nothing
-    Err.Raise number:=Err.number, source:=Err.source, Description:=Err.Description
+    If Err.number = 53 Then    ' File not Found
+        Err.Raise number:=VTK_FILE_NOT_FOUND, source:="getTestFileFromTemplate", Description:="File not found : " & source
+       Else
+        Err.Raise VTK_UNEXPECTED_ERROR, "getTestFileFromTemplate", "(" & Err.num & ") " & Err.Description
+    End If
 End Function
 
 
