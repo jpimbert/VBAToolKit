@@ -92,13 +92,29 @@ M_Error:
     errCount = errCount + 1
     If Err.number = 1004 And errCount < 5 Then Resume    ' It's possible that the file is not ready, just after copy : in this case retry
     Set getTestFileFromTemplate = Nothing
-    If Err.number = 53 Then    ' File not Found
-        Err.Raise number:=VTK_FILE_NOT_FOUND, source:="getTestFileFromTemplate", Description:="File not found : " & source
-       Else
-        Err.Raise VTK_UNEXPECTED_ERROR, "getTestFileFromTemplate", "(" & Err.num & ") " & Err.Description
-    End If
+    Select Case Err.number
+        Case 53
+            Err.Raise number:=VTK_FILE_NOT_FOUND, source:="getTestFileFromTemplate", Description:="File not found : " & source
+        Case 75
+            Err.Raise number:=VTK_DOESNT_COPY_FOLDER, source:="getTestFileFromTemplate", Description:="A file can't be copied : " & source
+        Case Else
+            Err.Raise VTK_UNEXPECTED_ERROR, "getTestFileFromTemplate", "(" & Err.number & ") " & Err.Description
+    End Select
 End Function
 
+
+'---------------------------------------------------------------------------------------
+' Procedure  : vtkGetTestFolderFromTemplate
+' Author     : Champonnois
+' Date       : 23/09/2013
+' Purpose    : Copy a folder from the Template folder to the Test folder
+' Parameters :
+'           - fileName as string, folder to get from the Template folder
+'           - Optional destinationName as string, name of folder to create in the Test folder (same as folderName by default)
+'---------------------------------------------------------------------------------------
+Public Function vtkGetTestFolderFromTemplate(folderName As String, Optional destinationName As String = "")
+
+End Function
 
 '---------------------------------------------------------------------------------------
 ' Procedure : insertDummyProcedureInCodeModule

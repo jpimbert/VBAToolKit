@@ -35,3 +35,4 @@ Public Const VTK_INEXISTANT_CONFIGURATION = 4002        ' Unknown configuration
 Public Const VTK_WORKBOOK_NOTOPEN = 4003
 
 Public Const VTK_FILE_NOT_FOUND = 5003
+Public Const VTK_DOESNT_COPY_FOLDER = 5004
