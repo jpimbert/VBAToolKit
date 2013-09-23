@@ -23,6 +23,7 @@ Option Explicit
 
 Public Const VTK_OK = 0
 Public Const VTK_UNEXPECTED_ERROR = 2001
+Public Const VTK_WRONG_FILE_PATH = 2075
 Public Const VTK_WRONG_FOLDER_PATH = 2076
 Public Const VTK_FORBIDDEN_PARAMETER = 2077
 
