@@ -28,27 +28,29 @@ Option Explicit
 '---------------------------------------------------------------------------------------
 '
 Public Function vtkNormalizeToken(token As String, listOfTokens() As String) As String
-    Dim tmpToken As String
-    
+
     On Error GoTo vtkNormalizeToken_Error
-
-    For Each tmpToken In listOfTokens
-        If StrComp(UCase(token), UCase(tmpToken)) = 0 Then
-            vtkNormalizeToken = tmpToken
-            Exit Sub
-        End If
-    Next
     
-    vtkNormalizeToken = token
-
+    ' If the list is not empty
+    If Len(Join(listOfTokens, "")) <> 0 Then
+        Dim i As Integer
+        For i = LBound(listOfTokens) To UBound(listOfTokens)
+            If StrComp(UCase(token), UCase(listOfTokens(i))) = 0 Then
+                vtkNormalizeToken = listOfTokens(i)
+                Exit Function
+            End If
+        Next
+    End If
+    
     On Error GoTo 0
+    vtkNormalizeToken = token
     Exit Function
 
 vtkNormalizeToken_Error:
     Err.source = "function vtkNormalizeToken of module vtkNormalize"
     Err.number = VTK_UNEXPECTED_ERROR
     Err.Raise Err.number, Err.source, Err.Description
-    Exit Sub
+    Exit Function
 End Function
 
 
@@ -148,17 +150,18 @@ Exit Function
 
 vtkNormalizeString_Error:
     
-    Err.source = "vtkNormalizeString of module vtkNormalize"
+    Err.source = "function vtkNormalizeString of module vtkNormalize"
     
-    If Err.number = VTK_UNEXPECTED_END Then
-        Err.Description = "Unexpected EOS in String " & s
-    ElseIf Err.number = VTK_UNEXPECTED_CHAR Then
-        Err.Description = "Unexpected character of Ascii code " & Asc(ch) & " in String " & s & " at position " & p
-    Else
-        Err.number = VTK_UNEXPECTED_ERROR
-    End If
+    Select Case Err.number
+        Case VTK_UNEXPECTED_END
+            Err.Description = "Unexpected EOS in String " & s
+        Case VTK_UNEXPECTED_CHAR
+            Err.Description = "Unexpected character of Ascii code " & Asc(ch) & " in String " & s & " at position " & p
+        Case Else
+            Err.number = VTK_UNEXPECTED_ERROR
+    End Select
     
-    Err.Raise Err.number
+    Err.Raise Err.number, Err.source, Err.Description
     
 End Function
 
@@ -196,7 +199,6 @@ On Error GoTo vtkNormalizeFile_Error
     Set textFileWrite = fso.OpenTextFile(normalizedFullFilePath, ForWriting)
     
     ' Copy each line of the input file in the output file after normalizing it
-    Dim strLine As String
     Do Until textFileRead.AtEndOfStream
         textFileWrite.WriteLine (vtkNormalizeString(textFileRead.ReadLine, listOfTokens))
     Loop
@@ -216,7 +218,18 @@ On Error GoTo vtkNormalizeFile_Error
    Exit Sub
 
 vtkNormalizeFile_Error:
-    Err.Raise VTK_UNEXPECTED_ERROR, "vtkNormalizeFile", Err.Description
+
+    Err.source = "sub vtkNormalizeFile of module vtkNormalize"
+    
+    Select Case Err.number
+        Case 53
+            Err.number = VTK_WRONG_FILE_PATH
+        Case Else
+            Err.number = VTK_UNEXPECTED_ERROR
+    End Select
+    
+    Err.Raise Err.number, Err.source, Err.Description
+    
     Exit Sub
     
 End Sub

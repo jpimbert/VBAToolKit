@@ -57,14 +57,29 @@ Private Function getListOfIdentifiersToNormalize() As String()
     getListOfIdentifiersToNormalize = Split(listOfIdentifiersToNormalize, ",")
 End Function
 
-Private Function fillFile(filePath As String)
+Private Function fillFile1(filePath As String)
     Dim fso As New FileSystemObject
     Dim ts As TextStream
-
-    ts = fso.OpenTextFile(filePath, ForWriting)
+    
+    Set ts = fso.OpenTextFile(filePath, ForWriting)
     
     ts.WriteLine fileLine1
     ts.WriteLine fileLine2
+    
+    ts.Close
+
+End Function
+
+Private Function fillFile2(filePath As String)
+    Dim fso As New FileSystemObject
+    Dim ts As TextStream
+    
+    Set ts = fso.OpenTextFile(filePath, ForWriting)
+    
+    ts.Write fileLine1 & vbNewLine
+    ts.Write fileLine2
+    
+    ts.Close
 
 End Function
 
@@ -110,7 +125,8 @@ End Sub
 '   test special characters like vbTab and vbNewLine : should not be different
 '
 ' Normalize File
-'   wrong file path : VTK_WRONG_FILE_PATH
+'   file doesn't exist : VTK_WRONG_FILE_PATH
+'   file is a folder : VTK_FORBIDDEN_PARAMETER
 '   file has the same length before and after normalization
 '   file content is properly cased
 '
@@ -387,7 +403,7 @@ Public Sub Test_vtkNormalizeString_stringHasSpecialCharacters()
     On Error GoTo Test_vtkNormalizeString_stringHasSpecialCharacters_Error
 
     str = "FOOBAR" & vbNewLine & "TEST1" & vbTab & "foo_bar"
-    expected = "FooBar" & vbNewLine & "Test1" & vbTab & "foo_BAR"
+    expected = "FooBar" & vbNewLine & "test1" & vbTab & "foo_BAR"
     result = vtkNormalizeString(str, getListOfIdentifiersToNormalize)
 
     mAssert.Should StrComp(expected, result) = 0, _
@@ -404,7 +420,7 @@ Test_vtkNormalizeString_stringHasSpecialCharacters_Error:
 End Sub
 
 Public Sub Test_vtkNormalizeFile_wrongPath()
-'   wrong file path : VTK_WRONG_FILE_PATH
+'   file doesn't exist : VTK_WRONG_FILE_PATH
     
     Dim error As Integer: error = 0
 
@@ -422,19 +438,42 @@ Test_vtkNormalizeFile_wrongPath_Error:
     Resume Next
 End Sub
 
-Public Sub Test_vtkNormalizeFile_sameSizeBeforeThanAfter()
-'   file has the same length before and after normalization
+Public Sub Test_vtkNormalizeFile_folderPath()
+'   file is a folder : VTK_WRONG_FILE_PATH
+    
+    Dim error As Integer: error = 0
+    Dim fso As New FileSystemObject
+    Dim dummyFolder As String
+    dummyFolder = VBAToolKit.vtkTestPath & "\dummyFolder"
+    fso.CreateFolder (dummyFolder)
+    
+    On Error GoTo Test_vtkNormalizeFile_wrongPath_Error
+
+    vtkNormalizeFile dummyFolder, getListOfIdentifiersToNormalize
+    
+    mAssert.Equals error, VTK_WRONG_FILE_PATH
+
+    On Error GoTo 0
+    Exit Sub
+
+Test_vtkNormalizeFile_wrongPath_Error:
+    error = Err.number
+    Resume Next
+End Sub
+
+Public Sub Test_vtkNormalizeFile_sameSizeBeforeThanAfter1()
+'   file has the same length before and after normalization : file initialized with WriteLine
 
     On Error GoTo Test_vtkNormalizeFile_sameSizeBeforeThanAfter_Error
 
     Dim fso As New FileSystemObject
-
+    
     Dim oldSize As Long: oldSize = 0
     Dim newSize As Long: newSize = 0
     
     ' Creation and initialization of the file
     fso.CreateTextFile dummyFile
-    fillFile dummyFile
+    fillFile1 dummyFile
 
     ' Measure size before processing, process, measure size after processing
     oldSize = fso.GetFile(dummyFile).Size
@@ -442,14 +481,42 @@ Public Sub Test_vtkNormalizeFile_sameSizeBeforeThanAfter()
     newSize = fso.GetFile(dummyFile).Size
     
     ' Compare
-    mAssert.Equals oldSize, newSize, "Normalization shouldn't change the file size."
-
+    mAssert.Equals oldSize, newSize, "Normalization shouldn't change the file size as it has a carriage return as las character."
     On Error GoTo 0
     Exit Sub
 
 Test_vtkNormalizeFile_sameSizeBeforeThanAfter_Error:
     mAssert.Should False, "Unexpected error " & Err.number & " (" & Err.Description & ") in procedure Test_vtkNormalizeFile_sameSizeBeforeThanAfter of Class Module vtkNormalizeTester"
-    Resume Next
+    Exit Sub
+End Sub
+
+Public Sub Test_vtkNormalizeFile_sameSizeBeforeThanAfter2()
+'   file has the same length before and after normalization: file initialized without WriteLine
+
+    On Error GoTo Test_vtkNormalizeFile_sameSizeBeforeThanAfter_Error
+
+    Dim fso As New FileSystemObject
+    
+    Dim oldSize As Long: oldSize = 0
+    Dim newSize As Long: newSize = 0
+    
+    ' Creation and initialization of the file
+    fso.CreateTextFile dummyFile
+    fillFile2 dummyFile
+
+    ' Measure size before processing, process, measure size after processing
+    oldSize = fso.GetFile(dummyFile).Size
+    vtkNormalizeFile dummyFile, getListOfIdentifiersToNormalize
+    newSize = fso.GetFile(dummyFile).Size
+    
+    ' Compare
+    mAssert.Equals oldSize, newSize - 2, "Normalization should add 2 bytes as the file did not have a carriage return as last character."
+    On Error GoTo 0
+    Exit Sub
+
+Test_vtkNormalizeFile_sameSizeBeforeThanAfter_Error:
+    mAssert.Should False, "Unexpected error " & Err.number & " (" & Err.Description & ") in procedure Test_vtkNormalizeFile_sameSizeBeforeThanAfter of Class Module vtkNormalizeTester"
+    Exit Sub
 End Sub
 
 Public Sub Test_vtkNormalizeFile_fileContent()
@@ -458,19 +525,38 @@ Public Sub Test_vtkNormalizeFile_fileContent()
     Dim fso As New FileSystemObject
     Dim ts As TextStream
     
+    Dim expected As String
+    Dim result As String
+    
     On Error GoTo Test_vtkNormalizeFile_fileContent_Error
 
+    ' Initialize the file
     fso.CreateTextFile dummyFile
-    fillFile dummyFile
+    fillFile1 dummyFile
     
-    mAssert.Equals StrComp(vtkNormalizeString(fileLine1, getListOfIdentifiersToNormalize), _
-                    vtkNormalizeString(ts.ReadLine, getListOfIdentifiersToNormalize)), _
-                    0, "First line of the file should be properly cased."
+    ' Process it
+    vtkNormalizeFile dummyFile, getListOfIdentifiersToNormalize
 
-    mAssert.Equals StrComp(vtkNormalizeString(fileLine2, getListOfIdentifiersToNormalize), _
-                    vtkNormalizeString(ts.ReadLine, getListOfIdentifiersToNormalize)), _
-                    0, "Second line of the file should be properly cased."
+    Set ts = fso.OpenTextFile(dummyFile, ForReading)
+    
+    ' First line
+    expected = vtkNormalizeString(fileLine1, getListOfIdentifiersToNormalize)
+    result = ts.ReadLine
+    mAssert.Should StrComp(expected, result) = 0, _
+                    "First line of the file should be properly cased." & vbNewLine & _
+                    "Expected : " & expected & vbNewLine & _
+                    "Result : " & result
 
+    ' Second line
+    expected = vtkNormalizeString(fileLine2, getListOfIdentifiersToNormalize)
+    result = ts.ReadLine
+    mAssert.Should StrComp(expected, result) = 0, _
+                    "First line of the file should be properly cased." & vbNewLine & _
+                    "Expected : " & expected & vbNewLine & _
+                    "Result : " & result
+    
+    ts.Close
+        
     On Error GoTo 0
     Exit Sub
 
@@ -478,6 +564,30 @@ Test_vtkNormalizeFile_fileContent_Error:
     mAssert.Should False, "Unexpected error " & Err.number & " (" & Err.Description & ") in procedure Test_vtkNormalizeFile_fileContent of Class Module vtkNormalizeTester"
     Resume Next
 
+End Sub
+
+Public Sub Test_vtkNormalizeFile_onlyOneFileInFolder()
+' tmp file has been deleted
+
+    Dim fso As New FileSystemObject
+    
+    ' Creation and initialization of the file
+    fso.CreateTextFile dummyFile
+    fillFile1 dummyFile
+    
+    On Error GoTo Test_vtkNormalizeFile_onlyOneFileInFolder_Error
+
+    vtkNormalizeFile dummyFile, getListOfIdentifiersToNormalize
+
+    mAssert.Equals fso.GetFolder(VBAToolKit.vtkTestPath).Files.count, 1, _
+            "There must only be one file in the directory, no tmp file or old file."
+    
+    On Error GoTo 0
+    Exit Sub
+
+Test_vtkNormalizeFile_onlyOneFileInFolder_Error:
+    mAssert.Should False, "Unexpected error " & Err.number & " (" & Err.Description & ") in procedure Test_vtkNormalizeFile_onlyOneFileInFolder of Class Module vtkNormalizeTester"
+    Resume Next
 End Sub
 
 Private Function ITest_Suite() As TestSuite
@@ -494,8 +604,11 @@ Private Function ITest_Suite() As TestSuite
     ITest_Suite.AddTest ITest_Manager.ClassName, "Test_vtkNormalizeString_tokensAreNotIdentifiers"
     ITest_Suite.AddTest ITest_Manager.ClassName, "Test_vtkNormalizeString_stringHasSpecialCharacters"
     ITest_Suite.AddTest ITest_Manager.ClassName, "Test_vtkNormalizeFile_wrongPath"
-    ITest_Suite.AddTest ITest_Manager.ClassName, "Test_vtkNormalizeFile_sameSizeBeforeThanAfter"
+    ITest_Suite.AddTest ITest_Manager.ClassName, "Test_vtkNormalizeFile_folderPath"
+    ITest_Suite.AddTest ITest_Manager.ClassName, "Test_vtkNormalizeFile_sameSizeBeforeThanAfter1"
+    ITest_Suite.AddTest ITest_Manager.ClassName, "Test_vtkNormalizeFile_sameSizeBeforeThanAfter2"
     ITest_Suite.AddTest ITest_Manager.ClassName, "Test_vtkNormalizeFile_fileContent"
+    ITest_Suite.AddTest ITest_Manager.ClassName, "Test_vtkNormalizeFile_onlyOneFileInFolder"
 End Function
 
 Private Sub ITestCase_RunTest()
@@ -512,8 +625,11 @@ Private Sub ITestCase_RunTest()
         Case "Test_vtkNormalizeString_tokensAreNotIdentifiers": Test_vtkNormalizeString_tokensAreNotIdentifiers
         Case "Test_vtkNormalizeString_stringHasSpecialCharacters": Test_vtkNormalizeString_stringHasSpecialCharacters
         Case "Test_vtkNormalizeFile_wrongPath": Test_vtkNormalizeFile_wrongPath
-        Case "Test_vtkNormalizeFile_sameSizeBeforeThanAfter": Test_vtkNormalizeFile_sameSizeBeforeThanAfter
+        Case "Test_vtkNormalizeFile_folderPath": Test_vtkNormalizeFile_folderPath
+        Case "Test_vtkNormalizeFile_sameSizeBeforeThanAfter1": Test_vtkNormalizeFile_sameSizeBeforeThanAfter1
+        Case "Test_vtkNormalizeFile_sameSizeBeforeThanAfter2": Test_vtkNormalizeFile_sameSizeBeforeThanAfter2
         Case "Test_vtkNormalizeFile_fileContent": Test_vtkNormalizeFile_fileContent
+        Case "Test_vtkNormalizeFile_onlyOneFileInFolder": Test_vtkNormalizeFile_onlyOneFileInFolder
         Case Else: mAssert.Should False, "Invalid test name: " & mManager.methodName
     End Select
 End Sub
