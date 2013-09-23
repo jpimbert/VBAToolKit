@@ -28,8 +28,27 @@ Option Explicit
 '---------------------------------------------------------------------------------------
 '
 Public Function vtkNormalizeToken(token As String, listOfTokens() As String) As String
-    'TODO : change the rule to a relevant rule
-    vtkNormalizeToken = LCase(token)
+    Dim tmpToken As String
+    
+    On Error GoTo vtkNormalizeToken_Error
+
+    For Each tmpToken In listOfTokens
+        If StrComp(UCase(token), UCase(tmpToken)) = 0 Then
+            vtkNormalizeToken = tmpToken
+            Exit Sub
+        End If
+    Next
+    
+    vtkNormalizeToken = token
+
+    On Error GoTo 0
+    Exit Function
+
+vtkNormalizeToken_Error:
+    Err.source = "function vtkNormalizeToken of module vtkNormalize"
+    Err.number = VTK_UNEXPECTED_ERROR
+    Err.Raise Err.number, Err.source, Err.Description
+    Exit Sub
 End Function
 
 

@@ -118,11 +118,20 @@ End Sub
 Public Sub Test_vtkNormalizeToken_wrongCase1()
 '   token in list, wrong case : casing is made proper
     
-    Dim normalized As String
+    Dim str As String
+    Dim expected As String
+    Dim result As String
     
     On Error GoTo Test_vtkNormalizeToken_wrongCase1_Error
-
-    mAssert.Equals StrComp(vtkNormalizeToken("FOOBAR", getListOfIdentifiersToNormalize), "FooBar"), 0, "Casing should have been corrected as token is in the list."
+    
+    str = "FOOBAR"
+    expected = "FooBar"
+    result = vtkNormalizeToken(str, getListOfIdentifiersToNormalize)
+    
+    mAssert.Should StrComp(expected, result) = 0, _
+                    "Casing should have been corrected as token is in the list." & vbNewLine & _
+                    "Expected : " & expected & vbNewLine & _
+                    "Result : " & result
 
     On Error GoTo 0
     Exit Sub
@@ -135,10 +144,21 @@ End Sub
 Public Sub Test_vtkNormalizeToken_wrongCase2()
 '   token in list, wrong case : casing is made proper
 
+    Dim str As String
+    Dim expected As String
+    Dim result As String
+
     On Error GoTo Test_vtkNormalizeToken_wrongCase2_Error
+    
+    str = "teSt2"
+    expected = "TEST2"
+    result = vtkNormalizeToken(str, getListOfIdentifiersToNormalize)
 
-    mAssert.Equals StrComp(vtkNormalizeToken("teSt2", getListOfIdentifiersToNormalize), "TEST2"), 0, "Casing should have been corrected as token is in the list."
-
+    mAssert.Should StrComp(expected, result) = 0, _
+                    "Casing should have been corrected as token is in the list." & vbNewLine & _
+                    "Expected : " & expected & vbNewLine & _
+                    "Result : " & result
+                    
     On Error GoTo 0
     Exit Sub
 
@@ -149,11 +169,22 @@ End Sub
 
 Public Sub Test_vtkNormalizeToken_wrongCase3()
 '   token containing a token in the list : casing is unchanged
+    
+    Dim str As String
+    Dim expected As String
+    Dim result As String
 
     On Error GoTo Test_vtkNormalizeToken_wrongCase3_Error
 
-    mAssert.Equals StrComp(vtkNormalizeToken("FOOBAR foobar", getListOfIdentifiersToNormalize), "FooBar_foobar"), 0, "Casing should not have been corrected as the two tokens are not separated."
-
+    str = "FOOBAR_foobar"
+    expected = "FOOBAR_foobar"
+    result = vtkNormalizeToken(str, getListOfIdentifiersToNormalize)
+    
+    mAssert.Should StrComp(expected, result) = 0, _
+                    "Casing should have been corrected as token is in the list." & vbNewLine & _
+                    "Expected : " & expected & vbNewLine & _
+                    "Result : " & result
+                    
     On Error GoTo 0
     Exit Sub
 
@@ -165,9 +196,20 @@ End Sub
 Public Sub Test_vtkNormalizeToken_tokenNotInList()
 '   token not in list : not modified
 
+    Dim str As String
+    Dim expected As String
+    Dim result As String
+
     On Error GoTo Test_vtkNormalizeToken_tokenNotInList_Error
 
-    mAssert.Equals StrComp(vtkNormalizeToken("NotInList", getListOfIdentifiersToNormalize), "NotInList"), 0, "Casing should not have been corrected as token is not in the list."
+    str = "NotInList"
+    expected = "NotInList"
+    result = vtkNormalizeToken(str, getListOfIdentifiersToNormalize)
+
+    mAssert.Should StrComp(expected, result) = 0, _
+                    "Casing should not have been corrected as token is not in the list." & vbNewLine & _
+                    "Expected : " & expected & vbNewLine & _
+                    "Result : " & result
 
     On Error GoTo 0
     Exit Sub
@@ -180,10 +222,20 @@ End Sub
 Public Sub Test_vtkNormalizeToken_notAnIdentifierButInList()
 '   token not an identifier, but in list : casing is changed
 
+    Dim str As String
+    Dim expected As String
+    Dim result As String
+
     On Error GoTo Test_vtkNormalizeToken_notAnIdentifierButInList_Error
 
-    mAssert.Equals StrComp(vtkNormalizeToken("1TEST", getListOfIdentifiersToNormalize), "1Test"), 0, "Casing should have been corrected as token has not been filtered yet."
+    str = "1TEST"
+    expected = "1Test"
+    result = vtkNormalizeToken(str, getListOfIdentifiersToNormalize)
 
+    mAssert.Should StrComp(expected, result) = 0, _
+                    "Casing should have been corrected as token is in the list." & vbNewLine & _
+                    "Expected : " & expected & vbNewLine & _
+                    "Result : " & result
     On Error GoTo 0
     Exit Sub
 
@@ -196,12 +248,22 @@ End Sub
 Public Sub Test_vtkNormalizeToken_listIsEmpty()
 '   list is empty : no token modified
 
+    Dim str As String
+    Dim expected As String
+    Dim result As String
+
     Dim emptyList() As String
 
     On Error GoTo Test_vtkNormalizeToken_listIsEmpty_Error
+    
+    str = "FOOBAR"
+    expected = "FOOBAR"
+    result = vtkNormalizeToken(expected, emptyList)
 
-    mAssert.Equals StrComp(vtkNormalizeToken("FOOBAR", emptyList), "FOOBAR"), 0, "Casing should be different as list is empty."
-
+    mAssert.Should StrComp(expected, result) = 0, _
+                    "Casing should not be different as list is empty." & vbNewLine & _
+                    "Expected : " & expected & vbNewLine & _
+                    "Result : " & result
     On Error GoTo 0
     Exit Sub
 
@@ -213,9 +275,20 @@ End Sub
 Public Sub Test_vtkNormalizeString_tokensInListAreCorrected()
 '   tokens in list, no comment : casing is corrected
 
+    Dim str As String
+    Dim expected As String
+    Dim result As String
+
     On Error GoTo Test_vtkNormalizeString_tokensInListAreCorrected_Error
 
-    mAssert.Equals StrComp(vtkNormalizeString("FOOBAR foo_bar", getListOfIdentifiersToNormalize), "FooBar foo_BAR"), 0
+    str = "FOOBAR foo_bar"
+    expected = "FooBar foo_BAR"
+    result = vtkNormalizeString(str, getListOfIdentifiersToNormalize)
+
+    mAssert.Should StrComp(expected, result) = 0, _
+                    "Casing should have been corrected as tokens are in the list." & vbNewLine & _
+                    "Expected : " & expected & vbNewLine & _
+                    "Result : " & result
 
     On Error GoTo 0
     Exit Sub
@@ -227,10 +300,21 @@ End Sub
 
 Public Sub Test_vtkNormalizeString_tokensAfterCommentAreNotCorrected()
 '   tokens in list after comment : casing is corrected before comment but not after
+    
+    Dim str As String
+    Dim expected As String
+    Dim result As String
 
     On Error GoTo Test_vtkNormalizeString_tokensAfterCommentAreNotCorrected_Error
 
-    mAssert.Equals StrComp(vtkNormalizeString("FOOBAR foo_bar 'FOOBAR", getListOfIdentifiersToNormalize), "FooBar foo_BAR 'FOOBAR"), 0, "Token after comment should not be corrected."
+    str = "FOOBAR foo_bar 'FOOBAR"
+    expected = "FooBar foo_BAR 'FOOBAR"
+    result = vtkNormalizeString(str, getListOfIdentifiersToNormalize)
+
+    mAssert.Should StrComp(expected, result) = 0, _
+                    "Token after comment should not be corrected." & vbNewLine & _
+                    "Expected : " & expected & vbNewLine & _
+                    "Result : " & result
 
     On Error GoTo 0
     Exit Sub
@@ -244,9 +328,20 @@ End Sub
 Public Sub Test_vtkNormalizeString_noBetweenQuotesOnlyAfterComments()
 '   tokens in list between quotes and after : casing is corrected before the comment quotes but not after they are closed
 
+    Dim str As String
+    Dim expected As String
+    Dim result As String
+
     On Error GoTo Test_vtkNormalizeString_noBetweenQuotesOnlyAfterComments_Error
 
-    mAssert.Equals StrComp(vtkNormalizeString("FOOBAR foo_bar 'FOOBAR' FOOBAR", getListOfIdentifiersToNormalize), "FooBar foo_BAR 'FOOBAR' FOOBAR"), 0, "Code after the closing quotes is a comment too and its case should not be changed."
+    str = "FOOBAR foo_bar 'FOOBAR' FOOBAR"
+    expected = "FooBar foo_BAR 'FOOBAR' FOOBAR"
+    result = vtkNormalizeString(str, getListOfIdentifiersToNormalize)
+
+    mAssert.Should StrComp(expected, result) = 0, _
+                    "Code after the closing quotes is a comment too and its case should not be changed." & vbNewLine & _
+                    "Expected : " & expected & vbNewLine & _
+                    "Result : " & result
 
     On Error GoTo 0
     Exit Sub
@@ -259,9 +354,20 @@ End Sub
 Public Sub Test_vtkNormalizeString_tokensAreNotIdentifiers()
 '   tokens are not identifiers : their casing should not be changed
 
+    Dim str As String
+    Dim expected As String
+    Dim result As String
+
     On Error GoTo Test_vtkNormalizeString_tokensAreNotIdentifiers_Error
 
-    mAssert.Equals StrComp(vtkNormalizeString("FOOBAR fOO-bar 1TEST", getListOfIdentifiersToNormalize), "FooBar fOO-bar 1TEST"), 0, "Only proper identifiers should have been corrected."
+    str = "FOOBAR fOO-bar 1TEST"
+    expected = "FooBar fOO-bar 1TEST"
+    result = vtkNormalizeString(str, getListOfIdentifiersToNormalize)
+
+    mAssert.Should StrComp(expected, result) = 0, _
+                    "Only proper identifiers should have been corrected." & vbNewLine & _
+                    "Expected : " & expected & vbNewLine & _
+                    "Result : " & result
 
     On Error GoTo 0
     Exit Sub
@@ -273,13 +379,22 @@ End Sub
 
 Public Sub Test_vtkNormalizeString_stringHasSpecialCharacters()
 '   test special characters like vbTab and vbNewLine : should not be different
+    
+    Dim str As String
+    Dim expected As String
+    Dim result As String
+    
     On Error GoTo Test_vtkNormalizeString_stringHasSpecialCharacters_Error
 
-    mAssert.Equals StrComp( _
-    vtkNormalizeString("FOOBAR" & vbNewLine & "TEST1" & vbTab & "foo_bar", getListOfIdentifiersToNormalize), _
-    "FooBar" & vbNewLine & "Test1" & vbTab & "foo_BAR"), 0, _
-    "No problem should occur with these special characters."
-    
+    str = "FOOBAR" & vbNewLine & "TEST1" & vbTab & "foo_bar"
+    expected = "FooBar" & vbNewLine & "Test1" & vbTab & "foo_BAR"
+    result = vtkNormalizeString(str, getListOfIdentifiersToNormalize)
+
+    mAssert.Should StrComp(expected, result) = 0, _
+                    "No problem should occur with these special characters." & vbNewLine & _
+                    "Expected : " & expected & vbNewLine & _
+                    "Result : " & result
+
     On Error GoTo 0
     Exit Sub
 
