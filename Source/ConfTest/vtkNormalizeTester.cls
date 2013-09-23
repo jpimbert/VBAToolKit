@@ -127,7 +127,8 @@ End Sub
 ' Normalize File
 '   file doesn't exist : VTK_WRONG_FILE_PATH
 '   file is a folder : VTK_FORBIDDEN_PARAMETER
-'   file has the same length before and after normalization
+'   file has been initialized with WriteLine : same length before and after normalization
+'   file does not end with vbNewLine : after normalization, file has the same length + 2 has a vbNewLine has been added
 '   file content is properly cased
 '
 
@@ -462,7 +463,7 @@ Test_vtkNormalizeFile_wrongPath_Error:
 End Sub
 
 Public Sub Test_vtkNormalizeFile_sameSizeBeforeThanAfter1()
-'   file has the same length before and after normalization : file initialized with WriteLine
+'   file has been initialized with WriteLine : same length before and after normalization
 
     On Error GoTo Test_vtkNormalizeFile_sameSizeBeforeThanAfter_Error
 
@@ -491,7 +492,7 @@ Test_vtkNormalizeFile_sameSizeBeforeThanAfter_Error:
 End Sub
 
 Public Sub Test_vtkNormalizeFile_sameSizeBeforeThanAfter2()
-'   file has the same length before and after normalization: file initialized without WriteLine
+'   file does not end with vbNewLine : after normalization, file has the same length + 2 has a vbNewLine has been added
 
     On Error GoTo Test_vtkNormalizeFile_sameSizeBeforeThanAfter_Error
 

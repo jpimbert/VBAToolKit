@@ -36,5 +36,5 @@ Public Const VTK_INEXISTANT_CONFIGURATION = 4002        ' Unknown configuration
 Public Const VTK_WORKBOOK_NOTOPEN = 4003
 
 Public Const VTK_UNEXPECTED_CHAR = 5001
-Public Const VTK_UNEXPECTED_END = 5002
+Public Const VTK_UNEXPECTED_EOS = 5002
 
