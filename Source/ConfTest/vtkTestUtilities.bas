@@ -77,7 +77,7 @@ Public Function getTestFileFromTemplate(fileName As String, Optional destination
         destination = vtkTestPath & "\" & destinationName
     End If
     FileCopy source:=source, destination:=destination
-    
+
     ' Open Excel file if required
     Set getTestFileFromTemplate = Nothing
     If openExcel Then
@@ -112,7 +112,7 @@ End Function
 '           - fileName as string, folder to get from the Template folder
 '           - Optional destinationName as string, name of folder to create in the Test folder (same as folderName by default)
 '---------------------------------------------------------------------------------------
-Public Function vtkGetTestFolderFromTemplate(folderName As String, Optional destinationName As String = "")
+Public Function vtkGetTestFolderFromTemplate(folderName As String, Optional destinationName As String = "") As Workbook
 
 End Function
 

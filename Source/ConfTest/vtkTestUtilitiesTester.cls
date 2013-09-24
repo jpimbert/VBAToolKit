@@ -56,8 +56,14 @@ Private Sub ITestCase_TearDown()
     vtkCleanFolder VBAToolKit.vtkTestPath
 End Sub
 
+
+'---------------------------------------------------------------------------------------
+' Procedure : Test_vtkTestPath
+' Author    : Champonnois
+' Purpose   : Get the path of a project that is not the active one
+'---------------------------------------------------------------------------------------
 Public Sub Test_vtkTestPath()
-    ' get the path of a project that is not the active one
+
     Dim wb1 As Workbook, wb2 As Workbook, p1 As vtkProject, p2 As vtkProject
     
     On Error GoTo Test_vtkTestPath_Error
@@ -88,8 +94,14 @@ Test_vtkTestPath_Error:
     
 End Sub
 
+
+'---------------------------------------------------------------------------------------
+' Procedure : Test_vtkGetFileFromTemplate
+' Author    : Champonnois
+' Purpose   : Verify the copy file from template in the folder test
+'---------------------------------------------------------------------------------------
 Public Sub Test_vtkGetFileFromTemplate()
-    'Verify the copy file from template in the folder test
+
     Dim wbb As Workbook
     
     On Error GoTo Test_vtkGetFileFromTemplate_Error
@@ -106,8 +118,14 @@ Test_vtkGetFileFromTemplate_Error:
     
 End Sub
 
+
+'---------------------------------------------------------------------------------------
+' Procedure : Test_vtkGetNotFileFromTemplate
+' Author    : Champonnois
+' Purpose   : Verifying an error is displayed if one doesn't possess the file template
+'---------------------------------------------------------------------------------------
 Public Sub Test_vtkGetNotFileFromTemplate()
-    'Verifying an error is displayed if one doesn't possess the file template
+
     Dim wbb As Workbook
     
     On Error GoTo Test_vtkGetNotFileFromTemplate_Error
@@ -122,8 +140,14 @@ Test_vtkGetNotFileFromTemplate_Error:
     
 End Sub
 
+
+'---------------------------------------------------------------------------------------
+' Procedure : Test_vtkGetReplaceFileFromTemplate
+' Author    : Champonnois
+' Purpose   : Test the replacement of an existing file
+'---------------------------------------------------------------------------------------
 Public Sub Test_vtkGetReplaceFileFromTemplate()
-    'Test the replacement of an existing file
+
     Dim fso As FileSystemObject, wbb As Workbook
 
     Set fso = CreateObject("Scripting.FileSystemObject")
@@ -146,14 +170,21 @@ Test_vtkGetReplaceFileFromTemplate_Error:
 End Sub
 
 
+'---------------------------------------------------------------------------------------
+' Procedure : Test_vtkGetFileFromTemplateOpenExcel
+' Author    : Champonnois
+' Purpose   : After copying an Excel file, verify if the file is opened
+'---------------------------------------------------------------------------------------
 Public Sub Test_vtkGetFileFromTemplateOpenExcel()
-    'After copying an Excel file, verify if the file is opened
+
     Dim wbb As Workbook
 
     On Error GoTo Test_vtkGetFileFromTemplateOpenExcel_Error
 
     Set wbb = getTestFileFromTemplate(fileName:="UninitializedProject.xlsm", openExcel:=True)
 
+    mAssert.Equals Dir(VBAToolKit.vtkTestPath & "\" & "UninitializedProject.xlsm"), "UninitializedProject.xlsm", "Bad test the file Error doesn't exist from template"
+    mAssert.Equals wbb.path, VBAToolKit.vtkTestPath, "the Excel file isn't open in the right directory"
     mAssert.Should VtkWorkbookIsOpen(wbb.name), "The file Excel isn't open"
 
     wbb.Close (False)
@@ -167,15 +198,21 @@ Test_vtkGetFileFromTemplateOpenExcel_Error:
     Resume Next
 End Sub
 
+
+'---------------------------------------------------------------------------------------
+' Procedure : Test_vtkGetFileFromTemplateExcelNotOpen
+' Author    : Champonnois
+' Purpose   : After copying an Excel file, verify if the file isn't opened
+'---------------------------------------------------------------------------------------
 Public Sub Test_vtkGetFileFromTemplateExcelNotOpen()
 
-    'After copying an Excel file, verify if the file isn't opened
     Dim wbb As Workbook
 
     On Error GoTo Test_vtkGetFileFromTemplateExcelNotOpen_Error
 
     Set wbb = getTestFileFromTemplate(fileName:="UninitializedProject.xlsm", openExcel:=False)
 
+    mAssert.Equals Dir(VBAToolKit.vtkTestPath & "\" & "UninitializedProject.xlsm"), "UninitializedProject.xlsm", "Bad test the file Error doesn't exist from template"
     mAssert.Should wbb Is Nothing, "The workbook shouldn't  exist"
     mAssert.Should Not VtkWorkbookIsOpen("UninitializedProject.xlsm"), "the file Excel shouldn't be open"
 
@@ -188,26 +225,41 @@ Test_vtkGetFileFromTemplateExcelNotOpen_Error:
     Resume Next
 End Sub
 
+
+'---------------------------------------------------------------------------------------
+' Procedure : Test_vtkGetErrorFolderFromTemplate
+' Author    : Champonnois
+' Purpose   : Verify the copy file from template in the folder test
+'---------------------------------------------------------------------------------------
 Public Sub Test_vtkGetErrorFolderFromTemplate()
-    'Verify the copy file from template in the folder test
+    
     Dim wbb As Workbook
 
     On Error GoTo Test_vtkGetErrorFolderFromTemplate_Error
+    On Error Resume Next
 
-    Set wbb = getTestFileFromTemplate(fileName:="EmptyFolder")
+    Set wbb = getTestFileFromTemplate(fileName:="Folder")
 
     mAssert.Should wbb Is Nothing, "The workbook shouldn't  exist"
-
+    mAssert.Equals Err.number, VTK_DOESNT_COPY_FOLDER, "The proper error must be raised when trying to copy a folder"
+    mAssert.Equals Dir(VBAToolKit.vtkTestPath & "\" & "Folder"), "", "The folder was copy"
+    
     On Error GoTo 0
     Exit Sub
 
 Test_vtkGetErrorFolderFromTemplate_Error:
-    If Err.number <> VTK_DOESNT_COPY_FOLDER Then mAssert.Should False, "Unexpected error " & Err.number & " (" & Err.Description & ") in procedure Test_vtkGetErrorFolderFromTemplate of Class Module vtkTestUtilitiesTester"
+    mAssert.Should False, "Unexpected error " & Err.number & " (" & Err.Description & ") in procedure Test_vtkGetErrorFolderFromTemplate of Class Module vtkTestUtilitiesTester"
     Resume Next
 End Sub
 
+
+'---------------------------------------------------------------------------------------
+' Procedure : Test_vtkGetFileNotVisibleFromTemplate
+' Author    : Champonnois
+' Purpose   : Verify the copy a hidden file from template
+'---------------------------------------------------------------------------------------
 Public Sub Test_vtkGetFileNotVisibleFromTemplate()
-    'Verify the copy a hidden file from template
+
     Dim wbb As Workbook
 
     On Error GoTo Test_vtkGetFileNotVisibleFromTemplate_Error
@@ -224,14 +276,20 @@ Test_vtkGetFileNotVisibleFromTemplate_Error:
     Resume Next
 End Sub
 
+
+'---------------------------------------------------------------------------------------
+' Procedure : Test_vtkGetFileFromTemplate_ParamDestination
+' Author    : Champonnois
+' Purpose   : Verify the copy file from template by providing the method the copy path
+'---------------------------------------------------------------------------------------
 Public Sub Test_vtkGetFileFromTemplate_ParamDestination()
-    'Verify the copy file from template by providing the method the copy path
+
     Dim wbb As Workbook
 
     On Error GoTo Test_vtkGetFileFromTemplate_ParamDestination_Error
 
-    Set wbb = getTestFileFromTemplate(fileName:="TestModule.bas", destinationName:="TestModule.bas")
-    mAssert.Equals Dir(VBAToolKit.vtkTestPath & "\" & "TestModule.bas"), "TestModule.bas", "Bad test the file TestModule hasn't been copied in folder Test"
+    Set wbb = getTestFileFromTemplate(fileName:="TestModule.bas", destinationName:="TestParamDestinationName.bas")
+    mAssert.Equals Dir(VBAToolKit.vtkTestPath & "\" & "TestParamDestinationName.bas"), "TestParamDestinationName.bas", "Bad test the file TestModule hasn't been copied in folder Test"
 
     On Error GoTo 0
     Exit Sub
@@ -242,35 +300,57 @@ Test_vtkGetFileFromTemplate_ParamDestination_Error:
 
 End Sub
 
+
+'---------------------------------------------------------------------------------------
+' Procedure : Test_vtkGetNotFileFromTemplate_ParamDestination
+' Author    : Champonnois
+' Purpose   : Same procedure as the copy of a nonexistent file, but with the given path
+'---------------------------------------------------------------------------------------
 Public Sub Test_vtkGetNotFileFromTemplate_ParamDestination()
-    'Same procedure as the copy of a nonexistent file, but with the given path
+    '
     Dim wbb As Workbook
 
     On Error GoTo Test_vtkGetNotFileFromTemplate_ParamDestination_Error
-
-    Set wbb = getTestFileFromTemplate(fileName:="Error.bas", destinationName:="Error.bas")
-    mAssert.Equals Dir(VBAToolKit.vtkTestPath & "\" & "Error.bas"), "", "Bad test the file Error doesn't exist from template"
+    On Error Resume Next
+    
+    Set wbb = getTestFileFromTemplate(fileName:="Error.bas", destinationName:="ErrorParamDestinationName.bas")
+    
+    mAssert.Equals Dir(VBAToolKit.vtkTestPath & "\" & "ErrorParamDestinationName.bas"), "", "Bad test the file Error doesn't exist from template"
+    mAssert.Equals Err.number, VTK_FILE_NOT_FOUND, "The proper error must be raised when trying to copy a folder"
+    
     On Error GoTo 0
     Exit Sub
+    
 Test_vtkGetNotFileFromTemplate_ParamDestination_Error:
-    If Err.number <> VTK_FILE_NOT_FOUND Then mAssert.Should False, "Unexpected error " & Err.number & " (" & Err.Description & ") in procedure Test_vtkGetNotFileFromTemplate_ParamDestination of Class Module vtkTestUtilitiesTester"
+    mAssert.Should False, "Unexpected error " & Err.number & " (" & Err.Description & ") in procedure Test_vtkGetNotFileFromTemplate_ParamDestination of Class Module vtkTestUtilitiesTester"
     Resume Next
 
 End Sub
 
+
+'---------------------------------------------------------------------------------------
+' Procedure : Test_vtkGetReplaceFileFromTemplate_ParamDestination
+' Author    : Champonnois
+' Purpose   : Copy of a file in the template generates the replacement of an existing file in the given path
+'---------------------------------------------------------------------------------------
 Public Sub Test_vtkGetReplaceFileFromTemplate_ParamDestination()
-    'Copy of a file in the template generates the replacement of an existing file in the given path
-    Dim fso As FileSystemObject, wbb As Workbook
+    
+    Dim fso As FileSystemObject, wbb As Workbook, FileLenBeforeCopy As Long, FileLenAfterCopy As Long
 
     Set fso = CreateObject("Scripting.FileSystemObject")
 
     On Error GoTo Test_vtkGetReplaceFileFromTemplate_ParamDestination_Error
 
-    fso.CreateTextFile (VBAToolKit.vtkTestPath & "\" & "TestModule.bas")
+    fso.CreateTextFile (VBAToolKit.vtkTestPath & "\" & "TestParamDestinationName.bas")
 
-    Set wbb = getTestFileFromTemplate(fileName:="TestModule.bas", destinationName:="TestModule.bas")
+    FileLenBeforeCopy = FileLen(VBAToolKit.vtkTestPath & "\" & "TestParamDestinationName.bas")
 
-    mAssert.Should vtkTextFileReader(VBAToolKit.vtkTestPath & "\" & "TestModule.bas") <> "", "the copied file doesn't replace the existing file"
+    Set wbb = getTestFileFromTemplate(fileName:="TestModule.bas", destinationName:="TestParamDestinationName.bas")
+
+    FileLenAfterCopy = FileLen(VBAToolKit.vtkTestPath & "\" & "TestParamDestinationName.bas")
+
+    mAssert.Equals Dir(VBAToolKit.vtkTestPath & "\" & "TestParamDestinationName.bas"), "TestParamDestinationName.bas", "Bad test the file Error doesn't exist from template"
+    mAssert.Should FileLenBeforeCopy < FileLenAfterCopy, "the copied file doesn't replace the existing file"
 
     On Error GoTo 0
     Exit Sub
@@ -281,65 +361,123 @@ Test_vtkGetReplaceFileFromTemplate_ParamDestination_Error:
 
 End Sub
 
+
+'---------------------------------------------------------------------------------------
+' Procedure : Test_vtkGetFolderFromTemplate
+' Author    : Champonnois
+' Date      : 23/09/2013
+' Purpose   : Verify the copy folder from template in the folder test
+'---------------------------------------------------------------------------------------
 Public Sub Test_vtkGetFolderFromTemplate()
-
+  
 End Sub
 
+
+'---------------------------------------------------------------------------------------
+' Procedure : Test_vtkGetNotFolderFromTemplate
+' Author    : Champonnois
+' Date      : 23/09/2013
+' Purpose   : Verifying an error is displayed if one doesn't possess the folder template
+'---------------------------------------------------------------------------------------
 Public Sub Test_vtkGetNotFolderFromTemplate()
-
+    
 End Sub
 
+
+'---------------------------------------------------------------------------------------
+' Procedure : Test_vtkGetErrorFileFromTemplate
+' Author    : Champonnois
+' Date      : 23/09/2013
+' Purpose   :
+'---------------------------------------------------------------------------------------
 Public Sub Test_vtkGetErrorFileFromTemplate()
-
+    
 End Sub
 
+
+'---------------------------------------------------------------------------------------
+' Procedure : Test_vtkGetReplaceFolderFromTemplate
+' Author    : Champonnois
+' Date      : 23/09/2013
+' Purpose   : Test the replacement of an existing folder
+'---------------------------------------------------------------------------------------
 Public Sub Test_vtkGetReplaceFolderFromTemplate()
-
+   
 End Sub
 
+'---------------------------------------------------------------------------------------
+' Procedure : Test_vtkGetFolderFromTemplate_ParamDestination
+' Author    : Champonnois
+' Date      : 23/09/2013
+' Purpose   : Verify the copy folder from template by providing the method the copy path
+'---------------------------------------------------------------------------------------
 Public Sub Test_vtkGetFolderFromTemplate_ParamDestination()
 
 End Sub
 
+'---------------------------------------------------------------------------------------
+' Procedure : Test_vtkGetNotFolderFromTemplate_ParamDestination
+' Author    : Champonnois
+' Date      : 23/09/2013
+' Purpose   : Same procedure as the copy of a nonexistent folder, but with the given path
+'---------------------------------------------------------------------------------------
 Public Sub Test_vtkGetNotFolderFromTemplate_ParamDestination()
-
+    
 End Sub
 
+'---------------------------------------------------------------------------------------
+' Procedure : Test_vtkGetReplaceFolderFromTemplate_ParamDestination
+' Author    : Champonnois
+' Date      : 23/09/2013
+' Purpose   : Copy of a folder in the template generates the replacement of an existing file in the given path
+'---------------------------------------------------------------------------------------
 Public Sub Test_vtkGetReplaceFolderFromTemplate_ParamDestination()
-
+    
 End Sub
 
+'---------------------------------------------------------------------------------------
+' Procedure : Test_vtkGetFolderNotVisibleFromTemplate
+' Author    : Champonnois
+' Date      : 23/09/2013
+' Purpose   : Verify the copy a hidden file from template
+'---------------------------------------------------------------------------------------
 Public Sub Test_vtkGetFolderNotVisibleFromTemplate()
-
+   
 End Sub
 
+'---------------------------------------------------------------------------------------
+' Procedure : Test_vtkGetFolderNotVisibleInFolderFromTemplate
+' Author    : Champonnois
+' Date      : 23/09/2013
+' Purpose   : Verify the copy a hidden folder from template
+'---------------------------------------------------------------------------------------
 Public Sub Test_vtkGetFolderNotVisibleInFolderFromTemplate()
-
+   
 End Sub
 
 
 Private Function ITest_Suite() As TestSuite
     Set ITest_Suite = New TestSuite
-    ITest_Suite.AddTest ITest_Manager.ClassName, "Test_vtkTestPath"
-    ITest_Suite.AddTest ITest_Manager.ClassName, "Test_vtkGetFileFromTemplate"
-    ITest_Suite.AddTest ITest_Manager.ClassName, "Test_vtkGetNotFileFromTemplate"
-    ITest_Suite.AddTest ITest_Manager.ClassName, "Test_vtkGetReplaceFileFromTemplate"
-    ITest_Suite.AddTest ITest_Manager.ClassName, "Test_vtkGetFileFromTemplateOpenExcel"
-    ITest_Suite.AddTest ITest_Manager.ClassName, "Test_vtkGetFileFromTemplateExcelNotOpen"
-    ITest_Suite.AddTest ITest_Manager.ClassName, "Test_vtkGetErrorFolderFromTemplate"
-    ITest_Suite.AddTest ITest_Manager.ClassName, "Test_vtkGetFileNotVisibleFromTemplate"
-    ITest_Suite.AddTest ITest_Manager.ClassName, "Test_vtkGetFileFromTemplate_ParamDestination"
-    ITest_Suite.AddTest ITest_Manager.ClassName, "Test_vtkGetNotFileFromTemplate_ParamDestination"
+    'ITest_Suite.AddTest ITest_Manager.ClassName, "Test_vtkTestPath"
+    'ITest_Suite.AddTest ITest_Manager.ClassName, "Test_vtkGetFileFromTemplate"
+    'ITest_Suite.AddTest ITest_Manager.ClassName, "Test_vtkGetNotFileFromTemplate"
+    'ITest_Suite.AddTest ITest_Manager.ClassName, "Test_vtkGetReplaceFileFromTemplate"
+    'ITest_Suite.AddTest ITest_Manager.ClassName, "Test_vtkGetFileFromTemplateOpenExcel"
+    'ITest_Suite.AddTest ITest_Manager.ClassName, "Test_vtkGetFileFromTemplateExcelNotOpen"
+    'ITest_Suite.AddTest ITest_Manager.ClassName, "Test_vtkGetErrorFolderFromTemplate"
+    'ITest_Suite.AddTest ITest_Manager.ClassName, "Test_vtkGetFileNotVisibleFromTemplate"
+    'ITest_Suite.AddTest ITest_Manager.ClassName, "Test_vtkGetFileFromTemplate_ParamDestination"
+    'ITest_Suite.AddTest ITest_Manager.ClassName, "Test_vtkGetNotFileFromTemplate_ParamDestination"
     ITest_Suite.AddTest ITest_Manager.ClassName, "Test_vtkGetReplaceFileFromTemplate_ParamDestination"
-    ITest_Suite.AddTest ITest_Manager.ClassName, "Test_vtkGetFolderFromTemplate"
-    ITest_Suite.AddTest ITest_Manager.ClassName, "Test_vtkGetNotFolderFromTemplate"
-    ITest_Suite.AddTest ITest_Manager.ClassName, "Test_vtkGetErrorFileFromTemplate"
-    ITest_Suite.AddTest ITest_Manager.ClassName, "Test_vtkGetReplaceFolderFromTemplate"
-    ITest_Suite.AddTest ITest_Manager.ClassName, "Test_vtkGetFolderFromTemplate_ParamDestination"
-    ITest_Suite.AddTest ITest_Manager.ClassName, "Test_vtkGetNotFolderFromTemplate_ParamDestination"
-    ITest_Suite.AddTest ITest_Manager.ClassName, "Test_vtkGetReplaceFolderFromTemplate_ParamDestination"
-    ITest_Suite.AddTest ITest_Manager.ClassName, "Test_vtkGetFolderNotVisibleFromTemplate"
-    ITest_Suite.AddTest ITest_Manager.ClassName, "Test_vtkGetFolderNotVisibleInFolderFromTemplate"
+    'ITest_Suite.AddTest ITest_Manager.ClassName, "Test_vtkGetFolderFromTemplate"
+    'ITest_Suite.AddTest ITest_Manager.ClassName, "Test_vtkGetNotFolderFromTemplate"
+    'ITest_Suite.AddTest ITest_Manager.ClassName, "Test_vtkGetErrorFileFromTemplate"
+    'ITest_Suite.AddTest ITest_Manager.ClassName, "Test_vtkGetReplaceFolderFromTemplate"
+    'ITest_Suite.AddTest ITest_Manager.ClassName, "Test_vtkGetFolderFromTemplate_ParamDestination"
+    'ITest_Suite.AddTest ITest_Manager.ClassName, "Test_vtkGetNotFolderFromTemplate_ParamDestination"
+    'ITest_Suite.AddTest ITest_Manager.ClassName, "Test_vtkGetReplaceFolderFromTemplate_ParamDestination"
+    'ITest_Suite.AddTest ITest_Manager.ClassName, "Test_vtkGetFolderNotVisibleFromTemplate"
+    'ITest_Suite.AddTest ITest_Manager.ClassName, "Test_vtkGetFolderNotVisibleInFolderFromTemplate"
 End Function
 
 Private Sub ITestCase_RunTest()
