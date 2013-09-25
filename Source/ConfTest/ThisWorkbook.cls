@@ -17,9 +17,6 @@ Attribute VB_Exposed = True
 '      This module exists in slightly different Prod and Test versions
 '          - explicit call to VBAToolKit project for Prod version
 '          - explicit call to VBAToolKit_DEV project for Test version
-' TO DO
-'   Dans la version PROD, recréer la barre VBE à l'ouverture du fichier (la VBE est temporaire)
-'   Dans la version DEV, exporter les modules modifiés lors de la sauvegarde
 '
 ' Copyright 2013 Skwal-Soft (http://skwalsoft.com)
 '
