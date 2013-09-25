@@ -123,6 +123,7 @@ End Sub
 '   tokens in list between quotes and after : casing is corrected before the comment quotes but not after they are closed
 '   tokens are not identifiers : their casing should not be changed
 '   test special characters like vbTab and vbNewLine : should not be different
+'   tokens in list between and out quotes : those between quotes are not modified, those out of them are
 '
 ' Normalize File
 '   file doesn't exist : VTK_WRONG_FILE_PATH
@@ -420,6 +421,34 @@ Test_vtkNormalizeString_stringHasSpecialCharacters_Error:
     Resume Next
 End Sub
 
+
+Public Sub Test_vtkNormalizeString_quotes()
+'   tokens in list between and out quotes : those between quotes are not modified, those out of them are
+
+    On Error GoTo Test_vtkNormalizeString_quotes_Error
+
+    Dim str As String
+    Dim expected As String
+    Dim result As String
+    
+    str = "FOOBAR ""foobar"" FOOBAR"
+    expected = "FooBar ""foobar"" FooBar"
+    result = vtkNormalizeString(str, getListOfIdentifiersToNormalize)
+
+    mAssert.Should StrComp(expected, result) = 0, _
+                    "The whole string except the part between the quotes should be normalized." & vbNewLine & _
+                    "Expected : " & expected & vbNewLine & _
+                    "Result : " & result
+
+    On Error GoTo 0
+    Exit Sub
+
+Test_vtkNormalizeString_quotes_Error:
+    mAssert.Should False, "Unexpected error " & Err.number & " (" & Err.Description & ") in procedure Test_vtkNormalizeString_quotes of Class Module vtkNormalizeTester"
+    Resume Next
+End Sub
+
+
 Public Sub Test_vtkNormalizeFile_wrongPath()
 '   file doesn't exist : VTK_WRONG_FILE_PATH
     
@@ -604,6 +633,7 @@ Private Function ITest_Suite() As TestSuite
     ITest_Suite.AddTest ITest_Manager.ClassName, "Test_vtkNormalizeString_noBetweenQuotesOnlyAfterComments"
     ITest_Suite.AddTest ITest_Manager.ClassName, "Test_vtkNormalizeString_tokensAreNotIdentifiers"
     ITest_Suite.AddTest ITest_Manager.ClassName, "Test_vtkNormalizeString_stringHasSpecialCharacters"
+    ITest_Suite.AddTest ITest_Manager.ClassName, "Test_vtkNormalizeString_quotes"
     ITest_Suite.AddTest ITest_Manager.ClassName, "Test_vtkNormalizeFile_wrongPath"
     ITest_Suite.AddTest ITest_Manager.ClassName, "Test_vtkNormalizeFile_folderPath"
     ITest_Suite.AddTest ITest_Manager.ClassName, "Test_vtkNormalizeFile_sameSizeBeforeThanAfter1"
@@ -625,6 +655,7 @@ Private Sub ITestCase_RunTest()
         Case "Test_vtkNormalizeString_noBetweenQuotesOnlyAfterComments": Test_vtkNormalizeString_noBetweenQuotesOnlyAfterComments
         Case "Test_vtkNormalizeString_tokensAreNotIdentifiers": Test_vtkNormalizeString_tokensAreNotIdentifiers
         Case "Test_vtkNormalizeString_stringHasSpecialCharacters": Test_vtkNormalizeString_stringHasSpecialCharacters
+        Case "Test_vtkNormalizeString_quotes": Test_vtkNormalizeString_quotes
         Case "Test_vtkNormalizeFile_wrongPath": Test_vtkNormalizeFile_wrongPath
         Case "Test_vtkNormalizeFile_folderPath": Test_vtkNormalizeFile_folderPath
         Case "Test_vtkNormalizeFile_sameSizeBeforeThanAfter1": Test_vtkNormalizeFile_sameSizeBeforeThanAfter1

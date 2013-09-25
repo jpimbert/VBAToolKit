@@ -28,7 +28,7 @@ Private properlyCasedIdentifiersArray() As String
 '---------------------------------------------------------------------------------------
 ' Procedure : initializeList
 ' Author    : Lucas Vitorino
-' Purpose   : This function initializes the list of properly cased identifiers used to normalize the source code.
+' Purpose   : This Sub initializes the list of properly cased identifiers used to normalize the source code.
 '---------------------------------------------------------------------------------------
 '
 Private Sub initializeList()
@@ -53,12 +53,12 @@ Private Sub initializeList()
     "Source" & "," & _
     ""
     
-    properlyCaseIdentifiersArray = Split(properlyCasedIdentifiersString, ",")
+    properlyCasedIdentifiersArray = Split(properlyCasedIdentifiersString, ",")
     
 End Sub
 
 '---------------------------------------------------------------------------------------
-' Procedure : vtkListOfWordsToNormalize
+' Procedure : vtkListOfProperlyCasedIdentifiers
 ' Author    : Lucas Vitorino
 ' Purpose   : This functions returns the array containing the properly cased Strings.
 '---------------------------------------------------------------------------------------
@@ -158,6 +158,10 @@ Do While p <= Len(s)
                     returnString = returnString & ch
                     token = ""
                     State = 2
+                ElseIf ch Like "[""]" Then
+                    returnString = returnString & ch
+                    token = ""
+                    State = 3
                 ElseIf ch Like "[!']" Then
                     returnString = returnString & ch
                     token = ""
@@ -177,6 +181,10 @@ Do While p <= Len(s)
                     returnString = returnString & vtkNormalizeToken(token, listOfTokens) & ch
                     token = ""
                     State = 2
+                ElseIf ch Like "[""]" Then
+                    returnString = returnString & vtkNormalizeToken(token, listOfTokens) & ch
+                    token = ""
+                    State = 3
                 ElseIf ch Like "[!']" Then
                     returnString = returnString & vtkNormalizeToken(token, listOfTokens) & ch
                     token = ""
@@ -186,7 +194,7 @@ Do While p <= Len(s)
 
 
             Case 2:
-                ' The analyser is in a comment : copy characters without modifying
+                ' The analyser is in a comment : copy characters without modifying until end of String
                 If Asc(ch) = 0 Then
                     State = 9
                 ElseIf Asc(ch) > 0 Then
@@ -194,6 +202,20 @@ Do While p <= Len(s)
                     State = 2
                 Else: Err.Raise VTK_UNEXPECTED_CHAR
                 End If
+                
+            Case 3:
+                'The analyser is in a String : copy characters without modifying until a quote
+                If Asc(ch) = 0 Then
+                    State = 9
+                ElseIf ch Like "[""]" Then
+                    returnString = returnString & ch
+                    State = 0
+                ElseIf Asc(ch) > 0 Then
+                    returnString = returnString & ch
+                    State = 3
+                Else: Err.Raise VTK_UNEXPECTED_CHAR
+                End If
+                    
 
             Case 9:
                 If True Then
