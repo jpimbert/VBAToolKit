@@ -144,6 +144,8 @@ End Sub
 '    - expected : all modules are exported, already existing modules are normalized
 '
 ' -------------------------------------------------------------------------
+
+
 Public Sub Test_vtkExportConfiguration_filesNotYetCreatedTrue()
 ' Source files are not yet created, onlyModified = True => expected : all modules are exported
     
@@ -534,12 +536,19 @@ Private Sub insertDummyLineInCodeModule(codemo As VBIDE.CodeModule, dummyLine As
     End With
 End Sub
 
-Private Function getLastLineOfCodeModule(codemo As VBIDE.CodeModule) As String
-    getLastLineOfCodeModule = codemo.Lines(codemo.CountOfLines, 1)
+Private Function getLastLineOfTextFile(textFilePath As String) As String
+    Dim str As String
+    Dim tmp As String
+    
+    str = vtkTextFileReader(textFilePath)
+    tmp = Split(str, Chr(10))(UBound(Split(str, Chr(10))))
+    If Len(tmp) < 2 Then tmp = Split(str, Chr(10))(UBound(Split(str, Chr(10))) - 1)
+    getLastLineOfTextFile = tmp
+    
 End Function
 
 
-Public Sub vtkExportConfiguration_modifiedModuleIsNormalizedOMTrue()
+Public Sub Test_vtkExportConfiguration_modifiedModuleIsNormalizedOMTrue()
 ' - Source files are exported, 1 module is modified, onlyModified = True
 '    - expected : one module is exported and modified
 
@@ -556,16 +565,16 @@ Public Sub vtkExportConfiguration_modifiedModuleIsNormalizedOMTrue()
     
     ' Export the modified modules
     retval = vtkExportConfiguration(testWorkbook.VBProject, testProjectName, testConf.name, onlyModified:=True)
-
+    
     ' Check the casing of the last line of the modified module
     Dim expected As String
     Dim result As String
     expected = "Err Dim"
-    result = getLastLineOfCodeModule(testWorkbook.VBProject.VBComponents(testModule1Name).CodeModule)
+    result = getLastLineOfTextFile(VBAToolKit.vtkTestPath & "\" & testModule1FileName)
     
     mAssert.Should StrComp(expected, result) = 0, _
-                    "File should have been formatted." & _
-                    "Expected : " & expected & _
+                    "File should have been formatted." & vbNewLine & _
+                    "Expected : " & expected & vbNewLine & _
                     "Result   : " & result
     
     ' Last check
@@ -579,7 +588,7 @@ vtkExportConfiguration_modifiedModuleIsNormalizedOMTrue_Error:
     Resume Next
 End Sub
 
-Public Sub vtkExportConfiguration_notModifiedModulesAreNotNormalizedOMTrue()
+Public Sub Test_vtkExportConfiguration_notModifiedModulesAreNotNormalizedOMTrue()
 ' - Souce files are exported, 1 module is modified, onlyModified = True
 '    - expected : 1 module is exported, the unexported modules are not normalized
 
@@ -588,22 +597,22 @@ Public Sub vtkExportConfiguration_notModifiedModulesAreNotNormalizedOMTrue()
     ' Export the modules already present so that they don't get exported again
     vtkExportOneModule testWorkbook.VBProject, testModule1Name, VBAToolKit.vtkTestPath & "\" & testModule1FileName
     vtkExportOneModule testWorkbook.VBProject, testModule2Name, VBAToolKit.vtkTestPath & "\" & testModule2FileName
-    
+
     ' Insert a line in code module 1 that contains key words badly cased
     insertDummyLineInCodeModule testWorkbook.VBProject.VBComponents(testModule1Name).CodeModule, "dim retval"
-    
+
     ' Export the modified modules
-    retval = vtkExportConfiguration(testWorkbook.VBProject, testProjectName, testConf.name, onlyModified:=True)
+    vtkExportConfiguration testWorkbook.VBProject, testProjectName, testConf.name, onlyModified:=True
 
     ' Check the casing of the last line of the untouched module. This line contained "Dim retval" before the export.
     Dim expected As String
     Dim result As String
-    expected = "Dim retVal"
-    result = getLastLineOfCodeModule(testWorkbook.VBProject.VBComponents(testModule2Name).CodeModule)
-    
+    expected = "Dim retval"
+    result = getLastLineOfTextFile(VBAToolKit.vtkTestPath & "\" & testModule2FileName)
+
     mAssert.Should StrComp(expected, result) = 0, _
-                    "File should not have been fomatted as it has not been modified." & _
-                    "Expected : " & expected & _
+                    "File should not have been fomatted as it has not been modified." & vbNewLine & _
+                    "Expected : " & expected & vbNewLine & _
                     "Result   : " & result
 
     On Error GoTo 0
@@ -614,7 +623,7 @@ vtkExportConfiguration_notModifiedModulesAreNotNormalizedOMTrue_Error:
 End Sub
 
 
-Public Sub vtkExportConfiguration_notModifiedModulesAreNormalizedOMFalse()
+Public Sub Test_vtkExportConfiguration_notModifiedModulesAreNormalizedOMFalse()
 ' - Source files are exported, no module is modified, onlyModified = False
 '    - expected : all modules are exported, already existing modules are normalized
 
@@ -623,31 +632,31 @@ Public Sub vtkExportConfiguration_notModifiedModulesAreNormalizedOMFalse()
     ' Export the modules already present so that they don't get exported again
     vtkExportOneModule testWorkbook.VBProject, testModule1Name, VBAToolKit.vtkTestPath & "\" & testModule1FileName
     vtkExportOneModule testWorkbook.VBProject, testModule2Name, VBAToolKit.vtkTestPath & "\" & testModule2FileName
-    
+
     ' Insert a line in code module 1 that contains key words badly cased
     insertDummyLineInCodeModule testWorkbook.VBProject.VBComponents(testModule1Name).CodeModule, "err dim"
-    
+
     ' Export all the modified modules
-    retval = vtkExportConfiguration(testWorkbook.VBProject, testProjectName, testConf.name, onlyModified:=False)
+    vtkExportConfiguration testWorkbook.VBProject, testProjectName, testConf.name, onlyModified:=False
 
     ' Check the casing of the last line of the untouched module. This line contained "Dim retval" before the export.
     Dim expected As String
     Dim result As String
     expected = "Dim retVal"
-    result = getLastLineOfCodeModule(testWorkbook.VBProject.VBComponents(testModule2Name).CodeModule)
-    
+    result = getLastLineOfTextFile(VBAToolKit.vtkTestPath & "\" & testModule2FileName)
+
     mAssert.Should StrComp(expected, result) = 0, _
-                    "File should have been formatted as all modules were formatted." & _
-                    "Expected : " & expected & _
+                    "File should have been formatted as all modules were formatted." & vbNewLine & _
+                    "Expected : " & expected & vbNewLine & _
                     "Result   : " & result
 
     ' Check the casing of the last line of the modified module.
     expected = "Err Dim"
-    result = getLastLineOfCodeModule(testWorkbook.VBProject.VBComponents(testModule1Name).CodeModule)
-    
+    result = getLastLineOfTextFile(VBAToolKit.vtkTestPath & "\" & testModule1FileName)
+
     mAssert.Should StrComp(expected, result) = 0, _
-                    "File should not have been formatted as all modules were formatted." & _
-                    "Expected : " & expected & _
+                    "File should not have been formatted as all modules were formatted." & vbNewLine & _
+                    "Expected : " & expected & vbNewLine & _
                     "Result   : " & result
 
     On Error GoTo 0
@@ -671,6 +680,9 @@ Private Function ITest_Suite() As TestSuite
     ITest_Suite.AddTest ITest_Manager.ClassName, "Test_vtkExportConfiguration_notReferencedModuleMustNotBeExported"
     ITest_Suite.AddTest ITest_Manager.ClassName, "Test_vtkExportConfiguration_importedModuleAddedToConfigurationManagerMustNotBeExported"
     ITest_Suite.AddTest ITest_Manager.ClassName, "Test_vtkAddBeforeSaveHandlerInDEVWorkbook_validWorkbook"
+    ITest_Suite.AddTest ITest_Manager.ClassName, "Test_vtkExportConfiguration_modifiedModuleIsNormalizedOMTrue"
+    ITest_Suite.AddTest ITest_Manager.ClassName, "Test_vtkExportConfiguration_notModifiedModulesAreNotNormalizedOMTrue"
+    ITest_Suite.AddTest ITest_Manager.ClassName, "Test_vtkExportConfiguration_notModifiedModulesAreNormalizedOMFalse"
 End Function
 
 Private Sub ITestCase_RunTest()
@@ -686,7 +698,11 @@ Private Sub ITestCase_RunTest()
         Case "Test_vtkExportConfiguration_notReferencedModuleMustNotBeExported": Test_vtkExportConfiguration_notReferencedModuleMustNotBeExported
         Case "Test_vtkExportConfiguration_importedModuleAddedToConfigurationManagerMustNotBeExported": Test_vtkExportConfiguration_importedModuleAddedToConfigurationManagerMustNotBeExported
         Case "Test_vtkAddBeforeSaveHandlerInDEVWorkbook_validWorkbook": Test_vtkAddBeforeSaveHandlerInDEVWorkbook_validWorkbook
+        Case "Test_vtkExportConfiguration_modifiedModuleIsNormalizedOMTrue": Test_vtkExportConfiguration_modifiedModuleIsNormalizedOMTrue
+        Case "Test_vtkExportConfiguration_notModifiedModulesAreNotNormalizedOMTrue": Test_vtkExportConfiguration_notModifiedModulesAreNotNormalizedOMTrue
+        Case "Test_vtkExportConfiguration_notModifiedModulesAreNormalizedOMFalse": Test_vtkExportConfiguration_notModifiedModulesAreNormalizedOMFalse
         Case Else: mAssert.Should False, "Invalid test name: " & mManager.methodName
     End Select
 End Sub
+
 
