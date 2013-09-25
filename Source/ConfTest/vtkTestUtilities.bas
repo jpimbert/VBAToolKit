@@ -112,8 +112,36 @@ End Function
 '           - fileName as string, folder to get from the Template folder
 '           - Optional destinationName as string, name of folder to create in the Test folder (same as folderName by default)
 '---------------------------------------------------------------------------------------
-Public Function vtkGetTestFolderFromTemplate(folderName As String, Optional destinationName As String = "") As Workbook
+Public Function getTestFolderFromTemplate(folderName As String, Optional destinationName As String = "")
 
+    Dim source As String, destination As String, errCount As Integer, fso As FileSystemObject
+
+    On Error GoTo getTestFolderFromTemplate_Error
+    
+    Set fso = CreateObject("Scripting.FileSystemObject")
+    
+    ' Copy folder
+    source = vtkPathToTemplateFolder(pWorkBook) & "\" & folderName
+    
+    If destinationName Like "" Then
+        destination = vtkTestPath & "\" & folderName
+       Else
+        destination = vtkTestPath & "\" & destinationName
+    End If
+    
+    fso.CopyFolder source:=source, destination:=destination, OverWriteFiles:=True
+    
+    On Error GoTo 0
+    Exit Function
+
+getTestFolderFromTemplate_Error:
+    Select Case Err.number
+        Case 76
+            Err.Raise number:=VTK_FOLDER_NOT_FOUND, source:="getTestFolderFromTemplate", Description:="Folder not found : " & source
+        Case Else
+            Err.Raise VTK_UNEXPECTED_ERROR, "getTestFolderFromTemplate", "(" & Err.number & ") " & Err.Description
+    End Select
+    Resume Next
 End Function
 
 '---------------------------------------------------------------------------------------
