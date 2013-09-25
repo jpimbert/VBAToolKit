@@ -225,7 +225,7 @@ End Sub
 Public Sub Test_vtkCreateProject_handlerAddedInDEVWorkbook()
 ' creating a project, modifying an existing module in the DEV workbook, save => module must be exported
     
-    Dim retVal As Integer
+    Dim retval As Integer
     Dim oldSize1 As Integer
     Dim oldSize2 As Integer
     Dim newSize1 As Integer

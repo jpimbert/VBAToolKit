@@ -445,10 +445,12 @@ Public Function vtkExportConfiguration(projectWithModules As VBProject, projectN
         If onlyModified And fso.fileExists(modulePath) Then
             If mo.VBAModule.Saved = False Then
                 vtkExportOneModule projectWithModules, mo.name, modulePath
+                vtkNormalizeFile modulePath, vtkListOfProperlyCasedIdentifiers
                 exportedModulesCount = exportedModulesCount + 1
             End If
         Else
             vtkExportOneModule projectWithModules, mo.name, modulePath
+            vtkNormalizeFile modulePath, vtkListOfProperlyCasedIdentifiers
             exportedModulesCount = exportedModulesCount + 1
         End If
         

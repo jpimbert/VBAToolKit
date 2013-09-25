@@ -23,6 +23,7 @@ Option Explicit
 
 Public Const VTK_OK = 0
 Public Const VTK_UNEXPECTED_ERROR = 2001
+Public Const VTK_WRONG_FILE_PATH = 2075
 Public Const VTK_WRONG_FOLDER_PATH = 2076
 Public Const VTK_FORBIDDEN_PARAMETER = 2077
 
@@ -33,3 +34,6 @@ Public Const VTK_GIT_PROBLEM_DURING_INITIALIZATION = 3003
 Public Const VTK_MODULE_NOTATTACHED = 4001              ' The module must be attached to a configuration
 Public Const VTK_INEXISTANT_CONFIGURATION = 4002        ' Unknown configuration
 Public Const VTK_WORKBOOK_NOTOPEN = 4003
+
+Public Const VTK_UNEXPECTED_CHAR = 5001
+Public Const VTK_UNEXPECTED_EOS = 5002

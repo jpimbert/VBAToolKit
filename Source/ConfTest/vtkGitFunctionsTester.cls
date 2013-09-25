@@ -69,11 +69,11 @@ Test_vtkInitializeGit_correctPathExistenceOfDotGitFolder_Error:
 End Sub
 
 Public Sub Test_vtkInitializeGit_correctPathRetVal()
-    Dim retVal As Integer
+    Dim retval As Integer
     On Error GoTo Test_vtkInitializeGit_correctPathRetVal_Error
 
-    retVal = vtkInitializeGit(VBAToolKit.vtkTestPath)
-    mAssert.Equals retVal, VTK_OK
+    retval = vtkInitializeGit(VBAToolKit.vtkTestPath)
+    mAssert.Equals retval, VTK_OK
 
     On Error GoTo 0
     Exit Sub
@@ -188,11 +188,11 @@ Test_vtkInitializeGit_correctPathLogFileIsDeleted_Error:
 End Sub
 
 Public Sub Test_vtkInitializeGit_correctPathCustomLogFileReturnValue()
-    Dim retVal As Integer
+    Dim retval As Integer
     On Error GoTo Test_vtkInitializeGit_correctPathCustomLogFileReturnValue_Error
 
-    retVal = vtkInitializeGit(VBAToolKit.vtkTestPath, "initialize.log")
-    mAssert.Equals retVal, VTK_OK
+    retval = vtkInitializeGit(VBAToolKit.vtkTestPath, "initialize.log")
+    mAssert.Equals retval, VTK_OK
 
     On Error GoTo 0
     Exit Sub
