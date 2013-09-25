@@ -146,30 +146,30 @@ Public Sub Test_vtkCleanFolder_correctPathReturnValue()
     Dim testFolder As String
     testFolder = VBAToolKit.vtkTestPath & "\" & "testFolder0"
     
-    Dim retVal As Integer
-    retVal = vtkCleanFolder(testFolder)
+    Dim retval As Integer
+    retval = vtkCleanFolder(testFolder)
 
-    mAssert.Equals retVal, VTK_OK, "Wrong return value"
+    mAssert.Equals retval, VTK_OK, "Wrong return value"
 End Sub
 
 Public Sub Test_vtkCleanFolder_wrongPath()
     Dim testFolder As String
     testFolder = VBAToolKit.vtkTestPath & "\" & "no_folder"
     
-    Dim retVal As Integer
-    retVal = vtkCleanFolder(testFolder)
+    Dim retval As Integer
+    retval = vtkCleanFolder(testFolder)
 
-    mAssert.Equals retVal, 76, "Return value must be 76 : path not found"
+    mAssert.Equals retval, 76, "Return value must be 76 : path not found"
 End Sub
 
 Public Sub Test_vtkCleanFolder_file()
     Dim filePath As String
     filePath = VBAToolKit.vtkTestPath & "\" & "hidden.txt"
     
-    Dim retVal As Integer
-    retVal = vtkCleanFolder(filePath)
+    Dim retval As Integer
+    retval = vtkCleanFolder(filePath)
 
-    mAssert.Equals retVal, 76, "Return value must be 76 : path not found"
+    mAssert.Equals retval, 76, "Return value must be 76 : path not found"
 End Sub
 
 
@@ -186,10 +186,10 @@ Public Sub Test_vtkDeleteFolder_correctPathReturnValue()
     Dim testFolder As String
     testFolder = VBAToolKit.vtkTestPath & "\" & "testFolder0"
     
-    Dim retVal As Integer
-    retVal = vtkDeleteFolder(testFolder)
+    Dim retval As Integer
+    retval = vtkDeleteFolder(testFolder)
 
-    mAssert.Equals retVal, VTK_OK, "Wrong return value"
+    mAssert.Equals retval, VTK_OK, "Wrong return value"
 End Sub
 
 Public Sub Test_vtkDeleteFolder_wrongPath()
@@ -197,20 +197,20 @@ Public Sub Test_vtkDeleteFolder_wrongPath()
     Dim testFolder As String
     testFolder = VBAToolKit.vtkTestPath & "\" & "no_folder"
     
-    Dim retVal As Integer
-    retVal = vtkDeleteFolder(testFolder)
+    Dim retval As Integer
+    retval = vtkDeleteFolder(testFolder)
 
-    mAssert.Equals retVal, 76, "Return value must be 76 : path not found"
+    mAssert.Equals retval, 76, "Return value must be 76 : path not found"
 End Sub
 
 Public Sub Test_vtkDeleteFolder_file()
     Dim filePath As String
     filePath = VBAToolKit.vtkTestPath & "\" & "hidden.txt"
     
-    Dim retVal As Integer
-    retVal = vtkCleanFolder(filePath)
+    Dim retval As Integer
+    retval = vtkCleanFolder(filePath)
 
-    mAssert.Equals retVal, 76, "Return value must be 76 : path not found"
+    mAssert.Equals retval, 76, "Return value must be 76 : path not found"
 End Sub
 
 

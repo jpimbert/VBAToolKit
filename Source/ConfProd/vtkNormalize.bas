@@ -21,6 +21,59 @@ Attribute VB_Name = "vtkNormalize"
 
 Option Explicit
 
+
+Private properlyCasedIdentifiersString As String
+Private properlyCasedIdentifiersArray() As String
+
+'---------------------------------------------------------------------------------------
+' Procedure : initializeList
+' Author    : Lucas Vitorino
+' Purpose   : This function initializes the list of properly cased identifiers used to normalize the source code.
+'---------------------------------------------------------------------------------------
+'
+Private Sub initializeList()
+    
+    properlyCasedIdentifiersString = _
+    "Dim" & "," & _
+    "Wb" & "," & _
+    "Err" & "," & _
+    "File" & "," & _
+    "Folder" & "," & _
+    "Scripting" & "," & _
+    "Boolean" & "," & _
+    "String" & "," & _
+    "Integer" & "," & _
+    "addModule" & "," & _
+    "returnValue" & "," & _
+    "retVal" & "," & _
+    "fileName" & "," & _
+    "saveChanges" & "," & _
+    "Number" & "," & _
+    "Description" & "," & _
+    "Source" & "," & _
+    ""
+    
+    properlyCaseIdentifiersArray = Split(properlyCasedIdentifiersString, ",")
+    
+End Sub
+
+'---------------------------------------------------------------------------------------
+' Procedure : vtkListOfWordsToNormalize
+' Author    : Lucas Vitorino
+' Purpose   : This functions returns the array containing the properly cased Strings.
+'---------------------------------------------------------------------------------------
+'
+Public Function vtkListOfProperlyCasedIdentifiers() As String()
+    
+    If Len(Join(properlyCasedIdentifiersArray, "")) = 0 Then ' if the array has not been initialized
+        initializeList
+    End If
+    
+    vtkListOfProperlyCasedIdentifiers = properlyCasedIdentifiersArray
+    
+End Function
+
+
 '---------------------------------------------------------------------------------------
 ' Procedure : vtkNormalizeToken
 ' Author    : Lucas Vitorino

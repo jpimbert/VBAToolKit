@@ -125,4 +125,3 @@ vtkAddBeforeSaveHandlerInDEVWorkbook_Error:
     Err.Raise VTK_UNEXPECTED_ERROR, "vtkAddBeforeSaveHandlerInDEVWorkBook", Err.Description
     Resume Next
 End Sub
-
