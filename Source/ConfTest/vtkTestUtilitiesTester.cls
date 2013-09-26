@@ -56,7 +56,6 @@ Private Sub ITestCase_TearDown()
     vtkCleanFolder VBAToolKit.vtkTestPath
 End Sub
 
-
 '---------------------------------------------------------------------------------------
 ' Procedure : Test_vtkTestPath
 ' Author    : Champonnois
@@ -70,9 +69,9 @@ Public Sub Test_vtkTestPath()
     
     Set p1 = vtkProjectForName("TestProject1")
     Set p2 = vtkProjectForName("TestProject2")
-    vtkCreateProject path:=VBAToolKit.vtkTestPath, name:="TestProject1", displayError:=False
+    vtkCreateProject Path:=VBAToolKit.vtkTestPath, name:="TestProject1", displayError:=False
     Set wb1 = Workbooks(p1.workbookDEVName)
-    vtkCreateProject path:=VBAToolKit.vtkTestPath, name:="TestProject2", displayError:=False
+    vtkCreateProject Path:=VBAToolKit.vtkTestPath, name:="TestProject2", displayError:=False
     Set wb2 = Workbooks(p2.workbookDEVName)
     
     wb1.Activate
@@ -184,7 +183,7 @@ Public Sub Test_vtkGetFileFromTemplateOpenExcel()
     Set wbb = getTestFileFromTemplate(fileName:="UninitializedProject.xlsm", openExcel:=True)
 
     mAssert.Equals Dir(VBAToolKit.vtkTestPath & "\" & "UninitializedProject.xlsm"), "UninitializedProject.xlsm", "Bad test the file Error doesn't exist from template"
-    mAssert.Equals wbb.path, VBAToolKit.vtkTestPath, "the Excel file isn't open in the right directory"
+    mAssert.Equals wbb.Path, VBAToolKit.vtkTestPath, "the Excel file isn't open in the right directory"
     mAssert.Should VtkWorkbookIsOpen(wbb.name), "The file Excel isn't open"
 
     wbb.Close (False)
@@ -647,6 +646,168 @@ Test_vtkGetFolderCompleteTreeFromTemplate_Error:
 End Sub
 
 
+'---------------------------------------------------------------------------------------
+' Procedure : Test_vtkResetTestFolder
+' Author    : Champonnois
+' Date      : 25/09/2013
+' Purpose   : remove the file in Test folder
+'---------------------------------------------------------------------------------------
+Public Sub Test_vtkResetTestFolder()
+
+    Dim fso As FileSystemObject
+    
+    Set fso = CreateObject("Scripting.FileSystemObject")
+
+    On Error GoTo Test_vtkResetTestFolder_Error
+
+    fso.CreateTextFile (VBAToolKit.vtkTestPath & "\" & "TestResetFile.bas")
+    
+    resetTestFolder
+    
+    mAssert.Equals fso.FileExists(VBAToolKit.vtkTestPath & "\" & "TestResetFile.bas"), False, "The file TestResetFile hasn't been deleted"
+
+    On Error GoTo 0
+    Exit Sub
+
+Test_vtkResetTestFolder_Error:
+    mAssert.Should False, "Unexpected error " & Err.number & " (" & Err.Description & ") in procedure Test_vtkResetTestFolder of Class Module vtkTestUtilitiesTester"
+    Resume Next
+    
+End Sub
+
+'---------------------------------------------------------------------------------------
+' Procedure : Test_vtkResetTestFolderFileOpen
+' Author    : Champonnois
+' Date      : 25/09/2013
+' Purpose   : remove the file that is open in Test folder
+'---------------------------------------------------------------------------------------
+Public Sub Test_vtkResetTestFolderFileOpen()
+
+    Dim fso As FileSystemObject
+    
+    Set fso = CreateObject("Scripting.FileSystemObject")
+
+    On Error GoTo Test_vtkResetTestFolderFileOpen_Error
+
+    fso.CreateTextFile (VBAToolKit.vtkTestPath & "\" & "TestResetFileOpen.txt")
+    fso.OpenTextFile (VBAToolKit.vtkTestPath & "\" & "TestResetFileOpen.txt")
+   
+    resetTestFolder
+    
+    mAssert.Equals fso.FileExists(VBAToolKit.vtkTestPath & "\" & "TestResetFileOpen.txt"), False, "The file TestResetFileOpen hasn't been deleted or the file is open"
+
+    On Error GoTo 0
+    Exit Sub
+
+Test_vtkResetTestFolderFileOpen_Error:
+    mAssert.Should False, "Unexpected error " & Err.number & " (" & Err.Description & ") in procedure Test_vtkResetTestFolderFileOpen of Class Module vtkTestUtilitiesTester"
+    Resume Next
+    
+End Sub
+
+'---------------------------------------------------------------------------------------
+' Procedure : Test_vtkResetTestFolderEmptyFolder
+' Author    : Champonnois
+' Date      : 25/09/2013
+' Purpose   : remove the empty folder in Test folder
+'---------------------------------------------------------------------------------------
+Public Sub Test_vtkResetTestFolderEmptyFolder()
+
+    Dim fso As FileSystemObject, folderTest As Folder
+    
+    Set fso = CreateObject("Scripting.FileSystemObject")
+
+    On Error GoTo Test_vtkResetTestFolderEmptyFolder_Error
+    
+    resetTestFolder
+    
+    Set folderTest = fso.GetFolder(VBAToolKit.vtkTestPath)
+    
+    mAssert.Equals folderTest.Files.count, 0, "All files hasn't been deleted"
+    mAssert.Equals folderTest.SubFolders.count, 0, "All folders hasn't been deleted"
+
+    On Error GoTo 0
+    Exit Sub
+
+Test_vtkResetTestFolderEmptyFolder_Error:
+    mAssert.Should False, "Unexpected error " & Err.number & " (" & Err.Description & ") in procedure Test_vtkResetTestFolderEmptyFolder of Class Module vtkTestUtilitiesTester"
+    Resume Next
+    
+End Sub
+
+'---------------------------------------------------------------------------------------
+' Procedure : Test_vtkResetTestFolderContainsFiles
+' Author    : Champonnois
+' Date      : 25/09/2013
+' Purpose   : remove the Test folder contains files
+'---------------------------------------------------------------------------------------
+Public Sub Test_vtkResetTestFolderContainsFiles()
+
+    Dim fso As FileSystemObject, folderTest As Folder
+    
+    Set fso = CreateObject("Scripting.FileSystemObject")
+
+    On Error GoTo Test_vtkResetTestFolderContainsFiles_Error
+    
+    fso.CreateTextFile (VBAToolKit.vtkTestPath & "\" & "TestTexte.txt")
+    fso.CreateTextFile (VBAToolKit.vtkTestPath & "\" & "TestBas.bas")
+    fso.CreateTextFile (VBAToolKit.vtkTestPath & "\" & "TestCls.cls")
+    fso.CreateTextFile (VBAToolKit.vtkTestPath & "\" & "TestXlsm.xlsm")
+    
+    resetTestFolder
+    
+    Set folderTest = fso.GetFolder(VBAToolKit.vtkTestPath)
+    
+    mAssert.Equals folderTest.Files.count, 0, "All files hasn't been deleted"
+
+    On Error GoTo 0
+    Exit Sub
+
+Test_vtkResetTestFolderContainsFiles_Error:
+    mAssert.Should False, "Unexpected error " & Err.number & " (" & Err.Description & ") in procedure Test_vtkResetTestFolderContainsFiles of Class Module vtkTestUtilitiesTester"
+    Resume Next
+    
+End Sub
+
+'---------------------------------------------------------------------------------------
+' Procedure : Test_vtkResetTestFolderContainsFolderAndFiles
+' Author    : Champonnois
+' Date      : 25/09/2013
+' Purpose   : remove the Test folder contains folders and files
+'---------------------------------------------------------------------------------------
+Public Sub Test_vtkResetTestFolderContainsFolderAndFiles()
+
+    Dim fso As FileSystemObject, folderTest As Folder
+    
+    Set fso = CreateObject("Scripting.FileSystemObject")
+
+    On Error GoTo Test_vtkResetTestFolderContainsFolderAndFiles_Error
+    
+    fso.CreateFolder (VBAToolKit.vtkTestPath & "\" & "TestFolderReset")
+    fso.CreateFolder (VBAToolKit.vtkTestPath & "\" & "TestFolderReset" & "\" & "TestSubFolder1")
+    fso.CreateFolder (VBAToolKit.vtkTestPath & "\" & "TestFolderReset" & "\" & "TestSubFolder2")
+    fso.CreateFolder (VBAToolKit.vtkTestPath & "\" & "TestFolderReset" & "\" & "TestSubFolder3")
+    
+    fso.CreateTextFile (VBAToolKit.vtkTestPath & "\" & "TestFolderReset" & "\" & "TestSubFolder1" & "\" & "TestFileSubFolder1.txt")
+    fso.CreateTextFile (VBAToolKit.vtkTestPath & "\" & "TestFolderReset" & "\" & "TestSubFolder2" & "\" & "TestFileSubFolder2.txt")
+    fso.CreateTextFile (VBAToolKit.vtkTestPath & "\" & "TestFolderReset" & "\" & "TestSubFolder3" & "\" & "TestFileSubFolder3.txt")
+    
+    resetTestFolder
+    
+    Set folderTest = fso.GetFolder(VBAToolKit.vtkTestPath)
+    
+    mAssert.Equals folderTest.Files.count, 0, "All files hasn't been deleted"
+    mAssert.Equals folderTest.SubFolders.count, 0, "All folders hasn't been deleted"
+
+    On Error GoTo 0
+    Exit Sub
+
+Test_vtkResetTestFolderContainsFolderAndFiles_Error:
+    mAssert.Should False, "Unexpected error " & Err.number & " (" & Err.Description & ") in procedure Test_vtkResetTestFolderContainsFolderAndFiles of Class Module vtkTestUtilitiesTester"
+    Resume Next
+    
+End Sub
+
 Private Function ITest_Suite() As TestSuite
     Set ITest_Suite = New TestSuite
     ITest_Suite.AddTest ITest_Manager.ClassName, "Test_vtkTestPath"
@@ -670,6 +831,11 @@ Private Function ITest_Suite() As TestSuite
     ITest_Suite.AddTest ITest_Manager.ClassName, "Test_vtkGetFolderNotVisibleFromTemplate"
     ITest_Suite.AddTest ITest_Manager.ClassName, "Test_vtkGetFolderNotVisibleInFolderFromTemplate"
     ITest_Suite.AddTest ITest_Manager.ClassName, "Test_vtkGetFolderCompleteTreeFromTemplate"
+    ITest_Suite.AddTest ITest_Manager.ClassName, "Test_vtkResetTestFolder"
+    ITest_Suite.AddTest ITest_Manager.ClassName, "Test_vtkResetTestFolderFileOpen"
+    ITest_Suite.AddTest ITest_Manager.ClassName, "Test_vtkResetTestFolderEmptyFolder"
+    ITest_Suite.AddTest ITest_Manager.ClassName, "Test_vtkResetTestFolderContainsFiles"
+    ITest_Suite.AddTest ITest_Manager.ClassName, "Test_vtkResetTestFolderContainsFolderAndFiles"
 End Function
 
 Private Sub ITestCase_RunTest()
@@ -695,6 +861,11 @@ Private Sub ITestCase_RunTest()
         Case "Test_vtkGetFolderNotVisibleFromTemplate": Test_vtkGetFolderNotVisibleFromTemplate
         Case "Test_vtkGetFolderNotVisibleInFolderFromTemplate": Test_vtkGetFolderNotVisibleInFolderFromTemplate
         Case "Test_vtkGetFolderCompleteTreeFromTemplate": Test_vtkGetFolderCompleteTreeFromTemplate
+        Case "Test_vtkResetTestFolder": Test_vtkResetTestFolder
+        Case "Test_vtkResetTestFolderFileOpen": Test_vtkResetTestFolderFileOpen
+        Case "Test_vtkResetTestFolderEmptyFolder": Test_vtkResetTestFolderEmptyFolder
+        Case "Test_vtkResetTestFolderContainsFiles": Test_vtkResetTestFolderContainsFiles
+        Case "Test_vtkResetTestFolderContainsFolderAndFiles": Test_vtkResetTestFolderContainsFolderAndFiles
         Case Else: mAssert.Should False, "Invalid test name: " & mManager.methodName
     End Select
 End Sub

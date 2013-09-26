@@ -144,6 +144,18 @@ getTestFolderFromTemplate_Error:
     Resume Next
 End Function
 
+
+'---------------------------------------------------------------------------------------
+' Procedure : ResetTestFolder
+' Author    : Champonnois
+' Date      : 25/09/2013
+' Purpose   : Remove the contents of the folder test
+'---------------------------------------------------------------------------------------
+'
+Public Sub resetTestFolder()
+    vtkCleanFolder VBAToolKit.vtkTestPath
+End Sub
+
 '---------------------------------------------------------------------------------------
 ' Procedure : insertDummyProcedureInCodeModule
 ' Author    : Lucas Vitorino
