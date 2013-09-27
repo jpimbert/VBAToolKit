@@ -23,16 +23,19 @@ Option Explicit
 
 Public Const VTK_OK = 0
 Public Const VTK_UNEXPECTED_ERROR = 2001
+Public Const VTK_WRONG_FILE_PATH = 2075
 Public Const VTK_WRONG_FOLDER_PATH = 2076
 Public Const VTK_FORBIDDEN_PARAMETER = 2077
 
 Public Const VTK_GIT_NOT_INSTALLED = 3000
 Public Const VTK_GIT_ALREADY_INITIALIZED_IN_FOLDER = 3001
 Public Const VTK_GIT_PROBLEM_DURING_INITIALIZATION = 3003
+' NOTE : DO NOT USE ERROR 3004 as it is raised by the SaveToFile method of object ADODB.Stream
 
 Public Const VTK_MODULE_NOTATTACHED = 4001              ' The module must be attached to a configuration
 Public Const VTK_INEXISTANT_CONFIGURATION = 4002        ' Unknown configuration
 
 Public Const VTK_WORKBOOK_NOT_OPEN = 6001
 Public Const VTK_WORKBOOK_NOT_INITIALIZED = 6002
-Public Const VTK_EMPTY_PROJECT = 6003
+Public Const VTK_PROJECT_NOT_INITIALIZED = 6003
+Public Const VTK_DOM_NOT_INITIALIZED = 6004

@@ -47,18 +47,18 @@ Public Function vtkExportAsXMLDOM(devWB As Workbook, projectName As String) As M
         Err.Raise VTK_WORKBOOK_NOT_INITIALIZED
     End If
     
-    ' If the workbook is not open, will raise Automation Error -2147221080
+    ' If the workbook is not open, will raise undocumented Automation Error -2147221080
     If VtkWorkbookIsOpen(devWB.name) = False Then
         Err.Raise VTK_WORKBOOK_NOT_OPEN
     End If
     
     ' If the project is not initialized
     Dim cm As vtkConfigurationManager
+    Dim conf As vtkConfiguration
     Set cm = vtkConfigurationManagerForProject(projectName)
     If cm Is Nothing Then
         Err.Raise VTK_PROJECT_NOT_INITIALIZED
     End If
-    Dim conf As vtkConfiguration
     
     Set dom = New MSXML2.DOMDocument
     Set node = dom.createProcessingInstruction("xml", "version=""1.0"" encoding=""ISO-8859-1""")
@@ -165,7 +165,7 @@ vtkExportAsXMLDOM_Error:
             Err.Description = "Workbook should be open."
         Case VTK_WORKBOOK_NOT_INITIALIZED
             Err.Description = "Workbook not initialized."
-        Case -2147221080
+        Case -2147221080 ' Automation error undocumented by Microsoft
             Err.number = VTK_WORKBOOK_NOT_OPEN
             Err.Description = "Workbook should be open."
         Case VTK_PROJECT_NOT_INITIALIZED
@@ -188,7 +188,8 @@ End Function
 ' Purpose   : - Write an XML DOM to a xml text file.
 '             - The content of the file is nicely indented, to be human-readable.
 '             - Overwrite the output file if it exists.
-' Raises    : - VTK_UNEXPECTED_ERRROR
+' Raises    : - VTK_DOM_NOT_INTIALIZED
+'             - VTK_UNEXPECTED_ERRROR
 ' Notes     : Heavily based on code from Baptiste Wicht, http://baptiste-wicht.developpez.com/
 '---------------------------------------------------------------------------------------
 '
@@ -198,9 +199,15 @@ Public Sub vtkWriteXMLDOMToFile(dom As MSXML2.DOMDocument, filePath As String)
     Dim wrt As MSXML2.MXXMLWriter
     
     On Error GoTo vtkWriteXMLDOMToFile_Error
-
+    
+    ' Check DOM intialization
+    If dom Is Nothing Then
+        Err.Raise VTK_DOM_NOT_INITIALIZED
+    End If
+    
     Set rdr = CreateObject("MSXML2.SAXXMLReader")
     Set wrt = CreateObject("MSXML2.MXXMLWriter")
+    
     Dim oStream As ADODB.STREAM
     Set oStream = CreateObject("ADODB.STREAM")
     oStream.Open
@@ -211,18 +218,28 @@ Public Sub vtkWriteXMLDOMToFile(dom As MSXML2.DOMDocument, filePath As String)
     wrt.output = oStream
     Set rdr.contentHandler = wrt
     Set rdr.errorHandler = wrt
+
     rdr.Parse dom
     wrt.flush
 
     oStream.SaveToFile filePath, adSaveCreateOverWrite
-    
+
     On Error GoTo 0
     Exit Sub
 
 vtkWriteXMLDOMToFile_Error:
     Err.source = "function vtkWriteXMLDOMToFile of module vtkXMLutilities"
-    Err.number = VTK_UNEXEPECTED_ERROR
     
+    Select Case Err.number
+        Case VTK_DOM_NOT_INITIALIZED
+            Err.Description = "Dom object is not initialized."
+        Case 3004 ' ADODB.Stream.SaveToFile failed because it couldn't find the path
+            Err.number = VTK_WRONG_FILE_PATH
+            Err.Description = "File path is wrong. Make sure the folder tree is valid."
+        Case Else
+            Err.number = VTK_UNEXPECTED_ERROR
+    End Select
+
     Err.Raise Err.number
     
     Exit Sub
