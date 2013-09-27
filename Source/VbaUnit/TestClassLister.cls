@@ -30,7 +30,7 @@ Public Function IsClassModule(ComponentType As vbext_ComponentType) As Boolean
 End Function
 
 Public Function NewTestClass(TestClassName As String) As ITest
-    Dim Test As ITest
+    Dim TEST As ITest
     Set NewTestClass = SelectTestClass(TestClassName)
     If NewTestClass Is Nothing Then Exit Function
     NewTestClass.Manager.ClassName = TestClassName
@@ -55,6 +55,7 @@ Public Function SelectTestClass(TestClassName As String) As ITest
         Case "vtkConfigurationTester": Set SelectTestClass = New vtkConfigurationTester
         Case "vtkModuleTester": Set SelectTestClass = New vtkModuleTester
         Case "vtkExportConfigurationTester": Set SelectTestClass = New vtkExportConfigurationTester
+        Case "vtkXMLExportTester": Set SelectTestClass = New vtkXMLExportTester
         Case Else:
     End Select
 End Function

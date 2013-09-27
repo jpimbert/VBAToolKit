@@ -39,21 +39,19 @@ Public Function vtkExportAsXMLDOM(devWB As Workbook, projectName As String) As M
     Dim attr As MSXML2.IXMLDOMAttribute
     
     On Error GoTo vtkExportAsXMLDOM_Error
-    
+'Debug.Print "1"
     ' If the workbook is not open
-    If vtkWorbookIsOpen(devWB) = False Then
+    If VtkWorkbookIsOpen(devWB.name) = False Then
         Err.Raise VTK_WORKBOOK_NOT_OPEN
     End If
-
-    vtkCleanFolder testFolder
-
+'Debug.Print "2"
     Set dom = New MSXML2.DOMDocument
     Set node = dom.createProcessingInstruction("xml", "version=""1.0"" encoding=""ISO-8859-1""")
     dom.appendChild node
-    
+'Debug.Print "3"
     ' The root node is an DOMElement, not a DOMNode
     Set rootNode = dom.createElement("vtkConf")
-    
+'Debug.Print "4"
     With dom.appendChild(rootNode)
         
         ' The info element
@@ -144,8 +142,9 @@ Public Function vtkExportAsXMLDOM(devWB As Workbook, projectName As String) As M
         Next
 
     End With
-
-    vtkExportAsXMLDOM = dom
+'Debug.Print "6"
+    Set vtkExportAsXMLDOM = dom
+'Debug.Print "7"
 
     On Error GoTo 0
     Exit Function
@@ -158,13 +157,14 @@ vtkExportAsXMLDOM_Error:
             Err.number = VTK_WORBOOK_NOTOPEN
             Err.Description = "Workbook should be open."
         Case Else
-                Debug.Print "Unexpected error " & Err.number & " (" & Err.Description & ") in procedure dumpInfoInXMLFile of Module TEST"
+            Debug.Print "Unexpected error " & Err.number & " (" & Err.Description & ") in " & Err.source
             Err.number = VTK_UNEXPECTED_ERROR
     End Select
     
     Err.Raise Err.number
     
-
+    Exit Function
+    
 End Function
 
 
@@ -200,8 +200,8 @@ Public Sub vtkWriteXMLDOMToFile(dom As MSXML2.DOMDocument, filePath As String)
     rdr.Parse dom
     wrt.flush
 
-    oStream.SaveToFile testFile, adSaveCreateOverWrite
-
+    oStream.SaveToFile filePath, adSaveCreateOverWrite
+    
     On Error GoTo 0
     Exit Sub
 
