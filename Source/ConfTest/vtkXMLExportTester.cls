@@ -2,7 +2,7 @@ VERSION 1.0 CLASS
 BEGIN
   MultiUse = -1  'True
 END
-Attribute VB_Name = "aavtkXMLExportTester"
+Attribute VB_Name = "vtkXMLExportTester"
 Attribute VB_GlobalNameSpace = False
 Attribute VB_Creatable = False
 Attribute VB_PredeclaredId = False
@@ -45,6 +45,8 @@ Private cm As vtkConfigurationManager
 Private conf As vtkConfiguration
 Private testFilePath As String
 
+Private retDom As MSXML2.DOMDocument
+
 Private Sub Class_Initialize()
     Set mManager = New TestCaseManager
 End Sub
@@ -70,6 +72,8 @@ Private Sub ITestCase_SetUp(Assert As IAssert)
 
     testFilePath = VBAToolKit.vtkTestPath & "\" & testFileName
 
+    Set retDom = vtkExportAsXMLDOM(testWorkbook, testProjectName)
+    
 End Sub
 
 
@@ -162,10 +166,6 @@ Public Sub Test_vtkExportAsXMLDom_correctNameForRoot()
 
     On Error GoTo Test_vtkExportAsXMLDom_correctNameForRoot_Error
 
-    Dim retDom As MSXML2.DOMDocument
-
-    Set retDom = vtkExportAsXMLDOM(testWorkbook, testProjectName)
-
     Dim expected As String
     Dim result As String
     expected = "vtkConf"
@@ -191,10 +191,6 @@ Public Sub Test_vtkExportAsXMLDom_correctNumberOfInfoObject()
 
     On Error GoTo Test_vtkExportAsXMLDom_correctNumberOfInfoObject_Error
 
-    Dim retDom As MSXML2.DOMDocument
-    
-    Set retDom = vtkExportAsXMLDOM(testWorkbook, testProjectName)
-
     mAssert.Equals countElementsInDom("info", retDom), 1, "DOM should have 1 info object."
 
     On Error GoTo 0
@@ -212,10 +208,6 @@ Public Sub Test_vtkExportAsXMLDom_correctInfoContent()
 '   info -> correct content
 
     On Error GoTo Test_vtkExportAsXMLDom_correctDomContent_Error
-
-    Dim retDom As MSXML2.DOMDocument
-
-    Set retDom = vtkExportAsXMLDOM(testWorkbook, testProjectName)
     
     mAssert.Equals retDom.getElementsByTagName("info").Item(0).ChildNodes.Item(0).BaseName, "projectName"
     mAssert.Equals retDom.getElementsByTagName("info").Item(0).ChildNodes.Item(0).Text, testProjectName
@@ -236,10 +228,6 @@ Public Sub Test_vtkExportAsXMLDom_correctReferenceNumber()
 '   references -> correct number of references
 
     On Error GoTo Test_vtkExportAsXMLDom_correctReferenceNumber_Error
-
-    Dim retDom As MSXML2.DOMDocument
-    
-    Set retDom = vtkExportAsXMLDOM(testWorkbook, testProjectName)
     
     Dim numRef As Integer
     numRef = testWorkbook.VBProject.References.count
@@ -260,18 +248,13 @@ Public Sub Test_vtkExportAsXMLDom_correctReferenceContent()
 '   references -> correct value of the references object
     
     On Error GoTo Test_vtkExportAsXMLDom_correctReferenceContent_Error
-
-    Dim retDom As MSXML2.DOMDocument
-    
-    Set retDom = vtkExportAsXMLDOM(testWorkbook, testProjectName)
     
     Dim i As Integer
     Dim expected As String
     Dim result As String
     
     For i = 1 To testWorkbook.VBProject.References.count
-        
-        
+              
         ' Testing the name of the first child node (name)
         expected = "name"
         result = retDom.getElementsByTagName("reference").Item(i - 1).ChildNodes.Item(0).BaseName
@@ -323,10 +306,6 @@ Public Sub Test_vtkExportAsXMLDom_correctConfigurationNumber()
 '   configurations -> correct number of configurations
     
     On Error GoTo Test_vtkExportAsXMLDom_correctConfigurationNumber_Error
-
-    Dim retDom As MSXML2.DOMDocument
-
-    Set retDom = vtkExportAsXMLDOM(testWorkbook, testProjectName)
     
     Dim numConf As Integer
     numConf = cm.configurationCount
@@ -409,10 +388,6 @@ Public Sub Test_vtkExportAsXMLDom_correctModuleNumber()
 '   modules -> correct number of modules
 
     On Error GoTo Test_vtkExportAsXMLDom_correctModuleNumber_Error
-
-    Dim retDom As MSXML2.DOMDocument
-    
-    Set retDom = vtkExportAsXMLDOM(testWorkbook, testProjectName)
     
     Dim numModules As Integer
     numModules = cm.moduleCount
@@ -434,10 +409,6 @@ Public Sub Test_vtkExportAsDom_correctModuleContent()
 '   modules -> correct content
     
     On Error GoTo Text_vtkExportAsDom_correctModuleContent_Error
-
-    Dim retDom As MSXML2.DOMDocument
-    
-    Set retDom = vtkExportAsXMLDOM(testWorkbook, testProjectName)
     
     Dim i As Integer
     Dim expected As String
@@ -520,7 +491,6 @@ Public Sub Test_vtkExportAsDom_dummyWorkbook()
 
     Dim dummyWorkbook As Workbook
     Dim error As Integer: error = 0
-    Dim retDom As MSXML2.DOMDocument
 
     Set retDom = vtkExportAsXMLDOM(dummyWorkbook, testProjectName)
 
@@ -541,7 +511,7 @@ Public Sub Test_vtkExportAsXMLDom_closedWorkbook()
     On Error GoTo Test_vtkExportAsXMLDom_closedWorkbook_Error
 
     Dim error As Integer: error = 0
-    Dim retDom As MSXML2.DOMDocument
+    
     testWorkbook.Close
 
     Set retDom = vtkExportAsXMLDOM(testWorkbook, testProjectName)
@@ -564,7 +534,6 @@ Public Sub Test_vtkExportAsXMLDom_dummyProject()
     Dim error As Integer: error = 0
     Dim dummyProjectName As String
     dummyProjectName = "dummyProject"
-    Dim retDom As MSXML2.DOMDocument
     
     Set retDom = vtkExportAsXMLDOM(testWorkbook, dummyProjectName)
     
@@ -609,9 +578,6 @@ Public Sub Test_vtkWriteXMLDomToFile_fileIsCreated()
     On Error GoTo Test_vtkvtkWriteXMLDomToFile_fileIsCreated_Error
 
     Dim fso As New FileSystemObject
-    
-    Dim retDom As MSXML2.DOMDocument
-    Set retDom = vtkExportAsXMLDOM(testWorkbook, testProjectName)
 
     vtkWriteXMLDOMToFile retDom, testFilePath
     
@@ -638,9 +604,6 @@ Public Sub Test_vtkWriteXMLDomToFile_fileIsOverWritten()
     Dim oldSize As Integer
     Dim newSize As Integer
     
-    Dim retDom As MSXML2.DOMDocument
-    Set retDom = vtkExportAsXMLDOM(testWorkbook, testProjectName)
-   
     fso.CreateTextFile testFilePath
     oldSize = fso.GetFile(testFilePath).Size
 
@@ -670,9 +633,6 @@ Public Sub Test_vtkWriteXMLDomToFile_filepathIsCreated()
     
     Dim newFilePath As String
     newFilePath = VBAToolKit.vtkTestPath & "\dummyFolder\testFile.xml"
-    
-    Dim retDom As MSXML2.DOMDocument
-    Set retDom = vtkExportAsXMLDOM(testWorkbook, testProjectName)
 
     vtkWriteXMLDOMToFile retDom, newFilePath
     
@@ -694,17 +654,14 @@ Public Sub Test_vtkWriteXMLDomToFile_fileContentIsValidDom()
 '   load content of the file -> file content is a valid DOM
 
     On Error GoTo Test_vtkWriteXMLDomToFile_fileContentIsValidDom_Error
-
-    Dim retDom As MSXML2.DOMDocument
-    Set retDom = vtkExportAsXMLDOM(testWorkbook, testProjectName)
-
+    
     vtkWriteXMLDOMToFile retDom, testFilePath
     
     Dim newDom As MSXML2.DOMDocument
     Set newDom = New MSXML2.DOMDocument
     newDom.Load testFilePath
 
-    mAssert.Should countElementsInDom("info"), 1, "Dom should be readable."
+    mAssert.Should countElementsInDom("info", newDom) = 1, "Dom should be readable."
 
     On Error GoTo 0
     Exit Sub
@@ -732,7 +689,8 @@ Private Function ITest_Suite() As TestSuite
     ITest_Suite.AddTest ITest_Manager.ClassName, "Test_vtkWriteXMLDomToFile_dummyDom"
     ITest_Suite.AddTest ITest_Manager.ClassName, "Test_vtkWriteXMLDomToFile_fileIsCreated"
     ITest_Suite.AddTest ITest_Manager.ClassName, "Test_vtkWriteXMLDomToFile_fileIsOverWritten"
-    ITest_Suite.AddTest ITest_Manager.ClassName, "Test_vtkWriteXMLDomTOFile_filepathIsCreated"
+    ITest_Suite.AddTest ITest_Manager.ClassName, "Test_vtkWriteXMLDomToFile_filepathIsCreated"
+    ITest_Suite.AddTest ITest_Manager.ClassName, "Test_vtkWriteXMLDomToFile_fileContentIsValidDom"
 End Function
 
 Private Sub ITestCase_RunTest()
@@ -751,7 +709,8 @@ Private Sub ITestCase_RunTest()
         Case "Test_vtkWriteXMLDomToFile_dummyDom": Test_vtkWriteXMLDomToFile_dummyDom
         Case "Test_vtkWriteXMLDomToFile_fileIsCreated": Test_vtkWriteXMLDomToFile_fileIsCreated
         Case "Test_vtkWriteXMLDomToFile_fileIsOverWritten": Test_vtkWriteXMLDomToFile_fileIsOverWritten
-        Case "Test_vtkWriteXMLDomTOFile_filepathIsCreated": Test_vtkWriteXMLDomToFile_filepathIsCreated
+        Case "Test_vtkWriteXMLDomToFile_filepathIsCreated": Test_vtkWriteXMLDomToFile_filepathIsCreated
+        Case "Test_vtkWriteXMLDomToFile_fileContentIsValidDom": Test_vtkWriteXMLDomToFile_fileContentIsValidDom
         Case Else: mAssert.Should False, "Invalid test name: " & mManager.methodName
     End Select
 End Sub
