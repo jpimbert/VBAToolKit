@@ -32,4 +32,7 @@ Public Const VTK_GIT_PROBLEM_DURING_INITIALIZATION = 3003
 
 Public Const VTK_MODULE_NOTATTACHED = 4001              ' The module must be attached to a configuration
 Public Const VTK_INEXISTANT_CONFIGURATION = 4002        ' Unknown configuration
-Public Const VTK_WORKBOOK_NOTOPEN = 4003
+
+Public Const VTK_WORKBOOK_NOT_OPEN = 6001
+Public Const VTK_WORKBOOK_NOT_INITIALIZED = 6002
+Public Const VTK_EMPTY_PROJECT = 6003

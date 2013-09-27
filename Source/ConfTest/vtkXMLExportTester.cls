@@ -2,7 +2,7 @@ VERSION 1.0 CLASS
 BEGIN
   MultiUse = -1  'True
 END
-Attribute VB_Name = "vtkXMLExportTester"
+Attribute VB_Name = "aavtkXMLExportTester"
 Attribute VB_GlobalNameSpace = False
 Attribute VB_Creatable = False
 Attribute VB_PredeclaredId = False
@@ -90,9 +90,9 @@ End Sub
 '   conf -> correct content
 '   modules -> correct number of modules
 '   modules -> correct content
-'   dummy workbook -> export everything but the references, and raise VTK_WRONG_FILE_PATH
-'   closed workbook -> export everything but the references, and raise error VTK_WORKBOOK_NOTOPEN
-'   dummy project name -> DOM doesn't have modules or configuration objects
+'   dummy workbook -> raise VTK_WRONG_FILE_PATH
+'   closed workbook -> raise error VTK_WORKBOOK_NOT_OPEN
+'   dummy project name -> raise VTK_PROJECT_NOT_INITIALIZED
 '
 ' WriteDom
 '   dummy DOM
@@ -505,6 +505,74 @@ Text_vtkExportAsDom_correctModuleContent_Error:
     Exit Sub
 End Sub
 
+Public Sub Test_vtkExportAsDom_dummyWorkbook()
+'   dummy workbook -> raise VTK_WORKBOOK_NOT_INITIALIZED
+
+    On Error GoTo Test_vtkExportAsDom_dummyWorkbook_Error
+
+    Dim dummyWorkbook As Workbook
+    Dim error As Integer: error = 0
+    Dim retDom As MSXML2.DOMDocument
+
+    Set retDom = vtkExportAsXMLDOM(dummyWorkbook, testProjectName)
+
+    mAssert.Equals error, VTK_WORKBOOK_NOT_INITIALIZED, "Workbook is not initialized : VTK_WORKBOOK_NOT_INITIALIZED should be raised."
+
+    On Error GoTo 0
+    Exit Sub
+
+Test_vtkExportAsDom_dummyWorkbook_Error:
+    error = Err.number
+    Resume Next
+End Sub
+
+
+Public Sub Test_vtkExportAsXMLDom_closedWorkbook()
+'   dummy workbook -> raise VTK_WORKBOOK_NOT_OPEN
+
+    On Error GoTo Test_vtkExportAsXMLDom_closedWorkbook_Error
+
+    Dim error As Integer: error = 0
+    Dim retDom As MSXML2.DOMDocument
+    testWorkbook.Close
+
+    Set retDom = vtkExportAsXMLDOM(testWorkbook, testProjectName)
+
+    mAssert.Equals error, VTK_WORKBOOK_NOT_OPEN, "Workbook is not open : VTK_WORKBOOK_NOT_OPEN should be raised."
+
+    On Error GoTo 0
+    Exit Sub
+
+Test_vtkExportAsXMLDom_closedWorkbook_Error:
+    error = Err.number
+    Resume Next
+End Sub
+
+Public Sub Test_vtkExportAsXMLDom_dummyProject()
+'   dummy project name -> raise VTK_PROJECT_NOT_INITIALIZED
+
+    On Error GoTo Test_vtkExportAsXMLDom_dummyProject_Error
+    
+    Dim error As Integer: error = 0
+    Dim dummyProjectName As String
+    dummyProjectName = "dummyProject"
+    Dim retDom As MSXML2.DOMDocument
+    
+    Set retDom = vtkExportAsXMLDOM(testWorkbook, dummyProjectName)
+    
+    mAssert.Equals error, VTK_PROJECT_NOT_INITIALIZED, "Project is empty : VTK_PROJECT_NOT_INITIALIZED should be raised."
+
+    On Error GoTo 0
+    Exit Sub
+
+Test_vtkExportAsXMLDom_dummyProject_Error:
+    error = Err.number
+    Resume Next
+End Sub
+
+Public Sub Test_vtkExportAsXMLDom_()
+
+End Sub
 
 Private Function ITest_Suite() As TestSuite
     Set ITest_Suite = New TestSuite
@@ -516,6 +584,10 @@ Private Function ITest_Suite() As TestSuite
     ITest_Suite.AddTest ITest_Manager.ClassName, "Test_vtkExportAsXMLDom_correctConfigurationNumber"
     ITest_Suite.AddTest ITest_Manager.ClassName, "Test_vtkExportAsXMLDom_correctModuleNumber"
     ITest_Suite.AddTest ITest_Manager.ClassName, "Test_vtkExportAsDom_correctModuleContent"
+    ITest_Suite.AddTest ITest_Manager.ClassName, "Test_vtkExportAsDom_dummyWorkbook"
+    ITest_Suite.AddTest ITest_Manager.ClassName, "Test_vtkExportAsXMLDom_closedWorkbook"
+    ITest_Suite.AddTest ITest_Manager.ClassName, "Test_vtkExportAsXMLDom_dummyProject"
+    ITest_Suite.AddTest ITest_Manager.ClassName, "Test_vtkExportAsXMLDom_"
 End Function
 
 Private Sub ITestCase_RunTest()
@@ -528,6 +600,10 @@ Private Sub ITestCase_RunTest()
         Case "Test_vtkExportAsXMLDom_correctConfigurationNumber": Test_vtkExportAsXMLDom_correctConfigurationNumber
         Case "Test_vtkExportAsXMLDom_correctModuleNumber": Test_vtkExportAsXMLDom_correctModuleNumber
         Case "Test_vtkExportAsDom_correctModuleContent": Test_vtkExportAsDom_correctModuleContent
+        Case "Test_vtkExportAsDom_dummyWorkbook": Test_vtkExportAsDom_dummyWorkbook
+        Case "Test_vtkExportAsXMLDom_closedWorkbook": Test_vtkExportAsXMLDom_closedWorkbook
+        Case "Test_vtkExportAsXMLDom_dummyProject": Test_vtkExportAsXMLDom_dummyProject
+        Case "Test_vtkExportAsXMLDom_": Test_vtkExportAsXMLDom_
         Case Else: mAssert.Should False, "Invalid test name: " & mManager.methodName
     End Select
 End Sub

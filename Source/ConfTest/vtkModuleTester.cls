@@ -340,7 +340,7 @@ Public Sub Test_VBAModule_NotOpen()
    Exit Sub
 
 M_Error:
-    mAssert.Equals Err.number, VTK_WORKBOOK_NOTOPEN, "Error raised"
+    mAssert.Equals Err.number, VTK_WORKBOOK_NOT_OPEN, "Error raised"
 End Sub
 
 Public Sub Test_VBAModule_NoModule()

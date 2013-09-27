@@ -27,7 +27,9 @@ Attribute VB_Name = "vtkXMLUtilities"
 ' Purpose   : Export a DEV workbook as an XML DOM.
 '
 ' Returns   : MSXML2.DOMDocument
-' Raises    : - VTK_WORBOOK_NOTOPEN
+' Raises    : - VTK_WORKBOOK_NOT_OPEN
+'             - VTK_WORKBOOK_NOT_INITIALIZED
+'             - VTK_PROJECT_NOT_INITIALIZED
 '             - VTK_UNEXPECTED_ERROR
 '---------------------------------------------------------------------------------------
 '
@@ -39,19 +41,32 @@ Public Function vtkExportAsXMLDOM(devWB As Workbook, projectName As String) As M
     Dim attr As MSXML2.IXMLDOMAttribute
     
     On Error GoTo vtkExportAsXMLDOM_Error
-'Debug.Print "1"
-    ' If the workbook is not open
+    
+    ' If the workbook is not initialized
+    If devWB Is Nothing Then
+        Err.Raise VTK_WORKBOOK_NOT_INITIALIZED
+    End If
+    
+    ' If the workbook is not open, will raise Automation Error -2147221080
     If VtkWorkbookIsOpen(devWB.name) = False Then
         Err.Raise VTK_WORKBOOK_NOT_OPEN
     End If
-'Debug.Print "2"
+    
+    ' If the project is not initialized
+    Dim cm As vtkConfigurationManager
+    Set cm = vtkConfigurationManagerForProject(projectName)
+    If cm Is Nothing Then
+        Err.Raise VTK_PROJECT_NOT_INITIALIZED
+    End If
+    Dim conf As vtkConfiguration
+    
     Set dom = New MSXML2.DOMDocument
     Set node = dom.createProcessingInstruction("xml", "version=""1.0"" encoding=""ISO-8859-1""")
     dom.appendChild node
-'Debug.Print "3"
+
     ' The root node is an DOMElement, not a DOMNode
     Set rootNode = dom.createElement("vtkConf")
-'Debug.Print "4"
+    
     With dom.appendChild(rootNode)
         
         ' The info element
@@ -70,36 +85,7 @@ Public Function vtkExportAsXMLDOM(devWB As Workbook, projectName As String) As M
         End With
         
         
-        ' The reference elements
-        Dim ref As reference
-        For Each ref In devWB.VBProject.References
-            With .appendChild(dom.createElement("reference"))
-                
-                ' The name
-                With .appendChild(dom.createElement("name"))
-                    .Text = ref.name
-                End With
-                
-                'The GUID or the path if there is no GUID
-                If ref.GUID = "" Then
-                    With .appendChild(dom.createElement("path"))
-                        .Text = ref.fullPath
-                    End With
-                Else
-                    With .appendChild(dom.createElement("GUID"))
-                        .Text = ref.GUID
-                    End With
-                End If
-            
-            End With
-        Next
-        
-        
         'The configuration elements
-        Dim cm As vtkConfigurationManager
-        Set cm = vtkConfigurationManagerForProject(projectName)
-        Dim conf As vtkConfiguration
-        
         For Each conf In cm.configurations
             With .appendChild(dom.createElement("configuration"))
                 
@@ -140,29 +126,57 @@ Public Function vtkExportAsXMLDOM(devWB As Workbook, projectName As String) As M
             
             End With
         Next
-
+        
+        ' The reference elements
+        Dim ref As reference
+        For Each ref In devWB.VBProject.References
+            With .appendChild(dom.createElement("reference"))
+                    
+                ' The name
+                With .appendChild(dom.createElement("name"))
+                    .Text = ref.name
+                End With
+                    
+                'The GUID or the path if there is no GUID
+                If ref.GUID = "" Then
+                    With .appendChild(dom.createElement("path"))
+                        .Text = ref.fullPath
+                    End With
+                Else
+                    With .appendChild(dom.createElement("GUID"))
+                        .Text = ref.GUID
+                    End With
+                End If
+                
+            End With
+        Next
+        
     End With
-'Debug.Print "6"
-    Set vtkExportAsXMLDOM = dom
-'Debug.Print "7"
 
     On Error GoTo 0
+    Set vtkExportAsXMLDOM = dom
     Exit Function
 
 vtkExportAsXMLDOM_Error:
     Err.source = "function vtkExportAsDOMXML of module vtkXMLutilities"
     
     Select Case Err.number
-        Case VTK_WORKBOOK_NOTOPEN
-            Err.number = VTK_WORBOOK_NOTOPEN
+        Case VTK_WORKBOOK_NOT_OPEN
             Err.Description = "Workbook should be open."
+        Case VTK_WORKBOOK_NOT_INITIALIZED
+            Err.Description = "Workbook not initialized."
+        Case -2147221080
+            Err.number = VTK_WORKBOOK_NOT_OPEN
+            Err.Description = "Workbook should be open."
+        Case VTK_PROJECT_NOT_INITIALIZED
+            Err.Description = "Project " & projectName & " has not been initialized. The name might be wrong."
         Case Else
             Debug.Print "Unexpected error " & Err.number & " (" & Err.Description & ") in " & Err.source
             Err.number = VTK_UNEXPECTED_ERROR
     End Select
-    
+
     Err.Raise Err.number
-    
+
     Exit Function
     
 End Function
