@@ -108,8 +108,8 @@ Public Function vtkNormalizeToken(token As String, listOfTokens() As String) As 
     Exit Function
 
 vtkNormalizeToken_Error:
-    Err.source = "function vtkNormalizeToken of module vtkNormalize"
-    Err.number = VTK_UNEXPECTED_ERROR
+    Err.Source = "function vtkNormalizeToken of module vtkNormalize"
+    Err.Number = VTK_UNEXPECTED_ERROR
     Err.Raise Err.number, Err.source, Err.Description
     Exit Function
 End Function
@@ -236,15 +236,15 @@ Exit Function
 
 vtkNormalizeString_Error:
     
-    Err.source = "function vtkNormalizeString of module vtkNormalize"
+    Err.Source = "function vtkNormalizeString of module vtkNormalize"
     
-    Select Case Err.number
+    Select Case Err.Number
         Case VTK_UNEXPECTED_EOS
             Err.Description = "Unexpected EOS in String " & s
         Case VTK_UNEXPECTED_CHAR
             Err.Description = "Unexpected character of Ascii code " & Asc(ch) & " in String " & s & " at position " & p
         Case Else
-            Err.number = VTK_UNEXPECTED_ERROR
+            Err.Number = VTK_UNEXPECTED_ERROR
     End Select
     
     Err.Raise Err.number, Err.source, Err.Description
@@ -271,13 +271,13 @@ On Error GoTo vtkNormalizeFile_Error
     Dim fso As New FileSystemObject
     
     ' Initialize input and output files
-    Dim inputFileObject As file
+    Dim inputFileObject As File
     Set inputFileObject = fso.GetFile(fullFilePath)
     
     Dim normalizedFullFilePath As String
     normalizedFullFilePath = inputFileObject.ParentFolder & "\" & "tmp_" & inputFileObject.name
     fso.CreateTextFile (normalizedFullFilePath)
-    Dim outputFileObject As file
+    Dim outputFileObject As File
     Set outputFileObject = fso.GetFile(normalizedFullFilePath)
     
     ' Initialize objects to read and write the files
@@ -307,13 +307,13 @@ On Error GoTo vtkNormalizeFile_Error
 
 vtkNormalizeFile_Error:
 
-    Err.source = "sub vtkNormalizeFile of module vtkNormalize"
+    Err.Source = "sub vtkNormalizeFile of module vtkNormalize"
     
-    Select Case Err.number
+    Select Case Err.Number
         Case 53
-            Err.number = VTK_WRONG_FILE_PATH
+            Err.Number = VTK_WRONG_FILE_PATH
         Case Else
-            Err.number = VTK_UNEXPECTED_ERROR
+            Err.Number = VTK_UNEXPECTED_ERROR
     End Select
     
     Err.Raise Err.number, Err.source, Err.Description

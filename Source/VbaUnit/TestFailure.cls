@@ -11,7 +11,7 @@ Option Explicit
 
 Private mTestCase As ITestCase, mComment As String
 
-Public Sub Init(TestCase As ITestCase, Comment As String)
+Public Sub init(TestCase As ITestCase, Comment As String)
     Set mTestCase = TestCase
     mComment = Comment
 End Sub

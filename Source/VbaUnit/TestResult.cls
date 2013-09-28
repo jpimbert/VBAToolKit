@@ -34,7 +34,7 @@ End Sub
 Public Sub AddFailure(TestCase As ITestCase, Comment As String)
     Dim Failure As TestFailure
     Set Failure = New TestFailure
-    Failure.Init TestCase, Comment
+    Failure.init TestCase, Comment
     Failures.Add Failure
 End Sub
 

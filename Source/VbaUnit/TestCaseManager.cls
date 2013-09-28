@@ -12,7 +12,7 @@ Implements ITestManager
 
 Private mMethodName As String, mClassName As String
 
-Public Sub Init(methodName As String)
+Public Sub init(methodName As String)
     mMethodName = methodName
 End Sub
 
@@ -36,12 +36,12 @@ Private Function ITestManager_Run(test As ITest, Optional RunManager As IRunMana
     Dim TestCase As ITestCase
     If RunManager Is Nothing Then Set RunManager = New RunManager
     Set TestCase = test
-    RunManager.Result.StartTest TestCase
+    RunManager.result.StartTest TestCase
     TestCase.SetUp RunManager.Assert
     TestCase.RunTest
     'debug.print "Run Runtest"
     TestCase.TearDown
     'debug.print "Run teardown"
-    RunManager.Result.EndTest TestCase
+    RunManager.result.EndTest TestCase
     'debug.print "Run endtest"
 End Function

@@ -72,7 +72,7 @@ End Function
 Public Sub vtkCloseAndKillWorkbook(Wb As Workbook)
     Dim fullPath As String
     fullPath = Wb.FullName
-    Wb.Close savechanges:=False
+    Wb.Close saveChanges:=False
     Kill PathName:=fullPath
 End Sub
 

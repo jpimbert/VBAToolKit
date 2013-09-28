@@ -34,12 +34,12 @@ Option Explicit
 '               - if a Workbook is given as parameter, return the root path of this project workbook
 '---------------------------------------------------------------------------------------
 '
-Public Function vtkPathOfCurrentProject(Optional wb As Workbook) As String
+Public Function vtkPathOfCurrentProject(Optional Wb As Workbook) As String
     Dim fso As New FileSystemObject
-    If wb Is Nothing Then
+    If Wb Is Nothing Then
         vtkPathOfCurrentProject = fso.GetParentFolderName(ThisWorkbook.path)
        Else
-        vtkPathOfCurrentProject = fso.GetParentFolderName(wb.path)
+        vtkPathOfCurrentProject = fso.GetParentFolderName(Wb.path)
     End If
 End Function
 
@@ -52,9 +52,9 @@ End Function
 '               - if a Workbook is given as parameter, return the test path of this project workbook
 '---------------------------------------------------------------------------------------
 
-Public Function vtkPathToTestFolder(Optional wb As Workbook) As String '\VBAToolKit\Tests
+Public Function vtkPathToTestFolder(Optional Wb As Workbook) As String '\VBAToolKit\Tests
     Dim path As String
-    path = vtkPathOfCurrentProject(wb) & "\Tests"
+    path = vtkPathOfCurrentProject(Wb) & "\Tests"
     If Dir(path, vbDirectory) = vbNullString Then MkDir (path)
     vtkPathToTestFolder = path
 End Function
@@ -67,8 +67,8 @@ End Function
 '               - if a Workbook is given as parameter, return the source path of this project workbook
 '---------------------------------------------------------------------------------------
 '
-Public Function vtkPathToSourceFolder(Optional wb As Workbook) As String 'VBAToolKit\Source
-   vtkPathToSourceFolder = vtkPathOfCurrentProject(wb) & "\Source"
+Public Function vtkPathToSourceFolder(Optional Wb As Workbook) As String 'VBAToolKit\Source
+   vtkPathToSourceFolder = vtkPathOfCurrentProject(Wb) & "\Source"
 End Function
 
 '---------------------------------------------------------------------------------------
@@ -79,8 +79,8 @@ End Function
 '               - if a Workbook is given as parameter, return the template path of this project workbook
 '---------------------------------------------------------------------------------------
 '
-Public Function vtkPathToTemplateFolder(Optional wb As Workbook) As String 'VBAToolKit\Source
-   vtkPathToTemplateFolder = vtkPathOfCurrentProject(wb) & "\Templates"
+Public Function vtkPathToTemplateFolder(Optional Wb As Workbook) As String 'VBAToolKit\Source
+   vtkPathToTemplateFolder = vtkPathOfCurrentProject(Wb) & "\Templates"
 End Function
 
 '---------------------------------------------------------------------------------------
@@ -106,23 +106,21 @@ End Function
 ' Author    : Lucas Vitorino
 ' Purpose   : - Returns a String containing the name of the file, that is to say without the first extension.
 '             - Works with a path too.
-' Examples  : "dummy.dummy" -> "dummy"
+' Examples  : "dummy.ext" -> "dummy"
 '             "dummy" -> "dummy"
-'             "dummy\dummy" -> "dummy"
-'             "dummy\dummy.dummy" -> "dummy"
-'             "dummy.dummy.dummy" -> "dummy.dummy"
+'             "folder\dummy" -> "dummy"
+'             "folder\dummy.ext" -> "dummy"
+'             "dummy.ext1.ext2" -> "dummy.ext1"
 '---------------------------------------------------------------------------------------
 '
 Public Function vtkStripFilePathOrNameOfExtension(fileNameOrPath As String) As String
 
     On Error GoTo vtkStripFilePathOrNameOfExtension_Error
 
-    Dim backslashPosition As Integer
-    backslashPosition = InStrRev(fileNameOrPath, "\")
-    
     ' Get the filename in the path
+    Dim fso As New FileSystemObject
     Dim substring As String
-    substring = Mid(fileNameOrPath, backslashPosition + 1)
+    substring = fso.GetFileName(fileNameOrPath)
     
     ' Remove the part after the last dot
     Dim dotPosition As Integer
@@ -148,12 +146,12 @@ End Function
 ' Purpose   : - Returns the vtkProjectName associated with a workbook path or name or a configuration name.
 '
 ' Examples  : "Dummy_DEV", "DEV" -> "Dummy"
-'             "Dummy_DEV.dummy", "DEV" -> "Dummy"
-'             "Dummy.dummy" -> "Dummy"
-'             "dummy\Dummy_DEV.dummy", "DEV" -> "Dummy"
+'             "Dummy_DEV.ext", "DEV" -> "Dummy"
+'             "Dummy.ext" -> "Dummy"
+'             "folder\Dummy_DEV.ext", "DEV" -> "Dummy"
 '             "Dummy_DEV", "DEEV" -> "Dummy_DEV"
-'             "Dummy_Dummy_DEV", "DEV", -> "Dummy_Dummy"
-'             "Dummy_Dummy"_DEV", "Dummy" -> "Dummy_Dummy_DEV"
+'             "Dummy_foo_DEV", "DEV", -> "Dummy_foo"
+'             "Dummy_foo_DEV", "foo" -> "Dummy_foo_DEV"
 '---------------------------------------------------------------------------------------
 '
 Public Function vtkStripPathOrNameOfVtkExtension(projectNameOrPath As String, extension As String) As String
@@ -210,7 +208,7 @@ Public Function vtkCreateTreeFolder(rootPath As String)
    Exit Function
    
 vtkCreateTreeFolder_Error:
-    vtkCreateTreeFolder = Err.number
+    vtkCreateTreeFolder = Err.Number
     Err.Raise Err.number, "Module vtkFileSystemUtilities : Function vtkCreateTreeFolder", Err.Description
 End Function
 

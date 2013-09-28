@@ -53,8 +53,8 @@ On Error GoTo vtkTextFileReader_Error
    Exit Function
 
 vtkTextFileReader_Error:
-    MsgBox "Error " & err.Number & " (" & err.Description & ") in procedure VtkTextFileReader of Module vtkGitFunctions"
-    vtkTextFileReader = err.Number
+    MsgBox "Error " & Err.Number & " (" & Err.Description & ") in procedure VtkTextFileReader of Module vtkGitFunctions"
+    vtkTextFileReader = Err.Number
     
 End Function
 
@@ -76,15 +76,15 @@ Public Function vtkCleanFolder(folderPath As String) As Integer
     Dim fso As New Scripting.FileSystemObject
     Dim sourceFolder As Scripting.Folder
     Dim subFolder As Scripting.Folder
-    Dim file As Scripting.file
+    Dim File As Scripting.File
 
     ' Will raise an error if folderPath does not correspond to a valid folder
     Set sourceFolder = fso.GetFolder(folderPath)
 
     ' Erase the files in the folder, even the hidden ones
-    For Each file In sourceFolder.Files
-        fso.DeleteFile file
-    Next file
+    For Each File In sourceFolder.Files
+        fso.DeleteFile File
+    Next File
     
     ' Call the function on all the SubFolders
     For Each subFolder In sourceFolder.SubFolders
@@ -97,8 +97,8 @@ Public Function vtkCleanFolder(folderPath As String) As Integer
     Exit Function
     
 vtkCleanFolder_Error:
-    If err.Number = 76 Then
-        vtkCleanFolder = err.Number
+    If Err.Number = 76 Then
+        vtkCleanFolder = Err.Number
     Else
         vtkCleanFolder = VTK_UNEXPECTED_ERROR
     End If
@@ -134,8 +134,8 @@ Public Function vtkDeleteFolder(folderPath As String)
     Exit Function
 
 vtkDeleteFolder_Error:
-    If err.Number = 76 Then
-        vtkDeleteFolder = err.Number
+    If Err.Number = 76 Then
+        vtkDeleteFolder = Err.Number
     Else
         vtkDeleteFolder = VTK_UNEXPECTED_ERROR
     End If

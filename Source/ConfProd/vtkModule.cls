@@ -77,8 +77,8 @@ End Property
 ' Purpose   : The number of the module in its parent
 '---------------------------------------------------------------------------------------
 '
-Public Property Get number() As Integer
-    number = m_number
+Public Property Get Number() As Integer
+    Number = m_number
 End Property
 
 '---------------------------------------------------------------------------------------
@@ -101,7 +101,7 @@ End Property
 '---------------------------------------------------------------------------------------
 '
 Property Get name() As String
-    name = parent.module(number)
+    name = parent.module(Number)
 End Property
 
 '---------------------------------------------------------------------------------------
@@ -148,7 +148,7 @@ End Function
 '
 Public Property Get configuration() As String
     configuration = ""
-    If confNumber = 0 Then Err.Raise VTK_MODULE_NOTATTACHED, "vtkModule::configuration()", "Module """ & parent.module(number) & """ not attached to a configuration "
+    If confNumber = 0 Then Err.Raise VTK_MODULE_NOTATTACHED, "vtkModule::configuration()", "Module """ & parent.module(Number) & """ not attached to a configuration "
     configuration = parent.configuration(confNumber)
 End Property
 
@@ -163,7 +163,7 @@ End Property
 '
 Public Property Get path() As String
     path = ""
-    If confNumber = 0 Then Err.Raise VTK_MODULE_NOTATTACHED, "vtkModule::path()", "Module """ & parent.module(number) & """ not attached to a configuration"
+    If confNumber = 0 Then Err.Raise VTK_MODULE_NOTATTACHED, "vtkModule::path()", "Module """ & parent.module(Number) & """ not attached to a configuration"
     path = parent.getModulePathWithNumber(numModule:=number, numConfiguration:=confNumber)
 End Property
 
@@ -179,9 +179,9 @@ End Property
 '---------------------------------------------------------------------------------------
 '
 Public Property Get VBAModule() As VBComponent
-    Dim wb As Workbook, fso As New FileSystemObject, wbName As String
+    Dim Wb As Workbook, fso As New FileSystemObject, wbName As String
     Set VBAModule = Nothing
-    If confNumber = 0 Then Err.Raise VTK_MODULE_NOTATTACHED, "vtkModule::VBAModule()", "Module """ & parent.module(number) & """ not attached to a configuration"
+    If confNumber = 0 Then Err.Raise VTK_MODULE_NOTATTACHED, "vtkModule::VBAModule()", "Module """ & parent.module(Number) & """ not attached to a configuration"
     wbName = fso.GetFileName(parent.getConfigurationPathWithNumber(confNumber))
     If Not VtkWorkbookIsOpen(wbName) Then Err.Raise VTK_WORKBOOK_NOTOPEN, "vtkModule::configuration()", "Workbook """ & wbName & """ is not open"
    On Error Resume Next

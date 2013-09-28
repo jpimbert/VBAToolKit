@@ -62,16 +62,16 @@ End Function
 '---------------------------------------------------------------------------------------
 '
 Public Function getTestFileFromTemplate(fileName As String, Optional destinationName As String = "", Optional openExcel As Boolean = False) As Workbook
-    Dim source As String, destination As String, errCount As Integer
+    Dim Source As String, destination As String, errCount As Integer
     
     ' Copy file
-    source = vtkPathToTemplateFolder(pWorkBook) & "\" & fileName
+    Source = vtkPathToTemplateFolder(pWorkBook) & "\" & fileName
     If destinationName Like "" Then
         destination = vtkTestPath & "\" & fileName
        Else
         destination = vtkTestPath & "\" & destinationName
     End If
-    FileCopy source:=source, destination:=destination
+    FileCopy Source:=source, destination:=destination
     
     ' Open Excel file if required
     Set getTestFileFromTemplate = Nothing
@@ -85,9 +85,9 @@ Public Function getTestFileFromTemplate(fileName As String, Optional destination
 
 M_Error:
     errCount = errCount + 1
-    If Err.number = 1004 And errCount < 5 Then Resume    ' It's possible that the file is not ready, just after copy : in this case retry
+    If Err.Number = 1004 And errCount < 5 Then Resume    ' It's possible that the file is not ready, just after copy : in this case retry
     Set getTestFileFromTemplate = Nothing
-    Err.Raise number:=Err.number, source:=Err.source, Description:=Err.Description
+    Err.Raise Number:=Err.number, Source:=Err.source, Description:=Err.Description
 End Function
 
 
