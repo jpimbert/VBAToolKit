@@ -21,8 +21,6 @@ Attribute VB_Name = "vtkNormalize"
 
 Option Explicit
 
-
-Private properlyCasedIdentifiersString As String
 Private properlyCasedIdentifiersArray() As String
 
 '---------------------------------------------------------------------------------------
@@ -33,10 +31,16 @@ Private properlyCasedIdentifiersArray() As String
 '
 Private Sub initializeList()
     
+    Dim properlyCasedIdentifiersString As String
+    
     properlyCasedIdentifiersString = _
     "Dim" & "," & _
     "Wb" & "," & _
     "Err" & "," & _
+    "Number" & "," & _
+    "Description" & "," & _
+    "Source" & "," & _
+    "Count" & "," & _
     "File" & "," & _
     "Folder" & "," & _
     "Scripting" & "," & _
@@ -48,9 +52,6 @@ Private Sub initializeList()
     "retVal" & "," & _
     "fileName" & "," & _
     "saveChanges" & "," & _
-    "Number" & "," & _
-    "Description" & "," & _
-    "Source" & "," & _
     ""
     
     properlyCasedIdentifiersArray = Split(properlyCasedIdentifiersString, ",")
