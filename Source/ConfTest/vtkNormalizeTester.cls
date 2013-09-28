@@ -155,7 +155,7 @@ Public Sub Test_vtkNormalizeToken_wrongCase1()
     Exit Sub
 
 Test_vtkNormalizeToken_wrongCase1_Error:
-    mAssert.Should False, "Unexpected error " & Err.number & " (" & Err.Description & ") in procedure Test_vtkNormalizeToken_wrongCase1 of Class Module vtkNormalizeTester"
+    mAssert.Should False, "Unexpected error " & Err.Number & " (" & Err.Description & ") in procedure Test_vtkNormalizeToken_wrongCase1 of Class Module vtkNormalizeTester"
     Resume Next
 End Sub
 
@@ -181,7 +181,7 @@ Public Sub Test_vtkNormalizeToken_wrongCase2()
     Exit Sub
 
 Test_vtkNormalizeToken_wrongCase2_Error:
-    mAssert.Should False, "Unexpected error " & Err.number & " (" & Err.Description & ") in procedure Test_vtkNormalizeToken_wrongCase2 of Class Module vtkNormalizeTester"
+    mAssert.Should False, "Unexpected error " & Err.Number & " (" & Err.Description & ") in procedure Test_vtkNormalizeToken_wrongCase2 of Class Module vtkNormalizeTester"
     Resume Next
 End Sub
 
@@ -207,7 +207,7 @@ Public Sub Test_vtkNormalizeToken_wrongCase3()
     Exit Sub
 
 Test_vtkNormalizeToken_wrongCase3_Error:
-    mAssert.Should False, "Unexpected error " & Err.number & " (" & Err.Description & ") in procedure Test_vtkNormalizeToken_wrongCase3 of Class Module vtkNormalizeTester"
+    mAssert.Should False, "Unexpected error " & Err.Number & " (" & Err.Description & ") in procedure Test_vtkNormalizeToken_wrongCase3 of Class Module vtkNormalizeTester"
     Resume Next
 End Sub
 
@@ -233,7 +233,7 @@ Public Sub Test_vtkNormalizeToken_tokenNotInList()
     Exit Sub
 
 Test_vtkNormalizeToken_tokenNotInList_Error:
-    mAssert.Should False, "Unexpected error " & Err.number & " (" & Err.Description & ") in procedure Test_vtkNormalizeToken_tokenNotInList of Class Module vtkNormalizeTester"
+    mAssert.Should False, "Unexpected error " & Err.Number & " (" & Err.Description & ") in procedure Test_vtkNormalizeToken_tokenNotInList of Class Module vtkNormalizeTester"
     Resume Next
 End Sub
 
@@ -258,7 +258,7 @@ Public Sub Test_vtkNormalizeToken_notAnIdentifierButInList()
     Exit Sub
 
 Test_vtkNormalizeToken_notAnIdentifierButInList_Error:
-    mAssert.Should False, "Unexpected error " & Err.number & " (" & Err.Description & ") in procedure Test_vtkNormalizeToken_notAnIdentifierButInList of Class Module vtkNormalizeTester"
+    mAssert.Should False, "Unexpected error " & Err.Number & " (" & Err.Description & ") in procedure Test_vtkNormalizeToken_notAnIdentifierButInList of Class Module vtkNormalizeTester"
     Resume Next
 End Sub
 
@@ -286,7 +286,7 @@ Public Sub Test_vtkNormalizeToken_listIsEmpty()
     Exit Sub
 
 Test_vtkNormalizeToken_listIsEmpty_Error:
-    mAssert.Should False, "Unexpected error " & Err.number & " (" & Err.Description & ") in procedure Test_vtkNormalizeToken_listIsEmpty of Class Module vtkNormalizeTester"
+    mAssert.Should False, "Unexpected error " & Err.Number & " (" & Err.Description & ") in procedure Test_vtkNormalizeToken_listIsEmpty of Class Module vtkNormalizeTester"
     Resume Next
 End Sub
 
@@ -312,7 +312,7 @@ Public Sub Test_vtkNormalizeString_tokensInListAreCorrected()
     Exit Sub
 
 Test_vtkNormalizeString_tokensInListAreCorrected_Error:
-    mAssert.Should False, "Unexpected error " & Err.number & " (" & Err.Description & ") in procedure Test_vtkNormalizeString_tokensInListAreCorrected of Class Module vtkNormalizeTester"
+    mAssert.Should False, "Unexpected error " & Err.Number & " (" & Err.Description & ") in procedure Test_vtkNormalizeString_tokensInListAreCorrected of Class Module vtkNormalizeTester"
     Resume Next
 End Sub
 
@@ -338,7 +338,7 @@ Public Sub Test_vtkNormalizeString_tokensAfterCommentAreNotCorrected()
     Exit Sub
 
 Test_vtkNormalizeString_tokensAfterCommentAreNotCorrected_Error:
-    mAssert.Should False, "Unexpected error " & Err.number & " (" & Err.Description & ") in procedure Test_vtkNormalizeString_tokensAfterCommentAreNotCorrected of Class Module vtkNormalizeTester"
+    mAssert.Should False, "Unexpected error " & Err.Number & " (" & Err.Description & ") in procedure Test_vtkNormalizeString_tokensAfterCommentAreNotCorrected of Class Module vtkNormalizeTester"
     Resume Next
 End Sub
 
@@ -365,7 +365,7 @@ Public Sub Test_vtkNormalizeString_noBetweenQuotesOnlyAfterComments()
     Exit Sub
 
 Test_vtkNormalizeString_noBetweenQuotesOnlyAfterComments_Error:
-    mAssert.Should False, "Unexpected error " & Err.number & " (" & Err.Description & ") in procedure Test_vtkNormalizeString_noBetweenQuotesOnlyAfterComments of Class Module vtkNormalizeTester"
+    mAssert.Should False, "Unexpected error " & Err.Number & " (" & Err.Description & ") in procedure Test_vtkNormalizeString_noBetweenQuotesOnlyAfterComments of Class Module vtkNormalizeTester"
     Resume Next
 End Sub
 
@@ -391,7 +391,7 @@ Public Sub Test_vtkNormalizeString_tokensAreNotIdentifiers()
     Exit Sub
 
 Test_vtkNormalizeString_tokensAreNotIdentifiers_Error:
-    mAssert.Should False, "Unexpected error " & Err.number & " (" & Err.Description & ") in procedure Test_vtkNormalizeString_tokensAreNotIdentifiers of Class Module vtkNormalizeTester"
+    mAssert.Should False, "Unexpected error " & Err.Number & " (" & Err.Description & ") in procedure Test_vtkNormalizeString_tokensAreNotIdentifiers of Class Module vtkNormalizeTester"
     Resume Next
 End Sub
 
@@ -417,7 +417,7 @@ Public Sub Test_vtkNormalizeString_stringHasSpecialCharacters()
     Exit Sub
 
 Test_vtkNormalizeString_stringHasSpecialCharacters_Error:
-    mAssert.Should False, "Unexpected error " & Err.number & " (" & Err.Description & ") in procedure Test_vtkNormalizeString_stringHasSpecialCharacters of Class Module vtkNormalizeTester"
+    mAssert.Should False, "Unexpected error " & Err.Number & " (" & Err.Description & ") in procedure Test_vtkNormalizeString_stringHasSpecialCharacters of Class Module vtkNormalizeTester"
     Resume Next
 End Sub
 
@@ -444,7 +444,7 @@ Public Sub Test_vtkNormalizeString_quotes()
     Exit Sub
 
 Test_vtkNormalizeString_quotes_Error:
-    mAssert.Should False, "Unexpected error " & Err.number & " (" & Err.Description & ") in procedure Test_vtkNormalizeString_quotes of Class Module vtkNormalizeTester"
+    mAssert.Should False, "Unexpected error " & Err.Number & " (" & Err.Description & ") in procedure Test_vtkNormalizeString_quotes of Class Module vtkNormalizeTester"
     Resume Next
 End Sub
 
@@ -464,7 +464,7 @@ Public Sub Test_vtkNormalizeFile_wrongPath()
     Exit Sub
 
 Test_vtkNormalizeFile_wrongPath_Error:
-    error = Err.number
+    error = Err.Number
     Resume Next
 End Sub
 
@@ -487,7 +487,7 @@ Public Sub Test_vtkNormalizeFile_folderPath()
     Exit Sub
 
 Test_vtkNormalizeFile_wrongPath_Error:
-    error = Err.number
+    error = Err.Number
     Resume Next
 End Sub
 
@@ -516,7 +516,7 @@ Public Sub Test_vtkNormalizeFile_sameSizeBeforeThanAfter1()
     Exit Sub
 
 Test_vtkNormalizeFile_sameSizeBeforeThanAfter_Error:
-    mAssert.Should False, "Unexpected error " & Err.number & " (" & Err.Description & ") in procedure Test_vtkNormalizeFile_sameSizeBeforeThanAfter of Class Module vtkNormalizeTester"
+    mAssert.Should False, "Unexpected error " & Err.Number & " (" & Err.Description & ") in procedure Test_vtkNormalizeFile_sameSizeBeforeThanAfter of Class Module vtkNormalizeTester"
     Exit Sub
 End Sub
 
@@ -545,7 +545,7 @@ Public Sub Test_vtkNormalizeFile_sameSizeBeforeThanAfter2()
     Exit Sub
 
 Test_vtkNormalizeFile_sameSizeBeforeThanAfter_Error:
-    mAssert.Should False, "Unexpected error " & Err.number & " (" & Err.Description & ") in procedure Test_vtkNormalizeFile_sameSizeBeforeThanAfter of Class Module vtkNormalizeTester"
+    mAssert.Should False, "Unexpected error " & Err.Number & " (" & Err.Description & ") in procedure Test_vtkNormalizeFile_sameSizeBeforeThanAfter of Class Module vtkNormalizeTester"
     Exit Sub
 End Sub
 
@@ -591,7 +591,7 @@ Public Sub Test_vtkNormalizeFile_fileContent()
     Exit Sub
 
 Test_vtkNormalizeFile_fileContent_Error:
-    mAssert.Should False, "Unexpected error " & Err.number & " (" & Err.Description & ") in procedure Test_vtkNormalizeFile_fileContent of Class Module vtkNormalizeTester"
+    mAssert.Should False, "Unexpected error " & Err.Number & " (" & Err.Description & ") in procedure Test_vtkNormalizeFile_fileContent of Class Module vtkNormalizeTester"
     Resume Next
 
 End Sub
@@ -616,7 +616,7 @@ Public Sub Test_vtkNormalizeFile_onlyOneFileInFolder()
     Exit Sub
 
 Test_vtkNormalizeFile_onlyOneFileInFolder_Error:
-    mAssert.Should False, "Unexpected error " & Err.number & " (" & Err.Description & ") in procedure Test_vtkNormalizeFile_onlyOneFileInFolder of Class Module vtkNormalizeTester"
+    mAssert.Should False, "Unexpected error " & Err.Number & " (" & Err.Description & ") in procedure Test_vtkNormalizeFile_onlyOneFileInFolder of Class Module vtkNormalizeTester"
     Resume Next
 End Sub
 

@@ -81,7 +81,7 @@ End Sub
 Private Sub ITestCase_TearDown()
     On Error Resume Next
     
-    vtkCloseAndKillWorkbook wb:=wbForTest
+    vtkCloseAndKillWorkbook Wb:=wbForTest
 
     Kill PathName:=vtkPathToTestFolder & "\" & existingWorkbookName
     Kill PathName:=vtkPathToTestFolder & "\" & moduleToImport
@@ -321,7 +321,7 @@ Public Sub Test_vtkExportOneModule_moduleIsNormalized()
     Exit Sub
 
 Test_vtkExportOneModule_moduleIsNormalized_Error:
-    mAssert.Should False, "Unexpected error " & Err.number & " (" & Err.Description & ") in procedure vtkExportConfiguration_modifiedModuleIsNormalizedTure of Class Module vtkExportConfigurationTester"
+    mAssert.Should False, "Unexpected error " & Err.Number & " (" & Err.Description & ") in procedure vtkExportConfiguration_modifiedModuleIsNormalizedTure of Class Module vtkExportConfigurationTester"
     Resume Next
 End Sub
 
@@ -356,7 +356,7 @@ Public Sub Test_vtkExportOneModule_moduleIsNotNormalized()
     Exit Sub
 
 Test_vtkExportOneModule_moduleIsNotNormalized_Error:
-    mAssert.Should False, "Unexpected error " & Err.number & " (" & Err.Description & ") in procedure vtkExportConfiguration_modifiedModuleIsNormalizedTure of Class Module vtkExportConfigurationTester"
+    mAssert.Should False, "Unexpected error " & Err.Number & " (" & Err.Description & ") in procedure vtkExportConfiguration_modifiedModuleIsNormalizedTure of Class Module vtkExportConfigurationTester"
     Resume Next
 End Sub
 

@@ -55,7 +55,7 @@ Private Sub SaveThenReOpenNewWorkbook()
 '       Else
 '        newWorkbook.Close SaveChanges:=True
 '    End If
-    newWorkBook.Close savechanges:=True
+    newWorkBook.Close saveChanges:=True
     vtkResetConfigurationManagers           ' reset all configuration managers
     Set newWorkBook = Workbooks.Open(fileName:=savedNewWorkbookPath)
     Set newConfManager = vtkConfigurationManagerForProject("NewProject")
@@ -87,8 +87,8 @@ Private Sub ITestCase_SetUp(Assert As IAssert)
 End Sub
 
 Private Sub ITestCase_TearDown()
-    vtkCloseAndKillWorkbook wb:=newWorkBook     ' close the new Excel project
-    vtkCloseAndKillWorkbook wb:=existingWorkbook ' close the existing Excel project
+    vtkCloseAndKillWorkbook Wb:=newWorkBook     ' close the new Excel project
+    vtkCloseAndKillWorkbook Wb:=existingWorkbook ' close the existing Excel project
     vtkResetConfigurationManagers             ' reset all configuration managers
 End Sub
 
@@ -116,11 +116,11 @@ End Sub
 Public Sub TestConfigurationSheetDoesntExistInNewWorkbook()
     '   Verify that the configuration sheet missing is detected in new workbook
     '   using a fresh configuration Manager (with no default sheet initialized)
-    Dim cm As New vtkConfigurationManager, wb As Workbook, wbFullName As String
-    Set wb = vtkCreateExcelWorkbookForTestWithProjectName("NewWorkbook")    ' create a fresh new Excel workbook
-    wbFullName = wb.FullName
-    mAssert.Should Not cm.isConfigurationInitializedForWorkbook(ExcelName:=wb.name), "The Configuration sheet must not exist in new workbook"
-    wb.Close savechanges:=False
+    Dim cm As New vtkConfigurationManager, Wb As Workbook, wbFullName As String
+    Set Wb = vtkCreateExcelWorkbookForTestWithProjectName("NewWorkbook")    ' create a fresh new Excel workbook
+    wbFullName = Wb.FullName
+    mAssert.Should Not cm.isConfigurationInitializedForWorkbook(ExcelName:=Wb.name), "The Configuration sheet must not exist in new workbook"
+    Wb.Close saveChanges:=False
     Kill PathName:=wbFullName
 End Sub
 

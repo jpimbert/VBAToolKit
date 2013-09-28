@@ -56,15 +56,15 @@ End Property
 Private Sub ITestCase_SetUp(Assert As IAssert)
     Set mAssert = Assert
     
-    Dim source As String, destination As String
-    source = vtkPathToTemplateFolder & "\" & initializedWorkbookName
+    Dim Source As String, destination As String
+    Source = vtkPathToTemplateFolder & "\" & initializedWorkbookName
     destination = vtkPathToTestFolder & "\" & initializedWorkbookName
     Set initializedWorkbook = getTestFileFromTemplate(fileName:=initializedWorkbookName, openExcel:=True)
     Set confManager = vtkConfigurationManagerForProject(initializedProjectName)
 End Sub
 
 Private Sub ITestCase_TearDown()
-    vtkCloseAndKillWorkbook wb:=initializedWorkbook ' close the existing Excel project
+    vtkCloseAndKillWorkbook Wb:=initializedWorkbook ' close the existing Excel project
     vtkResetConfigurationManagers             ' reset all configuration managers
 End Sub
 
@@ -134,7 +134,7 @@ Public Sub Test_ModuleGetName()
    Exit Sub
 
 M_Error:
-    mAssert.Should False, "Unexpected Error (" & Err.number & "): " & Err.Description
+    mAssert.Should False, "Unexpected Error (" & Err.Number & "): " & Err.Description
 End Sub
 
 Public Sub Test_GetPathForConfiguration_ExistingConfiguration()
@@ -150,7 +150,7 @@ Public Sub Test_GetPathForConfiguration_ExistingConfiguration()
    Exit Sub
 
 M_Error:
-    mAssert.Should False, "Unexpected Error (" & Err.number & "): " & Err.Description
+    mAssert.Should False, "Unexpected Error (" & Err.Number & "): " & Err.Description
 End Sub
 
 Public Sub Test_GetPathForConfiguration_InexistingConfigurationRaiseError()
@@ -194,7 +194,7 @@ Public Sub Test_SetPathForConfiguration_ExistingConfiguration()
    Exit Sub
 
 M_Error:
-    mAssert.Should False, "Unexpected Error (" & Err.number & "): " & Err.Description
+    mAssert.Should False, "Unexpected Error (" & Err.Number & "): " & Err.Description
 End Sub
 
 Public Sub Test_SetPathForConfiguration_InexistingConfigurationRaiseError()
@@ -223,7 +223,7 @@ Public Sub Test_Configuration_Attached()
    Exit Sub
 
 M_Error:
-    mAssert.Should False, "Unexpected Error (" & Err.number & "): " & Err.Description
+    mAssert.Should False, "Unexpected Error (" & Err.Number & "): " & Err.Description
 End Sub
 
 Public Sub Test_Configuration_NotAttachedErrorRaised()
@@ -261,7 +261,7 @@ Public Sub Test_Path_Attached()
    Exit Sub
 
 M_Error:
-    mAssert.Should False, "Unexpected Error (" & Err.number & "): " & Err.Description
+    mAssert.Should False, "Unexpected Error (" & Err.Number & "): " & Err.Description
 End Sub
 
 Public Sub Test_Path_NotAttachedErrorRaised()
@@ -299,7 +299,7 @@ Public Sub Test_VBAModule_Attached()
    Exit Sub
 
 M_Error:
-    mAssert.Should False, "Unexpected Error (" & Err.number & "): " & Err.Description
+    mAssert.Should False, "Unexpected Error (" & Err.Number & "): " & Err.Description
 End Sub
 
 Public Sub Test_VBAModule_NotAttachedErrorRaised()
@@ -356,7 +356,7 @@ Public Sub Test_VBAModule_NoModule()
    Exit Sub
 
 M_Error:
-    mAssert.Should False, "Unexpected Error (" & Err.number & "): " & Err.Description
+    mAssert.Should False, "Unexpected Error (" & Err.Number & "): " & Err.Description
 End Sub
 
 Private Function ITest_Suite() As TestSuite
