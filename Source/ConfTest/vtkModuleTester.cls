@@ -255,7 +255,7 @@ Public Sub Test_Path_Attached()
     ' collection just initialized from an Excel worlbook
     
    On Error GoTo M_Error
-    mAssert.Equals confManager.configurations(1).modules(2).path, "Tests\TestClass.cls", "Path of module"
+    mAssert.Equals confManager.configurations(1).modules(2).Path, "Tests\TestClass.cls", "Path of module"
 
    On Error GoTo 0
    Exit Sub
@@ -269,7 +269,7 @@ Public Sub Test_Path_NotAttachedErrorRaised()
     ' collection just initialized from an Excel worlbook
     
    On Error GoTo M_Error
-    mAssert.Equals confManager.modules(2).path, "", "Path of module"
+    mAssert.Equals confManager.modules(2).Path, "", "Path of module"
     mAssert.Should False, "An error must be raised"
 
    On Error GoTo 0
@@ -284,7 +284,7 @@ Public Sub Test_Path_NotAttachedNoError()
     ' collection just initialized from an Excel worlbook
     
    On Error Resume Next
-    mAssert.Equals confManager.modules(2).path, "", "Path of module"
+    mAssert.Equals confManager.modules(2).Path, "", "Path of module"
     mAssert.Equals Err.number, VTK_MODULE_NOTATTACHED, "Error raised"
 End Sub
 
@@ -329,7 +329,7 @@ End Sub
 Public Sub Test_VBAModule_NotOpen()
     ' This test verifies the getting of the VBAModule for a module attached to a configuration
     ' New configuration, Excel file not open
-    confManager.addConfiguration configuration:="NewConfiguration", path:="path/toto.xlsm"
+    confManager.addConfiguration configuration:="NewConfiguration", Path:="path/toto.xlsm"
     confManager.modules(3).setPathForConfiguration "NewConfiguration", "Toto/Module.cls"
     
    On Error GoTo M_Error

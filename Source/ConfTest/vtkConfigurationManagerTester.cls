@@ -247,10 +247,10 @@ End Sub
 Public Sub TestSetConfigurationPathWithNumberToNewProject()
 '       Verify the capability to set and retrieve the configuration path by number
     ' set new pathes
-    newConfManager.setConfigurationPathWithNumber n:=0, path:="Path0"
-    newConfManager.setConfigurationPathWithNumber n:=1, path:="Path1"
-    newConfManager.setConfigurationPathWithNumber n:=2, path:="Path2"
-    newConfManager.setConfigurationPathWithNumber n:=3, path:="Path3"
+    newConfManager.setConfigurationPathWithNumber n:=0, Path:="Path0"
+    newConfManager.setConfigurationPathWithNumber n:=1, Path:="Path1"
+    newConfManager.setConfigurationPathWithNumber n:=2, Path:="Path2"
+    newConfManager.setConfigurationPathWithNumber n:=3, Path:="Path3"
     ' verify pathes
     mAssert.Equals newConfManager.getConfigurationPathWithNumber(0), "", "Inexistant configuration number 0"
     mAssert.Equals newConfManager.getConfigurationPathWithNumber(1), "Path1", "Path of first configuration given by number"
@@ -261,10 +261,10 @@ End Sub
 Public Sub TestSetConfigurationPathWithNumberToSavedProject()
 '       Verify the capability to set and retrieve the configuration path by number
     ' set new pathes
-    newConfManager.setConfigurationPathWithNumber n:=0, path:="Path0"
-    newConfManager.setConfigurationPathWithNumber n:=1, path:="Path1"
-    newConfManager.setConfigurationPathWithNumber n:=2, path:="Path2"
-    newConfManager.setConfigurationPathWithNumber n:=3, path:="Path3"
+    newConfManager.setConfigurationPathWithNumber n:=0, Path:="Path0"
+    newConfManager.setConfigurationPathWithNumber n:=1, Path:="Path1"
+    newConfManager.setConfigurationPathWithNumber n:=2, Path:="Path2"
+    newConfManager.setConfigurationPathWithNumber n:=3, Path:="Path3"
     ' save and re-open file
     SaveThenReOpenNewWorkbook
     ' verify pathes
@@ -292,9 +292,9 @@ End Sub
 Public Sub TestSetConfigurationPathToSavedProject()
 '       Verify the capability to set and retrieve the configuration path by configuration name
     ' set new pathes
-    newConfManager.setConfigurationPath configuration:="InexistantConfiguration", path:="Path0"
-    newConfManager.setConfigurationPath configuration:=newProjectName, path:="Path1"
-    newConfManager.setConfigurationPath configuration:=newProjectName & "_DEV", path:="Path2"
+    newConfManager.setConfigurationPath configuration:="InexistantConfiguration", Path:="Path0"
+    newConfManager.setConfigurationPath configuration:=newProjectName, Path:="Path1"
+    newConfManager.setConfigurationPath configuration:=newProjectName & "_DEV", Path:="Path2"
     ' save and re-open file
     SaveThenReOpenNewWorkbook
     ' verify pathes
@@ -403,10 +403,10 @@ Public Sub TestAddModulePathToSavedProject()
     ' save and re-open file
     SaveThenReOpenNewWorkbook
     ' set new pathes
-    newConfManager.setModulePathWithNumber path:="Path1Module1", numModule:=1, numConfiguration:=1
-    newConfManager.setModulePathWithNumber path:="Path2Module1", numModule:=1, numConfiguration:=2
-    newConfManager.setModulePathWithNumber path:="Path1Module2", numModule:=2, numConfiguration:=1
-    newConfManager.setModulePathWithNumber path:="Path2Module3", numModule:=3, numConfiguration:=2
+    newConfManager.setModulePathWithNumber Path:="Path1Module1", numModule:=1, numConfiguration:=1
+    newConfManager.setModulePathWithNumber Path:="Path2Module1", numModule:=1, numConfiguration:=2
+    newConfManager.setModulePathWithNumber Path:="Path1Module2", numModule:=2, numConfiguration:=1
+    newConfManager.setModulePathWithNumber Path:="Path2Module3", numModule:=3, numConfiguration:=2
     ' save and re-open file
     SaveThenReOpenNewWorkbook
     ' verify module pathes

@@ -156,8 +156,8 @@ Public Sub Test_vtkExportConfiguration_filesNotYetCreatedTrue()
     retVal = vtkExportConfiguration(testWorkbook.VBProject, testProjectName, testConf.name, onlyModified:=True)
     mAssert.Equals retval, totalNumberOfModules, totalNumberOfModules & " should be exported as files do not yet exist."
     
-    mAssert.Should fso.fileExists(VBAToolKit.vtkTestPath & "\" & testModule1FileName), testModule1FileName & " should have been created."
-    mAssert.Should fso.fileExists(VBAToolKit.vtkTestPath & "\" & testModule2FileName), testModule2FileName & " should have been created."
+    mAssert.Should fso.FileExists(VBAToolKit.vtkTestPath & "\" & testModule1FileName), testModule1FileName & " should have been created."
+    mAssert.Should fso.FileExists(VBAToolKit.vtkTestPath & "\" & testModule2FileName), testModule2FileName & " should have been created."
 
     On Error GoTo 0
     Exit Sub
@@ -178,8 +178,8 @@ Public Sub Test_vtkExportConfiguration_filesNotYetCreatedFalse()
     retVal = vtkExportConfiguration(testWorkbook.VBProject, testProjectName, testConf.name, onlyModified:=False)
     mAssert.Equals retval, totalNumberOfModules, totalNumberOfModules & " should be exported as files do not yet exist."
 
-    mAssert.Should fso.fileExists(VBAToolKit.vtkTestPath & "\" & testModule1FileName), testModule1FileName & " should have been created."
-    mAssert.Should fso.fileExists(VBAToolKit.vtkTestPath & "\" & testModule2FileName), testModule2FileName & " should have been created."
+    mAssert.Should fso.FileExists(VBAToolKit.vtkTestPath & "\" & testModule1FileName), testModule1FileName & " should have been created."
+    mAssert.Should fso.FileExists(VBAToolKit.vtkTestPath & "\" & testModule2FileName), testModule2FileName & " should have been created."
 
     On Error GoTo 0
     Exit Sub
@@ -438,7 +438,7 @@ Public Sub Test_vtkExportConfiguration_notReferencedModuleMustNotBeExported()
     
     mAssert.Equals retval, 0, "The module should not be exported as it has not been added to the configuration."
     
-    mAssert.Should Not fso.fileExists(VBAToolKit.vtkTestPath & "\" & importedModuleFileName), importedModuleName & " should not have been created."
+    mAssert.Should Not fso.FileExists(VBAToolKit.vtkTestPath & "\" & importedModuleFileName), importedModuleName & " should not have been created."
 
     On Error GoTo 0
     Exit Sub
@@ -470,7 +470,7 @@ Public Sub Test_vtkExportConfiguration_importedModuleAddedToConfigurationManager
     
     mAssert.Equals retval, 0, "No module should be exported as none has been added to the configuration."
     
-    mAssert.Should Not fso.fileExists(VBAToolKit.vtkTestPath & "\" & importedModuleFileName), importedModuleName & " should not have been created."
+    mAssert.Should Not fso.FileExists(VBAToolKit.vtkTestPath & "\" & importedModuleFileName), importedModuleName & " should not have been created."
 
     On Error GoTo 0
     Exit Sub

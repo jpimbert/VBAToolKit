@@ -55,7 +55,6 @@ On Error GoTo vtkTextFileReader_Error
 vtkTextFileReader_Error:
     MsgBox "Error " & Err.Number & " (" & Err.Description & ") in procedure VtkTextFileReader of Module vtkGitFunctions"
     vtkTextFileReader = Err.Number
-    
 End Function
 
 
@@ -77,7 +76,6 @@ Public Function vtkCleanFolder(folderPath As String) As Integer
     Dim sourceFolder As Scripting.Folder
     Dim subFolder As Scripting.Folder
     Dim File As Scripting.File
-
     ' Will raise an error if folderPath does not correspond to a valid folder
     Set sourceFolder = fso.GetFolder(folderPath)
 
@@ -85,7 +83,6 @@ Public Function vtkCleanFolder(folderPath As String) As Integer
     For Each File In sourceFolder.Files
         fso.DeleteFile File
     Next File
-    
     ' Call the function on all the SubFolders
     For Each subFolder In sourceFolder.SubFolders
         vtkCleanFolder (subFolder.path)

@@ -72,10 +72,10 @@ Private Sub ITestCase_TearDown()
 End Sub
 
 Private Sub OpenDeliveryProject()
-    Dim path As String
+    Dim Path As String
     Dim fso As New FileSystemObject
-    path = fso.GetParentFolderName(ActiveWorkbook.path) & "\" & vtkConfigurationManagerForProject(vtkTestProjectName).getConfigurationPath(vtkTestProjectName)
-    Workbooks.Open fileName:=path
+    Path = fso.GetParentFolderName(ActiveWorkbook.Path) & "\" & vtkConfigurationManagerForProject(vtkTestProjectName).getConfigurationPath(vtkTestProjectName)
+    Workbooks.Open fileName:=Path
 End Sub
 
 Public Sub TestCreateProjectDoesNothingWhenPathDoesntExist()
@@ -116,6 +116,7 @@ Public Sub TestDevXlsmFileIsNamedcorrectly()
 'test that xlsm is correctly renamed
     Dim returnValue As Long
     returnValue = vtkCreateProject(path:=VBAToolKit.vtkTestPath, name:=vtkTestProjectName, displayError:=False)
+
     mAssert.Equals Workbooks(vtkTestProjectName & "_DEV.xlsm").VBProject.name, vtkTestProjectName & "_DEV", "the workbook name must be like " & vtkTestProjectName & "_DEV"
 End Sub
 
@@ -183,7 +184,7 @@ Public Sub Test_VBAUnitModulesExportation()
     
     returnValue = vtkCreateProject(path:=VBAToolKit.vtkTestPath, name:=vtkTestProjectName, displayError:=False)
     
-    mAssert.Should fso.fileExists(VBAToolKit.vtkTestPath & "\" & vtkTestProjectName & "\" & "Source\VbaUnit\" & "VbaUnitMain.bas"), "VBAUnitMain module have to be exported"
+    mAssert.Should fso.FileExists(VBAToolKit.vtkTestPath & "\" & vtkTestProjectName & "\" & "Source\VbaUnit\" & "VbaUnitMain.bas"), "VBAUnitMain module have to be exported"
 End Sub
 
 Public Sub Test_VBAUnitModulesImportation()
@@ -191,6 +192,7 @@ Public Sub Test_VBAUnitModulesImportation()
     Dim returnValue As Long, fso As New FileSystemObject
     
     returnValue = vtkCreateProject(path:=VBAToolKit.vtkTestPath, name:=vtkTestProjectName, displayError:=False)
+
     
    On Error GoTo Test_VBAUnitModulesImportation_Error
     mAssert.Should Not Workbooks(vtkTestProjectName & "_DEV.xlsm").VBProject.VBComponents("VBAUnitMain") Is Nothing, "VBAUnitMain module have to be imported"
