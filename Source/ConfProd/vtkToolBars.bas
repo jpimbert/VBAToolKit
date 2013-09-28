@@ -282,8 +282,6 @@ Private Sub vtkXMLExportButtonClicked()
     ' If workbook is not a DEV one, error
     ' TODO : Implement better testing of the DEVness of a workbook
     If Len(vtkStripPathOrNameOfVtkExtension(ActiveWorkbook.name, "DEV")) = Len(vtkStripFilePathOrNameOfExtension(ActiveWorkbook.name)) Then
-        Debug.Print vtkStripPathOrNameOfVtkExtension(ActiveWorkbook.name, "DEV")
-        Debug.Print vtkStripFilePathOrNameOfExtension(ActiveWorkbook.name)
         MsgBox "You can't use the XML Export on a non DEV Workbook", vbOKOnly + vbExclamation, "Impossible operation"
         Exit Sub
     End If

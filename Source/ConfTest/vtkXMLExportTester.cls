@@ -62,9 +62,6 @@ End Property
 
 Private Sub ITestCase_SetUp(Assert As IAssert)
 
-    'TODO = dégager
-    ITestCase_TearDown
-    
     Set mAssert = Assert
     
     Set testWorkbook = getTestFileFromTemplate(fileName:=testProjectFileName, openExcel:=True)
