@@ -59,14 +59,12 @@ End Property
 Private Sub ITestCase_SetUp(Assert As IAssert)
     Set mAssert = Assert
     
-    FileCopy source:=vtkPathToTemplateFolder & "\" & existingWorkbookName, destination:=vtkPathToTestFolder & "\" & existingWorkbookName
-    FileCopy source:=vtkPathToTemplateFolder & "\" & moduleToImport, destination:=vtkPathToTestFolder & "\" & moduleToImport
-    FileCopy source:=vtkPathToTemplateFolder & "\" & classToImport, destination:=vtkPathToTestFolder & "\" & classToImport
-    FileCopy source:=vtkPathToTemplateFolder & "\" & sheetToImport, destination:=vtkPathToTestFolder & "\" & sheetToImport
-    FileCopy source:=vtkPathToTemplateFolder & "\" & workbookToImport, destination:=vtkPathToTestFolder & "\" & workbookToImport
-    FileCopy source:=vtkPathToTemplateFolder & "\" & formToImport, destination:=vtkPathToTestFolder & "\" & formToImport
-    
-    Set wbForTest = Workbooks.Open(fileName:=vtkPathToTestFolder & "\" & existingWorkbookName)
+    Set wbForTest = VBAToolKit.getTestFileFromTemplate(fileName:=existingWorkbookName, openExcel:=True)
+    VBAToolKit.getTestFileFromTemplate fileName:=moduleToImport
+    VBAToolKit.getTestFileFromTemplate fileName:=classToImport
+    VBAToolKit.getTestFileFromTemplate fileName:=sheetToImport
+    VBAToolKit.getTestFileFromTemplate fileName:=workbookToImport
+    VBAToolKit.getTestFileFromTemplate fileName:=formToImport
     
 End Sub
 
@@ -139,7 +137,7 @@ End Sub
 Public Sub Test_ModuleDoesntExistAndFileExists()
     Dim sizeBefore As Long, sizeAfter As Long, filePath As String, moduleName As String
    
-    filePath = vtkPathToTestFolder & "\" & moduleToImport
+    filePath = VBAToolKit.vtkTestPath & "\" & moduleToImport
     moduleName = "InexistantModule"
    
    On Error GoTo Test_Error
@@ -157,8 +155,8 @@ End Sub
 Public Sub Test_StandardModuleExistsAndFileDoesntExist()
     Dim existingFilePath As String, newFilePath As String, moduleName As String
 
-    existingFilePath = vtkPathToTestFolder & "\" & "TestModule.bas"
-    newFilePath = vtkPathToTestFolder & "\" & "TestModule2.bas"
+    existingFilePath = VBAToolKit.vtkTestPath & "\" & "TestModule.bas"
+    newFilePath = VBAToolKit.vtkTestPath & "\" & "TestModule2.bas"
     moduleName = "TestModule"
 
    On Error GoTo Test_Error
@@ -175,8 +173,8 @@ End Sub
 Public Sub Test_ClassModuleExistsAndFileDoesntExist()
     Dim existingFilePath As String, newFilePath As String, moduleName As String
 
-    existingFilePath = vtkPathToTestFolder & "\" & "TestClass.cls"
-    newFilePath = vtkPathToTestFolder & "\" & "TestClass.cls"
+    existingFilePath = VBAToolKit.vtkTestPath & "\" & "TestClass.cls"
+    newFilePath = VBAToolKit.vtkTestPath & "\" & "TestClass.cls"
     moduleName = "TestClass"
 
    On Error GoTo Test_Error
@@ -192,7 +190,7 @@ End Sub
 Public Sub Test_StandardModuleExistsAndFileExists()
     Dim sizeBefore As Long, sizeAfter As Long, filePath As String, moduleName As String
 
-    filePath = vtkPathToTestFolder & "\" & "TestModule.bas"
+    filePath = VBAToolKit.vtkTestPath & "\" & "TestModule.bas"
     moduleName = "TestModule"
 
    On Error GoTo Test_Error
@@ -211,7 +209,7 @@ End Sub
 Public Sub Test_SheetModuleExistsAndFileExists()
     Dim sizeBefore As Long, sizeAfter As Long, filePath As String, moduleName As String
 
-    filePath = vtkPathToTestFolder & "\" & "Feuil1.cls"
+    filePath = VBAToolKit.vtkTestPath & "\" & "Feuil1.cls"
     moduleName = "Feuil1"
 
    On Error GoTo Test_Error
@@ -230,8 +228,8 @@ End Sub
 Public Sub Test_FormModuleExistsAndFRMFileExists()
     Dim sizeBefore As Long, sizeAfter As Long, filePath As String, moduleName As String, secondFilePath As String
 
-    filePath = vtkPathToTestFolder & "\" & "TestForm.frm"
-    secondFilePath = vtkPathToTestFolder & "\" & "TestForm.frx"
+    filePath = VBAToolKit.vtkTestPath & "\" & "TestForm.frm"
+    secondFilePath = VBAToolKit.vtkTestPath & "\" & "TestForm.frx"
     moduleName = "TestForm"
 
    On Error GoTo Test_Error
@@ -251,8 +249,8 @@ End Sub
 Public Sub Test_FormModuleExistsAndFRXFileExists()
     Dim sizeBefore As Long, sizeAfter As Long, filePath As String, moduleName As String, secondFilePath As String
 
-    filePath = vtkPathToTestFolder & "\" & "TestForm.frm"
-    secondFilePath = vtkPathToTestFolder & "\" & "TestForm.frx"
+    filePath = VBAToolKit.vtkTestPath & "\" & "TestForm.frm"
+    secondFilePath = VBAToolKit.vtkTestPath & "\" & "TestForm.frx"
     moduleName = "TestForm"
     
     fso.CreateTextFile secondFilePath
@@ -373,6 +371,7 @@ Private Function ITest_Suite() As TestSuite
     ITest_Suite.AddTest ITest_Manager.ClassName, "Test_FormModuleExistsAndFRMFileExists"
     ITest_Suite.AddTest ITest_Manager.ClassName, "Test_FormModuleExistsAndFRXFileExists"
     ITest_Suite.AddTest ITest_Manager.ClassName, "Test_vtkExportOneModule_moduleIsNormalized"
+    ITest_Suite.AddTest ITest_Manager.ClassName, "Test_vtkExportOneModule_moduleIsNotNormalized"
 End Function
 
 Private Sub ITestCase_RunTest()
@@ -386,6 +385,7 @@ Private Sub ITestCase_RunTest()
         Case "Test_FormModuleExistsAndFRMFileExists": Test_FormModuleExistsAndFRMFileExists
         Case "Test_FormModuleExistsAndFRXFileExists": Test_FormModuleExistsAndFRXFileExists
         Case "Test_vtkExportOneModule_moduleIsNormalized": Test_vtkExportOneModule_moduleIsNormalized
+        Case "Test_vtkExportOneModule_moduleIsNotNormalized": Test_vtkExportOneModule_moduleIsNotNormalized
         Case Else: mAssert.Should False, "Invalid test name: " & mManager.methodName
     End Select
 End Sub
