@@ -271,6 +271,97 @@ Test_Error:
     mAssert.Equals Err.number, 0, "No error must be thrown when Module exists"
 End Sub
 
+'-----------------------------------------------
+' TESTS REGARDING NORMALIZATION
+'-----------------------------------------------
+
+Private Sub insertDummyLineInCodeModule(codemo As VBIDE.CodeModule, dummyLine As String)
+    With codemo
+        .InsertLines .CountOfLines + 1, dummyLine
+    End With
+End Sub
+
+Private Function getLastLineOfTextFile(textFilePath As String) As String
+    Dim str As String
+    Dim tmp As String
+    
+    str = vtkTextFileReader(textFilePath)
+    tmp = Split(str, Chr(10))(UBound(Split(str, Chr(10))))
+    If Len(tmp) < 2 Then tmp = Split(str, Chr(10))(UBound(Split(str, Chr(10))) - 1)
+    getLastLineOfTextFile = tmp
+    
+End Function
+
+Public Sub Test_vtkExportOneModule_moduleIsNormalized()
+' - expected : one module is exported and modified
+
+    Dim filePath As String, moduleName As String
+
+    On Error GoTo Test_vtkExportOneModule_moduleIsNormalized_Error
+    
+    filePath = VBAToolKit.vtkTestPath & "\" & "TestModule.bas"
+    moduleName = "TestModule"
+    
+    ' Insert a line that contains key words badly cased
+    insertDummyLineInCodeModule wbForTest.VBProject.VBComponents(moduleName).CodeModule, "err dim"
+    
+    ' Export the modified modules
+    vtkExportOneModule project:=wbForTest.VBProject, moduleName:=moduleName, filePath:=filePath
+    
+    ' Check the casing of the last line of the modified module
+    Dim expected As String
+    Dim result As String
+    expected = "Err Dim"
+    result = getLastLineOfTextFile(filePath)
+    
+    mAssert.Should StrComp(expected, result) = 0, _
+                    "File should have been formatted." & vbNewLine & _
+                    "Expected : " & expected & vbNewLine & _
+                    "Result   : " & result
+    
+    On Error GoTo 0
+    Exit Sub
+
+Test_vtkExportOneModule_moduleIsNormalized_Error:
+    mAssert.Should False, "Unexpected error " & Err.number & " (" & Err.Description & ") in procedure vtkExportConfiguration_modifiedModuleIsNormalizedTure of Class Module vtkExportConfigurationTester"
+    Resume Next
+End Sub
+
+Public Sub Test_vtkExportOneModule_moduleIsNotNormalized()
+' - expected : one module is exported and not modified when Normalized = False
+
+    Dim filePath As String, moduleName As String
+
+    On Error GoTo Test_vtkExportOneModule_moduleIsNotNormalized_Error
+    
+    filePath = VBAToolKit.vtkTestPath & "\" & "TestModule.bas"
+    moduleName = "TestModule"
+    
+    ' Insert a line that contains key words badly cased
+    insertDummyLineInCodeModule wbForTest.VBProject.VBComponents(moduleName).CodeModule, "err dim"
+    
+    ' Export the modified modules
+    vtkExportOneModule project:=wbForTest.VBProject, moduleName:=moduleName, filePath:=filePath, normalize:=False
+    
+    ' Check the casing of the last line of the modified module
+    Dim expected As String
+    Dim result As String
+    expected = "err dim"
+    result = getLastLineOfTextFile(filePath)
+    
+    mAssert.Should StrComp(expected, result) = 0, _
+                    "File should have been formatted." & vbNewLine & _
+                    "Expected : " & expected & vbNewLine & _
+                    "Result   : " & result
+    
+    On Error GoTo 0
+    Exit Sub
+
+Test_vtkExportOneModule_moduleIsNotNormalized_Error:
+    mAssert.Should False, "Unexpected error " & Err.number & " (" & Err.Description & ") in procedure vtkExportConfiguration_modifiedModuleIsNormalizedTure of Class Module vtkExportConfigurationTester"
+    Resume Next
+End Sub
+
 Private Function ITest_Suite() As TestSuite
     Set ITest_Suite = New TestSuite
     ITest_Suite.AddTest ITest_Manager.ClassName, "Test_ModuleAndFileDoesntExist"
@@ -281,6 +372,7 @@ Private Function ITest_Suite() As TestSuite
     ITest_Suite.AddTest ITest_Manager.ClassName, "Test_SheetModuleExistsAndFileExists"
     ITest_Suite.AddTest ITest_Manager.ClassName, "Test_FormModuleExistsAndFRMFileExists"
     ITest_Suite.AddTest ITest_Manager.ClassName, "Test_FormModuleExistsAndFRXFileExists"
+    ITest_Suite.AddTest ITest_Manager.ClassName, "Test_vtkExportOneModule_moduleIsNormalized"
 End Function
 
 Private Sub ITestCase_RunTest()
@@ -293,6 +385,7 @@ Private Sub ITestCase_RunTest()
         Case "Test_SheetModuleExistsAndFileExists": Test_SheetModuleExistsAndFileExists
         Case "Test_FormModuleExistsAndFRMFileExists": Test_FormModuleExistsAndFRMFileExists
         Case "Test_FormModuleExistsAndFRXFileExists": Test_FormModuleExistsAndFRXFileExists
+        Case "Test_vtkExportOneModule_moduleIsNormalized": Test_vtkExportOneModule_moduleIsNormalized
         Case Else: mAssert.Should False, "Invalid test name: " & mManager.methodName
     End Select
 End Sub

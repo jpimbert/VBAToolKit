@@ -242,13 +242,13 @@ End Sub
 '           - project, a VBProject from which to export the module
 '           - moduleName, the name of module to export
 '           - filePath, path of the file to export the module
+'           - normalize, if True (default value) the token are nomalized
 ' NOTE      : The file in which to export is deleted prior to export if it already exists
 '             except if the file has readonly attribute
-'
-' TODO :    - Replace Filepath functions with new ones in FileSystemUtilities
+' NOTE      : The tokens in the exported module are normalized (default behavior)
 '---------------------------------------------------------------------------------------
 '
-Public Sub vtkExportOneModule(project As VBProject, moduleName As String, filePath As String)
+Public Sub vtkExportOneModule(project As VBProject, moduleName As String, filePath As String, Optional normalize As Boolean = True)
     Dim fso As New FileSystemObject, m As VBComponent
     
    On Error GoTo vtkExportOneModule_Error
@@ -261,6 +261,9 @@ Public Sub vtkExportOneModule(project As VBProject, moduleName As String, filePa
     
     ' Export module
     m.Export fileName:=filePath
+    
+    ' Normalize tokens in file
+    If normalize Then vtkNormalizeFile filePath, vtkListOfProperlyCasedIdentifiers
     
    On Error GoTo 0
     Exit Sub
@@ -445,12 +448,10 @@ Public Function vtkExportConfiguration(projectWithModules As VBProject, projectN
         If onlyModified And fso.fileExists(modulePath) Then
             If mo.VBAModule.Saved = False Then
                 vtkExportOneModule projectWithModules, mo.name, modulePath
-                vtkNormalizeFile modulePath, vtkListOfProperlyCasedIdentifiers
                 exportedModulesCount = exportedModulesCount + 1
             End If
         Else
             vtkExportOneModule projectWithModules, mo.name, modulePath
-            vtkNormalizeFile modulePath, vtkListOfProperlyCasedIdentifiers
             exportedModulesCount = exportedModulesCount + 1
         End If
         

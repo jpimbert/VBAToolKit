@@ -595,8 +595,8 @@ Public Sub Test_vtkExportConfiguration_notModifiedModulesAreNotNormalizedOMTrue(
     On Error GoTo vtkExportConfiguration_notModifiedModulesAreNotNormalizedOMTrue_Error
 
     ' Export the modules already present so that they don't get exported again
-    vtkExportOneModule testWorkbook.VBProject, testModule1Name, VBAToolKit.vtkTestPath & "\" & testModule1FileName
-    vtkExportOneModule testWorkbook.VBProject, testModule2Name, VBAToolKit.vtkTestPath & "\" & testModule2FileName
+    vtkExportOneModule testWorkbook.VBProject, testModule1Name, VBAToolKit.vtkTestPath & "\" & testModule1FileName, normalize:=False
+    vtkExportOneModule testWorkbook.VBProject, testModule2Name, VBAToolKit.vtkTestPath & "\" & testModule2FileName, normalize:=False
 
     ' Insert a line in code module 1 that contains key words badly cased
     insertDummyLineInCodeModule testWorkbook.VBProject.VBComponents(testModule1Name).CodeModule, "dim retval"
