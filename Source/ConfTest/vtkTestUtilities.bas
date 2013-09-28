@@ -76,7 +76,7 @@ Public Function getTestFileFromTemplate(fileName As String, Optional destination
        Else
         destination = vtkTestPath & "\" & destinationName
     End If
-    FileCopy Source:=source, destination:=destination
+    FileCopy Source:=Source, destination:=destination
     ' Open Excel file if required
     Set getTestFileFromTemplate = Nothing
     If openExcel Then
@@ -128,7 +128,7 @@ Public Function getTestFolderFromTemplate(folderName As String, Optional destina
         destination = vtkTestPath & "\" & destinationName
     End If
     
-    fso.CopyFolder Source:=source, destination:=destination, OverWriteFiles:=True
+    fso.CopyFolder Source:=Source, destination:=destination, OverWriteFiles:=True
     
     On Error GoTo 0
     Exit Function

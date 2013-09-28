@@ -14,6 +14,7 @@ Attribute VB_Creatable = False
 Attribute VB_PredeclaredId = True
 Attribute VB_Exposed = False
 
+
 '---------------------------------------------------------------------------------------
 ' Module    : vtkCreateProjectForm
 ' Author    : Jean-Pierre Imbert

@@ -154,7 +154,7 @@ Public Sub Test_vtkExportConfiguration_filesNotYetCreatedTrue()
     On Error GoTo Test_vtkExportConfiguration_filesNotYetCreatedTrue_Error
 
     retVal = vtkExportConfiguration(testWorkbook.VBProject, testProjectName, testConf.name, onlyModified:=True)
-    mAssert.Equals retval, totalNumberOfModules, totalNumberOfModules & " should be exported as files do not yet exist."
+    mAssert.Equals retVal, totalNumberOfModules, totalNumberOfModules & " should be exported as files do not yet exist."
     
     mAssert.Should fso.FileExists(VBAToolKit.vtkTestPath & "\" & testModule1FileName), testModule1FileName & " should have been created."
     mAssert.Should fso.FileExists(VBAToolKit.vtkTestPath & "\" & testModule2FileName), testModule2FileName & " should have been created."
@@ -176,7 +176,7 @@ Public Sub Test_vtkExportConfiguration_filesNotYetCreatedFalse()
     On Error GoTo Test_vtkExportConfiguration_filesNotYetCreatedFalse_Error
 
     retVal = vtkExportConfiguration(testWorkbook.VBProject, testProjectName, testConf.name, onlyModified:=False)
-    mAssert.Equals retval, totalNumberOfModules, totalNumberOfModules & " should be exported as files do not yet exist."
+    mAssert.Equals retVal, totalNumberOfModules, totalNumberOfModules & " should be exported as files do not yet exist."
 
     mAssert.Should fso.FileExists(VBAToolKit.vtkTestPath & "\" & testModule1FileName), testModule1FileName & " should have been created."
     mAssert.Should fso.FileExists(VBAToolKit.vtkTestPath & "\" & testModule2FileName), testModule2FileName & " should have been created."
@@ -213,7 +213,7 @@ Public Sub Test_vtkExportConfiguration_filesJustExportedTrue()
     newFileSize1 = fso.GetFile(VBAToolKit.vtkTestPath & "\" & testModule1FileName).Size
     newFileSize2 = fso.GetFile(VBAToolKit.vtkTestPath & "\" & testModule2FileName).Size
     
-    mAssert.Equals retval, 0, "No module should be exported as files yet exist and onlyModified = True"
+    mAssert.Equals retVal, 0, "No module should be exported as files yet exist and onlyModified = True"
 
     mAssert.Should oldFileSize1 = newFileSize1, testModule1FileName & " must be the same size as before export as the corresponding module has not been exported."
     mAssert.Should oldFileSize2 = newFileSize2, testModule2FileName & " must be the same size as before export as the corresponding module has not been exported."
@@ -248,7 +248,7 @@ Public Sub Test_vtkExportConfiguration_filesJustExportedFalse()
     newFileSize1 = fso.GetFile(VBAToolKit.vtkTestPath & "\" & testModule1FileName).Size
     newFileSize2 = fso.GetFile(VBAToolKit.vtkTestPath & "\" & testModule2FileName).Size
     
-    mAssert.Equals retval, totalNumberOfModules, totalNumberOfModules & " modules should be exported as onlyModified = False."
+    mAssert.Equals retVal, totalNumberOfModules, totalNumberOfModules & " modules should be exported as onlyModified = False."
 
     mAssert.Should oldFileSize1 = newFileSize1, testModule1FileName & " must be the same size after exporting since the corresponding module has not been modified."
     mAssert.Should oldFileSize2 = newFileSize2, testModule2FileName & " must be the same size after exporting since the corresponding module has not been modified."
@@ -286,7 +286,7 @@ Public Sub Test_vtkExportConfiguration_oneFileModifiedTrue()
     newFileSize1 = fso.GetFile(VBAToolKit.vtkTestPath & "\" & testModule1FileName).Size
     newFileSize2 = fso.GetFile(VBAToolKit.vtkTestPath & "\" & testModule2FileName).Size
     
-    mAssert.Equals retval, 1, "1 module should be exported as 1 module has been modified and onlyModified = True"
+    mAssert.Equals retVal, 1, "1 module should be exported as 1 module has been modified and onlyModified = True"
     mAssert.Should oldFileSize1 < newFileSize1, testModule1FileName & " must be bigger after adding code in the module and exporting."
     mAssert.Should oldFileSize2 = newFileSize2, testModule2FileName & " must be the same after exporting since it has not been modified."
 
@@ -324,7 +324,7 @@ Public Sub Test_vtkExportConfiguration_oneFileModifiedFalse()
     newFileSize1 = fso.GetFile(VBAToolKit.vtkTestPath & "\" & testModule1FileName).Size
     newFileSize2 = fso.GetFile(VBAToolKit.vtkTestPath & "\" & testModule2FileName).Size
     
-    mAssert.Equals retval, totalNumberOfModules, totalNumberOfModules & " modules should be exported as onlyModified = False"
+    mAssert.Equals retVal, totalNumberOfModules, totalNumberOfModules & " modules should be exported as onlyModified = False"
     
     mAssert.Should oldFileSize1 < newFileSize1, testModule1FileName & " must be bigger after adding code in the module and exporting."
     mAssert.Should oldFileSize2 = newFileSize2, testModule2FileName & " must be the same after exporting since it has not been modified."
@@ -364,7 +364,7 @@ Public Sub Test_vtkExportConfiguration_twoFilesModifiedTrue()
     newFileSize1 = fso.GetFile(VBAToolKit.vtkTestPath & "\" & testModule1FileName).Size
     newFileSize2 = fso.GetFile(VBAToolKit.vtkTestPath & "\" & testModule2FileName).Size
     
-    mAssert.Equals retval, 2, "2 modules should be exported as 2 modules have been modified and onlyModified = True"
+    mAssert.Equals retVal, 2, "2 modules should be exported as 2 modules have been modified and onlyModified = True"
 
     mAssert.Should oldFileSize1 < newFileSize1, testModule1FileName & " must be bigger after adding code in the module and exporting."
     mAssert.Should oldFileSize2 < newFileSize2, testModule2FileName & " must be bigger after adding code in the module and exporting."
@@ -403,7 +403,7 @@ Public Sub Test_vtkExportConfiguration_twoFilesModifiedFalse()
     newFileSize1 = fso.GetFile(VBAToolKit.vtkTestPath & "\" & testModule1FileName).Size
     newFileSize2 = fso.GetFile(VBAToolKit.vtkTestPath & "\" & testModule2FileName).Size
     
-    mAssert.Equals retval, totalNumberOfModules, totalNumberOfModules & " modules should be exported as onlyModified = False"
+    mAssert.Equals retVal, totalNumberOfModules, totalNumberOfModules & " modules should be exported as onlyModified = False"
 
     mAssert.Should oldFileSize1 < newFileSize1, testModule1FileName & " must be bigger after adding code in the module and exporting."
     mAssert.Should oldFileSize2 < newFileSize2, testModule2FileName & " must be bigger after adding code in the module and exporting."
@@ -436,7 +436,7 @@ Public Sub Test_vtkExportConfiguration_notReferencedModuleMustNotBeExported()
         
     retVal = vtkExportConfiguration(testWorkbook.VBProject, testProjectName, testConf.name, onlyModified:=True)
     
-    mAssert.Equals retval, 0, "The module should not be exported as it has not been added to the configuration."
+    mAssert.Equals retVal, 0, "The module should not be exported as it has not been added to the configuration."
     
     mAssert.Should Not fso.FileExists(VBAToolKit.vtkTestPath & "\" & importedModuleFileName), importedModuleName & " should not have been created."
 
@@ -468,7 +468,7 @@ Public Sub Test_vtkExportConfiguration_importedModuleAddedToConfigurationManager
     
     retVal = vtkExportConfiguration(testWorkbook.VBProject, testProjectName, testConf.name, onlyModified:=True)
     
-    mAssert.Equals retval, 0, "No module should be exported as none has been added to the configuration."
+    mAssert.Equals retVal, 0, "No module should be exported as none has been added to the configuration."
     
     mAssert.Should Not fso.FileExists(VBAToolKit.vtkTestPath & "\" & importedModuleFileName), importedModuleName & " should not have been created."
 
@@ -578,7 +578,7 @@ Public Sub Test_vtkExportConfiguration_modifiedModuleIsNormalizedOMTrue()
                     "Result   : " & result
     
     ' Last check
-    mAssert.Equals retval, 1, "Only one module should have been exported."
+    mAssert.Equals retVal, 1, "Only one module should have been exported."
     
     On Error GoTo 0
     Exit Sub

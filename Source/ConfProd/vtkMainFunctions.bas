@@ -98,7 +98,7 @@ Public Function vtkCreateProject(path As String, name As String, Optional displa
     vtkImportModulesInAnotherProject projectForModules:=Wb.VBProject, projectName:=project.projectName, confName:=project.projectDEVName
     
     ' Insert the BeforeSave handler in the newly created project
-    vtkAddBeforeSaveHandlerInDEVWorkbook Wb:=wb, projectName:=project.projectName, confName:=project.projectDEVName
+    vtkAddBeforeSaveHandlerInDEVWorkbook Wb:=Wb, projectName:=project.projectName, confName:=project.projectDEVName
     ' Save configured and updated project for test
     Wb.Save
         

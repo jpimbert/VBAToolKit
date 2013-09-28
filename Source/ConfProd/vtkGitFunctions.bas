@@ -137,7 +137,7 @@ vtkInitializeGit_Err:
         Or (Err.Number = VTK_FORBIDDEN_PARAMETER) _
         Or (Err.Number = VTK_GIT_PROBLEM_DURING_INITIALIZATION) _
         Or (Err.Number = VTK_WRONG_FOLDER_PATH)) Then
-        Err.Raise Err.number, "Module vktGitFuntions : Function vtkGitInitialize", Err.Description
+        Err.Raise Err.Number, "Module vktGitFuntions : Function vtkGitInitialize", Err.Description
     Else
         Debug.Print "ERR IN INITIALIZE : " & Err.Number & Err.Description
         Err.Raise VTK_UNEXPECTED_ERROR, "Module vktGitFuntions : Function vtkGitInitialize", Err.Description
@@ -189,7 +189,7 @@ Public Function vtkGitConvertWinPath(winPath As String) As String
 
 vtkGitConvertWinPath_Error:
     If (Err.Number = VTK_FORBIDDEN_PARAMETER) Then
-        Err.Raise Err.number, "Module vtkGitFunctions ; Function vtkGitConvertWinPath", Err.Description
+        Err.Raise Err.Number, "Module vtkGitFunctions ; Function vtkGitConvertWinPath", Err.Description
     Else
         'Debug.Print "ERR IN CONVERT : " & Err.Number & Err.Description
         Err.Raise VTK_UNEXPECTED_ERROR, "Module vtkGitFunctions ; Function vtkGitConvertWinPath", Err.Description

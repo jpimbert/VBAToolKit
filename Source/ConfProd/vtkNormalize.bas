@@ -110,7 +110,7 @@ Public Function vtkNormalizeToken(token As String, listOfTokens() As String) As 
 vtkNormalizeToken_Error:
     Err.Source = "function vtkNormalizeToken of module vtkNormalize"
     Err.Number = VTK_UNEXPECTED_ERROR
-    Err.Raise Err.number, Err.source, Err.Description
+    Err.Raise Err.Number, Err.Source, Err.Description
     Exit Function
 End Function
 
@@ -247,7 +247,7 @@ vtkNormalizeString_Error:
             Err.Number = VTK_UNEXPECTED_ERROR
     End Select
     
-    Err.Raise Err.number, Err.source, Err.Description
+    Err.Raise Err.Number, Err.Source, Err.Description
     
 End Function
 
@@ -316,7 +316,7 @@ vtkNormalizeFile_Error:
             Err.Number = VTK_UNEXPECTED_ERROR
     End Select
     
-    Err.Raise Err.number, Err.source, Err.Description
+    Err.Raise Err.Number, Err.Source, Err.Description
     
     Exit Sub
     

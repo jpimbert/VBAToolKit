@@ -257,7 +257,7 @@ Public Sub vtkExportOneModule(project As VBProject, moduleName As String, filePa
     Set m = project.VBComponents(moduleName)
         
     ' Kill file if it already exists only AFTER get the module, if it not exists the file must not be deleted
-    If fso.fileExists(filePath) Then fso.DeleteFile fileSpec:=filePath
+    If fso.FileExists(filePath) Then fso.DeleteFile fileSpec:=filePath
     
     ' Export module
     m.Export fileName:=filePath
@@ -449,7 +449,7 @@ Public Function vtkExportConfiguration(projectWithModules As VBProject, projectN
         ' The conditon to export could be simplified in
         '   If Not (onlyModified And fso.FileExists(modulePath) And mo.VBAModule) Then <export>
         ' but it doesn't seem to work, so we stick to this code.
-        If onlyModified And fso.fileExists(modulePath) Then
+        If onlyModified And fso.FileExists(modulePath) Then
             If mo.VBAModule.Saved = False Then
                 vtkExportOneModule projectWithModules, mo.name, modulePath
                 exportedModulesCount = exportedModulesCount + 1
@@ -466,7 +466,7 @@ Public Function vtkExportConfiguration(projectWithModules As VBProject, projectN
     Exit Function
 
 vtkExportConfiguration_Error:
-    Err.Raise Err.number, "procedure vtkExportConfiguration of Module vtkImportExportUtilities", Err.Source
+    Err.Raise Err.Number, "procedure vtkExportConfiguration of Module vtkImportExportUtilities", Err.Source
     Resume Next
 
 End Function

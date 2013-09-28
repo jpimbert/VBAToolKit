@@ -69,9 +69,9 @@ Public Sub Test_vtkTestPath()
     
     Set p1 = vtkProjectForName("TestProject1")
     Set p2 = vtkProjectForName("TestProject2")
-    vtkCreateProject Path:=VBAToolKit.vtkTestPath, name:="TestProject1", displayError:=False
+    vtkCreateProject path:=VBAToolKit.vtkTestPath, name:="TestProject1", displayError:=False
     Set wb1 = Workbooks(p1.workbookDEVName)
-    vtkCreateProject Path:=VBAToolKit.vtkTestPath, name:="TestProject2", displayError:=False
+    vtkCreateProject path:=VBAToolKit.vtkTestPath, name:="TestProject2", displayError:=False
     Set wb2 = Workbooks(p2.workbookDEVName)
     
     wb1.Activate
@@ -178,7 +178,7 @@ Public Sub Test_vtkGetFileFromTemplate_OpenExcel()
     Set wbb = getTestFileFromTemplate(fileName:="UninitializedProject.xlsm", openExcel:=True)
 
     mAssert.Equals Dir(VBAToolKit.vtkTestPath & "\" & "UninitializedProject.xlsm"), "UninitializedProject.xlsm", "The file UninitializedProject.xlsm should be copied in folder Test"
-    mAssert.Equals wbb.Path, VBAToolKit.vtkTestPath, "the Excel file isn't open in the right directory"
+    mAssert.Equals wbb.path, VBAToolKit.vtkTestPath, "the Excel file isn't open in the right directory"
     mAssert.Should VtkWorkbookIsOpen(wbb.name), "The file Excel isn't open"
 
     wbb.Close (False)
@@ -229,7 +229,7 @@ Public Sub Test_vtkGetFileFromTemplate_Folder()
 
    On Error Resume Next
     Set wbb = getTestFileFromTemplate(fileName:="Folder")
-    mAssert.Equals Err.number, VTK_DOESNT_COPY_FOLDER, "The proper error must be raised when trying to copy a folder"
+    mAssert.Equals Err.Number, VTK_DOESNT_COPY_FOLDER, "The proper error must be raised when trying to copy a folder"
     
    On Error GoTo Test_vtkGetFileFromTemplate_Folder_Error
 
@@ -282,7 +282,7 @@ Public Sub Test_vtkGetNotFileFromTemplate_ParamDestination()
     Set wbb = getTestFileFromTemplate(fileName:="Error.bas", destinationName:="ErrorParamDestinationName.bas")
     
     mAssert.Equals Dir(VBAToolKit.vtkTestPath & "\" & "ErrorParamDestinationName.bas"), "", "Bad test the file Error doesn't exist from template"
-    mAssert.Equals Err.number, VTK_FILE_NOT_FOUND, "The proper error must be raised when trying to copy a folder"
+    mAssert.Equals Err.Number, VTK_FILE_NOT_FOUND, "The proper error must be raised when trying to copy a folder"
     
     On Error GoTo 0
     Exit Sub
@@ -370,7 +370,7 @@ Public Sub Test_vtkGetFolderFromTemplate_NoFolder()
     
    On Error Resume Next
     getTestFolderFromTemplate folderName:="Error"
-    mAssert.Equals Err.number, VTK_FOLDER_NOT_FOUND, "The proper error must be raised when trying to copy a folder"
+    mAssert.Equals Err.Number, VTK_FOLDER_NOT_FOUND, "The proper error must be raised when trying to copy a folder"
     
    On Error GoTo Test_vtkGetFolderFromTemplate_NoFolder_Error
     mAssert.Equals fso.folderExists(VBAToolKit.vtkTestPath & "\" & "Error"), False, "The folder Error shouldn't have to be copied into folder Test"
@@ -394,7 +394,7 @@ Public Sub Test_vtkGetFolderFromTemplate_CopyFile()
     
    On Error Resume Next
     getTestFolderFromTemplate folderName:="Module.bas"
-    mAssert.Equals Err.number, VTK_FOLDER_NOT_FOUND, "The proper error must be raised when trying to copy a file instead of a folder"
+    mAssert.Equals Err.Number, VTK_FOLDER_NOT_FOUND, "The proper error must be raised when trying to copy a file instead of a folder"
 
    On Error GoTo Test_vtkGetFolderFromTemplate_CopyFile_Error
     mAssert.Equals fso.folderExists(VBAToolKit.vtkTestPath & "\" & "Module.bas"), False, "The file Module.bas shouldn't have to be copied into folder Test"
@@ -473,7 +473,7 @@ Public Sub Test_vtkGetFolderFromTemplate_NoFolderParamDestination()
     
    On Error Resume Next
     getTestFolderFromTemplate folderName:="Error", destinationName:="TestRenameError"
-    mAssert.Equals Err.number, VTK_FOLDER_NOT_FOUND, "The proper error must be raised when trying to copy a folder"
+    mAssert.Equals Err.Number, VTK_FOLDER_NOT_FOUND, "The proper error must be raised when trying to copy a folder"
     
    On Error GoTo Test_vtkGetFolderFromTemplate_NoFolderParamDestination_Error
     mAssert.Equals fso.folderExists(VBAToolKit.vtkTestPath & "\" & "TestRenameError"), False, "Bad test the folder Folder hasn't been copied in folder Test"
@@ -523,8 +523,8 @@ Private Sub assertTestFolderIsEmpty(mAssert As IAssert)
     Dim fso As New FileSystemObject, folderTest As Folder
     Set folderTest = fso.GetFolder(VBAToolKit.vtkTestPath)
     
-    mAssert.Equals folderTest.Files.count, 0, "All files hasn't been deleted"
-    mAssert.Equals folderTest.SubFolders.count, 0, "All folders hasn't been deleted"
+    mAssert.Equals folderTest.Files.Count, 0, "All files hasn't been deleted"
+    mAssert.Equals folderTest.SubFolders.Count, 0, "All folders hasn't been deleted"
 End Sub
 '---------------------------------------------------------------------------------------
 ' Procedure : Test_vtkResetTestFolder_OneFile
@@ -566,7 +566,7 @@ Public Sub Test_vtkResetTestFolder_FileOpen()
 
    On Error Resume Next
     resetTestFolder
-    mAssert.Equals Err.number, VTK_FILE_OPEN_OR_LOCKED, "The proper error must be raised when attempting to clean folder when a file is opened"
+    mAssert.Equals Err.Number, VTK_FILE_OPEN_OR_LOCKED, "The proper error must be raised when attempting to clean folder when a file is opened"
     
    On Error GoTo Test_vtkResetTestFolder_FileOpen_Error
     mAssert.Should VtkWorkbookIsOpen("UninitializedProject.xlsm"), "The workbook UninitializedProject.xlsm must not be closed when attempting to clean the Test folder"

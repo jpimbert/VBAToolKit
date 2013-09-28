@@ -109,7 +109,7 @@ Public Sub TestMainFolderIsCreated()
 
     returnValue = vtkCreateTreeFolder(rootPath:=VBAToolKit.vtkTestPath & "\" & vtkTestProjectName)
     mAssert.Should Dir(VBAToolKit.vtkTestPath & "\" & vtkTestProjectName, vbDirectory) <> "", "The project main folder must exist"
-    mAssert.Equals returnvalue, VTK_OK, "The project creation must succeed"
+    mAssert.Equals returnValue, VTK_OK, "The project creation must succeed"
 
     On Error GoTo 0
     Exit Sub
@@ -126,7 +126,7 @@ Public Sub TestProjectFolderIsCreated()
 
     returnValue = vtkCreateTreeFolder(rootPath:=VBAToolKit.vtkTestPath & "\" & vtkTestProjectName)
     mAssert.Should Dir(VBAToolKit.vtkTestPath & "\" & vtkTestProjectName & "\Project", vbDirectory) <> "", "The Project folder must exist"
-    mAssert.Equals returnvalue, VTK_OK, "The project creation must succeed"
+    mAssert.Equals returnValue, VTK_OK, "The project creation must succeed"
 
     On Error GoTo 0
     Exit Sub
@@ -143,7 +143,7 @@ Public Sub TestSourceFolderIsCreated()
 
     returnValue = vtkCreateTreeFolder(rootPath:=VBAToolKit.vtkTestPath & "\" & vtkTestProjectName)
     mAssert.Should Dir(VBAToolKit.vtkTestPath & "\" & vtkTestProjectName & "\Source", vbDirectory) <> "", "The Source folder must exist"
-    mAssert.Equals returnvalue, VTK_OK, "The project creation must succeed"
+    mAssert.Equals returnValue, VTK_OK, "The project creation must succeed"
 
     On Error GoTo 0
     Exit Sub
@@ -160,7 +160,7 @@ Public Sub TestTestsFolderIsCreated()
 
     returnValue = vtkCreateTreeFolder(rootPath:=VBAToolKit.vtkTestPath & "\" & vtkTestProjectName)
     mAssert.Should Dir(VBAToolKit.vtkTestPath & "\" & vtkTestProjectName & "\Tests", vbDirectory) <> "", "The Tests folder must exist"
-    mAssert.Equals returnvalue, VTK_OK, "The project creation must succeed"
+    mAssert.Equals returnValue, VTK_OK, "The project creation must succeed"
 
     On Error GoTo 0
     Exit Sub
@@ -177,7 +177,7 @@ Public Sub TestConfProdFolderIsCreated()
 
     returnValue = vtkCreateTreeFolder(rootPath:=VBAToolKit.vtkTestPath & "\" & vtkTestProjectName)
     mAssert.Should Dir(VBAToolKit.vtkTestPath & "\" & vtkTestProjectName & "\source\ConfProd", vbDirectory) <> "", "source\ConfProd folder must exist"
-    mAssert.Equals returnvalue, VTK_OK, "The project creation must succeed"
+    mAssert.Equals returnValue, VTK_OK, "The project creation must succeed"
 
     On Error GoTo 0
     Exit Sub
@@ -194,7 +194,7 @@ Public Sub TestConfTestFolderIsCreated()
 
     returnValue = vtkCreateTreeFolder(rootPath:=VBAToolKit.vtkTestPath & "\" & vtkTestProjectName)
     mAssert.Should Dir(VBAToolKit.vtkTestPath & "\" & vtkTestProjectName & "\source\ConfTest", vbDirectory) <> "", "The source\ConfTest folder must exist"
-    mAssert.Equals returnvalue, VTK_OK, "The project creation must succeed"
+    mAssert.Equals returnValue, VTK_OK, "The project creation must succeed"
 
     On Error GoTo 0
     Exit Sub
@@ -211,7 +211,7 @@ Public Sub TestVbaUnitFolderIsCreated()
 
     returnValue = vtkCreateTreeFolder(rootPath:=VBAToolKit.vtkTestPath & "\" & vtkTestProjectName)
     mAssert.Should Dir(VBAToolKit.vtkTestPath & "\" & vtkTestProjectName & "\source\VbaUnit", vbDirectory) <> "", "The source\VbaUnit folder must exist"
-    mAssert.Equals returnvalue, VTK_OK, "The project creation must succeed"
+    mAssert.Equals returnValue, VTK_OK, "The project creation must succeed"
 
     On Error GoTo 0
     Exit Sub
@@ -228,7 +228,7 @@ Public Sub TestGitLogIsCreated()
 
     returnValue = vtkCreateTreeFolder(rootPath:=VBAToolKit.vtkTestPath & "\" & vtkTestProjectName)
     mAssert.Should Dir(VBAToolKit.vtkTestPath & "\" & vtkTestProjectName & "\GitLog", vbDirectory) <> "", "The ..\GitLog folder must exist"
-    mAssert.Equals returnvalue, VTK_OK, "The project creation must succeed"
+    mAssert.Equals returnValue, VTK_OK, "The project creation must succeed"
 
     On Error GoTo 0
     Exit Sub
@@ -245,7 +245,7 @@ Public Sub TestDeliveryFolderIsCreated()
 
     returnValue = vtkCreateTreeFolder(rootPath:=VBAToolKit.vtkTestPath & "\" & vtkTestProjectName)
     mAssert.Should Dir(VBAToolKit.vtkTestPath & "\" & vtkTestProjectName & "\Delivery", vbDirectory) <> "", "The \Delivery folder must exist"
-    mAssert.Equals returnvalue, VTK_OK, "The project creation must succeed"
+    mAssert.Equals returnValue, VTK_OK, "The project creation must succeed"
 
     On Error GoTo 0
     Exit Sub

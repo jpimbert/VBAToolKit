@@ -72,10 +72,10 @@ Private Sub ITestCase_TearDown()
 End Sub
 
 Private Sub OpenDeliveryProject()
-    Dim Path As String
+    Dim path As String
     Dim fso As New FileSystemObject
-    Path = fso.GetParentFolderName(ActiveWorkbook.Path) & "\" & vtkConfigurationManagerForProject(vtkTestProjectName).getConfigurationPath(vtkTestProjectName)
-    Workbooks.Open fileName:=Path
+    path = fso.GetParentFolderName(ActiveWorkbook.path) & "\" & vtkConfigurationManagerForProject(vtkTestProjectName).getConfigurationPath(vtkTestProjectName)
+    Workbooks.Open fileName:=path
 End Sub
 
 Public Sub TestCreateProjectDoesNothingWhenPathDoesntExist()
@@ -85,7 +85,7 @@ Public Sub TestCreateProjectDoesNothingWhenPathDoesntExist()
     InexistentPath = VBAToolKit.vtkTestPath & "\InexistentFolder"
     returnValue = vtkCreateProject(path:=InexistentPath, name:=vtkTestProjectName, displayError:=False)
     mAssert.Should Dir(InexistentPath & "\" & vtkTestProjectName, vbDirectory) = "", "The project main folder must exist"
-    mAssert.Equals returnvalue, 76, "The project creation must fail"
+    mAssert.Equals returnValue, 76, "The project creation must fail"
 End Sub
 
 Public Sub TestCreateProjectAlreadyExisting()
@@ -94,7 +94,7 @@ Public Sub TestCreateProjectAlreadyExisting()
     MkDir VBAToolKit.vtkTestPath & "\" & vtkTestProjectName 'must respect order mkdir before call vtkcreateproject
     returnValue = vtkCreateProject(path:=VBAToolKit.vtkTestPath, name:=vtkTestProjectName, displayError:=False)
     mAssert.Should Dir(VBAToolKit.vtkTestPath & "\" & vtkTestProjectName, vbDirectory) <> "", "The existing project main folder must exist"
-    mAssert.Equals returnvalue, 75, "The project creation must fail"
+    mAssert.Equals returnValue, 75, "The project creation must fail"
 End Sub
 
 Public Sub TestMainFolderIsCreated()
@@ -102,7 +102,7 @@ Public Sub TestMainFolderIsCreated()
     Dim returnValue As Long
     returnValue = vtkCreateProject(path:=VBAToolKit.vtkTestPath, name:=vtkTestProjectName, displayError:=False)
     mAssert.Should Dir(VBAToolKit.vtkTestPath & "\" & vtkTestProjectName, vbDirectory) <> "", "The project main folder must exist"
-    mAssert.Equals returnvalue, VTK_OK, "The project creation must succeed"
+    mAssert.Equals returnValue, VTK_OK, "The project creation must succeed"
 End Sub
 
 Public Sub TestDevXlsmFileCreated()

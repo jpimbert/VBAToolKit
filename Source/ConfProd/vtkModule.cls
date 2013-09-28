@@ -118,7 +118,7 @@ Public Function getPathForConfiguration(confName As String) As String
     cn = parent.getConfigurationNumber(confName)
     getPathForConfiguration = ""
     If cn = 0 Then Err.Raise VTK_INEXISTANT_CONFIGURATION, "vtkModule getPathForConfiguration", "Configuration """ & confName & """ in project """ & parent.projectName & """"
-    getPathForConfiguration = parent.getModulePathWithNumber(number, cn)
+    getPathForConfiguration = parent.getModulePathWithNumber(Number, cn)
 End Function
 
 '---------------------------------------------------------------------------------------
@@ -134,7 +134,7 @@ Public Function setPathForConfiguration(confName As String, newPath As String) A
     Dim cn As Integer
     cn = parent.getConfigurationNumber(confName)
     If cn = 0 Then Err.Raise VTK_INEXISTANT_CONFIGURATION, "vtkModule getPathForConfiguration", "Configuration """ & confName & """ in project """ & parent.projectName & """"
-    parent.setModulePathWithNumber path:=newPath, numModule:=number, numConfiguration:=cn
+    parent.setModulePathWithNumber path:=newPath, numModule:=Number, numConfiguration:=cn
 End Function
 
 '---------------------------------------------------------------------------------------
@@ -164,7 +164,7 @@ End Property
 Public Property Get path() As String
     path = ""
     If confNumber = 0 Then Err.Raise VTK_MODULE_NOTATTACHED, "vtkModule::path()", "Module """ & parent.module(Number) & """ not attached to a configuration"
-    path = parent.getModulePathWithNumber(numModule:=number, numConfiguration:=confNumber)
+    path = parent.getModulePathWithNumber(numModule:=Number, numConfiguration:=confNumber)
 End Property
 
 '---------------------------------------------------------------------------------------

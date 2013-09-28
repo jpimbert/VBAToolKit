@@ -72,7 +72,7 @@ Public Sub Test_ModuleCollection_Count()
     ' This test verifies the count of modules collection property of Configuration Management
     ' just initialized from an Excel worlbook
     
-    mAssert.Equals confManager.modules.count, 4, "Number of modules in the Test workbook"
+    mAssert.Equals confManager.modules.Count, 4, "Number of modules in the Test workbook"
 End Sub
 
 Public Sub Test_AddedConfigurationCollection_Count()
@@ -81,7 +81,7 @@ Public Sub Test_AddedConfigurationCollection_Count()
     
     confManager.addModule ("NewModule")
     
-    mAssert.Equals confManager.modules.count, 5, "Number of modules in the Test workbook with added module"
+    mAssert.Equals confManager.modules.Count, 5, "Number of modules in the Test workbook with added module"
 End Sub
 
 Public Sub Test_ModuleCollection_Parent()
@@ -106,7 +106,7 @@ Public Sub Test_ModuleCollection_Number()
     ' collection just initialized from an Excel worlbook
     Dim i As Integer
     For i = 1 To 4
-        mAssert.Equals confManager.modules(i).number, i, "The number of vtkModule " & i
+        mAssert.Equals confManager.modules(i).Number, i, "The number of vtkModule " & i
     Next i
 End Sub
 
@@ -117,7 +117,7 @@ Public Sub Test_AddedModuleCollection_Number()
     confManager.addModule ("NewConfiguration")
     Dim i As Integer
     For i = 1 To 5
-        mAssert.Equals confManager.modules(i).number, i, "The number of vtkModule " & i
+        mAssert.Equals confManager.modules(i).Number, i, "The number of vtkModule " & i
     Next i
 End Sub
 
@@ -167,7 +167,7 @@ Public Sub Test_GetPathForConfiguration_InexistingConfigurationRaiseError()
    Exit Sub
 
 M_Error:
-    mAssert.Equals Err.number, VTK_INEXISTANT_CONFIGURATION, "Error raised"
+    mAssert.Equals Err.Number, VTK_INEXISTANT_CONFIGURATION, "Error raised"
 End Sub
 
 Public Sub Test_GetPathForConfiguration_InexistingConfigurationNullPath()
@@ -209,7 +209,7 @@ Public Sub Test_SetPathForConfiguration_InexistingConfigurationRaiseError()
    Exit Sub
 
 M_Error:
-    mAssert.Equals Err.number, VTK_INEXISTANT_CONFIGURATION, "Error raised"
+    mAssert.Equals Err.Number, VTK_INEXISTANT_CONFIGURATION, "Error raised"
 End Sub
 
 Public Sub Test_Configuration_Attached()
@@ -238,7 +238,7 @@ Public Sub Test_Configuration_NotAttachedErrorRaised()
    Exit Sub
 
 M_Error:
-    mAssert.Equals Err.number, VTK_MODULE_NOTATTACHED, "Error raised"
+    mAssert.Equals Err.Number, VTK_MODULE_NOTATTACHED, "Error raised"
 End Sub
 
 Public Sub Test_Configuration_NotAttachedNoError()
@@ -247,7 +247,7 @@ Public Sub Test_Configuration_NotAttachedNoError()
     
    On Error Resume Next
     mAssert.Equals confManager.modules(2).configuration, "", "Name of configuration"
-    mAssert.Equals Err.number, VTK_MODULE_NOTATTACHED, "Error raised"
+    mAssert.Equals Err.Number, VTK_MODULE_NOTATTACHED, "Error raised"
 End Sub
 
 Public Sub Test_Path_Attached()
@@ -255,7 +255,7 @@ Public Sub Test_Path_Attached()
     ' collection just initialized from an Excel worlbook
     
    On Error GoTo M_Error
-    mAssert.Equals confManager.configurations(1).modules(2).Path, "Tests\TestClass.cls", "Path of module"
+    mAssert.Equals confManager.configurations(1).modules(2).path, "Tests\TestClass.cls", "Path of module"
 
    On Error GoTo 0
    Exit Sub
@@ -269,14 +269,14 @@ Public Sub Test_Path_NotAttachedErrorRaised()
     ' collection just initialized from an Excel worlbook
     
    On Error GoTo M_Error
-    mAssert.Equals confManager.modules(2).Path, "", "Path of module"
+    mAssert.Equals confManager.modules(2).path, "", "Path of module"
     mAssert.Should False, "An error must be raised"
 
    On Error GoTo 0
    Exit Sub
 
 M_Error:
-    mAssert.Equals Err.number, VTK_MODULE_NOTATTACHED, "Error raised"
+    mAssert.Equals Err.Number, VTK_MODULE_NOTATTACHED, "Error raised"
 End Sub
 
 Public Sub Test_Path_NotAttachedNoError()
@@ -284,8 +284,8 @@ Public Sub Test_Path_NotAttachedNoError()
     ' collection just initialized from an Excel worlbook
     
    On Error Resume Next
-    mAssert.Equals confManager.modules(2).Path, "", "Path of module"
-    mAssert.Equals Err.number, VTK_MODULE_NOTATTACHED, "Error raised"
+    mAssert.Equals confManager.modules(2).path, "", "Path of module"
+    mAssert.Equals Err.Number, VTK_MODULE_NOTATTACHED, "Error raised"
 End Sub
 
 Public Sub Test_VBAModule_Attached()
@@ -314,7 +314,7 @@ Public Sub Test_VBAModule_NotAttachedErrorRaised()
    Exit Sub
 
 M_Error:
-    mAssert.Equals Err.number, VTK_MODULE_NOTATTACHED, "Error raised"
+    mAssert.Equals Err.Number, VTK_MODULE_NOTATTACHED, "Error raised"
 End Sub
 
 Public Sub Test_VBAModule_NotAttachedNoError()
@@ -323,13 +323,13 @@ Public Sub Test_VBAModule_NotAttachedNoError()
     
    On Error Resume Next
     mAssert.Equals confManager.modules(4).VBAModule.name, "", "Name of VBComponent"
-    mAssert.Equals Err.number, VTK_MODULE_NOTATTACHED, "Error raised"
+    mAssert.Equals Err.Number, VTK_MODULE_NOTATTACHED, "Error raised"
 End Sub
 
 Public Sub Test_VBAModule_NotOpen()
     ' This test verifies the getting of the VBAModule for a module attached to a configuration
     ' New configuration, Excel file not open
-    confManager.addConfiguration configuration:="NewConfiguration", Path:="path/toto.xlsm"
+    confManager.addConfiguration configuration:="NewConfiguration", path:="path/toto.xlsm"
     confManager.modules(3).setPathForConfiguration "NewConfiguration", "Toto/Module.cls"
     
    On Error GoTo M_Error
@@ -340,7 +340,7 @@ Public Sub Test_VBAModule_NotOpen()
    Exit Sub
 
 M_Error:
-    mAssert.Equals Err.number, VTK_WORKBOOK_NOTOPEN, "Error raised"
+    mAssert.Equals Err.Number, VTK_WORKBOOK_NOTOPEN, "Error raised"
 End Sub
 
 Public Sub Test_VBAModule_NoModule()

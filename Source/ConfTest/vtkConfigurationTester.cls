@@ -72,7 +72,7 @@ Public Sub Test_ConfigurationCollection_Count()
     ' This test verifies the count of configurations collection property of Configuration Management
     ' just initialized from an Excel worlbook
     
-    mAssert.Equals confManager.configurations.count, 1, "Number of configurations in the Test workbook"
+    mAssert.Equals confManager.configurations.Count, 1, "Number of configurations in the Test workbook"
 End Sub
 
 Public Sub Test_AddedConfigurationCollection_Count()
@@ -81,7 +81,7 @@ Public Sub Test_AddedConfigurationCollection_Count()
     
     confManager.addConfiguration ("NewConfiguration")
     
-    mAssert.Equals confManager.configurations.count, 2, "Number of configurations in the Test workbook with added configuration"
+    mAssert.Equals confManager.configurations.Count, 2, "Number of configurations in the Test workbook with added configuration"
 End Sub
 
 Public Sub Test_ConfigurationCollection_Parent()
@@ -105,7 +105,7 @@ Public Sub Test_ConfigurationCollection_Number()
     ' This test verifies the number of each vtkConfiguration object
     ' collection just initialized from an Excel worlbook
     
-    mAssert.Equals confManager.configurations(1).number, 1, "The number of each vtkConfiguration must be initialized"
+    mAssert.Equals confManager.configurations(1).Number, 1, "The number of each vtkConfiguration must be initialized"
 End Sub
 
 Public Sub Test_AddedConfigurationCollection_Number()
@@ -114,8 +114,8 @@ Public Sub Test_AddedConfigurationCollection_Number()
     
     confManager.addConfiguration ("NewConfiguration")
     
-    mAssert.Equals confManager.configurations(1).number, 1, "The number of each vtkConfiguration must be initialized"
-    mAssert.Equals confManager.configurations(2).number, 2, "The number of each vtkConfiguration must be initialized"
+    mAssert.Equals confManager.configurations(1).Number, 1, "The number of each vtkConfiguration must be initialized"
+    mAssert.Equals confManager.configurations(2).Number, 2, "The number of each vtkConfiguration must be initialized"
 End Sub
 
 Public Sub Test_ConfigurationGetName()
@@ -140,8 +140,8 @@ Public Sub Test_ConfigurationGetPath()
     
    On Error GoTo M_Error
 
-    mAssert.Equals confManager.configurations(1).Path, "Tests\InitializedProject_DEV.xlsm", "Path of the vtkConfiguration object by Index"
-    mAssert.Equals confManager.configurations("InitializedProject_DEV").Path, "Tests\InitializedProject_DEV.xlsm", "Path of the vtkConfiguration object by Name"
+    mAssert.Equals confManager.configurations(1).path, "Tests\InitializedProject_DEV.xlsm", "Path of the vtkConfiguration object by Index"
+    mAssert.Equals confManager.configurations("InitializedProject_DEV").path, "Tests\InitializedProject_DEV.xlsm", "Path of the vtkConfiguration object by Name"
 
    On Error GoTo 0
    Exit Sub
@@ -155,9 +155,9 @@ Public Sub Test_ConfigurationSetPath()
     ' collection just initialized from an Excel worlbook
 
    On Error GoTo M_Error
-    confManager.configurations(1).Path = "NewPath"
-    mAssert.Equals confManager.configurations(1).Path, "NewPath", "Path of the vtkConfiguration object by index"
-    mAssert.Equals confManager.configurations("InitializedProject_DEV").Path, "NewPath", "Path of the vtkConfiguration object by name"
+    confManager.configurations(1).path = "NewPath"
+    mAssert.Equals confManager.configurations(1).path, "NewPath", "Path of the vtkConfiguration object by index"
+    mAssert.Equals confManager.configurations("InitializedProject_DEV").path, "NewPath", "Path of the vtkConfiguration object by name"
     mAssert.Equals confManager.getConfigurationPathWithNumber(1), "NewPath", "Path of the modified configuration in the configuration manager"
 
    On Error GoTo 0
@@ -172,7 +172,7 @@ Public Sub Test_ConfigurationModules_Initialized()
     ' collection just initialized from an Excel worlbook
 
    On Error GoTo M_Error
-    mAssert.Equals confManager.configurations(1).modules.count, 4, "Number of modules in the Configuration"
+    mAssert.Equals confManager.configurations(1).modules.Count, 4, "Number of modules in the Configuration"
     mAssert.Equals confManager.configurations(1).modules(1).name, "TestModule", "Name of the first module in the configuration"
     mAssert.Equals confManager.configurations(1).modules(2).name, "TestClass", "Name of the second module in the configuration"
     mAssert.Equals confManager.configurations(1).modules(3).name, "TestForm", "Name of the third module in the configuration"
@@ -192,7 +192,7 @@ Public Sub Test_ConfigurationModules_NewEmpty()
     confManager.addConfiguration ("NewConfiguration")
 
    On Error GoTo M_Error
-    mAssert.Equals confManager.configurations("NewConfiguration").modules.count, 0, "Number of modules in the Configuration"
+    mAssert.Equals confManager.configurations("NewConfiguration").modules.Count, 0, "Number of modules in the Configuration"
 
    On Error GoTo 0
    Exit Sub
@@ -209,7 +209,7 @@ Public Sub Test_ConfigurationModules_NewNotEmpty()
     confManager.setModulePathWithNumber "newPath", 3, 2
 
    On Error GoTo M_Error
-    mAssert.Equals confManager.configurations("NewConfiguration").modules.count, 1, "Number of modules in the Configuration"
+    mAssert.Equals confManager.configurations("NewConfiguration").modules.Count, 1, "Number of modules in the Configuration"
 
    On Error GoTo 0
    Exit Sub

@@ -73,7 +73,7 @@ Public Sub Test_vtkInitializeGit_correctPathRetVal()
     On Error GoTo Test_vtkInitializeGit_correctPathRetVal_Error
 
     retVal = vtkInitializeGit(VBAToolKit.vtkTestPath)
-    mAssert.Equals retval, VTK_OK
+    mAssert.Equals retVal, VTK_OK
 
     On Error GoTo 0
     Exit Sub
@@ -192,7 +192,7 @@ Public Sub Test_vtkInitializeGit_correctPathCustomLogFileReturnValue()
     On Error GoTo Test_vtkInitializeGit_correctPathCustomLogFileReturnValue_Error
 
     retVal = vtkInitializeGit(VBAToolKit.vtkTestPath, "initialize.log")
-    mAssert.Equals retval, VTK_OK
+    mAssert.Equals retVal, VTK_OK
 
     On Error GoTo 0
     Exit Sub
@@ -218,12 +218,12 @@ Test_vtkInitializeGit_correctPathCustomLogFileExists_Error:
 End Sub
 
 Public Sub Test_vtkGitConvertWinPath_absolutePathOnCDrive()
-    Dim Path As String
+    Dim path As String
     Dim convertedPath As String
     On Error GoTo Test_vtkGitConvertWinPath_absolutePathOnCDrive_Error
 
-    Path = "C:\test1\test2"
-    convertedPath = vtkGitConvertWinPath(Path)
+    path = "C:\test1\test2"
+    convertedPath = vtkGitConvertWinPath(path)
     mAssert.Equals convertedPath, Chr(34) & "/test1/test2" & Chr(34), "Path must be correctly transformed."
 
     On Error GoTo 0
@@ -236,13 +236,13 @@ End Sub
 
 Public Sub Test_vtkGitConvertWinPath_absolutePathOnOneLetterDriveNotC()
     Dim error As Integer: error = -1
-    Dim Path As String
+    Dim path As String
     Dim convertedPath As String
     
     On Error GoTo errHandler
     
-    Path = "D:\test1\test2"
-    convertedPath = vtkGitConvertWinPath(Path)
+    path = "D:\test1\test2"
+    convertedPath = vtkGitConvertWinPath(path)
     
     mAssert.Equals error, VTK_FORBIDDEN_PARAMETER
     
@@ -257,13 +257,13 @@ End Sub
 
 Public Sub Test_vtkGitConvertWinPath_absolutePathOnSeveralLettersDrive()
     Dim error As Integer: error = -1
-    Dim Path As String
+    Dim path As String
     Dim convertedPath As String
     
     On Error GoTo errHandler
     
-    Path = "TOTO:\test1\test2"
-    convertedPath = vtkGitConvertWinPath(Path)
+    path = "TOTO:\test1\test2"
+    convertedPath = vtkGitConvertWinPath(path)
     
     mAssert.Equals error, VTK_FORBIDDEN_PARAMETER
     
@@ -278,13 +278,13 @@ End Sub
 
 Public Sub Test_vtkGitConvertWinPath_relativePath()
     Dim error As Integer: error = -1
-    Dim Path As String
+    Dim path As String
     Dim convertedPath As String
     
     On Error GoTo errHandler
     
-    Path = "\test1\test2"
-    convertedPath = vtkGitConvertWinPath(Path)
+    path = "\test1\test2"
+    convertedPath = vtkGitConvertWinPath(path)
     
     mAssert.Equals error, VTK_FORBIDDEN_PARAMETER
     

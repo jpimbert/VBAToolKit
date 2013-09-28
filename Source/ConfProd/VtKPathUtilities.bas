@@ -209,7 +209,7 @@ Public Function vtkCreateTreeFolder(rootPath As String)
    
 vtkCreateTreeFolder_Error:
     vtkCreateTreeFolder = Err.Number
-    Err.Raise Err.number, "Module vtkFileSystemUtilities : Function vtkCreateTreeFolder", Err.Description
+    Err.Raise Err.Number, "Module vtkFileSystemUtilities : Function vtkCreateTreeFolder", Err.Description
 End Function
 
 '---------------------------------------------------------------------------------------
