@@ -82,8 +82,8 @@ Private Sub ITestCase_TearDown()
     On Error Resume Next
     
     vtkResetConfigurationManagers
-    vtkCloseAndKillWorkbook wb:=testWorkbook
-    vtkCloseAndKillWorkbook wb:=newlyCreatedWorkbook
+    vtkCloseAndKillWorkbook Wb:=testWorkbook
+    vtkCloseAndKillWorkbook Wb:=newlyCreatedWorkbook
     vtkCleanFolder VBAToolKit.vtkTestPath
 
 End Sub
@@ -149,14 +149,14 @@ Public Sub Test_vtkExportConfiguration_filesNotYetCreatedTrue()
     retVal = vtkExportConfiguration(testWorkbook.VBProject, testProjectName, testConf.name, onlyModified:=True)
     mAssert.Equals retVal, totalNumberOfModules, totalNumberOfModules & " should be exported as files do not yet exist."
     
-    mAssert.Should fso.fileExists(VBAToolKit.vtkTestPath & "\" & testModule1FileName), testModule1FileName & " should have been created."
-    mAssert.Should fso.fileExists(VBAToolKit.vtkTestPath & "\" & testModule2FileName), testModule2FileName & " should have been created."
+    mAssert.Should fso.FileExists(VBAToolKit.vtkTestPath & "\" & testModule1FileName), testModule1FileName & " should have been created."
+    mAssert.Should fso.FileExists(VBAToolKit.vtkTestPath & "\" & testModule2FileName), testModule2FileName & " should have been created."
 
     On Error GoTo 0
     Exit Sub
 
 Test_vtkExportConfiguration_filesNotYetCreatedTrue_Error:
-    mAssert.Should False, "Unexpected error " & Err.number & " (" & Err.Description & ") in procedure Test_vtkExportConfiguration_filesNotYetCreatedTrue of Class Module vtkExportConfigurationTester"
+    mAssert.Should False, "Unexpected error " & Err.Number & " (" & Err.Description & ") in procedure Test_vtkExportConfiguration_filesNotYetCreatedTrue of Class Module vtkExportConfigurationTester"
     Resume Next
     
 End Sub
@@ -171,14 +171,14 @@ Public Sub Test_vtkExportConfiguration_filesNotYetCreatedFalse()
     retVal = vtkExportConfiguration(testWorkbook.VBProject, testProjectName, testConf.name, onlyModified:=False)
     mAssert.Equals retVal, totalNumberOfModules, totalNumberOfModules & " should be exported as files do not yet exist."
 
-    mAssert.Should fso.fileExists(VBAToolKit.vtkTestPath & "\" & testModule1FileName), testModule1FileName & " should have been created."
-    mAssert.Should fso.fileExists(VBAToolKit.vtkTestPath & "\" & testModule2FileName), testModule2FileName & " should have been created."
+    mAssert.Should fso.FileExists(VBAToolKit.vtkTestPath & "\" & testModule1FileName), testModule1FileName & " should have been created."
+    mAssert.Should fso.FileExists(VBAToolKit.vtkTestPath & "\" & testModule2FileName), testModule2FileName & " should have been created."
 
     On Error GoTo 0
     Exit Sub
 
 Test_vtkExportConfiguration_filesNotYetCreatedFalse_Error:
-    mAssert.Should False, "Unexpected error " & Err.number & " (" & Err.Description & ") in procedure Test_vtkExportConfiguration_filesNotYetCreatedFalse of Class Module vtkExportConfigurationTester"
+    mAssert.Should False, "Unexpected error " & Err.Number & " (" & Err.Description & ") in procedure Test_vtkExportConfiguration_filesNotYetCreatedFalse of Class Module vtkExportConfigurationTester"
     Resume Next
 
 End Sub
@@ -215,7 +215,7 @@ Public Sub Test_vtkExportConfiguration_filesJustExportedTrue()
     Exit Sub
 
 Test_vtkExportConfiguration_filesYetCreatedTrue_Error:
-    mAssert.Should False, "Unexpected error " & Err.number & " (" & Err.Description & ") in procedure Test_vtkExportConfiguration_filesYetCreatedTrue of Class Module vtkExportConfigurationTester"
+    mAssert.Should False, "Unexpected error " & Err.Number & " (" & Err.Description & ") in procedure Test_vtkExportConfiguration_filesYetCreatedTrue of Class Module vtkExportConfigurationTester"
     Resume Next
 End Sub
 
@@ -251,7 +251,7 @@ Public Sub Test_vtkExportConfiguration_filesJustExportedFalse()
     Exit Sub
 
 Test_vtkExportConfiguration_filesJustExportedFalse_Error:
-    mAssert.Should False, "Unexpected error " & Err.number & " (" & Err.Description & ") in procedure Test_vtkExportConfiguration_filesJustExportedFalse of Class Module vtkExportConfigurationTester"
+    mAssert.Should False, "Unexpected error " & Err.Number & " (" & Err.Description & ") in procedure Test_vtkExportConfiguration_filesJustExportedFalse of Class Module vtkExportConfigurationTester"
     Resume Next
 End Sub
 
@@ -287,7 +287,7 @@ Public Sub Test_vtkExportConfiguration_oneFileModifiedTrue()
     Exit Sub
 
 Test_vtkExportConfiguration_oneFileModifiedTrue_Error:
-    mAssert.Should False, "Unexpected error " & Err.number & " (" & Err.Description & ") in procedure Test_vtkExportConfiguration_oneFileModifiedTrue of Class Module vtkExportConfigurationTester"
+    mAssert.Should False, "Unexpected error " & Err.Number & " (" & Err.Description & ") in procedure Test_vtkExportConfiguration_oneFileModifiedTrue of Class Module vtkExportConfigurationTester"
     Resume Next
     
 End Sub
@@ -326,7 +326,7 @@ Public Sub Test_vtkExportConfiguration_oneFileModifiedFalse()
     Exit Sub
 
 Test_vtkExportConfiguration_oneFileModifiedFalse_Error:
-    mAssert.Should False, "Unexpected error " & Err.number & " (" & Err.Description & ") in procedure Test_vtkExportConfiguration_oneFileModifiedFalse of Class Module vtkExportConfigurationTester"
+    mAssert.Should False, "Unexpected error " & Err.Number & " (" & Err.Description & ") in procedure Test_vtkExportConfiguration_oneFileModifiedFalse of Class Module vtkExportConfigurationTester"
     Resume Next
     
 End Sub
@@ -366,7 +366,7 @@ Public Sub Test_vtkExportConfiguration_twoFilesModifiedTrue()
     Exit Sub
 
 Test_vtkExportConfiguration_twoFilesModifiedTrue_Error:
-    mAssert.Should False, "Unexpected error " & Err.number & " (" & Err.Description & ") in procedure Test_vtkExportConfiguration_twoFilesModifiedTrue of Class Module vtkExportConfigurationTester"
+    mAssert.Should False, "Unexpected error " & Err.Number & " (" & Err.Description & ") in procedure Test_vtkExportConfiguration_twoFilesModifiedTrue of Class Module vtkExportConfigurationTester"
     Resume Next
 
 End Sub
@@ -405,7 +405,7 @@ Public Sub Test_vtkExportConfiguration_twoFilesModifiedFalse()
     Exit Sub
 
 Test_vtkExportConfiguration_twoFilesModifiedFalse_Error:
-    mAssert.Should False, "Unexpected error " & Err.number & " (" & Err.Description & ") in procedure Test_vtkExportConfiguration_twoFilesModifiedFalse of Class Module vtkExportConfigurationTester"
+    mAssert.Should False, "Unexpected error " & Err.Number & " (" & Err.Description & ") in procedure Test_vtkExportConfiguration_twoFilesModifiedFalse of Class Module vtkExportConfigurationTester"
     Resume Next
 
 End Sub
@@ -431,13 +431,13 @@ Public Sub Test_vtkExportConfiguration_notReferencedModuleMustNotBeExported()
     
     mAssert.Equals retVal, 0, "The module should not be exported as it has not been added to the configuration."
     
-    mAssert.Should Not fso.fileExists(VBAToolKit.vtkTestPath & "\" & importedModuleFileName), importedModuleName & " should not have been created."
+    mAssert.Should Not fso.FileExists(VBAToolKit.vtkTestPath & "\" & importedModuleFileName), importedModuleName & " should not have been created."
 
     On Error GoTo 0
     Exit Sub
 
 Test_vtkExportConfiguration_notReferencedModuleMustNotBeExported_Error:
-    mAssert.Should False, "Unexpected error " & Err.number & " (" & Err.Description & ") in procedure Test_vtkExportConfiguration_importedFileMustBeExported of Class Module vtkExportConfigurationTester"
+    mAssert.Should False, "Unexpected error " & Err.Number & " (" & Err.Description & ") in procedure Test_vtkExportConfiguration_importedFileMustBeExported of Class Module vtkExportConfigurationTester"
     Resume Next
 End Sub
 
@@ -463,13 +463,13 @@ Public Sub Test_vtkExportConfiguration_importedModuleAddedToConfigurationManager
     
     mAssert.Equals retVal, 0, "No module should be exported as none has been added to the configuration."
     
-    mAssert.Should Not fso.fileExists(VBAToolKit.vtkTestPath & "\" & importedModuleFileName), importedModuleName & " should not have been created."
+    mAssert.Should Not fso.FileExists(VBAToolKit.vtkTestPath & "\" & importedModuleFileName), importedModuleName & " should not have been created."
 
     On Error GoTo 0
     Exit Sub
 
 Test_vtkExportConfiguration_importedModuleAddedToConfigurationManagerMustBeExported_Error:
-    mAssert.Should False, "Unexpected error " & Err.number & " (" & Err.Description & ") in procedure Test_vtkExportConfiguration_importedFileMustBeExported of Class Module vtkExportConfigurationTester"
+    mAssert.Should False, "Unexpected error " & Err.Number & " (" & Err.Description & ") in procedure Test_vtkExportConfiguration_importedFileMustBeExported of Class Module vtkExportConfigurationTester"
     Resume Next
 End Sub
 
@@ -513,7 +513,7 @@ Public Sub Test_vtkAddBeforeSaveHandlerInDEVWorkbook_validWorkbook()
     Exit Sub
 
 Test_vtkAddBeforeSaveHandlerInDEVWorkbook_validWorkbook_Error:
-    mAssert.Should False, "Unexpected error " & Err.number & " (" & Err.Description & ") in procedure Test_vtkAddBeforeSaveHandlerInDEVWorkbook_validWorkbook of Class Module vtkBeforeSaveHandlerTester"
+    mAssert.Should False, "Unexpected error " & Err.Number & " (" & Err.Description & ") in procedure Test_vtkAddBeforeSaveHandlerInDEVWorkbook_validWorkbook of Class Module vtkBeforeSaveHandlerTester"
     ITestCase_TearDown
     Exit Sub
     

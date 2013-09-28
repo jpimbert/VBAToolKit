@@ -56,15 +56,15 @@ End Property
 Private Sub ITestCase_SetUp(Assert As IAssert)
     Set mAssert = Assert
     
-    Dim source As String, destination As String
-    source = vtkPathToTemplateFolder & "\" & initializedWorkbookName
+    Dim Source As String, destination As String
+    Source = vtkPathToTemplateFolder & "\" & initializedWorkbookName
     destination = vtkPathToTestFolder & "\" & initializedWorkbookName
     Set initializedWorkbook = getTestFileFromTemplate(fileName:=initializedWorkbookName, openExcel:=True)
     Set confManager = vtkConfigurationManagerForProject(initializedProjectName)
 End Sub
 
 Private Sub ITestCase_TearDown()
-    vtkCloseAndKillWorkbook wb:=initializedWorkbook ' close the existing Excel project
+    vtkCloseAndKillWorkbook Wb:=initializedWorkbook ' close the existing Excel project
     vtkResetConfigurationManagers             ' reset all configuration managers
 End Sub
 
@@ -134,7 +134,7 @@ Public Sub Test_ModuleGetName()
    Exit Sub
 
 M_Error:
-    mAssert.Should False, "Unexpected Error (" & Err.number & "): " & Err.Description
+    mAssert.Should False, "Unexpected Error (" & Err.Number & "): " & Err.Description
 End Sub
 
 Public Sub Test_GetPathForConfiguration_ExistingConfiguration()
@@ -150,7 +150,7 @@ Public Sub Test_GetPathForConfiguration_ExistingConfiguration()
    Exit Sub
 
 M_Error:
-    mAssert.Should False, "Unexpected Error (" & Err.number & "): " & Err.Description
+    mAssert.Should False, "Unexpected Error (" & Err.Number & "): " & Err.Description
 End Sub
 
 Public Sub Test_GetPathForConfiguration_InexistingConfigurationRaiseError()
@@ -194,7 +194,7 @@ Public Sub Test_SetPathForConfiguration_ExistingConfiguration()
    Exit Sub
 
 M_Error:
-    mAssert.Should False, "Unexpected Error (" & Err.number & "): " & Err.Description
+    mAssert.Should False, "Unexpected Error (" & Err.Number & "): " & Err.Description
 End Sub
 
 Public Sub Test_SetPathForConfiguration_InexistingConfigurationRaiseError()
@@ -223,7 +223,7 @@ Public Sub Test_Configuration_Attached()
    Exit Sub
 
 M_Error:
-    mAssert.Should False, "Unexpected Error (" & Err.number & "): " & Err.Description
+    mAssert.Should False, "Unexpected Error (" & Err.Number & "): " & Err.Description
 End Sub
 
 Public Sub Test_Configuration_NotAttachedErrorRaised()
@@ -255,13 +255,13 @@ Public Sub Test_Path_Attached()
     ' collection just initialized from an Excel worlbook
     
    On Error GoTo M_Error
-    mAssert.Equals confManager.configurations(1).modules(2).path, "Tests\TestClass.cls", "Path of module"
+    mAssert.Equals confManager.configurations(1).modules(2).Path, "Tests\TestClass.cls", "Path of module"
 
    On Error GoTo 0
    Exit Sub
 
 M_Error:
-    mAssert.Should False, "Unexpected Error (" & Err.number & "): " & Err.Description
+    mAssert.Should False, "Unexpected Error (" & Err.Number & "): " & Err.Description
 End Sub
 
 Public Sub Test_Path_NotAttachedErrorRaised()
@@ -269,7 +269,7 @@ Public Sub Test_Path_NotAttachedErrorRaised()
     ' collection just initialized from an Excel worlbook
     
    On Error GoTo M_Error
-    mAssert.Equals confManager.modules(2).path, "", "Path of module"
+    mAssert.Equals confManager.modules(2).Path, "", "Path of module"
     mAssert.Should False, "An error must be raised"
 
    On Error GoTo 0
@@ -284,7 +284,7 @@ Public Sub Test_Path_NotAttachedNoError()
     ' collection just initialized from an Excel worlbook
     
    On Error Resume Next
-    mAssert.Equals confManager.modules(2).path, "", "Path of module"
+    mAssert.Equals confManager.modules(2).Path, "", "Path of module"
     mAssert.Equals Err.number, VTK_MODULE_NOTATTACHED, "Error raised"
 End Sub
 
@@ -299,7 +299,7 @@ Public Sub Test_VBAModule_Attached()
    Exit Sub
 
 M_Error:
-    mAssert.Should False, "Unexpected Error (" & Err.number & "): " & Err.Description
+    mAssert.Should False, "Unexpected Error (" & Err.Number & "): " & Err.Description
 End Sub
 
 Public Sub Test_VBAModule_NotAttachedErrorRaised()
@@ -329,7 +329,7 @@ End Sub
 Public Sub Test_VBAModule_NotOpen()
     ' This test verifies the getting of the VBAModule for a module attached to a configuration
     ' New configuration, Excel file not open
-    confManager.addConfiguration configuration:="NewConfiguration", path:="path/toto.xlsm"
+    confManager.addConfiguration configuration:="NewConfiguration", Path:="path/toto.xlsm"
     confManager.modules(3).setPathForConfiguration "NewConfiguration", "Toto/Module.cls"
     
    On Error GoTo M_Error
@@ -356,7 +356,7 @@ Public Sub Test_VBAModule_NoModule()
    Exit Sub
 
 M_Error:
-    mAssert.Should False, "Unexpected Error (" & Err.number & "): " & Err.Description
+    mAssert.Should False, "Unexpected Error (" & Err.Number & "): " & Err.Description
 End Sub
 
 Private Function ITest_Suite() As TestSuite

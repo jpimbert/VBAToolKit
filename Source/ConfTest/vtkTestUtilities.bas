@@ -31,8 +31,8 @@ Private pWorkBook As Workbook
 ' Purpose   : Prepare the module before use in test
 '---------------------------------------------------------------------------------------
 '
-Public Sub prepare(wb As Workbook)
-    Set pWorkBook = wb    ' VBAToolKit works on Active Workbook by default
+Public Sub prepare(Wb As Workbook)
+    Set pWorkBook = Wb    ' VBAToolKit works on Active Workbook by default
 End Sub
 
 '---------------------------------------------------------------------------------------
@@ -65,18 +65,18 @@ End Function
 '---------------------------------------------------------------------------------------
 '
 Public Function getTestFileFromTemplate(fileName As String, Optional destinationName As String = "", Optional openExcel As Boolean = False) As Workbook
-    Dim source As String, destination As String, errCount As Integer
+    Dim Source As String, destination As String, errCount As Integer
     
    On Error GoTo M_Error
    
     ' Copy file
-    source = vtkPathToTemplateFolder(pWorkBook) & "\" & fileName
+    Source = vtkPathToTemplateFolder(pWorkBook) & "\" & fileName
     If destinationName Like "" Then
         destination = vtkTestPath & "\" & fileName
        Else
         destination = vtkTestPath & "\" & destinationName
     End If
-    FileCopy source:=source, destination:=destination
+    FileCopy Source:=source, destination:=destination
 
     ' Open Excel file if required
     Set getTestFileFromTemplate = Nothing
@@ -90,15 +90,15 @@ Public Function getTestFileFromTemplate(fileName As String, Optional destination
 
 M_Error:
     errCount = errCount + 1
-    If Err.number = 1004 And errCount < 5 Then Resume    ' It's possible that the file is not ready, just after copy : in this case retry
+    If Err.Number = 1004 And errCount < 5 Then Resume    ' It's possible that the file is not ready, just after copy : in this case retry
     Set getTestFileFromTemplate = Nothing
-    Select Case Err.number
+    Select Case Err.Number
         Case 53
-            Err.Raise number:=VTK_FILE_NOT_FOUND, source:="getTestFileFromTemplate", Description:="File not found : " & source
+            Err.Raise Number:=VTK_FILE_NOT_FOUND, Source:="getTestFileFromTemplate", Description:="File not found : " & Source
         Case 75
-            Err.Raise number:=VTK_DOESNT_COPY_FOLDER, source:="getTestFileFromTemplate", Description:="A file can't be copied : " & source
+            Err.Raise Number:=VTK_DOESNT_COPY_FOLDER, Source:="getTestFileFromTemplate", Description:="A file can't be copied : " & Source
         Case Else
-            Err.Raise VTK_UNEXPECTED_ERROR, "getTestFileFromTemplate", "(" & Err.number & ") " & Err.Description
+            Err.Raise VTK_UNEXPECTED_ERROR, "getTestFileFromTemplate", "(" & Err.Number & ") " & Err.Description
     End Select
 End Function
 
@@ -114,14 +114,14 @@ End Function
 '---------------------------------------------------------------------------------------
 Public Function getTestFolderFromTemplate(folderName As String, Optional destinationName As String = "")
 
-    Dim source As String, destination As String, errCount As Integer, fso As FileSystemObject
+    Dim Source As String, destination As String, errCount As Integer, fso As FileSystemObject
 
     On Error GoTo getTestFolderFromTemplate_Error
     
     Set fso = CreateObject("Scripting.FileSystemObject")
     
     ' Copy folder
-    source = vtkPathToTemplateFolder(pWorkBook) & "\" & folderName
+    Source = vtkPathToTemplateFolder(pWorkBook) & "\" & folderName
     
     If destinationName Like "" Then
         destination = vtkTestPath & "\" & folderName
@@ -129,17 +129,17 @@ Public Function getTestFolderFromTemplate(folderName As String, Optional destina
         destination = vtkTestPath & "\" & destinationName
     End If
     
-    fso.CopyFolder source:=source, destination:=destination, OverWriteFiles:=True
+    fso.CopyFolder Source:=source, destination:=destination, OverWriteFiles:=True
     
     On Error GoTo 0
     Exit Function
 
 getTestFolderFromTemplate_Error:
-    Select Case Err.number
+    Select Case Err.Number
         Case 76
-            Err.Raise number:=VTK_FOLDER_NOT_FOUND, source:="getTestFolderFromTemplate", Description:="Folder not found : " & source
+            Err.Raise Number:=VTK_FOLDER_NOT_FOUND, Source:="getTestFolderFromTemplate", Description:="Folder not found : " & Source
         Case Else
-            Err.Raise VTK_UNEXPECTED_ERROR, "getTestFolderFromTemplate", "(" & Err.number & ") " & Err.Description
+            Err.Raise VTK_UNEXPECTED_ERROR, "getTestFolderFromTemplate", "(" & Err.Number & ") " & Err.Description
     End Select
     Resume Next
 End Function
@@ -150,10 +150,29 @@ End Function
 ' Author    : Champonnois
 ' Date      : 25/09/2013
 ' Purpose   : Remove the contents of the folder test
+'
+' Raise error :
+'           - VTK_FILE_OPEN_OR_LOCKED, the folder can't be clean up
+'           - VTK_UNEXPECTED_ERROR
 '---------------------------------------------------------------------------------------
 '
 Public Sub resetTestFolder()
-    vtkCleanFolder VBAToolKit.vtkTestPath
+    Dim fso As New FileSystemObject
+   On Error GoTo resetTestFolder_Error
+
+    fso.DeleteFolder VBAToolKit.vtkTestPath & "\*"
+    fso.DeleteFile VBAToolKit.vtkTestPath & "\*.*"
+
+   On Error GoTo 0
+   Exit Sub
+
+resetTestFolder_Error:
+    Select Case Err.Number
+        Case 70
+            Err.Raise Number:=VTK_FILE_OPEN_OR_LOCKED, Source:="resetTestFolder", Description:=Err.Description
+        Case Else
+            Err.Raise VTK_UNEXPECTED_ERROR, "resetTestFolder", "(" & Err.Number & ") " & Err.Description
+    End Select
 End Sub
 
 '---------------------------------------------------------------------------------------

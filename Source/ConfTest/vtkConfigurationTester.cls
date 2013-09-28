@@ -56,15 +56,15 @@ End Property
 Private Sub ITestCase_SetUp(Assert As IAssert)
     Set mAssert = Assert
     
-    Dim source As String, destination As String
-    source = vtkPathToTemplateFolder & "\" & initializedWorkbookName
+    Dim Source As String, destination As String
+    Source = vtkPathToTemplateFolder & "\" & initializedWorkbookName
     destination = vtkPathToTestFolder & "\" & initializedWorkbookName
     Set initializedWorkbook = getTestFileFromTemplate(fileName:=initializedWorkbookName, openExcel:=True)
     Set confManager = vtkConfigurationManagerForProject(initializedProjectName)
 End Sub
 
 Private Sub ITestCase_TearDown()
-    vtkCloseAndKillWorkbook wb:=initializedWorkbook ' close the existing Excel project
+    vtkCloseAndKillWorkbook Wb:=initializedWorkbook ' close the existing Excel project
     vtkResetConfigurationManagers             ' reset all configuration managers
 End Sub
 
@@ -131,7 +131,7 @@ Public Sub Test_ConfigurationGetName()
    Exit Sub
 
 M_Error:
-    mAssert.Should False, "Unexpected Error (" & Err.number & "): " & Err.Description
+    mAssert.Should False, "Unexpected Error (" & Err.Number & "): " & Err.Description
 End Sub
 
 Public Sub Test_ConfigurationGetPath()
@@ -140,14 +140,14 @@ Public Sub Test_ConfigurationGetPath()
     
    On Error GoTo M_Error
 
-    mAssert.Equals confManager.configurations(1).path, "Tests\InitializedProject_DEV.xlsm", "Path of the vtkConfiguration object by Index"
-    mAssert.Equals confManager.configurations("InitializedProject_DEV").path, "Tests\InitializedProject_DEV.xlsm", "Path of the vtkConfiguration object by Name"
+    mAssert.Equals confManager.configurations(1).Path, "Tests\InitializedProject_DEV.xlsm", "Path of the vtkConfiguration object by Index"
+    mAssert.Equals confManager.configurations("InitializedProject_DEV").Path, "Tests\InitializedProject_DEV.xlsm", "Path of the vtkConfiguration object by Name"
 
    On Error GoTo 0
    Exit Sub
 
 M_Error:
-    mAssert.Should False, "Unexpected Error (" & Err.number & "): " & Err.Description
+    mAssert.Should False, "Unexpected Error (" & Err.Number & "): " & Err.Description
 End Sub
 
 Public Sub Test_ConfigurationSetPath()
@@ -155,16 +155,16 @@ Public Sub Test_ConfigurationSetPath()
     ' collection just initialized from an Excel worlbook
 
    On Error GoTo M_Error
-    confManager.configurations(1).path = "NewPath"
-    mAssert.Equals confManager.configurations(1).path, "NewPath", "Path of the vtkConfiguration object by index"
-    mAssert.Equals confManager.configurations("InitializedProject_DEV").path, "NewPath", "Path of the vtkConfiguration object by name"
+    confManager.configurations(1).Path = "NewPath"
+    mAssert.Equals confManager.configurations(1).Path, "NewPath", "Path of the vtkConfiguration object by index"
+    mAssert.Equals confManager.configurations("InitializedProject_DEV").Path, "NewPath", "Path of the vtkConfiguration object by name"
     mAssert.Equals confManager.getConfigurationPathWithNumber(1), "NewPath", "Path of the modified configuration in the configuration manager"
 
    On Error GoTo 0
    Exit Sub
 
 M_Error:
-    mAssert.Should False, "Unexpected Error (" & Err.number & "): " & Err.Description
+    mAssert.Should False, "Unexpected Error (" & Err.Number & "): " & Err.Description
 End Sub
 
 Public Sub Test_ConfigurationModules_Initialized()
@@ -182,7 +182,7 @@ Public Sub Test_ConfigurationModules_Initialized()
    Exit Sub
 
 M_Error:
-    mAssert.Should False, "Unexpected Error (" & Err.number & "): " & Err.Description
+    mAssert.Should False, "Unexpected Error (" & Err.Number & "): " & Err.Description
 End Sub
 
 Public Sub Test_ConfigurationModules_NewEmpty()
@@ -198,7 +198,7 @@ Public Sub Test_ConfigurationModules_NewEmpty()
    Exit Sub
 
 M_Error:
-    mAssert.Should False, "Unexpected Error (" & Err.number & "): " & Err.Description
+    mAssert.Should False, "Unexpected Error (" & Err.Number & "): " & Err.Description
 End Sub
 
 Public Sub Test_ConfigurationModules_NewNotEmpty()
@@ -215,7 +215,7 @@ Public Sub Test_ConfigurationModules_NewNotEmpty()
    Exit Sub
 
 M_Error:
-    mAssert.Should False, "Unexpected Error (" & Err.number & "): " & Err.Description
+    mAssert.Should False, "Unexpected Error (" & Err.Number & "): " & Err.Description
 End Sub
 
 Private Function ITest_Suite() As TestSuite
