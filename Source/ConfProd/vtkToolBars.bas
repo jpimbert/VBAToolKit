@@ -264,6 +264,14 @@ Public Sub vtkClickForVBAToolKitDEVRecreation()
     vtkRecreateConfiguration projectName:="VBAToolKit2", configurationName:="VBAToolKit_DEV"
 End Sub
 
+'---------------------------------------------------------------------------------------
+' Procedure : vtkXMLExportButtonClicked
+' Author    : Lucas Vitorino
+' Purpose   : Handler of the XML button clicked() event.
+'
+' Notes     : Not unit tested yet.
+'---------------------------------------------------------------------------------------
+'
 Private Sub vtkXMLExportButtonClicked()
     Dim fso As New FileSystemObject
 
