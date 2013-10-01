@@ -69,7 +69,7 @@ Private Sub ITestCase_SetUp(Assert As IAssert)
 
     testFilePath = VBAToolKit.vtkTestPath & "\" & testFileName
 
-    Set retDom = vtkExportAsXMLDOM(testWorkbook, testProjectName)
+    Set retDom = vtkExportAsXMLDOM(testProjectName)
     
 End Sub
 
@@ -92,14 +92,10 @@ End Sub
 '   rootNode -> correct name
 '   info -> 1 info object
 '   info -> correct content
-'   references -> correct number of references
-'   references -> correct content
 '   conf -> correct number of configurations
 '   conf -> correct content
 '   modules -> correct number of modules
 '   modules -> correct content
-'   dummy workbook -> raise VTK_WORKBOOK_NOT_INITIALIZED
-'   closed workbook -> raise error VTK_WORKBOOK_NOT_OPEN
 '   dummy project name -> raise VTK_PROJECT_NOT_INITIALIZED
 '
 ' WriteDom
@@ -164,14 +160,12 @@ Public Sub Test_vtkExportAsXMLDom_correctNameForRoot()
     On Error GoTo Test_vtkExportAsXMLDom_correctNameForRoot_Error
 
     Dim expected As String
-    Dim result As String
+    Dim actual As String
     expected = "vtkConf"
-    result = retDom.ChildNodes.Item(1).BaseName
+    actual = retDom.ChildNodes.Item(1).BaseName
 
-    mAssert.Should StrComp(expected, result) = 0, _
-                    "The root node has an incorrect name." & vbNewLine & _
-                    "Expected : " & expected & vbNewLine & _
-                    "Result   : " & result
+    mAssert.Equals expected, actual, "The root node has an incorrect name."
+
 
     On Error GoTo 0
     Exit Sub
@@ -221,84 +215,6 @@ Test_vtkExportAsXMLDom_correctDomContent_Error:
 End Sub
 
 
-Public Sub Test_vtkExportAsXMLDom_correctReferenceNumber()
-'   references -> correct number of references
-
-    On Error GoTo Test_vtkExportAsXMLDom_correctReferenceNumber_Error
-    
-    Dim numRef As Integer
-    numRef = testWorkbook.VBProject.References.count
-
-    mAssert.Equals countElementsInDom("reference", retDom), numRef, "DOM should have " & numRef & " reference objects."
-
-    On Error GoTo 0
-    Exit Sub
-
-Test_vtkExportAsXMLDom_correctReferenceNumber_Error:
-    Err.source = "Test_vtkExportAsXMLDom_correctReferenceNumber of module vtkXMLExportTester"
-    mAssert.Should False, "Unexpected error " & Err.number & " (" & Err.Description & ") in " & Err.source
-    ITestCase_TearDown
-    Exit Sub
-End Sub
-
-Public Sub Test_vtkExportAsXMLDom_correctReferenceContent()
-'   references -> correct value of the references object
-    
-    On Error GoTo Test_vtkExportAsXMLDom_correctReferenceContent_Error
-    
-    Dim i As Integer
-    Dim expected As String
-    Dim result As String
-    
-    For i = 1 To testWorkbook.VBProject.References.count
-              
-        ' Testing the name of the first child node (name)
-        expected = "name"
-        result = retDom.getElementsByTagName("reference").Item(i - 1).ChildNodes.Item(0).BaseName
-        mAssert.Should StrComp(expected, result) = 0, _
-                        "First child node of the reference in the XML DOM has an incorrect name." & vbNewLine & _
-                        "Expected   : " & expected & vbNewLine & _
-                        "Result     : " & result
-        
-        ' Testing the content of the first child node (name)
-        expected = testWorkbook.VBProject.References(i).name
-        result = retDom.getElementsByTagName("reference").Item(i - 1).ChildNodes.Item(0).Text
-        mAssert.Should StrComp(expected, result) = 0, _
-                        "First child node of the reference in the XML DOM has an incorrect value." & vbNewLine & _
-                        "Expected   : " & expected & vbNewLine & _
-                        "Result     : " & result
-        
-        ' Testing the name of the second child node (GUID or path)
-        expected = "GUID"
-        If testWorkbook.VBProject.References(i).GUID = "" Then expected = "path"
-        result = retDom.getElementsByTagName("reference").Item(i - 1).ChildNodes.Item(1).BaseName
-        mAssert.Should StrComp(expected, result) = 0, _
-                        "Second child node of the reference in the XML DOM has an incorrect name." & vbNewLine & _
-                        "Expected   : " & expected & vbNewLine & _
-                        "Result     : " & result
-        
-        ' Testing the content of the second child node (GUID or path)
-        expected = testWorkbook.VBProject.References(i).GUID
-        If testWorkbook.VBProject.References(i).GUID = "" Then expected = testWorkbook.VBProject.References(i).fullPath
-        result = retDom.getElementsByTagName("reference").Item(i - 1).ChildNodes.Item(1).Text
-        mAssert.Should StrComp(expected, result) = 0, _
-                        "Reference in the XML DOM has an incorrect GUID or Path." & vbNewLine & _
-                        "Expected   : " & expected & vbNewLine & _
-                        "Result     : " & result
-
-    Next
-
-    On Error GoTo 0
-    Exit Sub
-
-Test_vtkExportAsXMLDom_correctReferenceContent_Error:
-    Err.source = "Test_vtkExportAsXMLDom_correctReferenceContent of module vtkXMLExportTester"
-    mAssert.Should False, "Unexpected error " & Err.number & " (" & Err.Description & ") in " & Err.source
-    ITestCase_TearDown
-    Exit Sub
-End Sub
-
-
 Public Sub Test_vtkExportAsXMLDom_correctConfigurationNumber()
 '   configurations -> correct number of configurations
     
@@ -319,6 +235,7 @@ Test_vtkExportAsXMLDom_correctConfigurationNumber_Error:
     Exit Sub
 End Sub
 
+
 Public Sub Text_vtkExportAsDom_correctConfigurationContent()
 '   configurations -> correct content
 
@@ -330,43 +247,31 @@ Public Sub Text_vtkExportAsDom_correctConfigurationContent()
     
     Dim i As Integer
     Dim expected As String
-    Dim result As String
+    Dim actual As String
     
     Dim conf As vtkConfiguration
     For Each conf In cm.configurations
         
         ' Testing the name of the first child node (name)
         expected = "name"
-        result = retDom.getElementsByTagName("configuration").Item(i - 1).ChildNodes.Item(0).BaseName
-        mAssert.Should StrComp(expected, result) = 0, _
-                        "First child node of the reference in the XML DOM has an incorrect name." & vbNewLine & _
-                        "Expected   : " & expected & vbNewLine & _
-                        "Result     : " & result
-        
+        actual = retDom.getElementsByTagName("configuration").Item(conf.number - 1).ChildNodes.Item(0).BaseName
+        mAssert.Equals expected, actual, "First child node of the reference in the XML DOM has an incorrect name."
+
         ' Testing the content of the first child node (name)
         expected = conf.name
-        result = retDom.getElementsByTagName("configuration").Item(i - 1).ChildNodes.Item(0).Text
-        mAssert.Should StrComp(expected, result) = 0, _
-                        "First child node of the reference in the XML DOM has an incorrect value." & vbNewLine & _
-                        "Expected   : " & expected & vbNewLine & _
-                        "Result     : " & result
+        actual = retDom.getElementsByTagName("configuration").Item(conf.number - 1).ChildNodes.Item(0).Text
+        mAssert.Equals expected, actual, "First child node of the reference in the XML DOM has an incorrect value."
         
         ' Testing the name of the second child node (path)
         expected = "path"
-        result = retDom.getElementsByTagName("configuration").Item(i - 1).ChildNodes.Item(1).BaseName
-        mAssert.Should StrComp(expected, result) = 0, _
-                        "Second child node of the reference in the XML DOM has an incorrect name." & vbNewLine & _
-                        "Expected   : " & expected & vbNewLine & _
-                        "Result     : " & result
+        actual = retDom.getElementsByTagName("configuration").Item(conf.number - 1).ChildNodes.Item(1).BaseName
+        mAssert.Equals expected, actual, "Second child node of the reference in the XML DOM has an incorrect name."
         
         ' Testing the content of the second child node (path)
         expected = conf.path
-        If testWorkbook.VBProject.References(i).GUID = "" Then expected = testWorkbook.VBProject.References(i).fullPath
-        result = retDom.getElementsByTagName("configuration").Item(i - 1).ChildNodes.Item(1).Text
-        mAssert.Should StrComp(expected, result) = 0, _
-                        "Reference in the XML DOM has an incorrect GUID or Path." & vbNewLine & _
-                        "Expected   : " & expected & vbNewLine & _
-                        "Result     : " & result
+        If testWorkbook.VBProject.References(conf.number).GUID = "" Then expected = testWorkbook.VBProject.References(conf.number).fullPath
+        actual = retDom.getElementsByTagName("configuration").Item(conf.number - 1).ChildNodes.Item(1).Text
+        mAssert.Equals expected, actual, "Reference in the XML DOM has an incorrect GUID or Path."
 
     Next
 
@@ -409,27 +314,20 @@ Public Sub Test_vtkExportAsDom_correctModuleContent()
     
     Dim i As Integer
     Dim expected As String
-    Dim result As String
+    Dim actual As String
     
     Dim mo As vtkModule
     For Each mo In cm.modules
         
         ' Testing the name of the first child node (name)
         expected = "name"
-        result = retDom.getElementsByTagName("module").Item(mo.number - 1).ChildNodes.Item(0).BaseName
-
-        mAssert.Should StrComp(expected, result) = 0, _
-                        "First child node of the reference in the XML DOM has an incorrect name." & vbNewLine & _
-                        "Expected   : " & expected & vbNewLine & _
-                        "Result     : " & result
-        
+        actual = retDom.getElementsByTagName("module").Item(mo.number - 1).ChildNodes.Item(0).BaseName
+        mAssert.Equals expected, actual, "First child node of the reference in the XML DOM has an incorrect name."
+       
         ' Testing the content of the first child node (name)
         expected = mo.name
-        result = retDom.getElementsByTagName("module").Item(mo.number - 1).ChildNodes.Item(0).Text
-        mAssert.Should StrComp(expected, result) = 0, _
-                        "First child node of the reference in the XML DOM has an incorrect value." & vbNewLine & _
-                        "Expected   : " & expected & vbNewLine & _
-                        "Result     : " & result
+        actual = retDom.getElementsByTagName("module").Item(mo.number - 1).ChildNodes.Item(0).Text
+        mAssert.Equals expected, actual, "First child node of the reference in the XML DOM has an incorrect value."
         
         ' Testing the "path" nodes - one for each configuration
         Dim conf As vtkConfiguration
@@ -437,36 +335,24 @@ Public Sub Test_vtkExportAsDom_correctModuleContent()
         
             ' Testing the name of the node
             expected = "path"
-            result = retDom.getElementsByTagName("module").Item(mo.number - 1).ChildNodes.Item(conf.number).BaseName
-            mAssert.Should StrComp(expected, result) = 0, _
-                            "Child node #" & conf.number & " of the reference in the XML DOM has an incorrect name." & vbNewLine & _
-                            "Expected   : " & expected & vbNewLine & _
-                            "Result     : " & result
+            actual = retDom.getElementsByTagName("module").Item(mo.number - 1).ChildNodes.Item(conf.number).BaseName
+            mAssert.Equals expected, actual, "Child node #" & conf.number & " of the reference in the XML DOM has an incorrect name."
 
             ' Testing the name of the attribute of the node
             expected = "confName"
-            result = retDom.getElementsByTagName("module").Item(mo.number - 1).ChildNodes.Item(conf.number).Attributes(0).BaseName
-            mAssert.Should StrComp(expected, result) = 0, _
-                            "Child node #" & conf.number & "  of the reference in the XML DOM has an incorrect attribute name." & vbNewLine & _
-                            "Expected   : " & expected & vbNewLine & _
-                            "Result     : " & result
+            actual = retDom.getElementsByTagName("module").Item(mo.number - 1).ChildNodes.Item(conf.number).Attributes(0).BaseName
+            mAssert.Equals expected, actual, "Child node #" & conf.number & " of the reference in the XML DOM has an incorrect attribute name."
             
             ' Testing the content of the attribute of the node
             expected = conf.name
-            result = retDom.getElementsByTagName("module").Item(mo.number - 1).ChildNodes.Item(conf.number).Attributes(0).Text
-            mAssert.Should StrComp(expected, result) = 0, _
-                            "Child node #" & conf.number & "  the reference in the XML DOM has an incorrect attribute value." & vbNewLine & _
-                            "Expected   : " & expected & vbNewLine & _
-                            "Result     : " & result
-                            
+            actual = retDom.getElementsByTagName("module").Item(mo.number - 1).ChildNodes.Item(conf.number).Attributes(0).Text
+            mAssert.Equals expected, actual, "Child node #" & conf.number & "  the reference in the XML DOM has an incorrect attribute value."
+
             ' Testing the content of the node
             expected = mo.getPathForConfiguration(conf.name)
-            result = retDom.getElementsByTagName("module").Item(mo.number - 1).ChildNodes.Item(conf.number).Text
-            mAssert.Should StrComp(expected, result) = 0, _
-                            "Child node #" & conf.number & "  has an incorrect content." & vbNewLine & _
-                            "Expected   : " & expected & vbNewLine & _
-                            "Result     : " & result
-                            
+            actual = retDom.getElementsByTagName("module").Item(mo.number - 1).ChildNodes.Item(conf.number).Text
+            mAssert.Equals expected, actual, "Child node #" & conf.number & "  has an incorrect content."
+
         Next
 
     Next
@@ -481,47 +367,6 @@ Text_vtkExportAsDom_correctModuleContent_Error:
     Exit Sub
 End Sub
 
-Public Sub Test_vtkExportAsDom_dummyWorkbook()
-'   dummy workbook -> raise VTK_WORKBOOK_NOT_INITIALIZED
-
-    On Error GoTo Test_vtkExportAsDom_dummyWorkbook_Error
-
-    Dim dummyWorkbook As Workbook
-    Dim error As Integer: error = 0
-
-    Set retDom = vtkExportAsXMLDOM(dummyWorkbook, testProjectName)
-
-    mAssert.Equals error, VTK_WORKBOOK_NOT_INITIALIZED, "Workbook is not initialized : VTK_WORKBOOK_NOT_INITIALIZED should be raised."
-
-    On Error GoTo 0
-    Exit Sub
-
-Test_vtkExportAsDom_dummyWorkbook_Error:
-    error = Err.number
-    Resume Next
-End Sub
-
-
-Public Sub Test_vtkExportAsXMLDom_closedWorkbook()
-'   dummy workbook -> raise VTK_WORKBOOK_NOT_OPEN
-
-    On Error GoTo Test_vtkExportAsXMLDom_closedWorkbook_Error
-
-    Dim error As Integer: error = 0
-    
-    testWorkbook.Close
-
-    Set retDom = vtkExportAsXMLDOM(testWorkbook, testProjectName)
-
-    mAssert.Equals error, VTK_WORKBOOK_NOT_OPEN, "Workbook is not open : VTK_WORKBOOK_NOT_OPEN should be raised."
-
-    On Error GoTo 0
-    Exit Sub
-
-Test_vtkExportAsXMLDom_closedWorkbook_Error:
-    error = Err.number
-    Resume Next
-End Sub
 
 Public Sub Test_vtkExportAsXMLDom_dummyProject()
 '   dummy project name -> raise VTK_PROJECT_NOT_INITIALIZED
@@ -532,7 +377,7 @@ Public Sub Test_vtkExportAsXMLDom_dummyProject()
     Dim dummyProjectName As String
     dummyProjectName = "dummyProject"
     
-    Set retDom = vtkExportAsXMLDOM(testWorkbook, dummyProjectName)
+    Set retDom = vtkExportAsXMLDOM(dummyProjectName)
     
     mAssert.Equals error, VTK_PROJECT_NOT_INITIALIZED, "Project is empty : VTK_PROJECT_NOT_INITIALIZED should be raised."
 
@@ -669,6 +514,7 @@ Test_vtkWriteXMLDomToFile_fileContentIsValidDom_Error:
     ITestCase_TearDown
     Exit Sub
 End Sub
+
 
 Private Function ITest_Suite() As TestSuite
     Set ITest_Suite = New TestSuite

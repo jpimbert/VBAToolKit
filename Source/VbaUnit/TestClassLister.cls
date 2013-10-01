@@ -55,7 +55,7 @@ Public Function SelectTestClass(TestClassName As String) As ITest
         Case "vtkConfigurationTester": Set SelectTestClass = New vtkConfigurationTester
         Case "vtkModuleTester": Set SelectTestClass = New vtkModuleTester
         Case "vtkExportConfigurationTester": Set SelectTestClass = New vtkExportConfigurationTester
-        Case "aavtkXMLExportTester": Set SelectTestClass = New aavtkXMLExportTester
+        Case "vtkXMLExportTester": Set SelectTestClass = New vtkXMLExportTester
         Case Else:
     End Select
 End Function
