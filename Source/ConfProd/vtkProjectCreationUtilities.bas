@@ -80,7 +80,7 @@ End Sub
 '---------------------------------------------------------------------------------------
 '
 Public Sub vtkDisplayActivatedReferencesGuid()
-    Dim r As VBIDE.Reference
+    Dim r As VBIDE.reference
     For Each r In ActiveWorkbook.VBProject.References
         Debug.Print r.name, r.GUID
     Next
@@ -96,6 +96,8 @@ End Sub
 '                 - the project of the current workbook
 '                 - a project name that is the name of the worbook without "_DEV.xlsm"
 '                 - a confname that is the name of the workbook without ".xslm"
+'             - The handler will export the vtkConfigurations sheet as an XML file in the
+'               same folder that the workbook.
 '             - It works on any workbook, but shouldn't be used on something else than
 '               a proper _DEV workbook of a VTKProject. Most probably, when saving the workbook,
 '               an error will occur.
