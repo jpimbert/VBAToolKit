@@ -9,12 +9,12 @@ Attribute VB_PredeclaredId = False
 Attribute VB_Exposed = False
 Option Explicit
 
-Public Function CountOfLines(Module As codemodule) As Long
-    CountOfLines = Module.CountOfLines
+Public Function CountOfLines(module As CodeModule) As Long
+    CountOfLines = module.CountOfLines
 End Function
 
-Public Function Lines(Module As codemodule, StartLine As Long, Count As Long) As String
-    Lines = Module.Lines(StartLine, Count)
+Public Function Lines(module As CodeModule, StartLine As Long, count As Long) As String
+    Lines = module.Lines(StartLine, count)
 End Function
 
 Public Function SuiteMethodBody(TestMethodNames As Collection) As String
@@ -42,101 +42,101 @@ Public Function EndFunction() As String
 End Function
 
 Public Function GetMethodBody(ClassName As String, methodName As String) As String
-    Dim Module As codemodule, StartLine As Long, LineCount As Long, BodyLine As Long
-    Set Module = GetCodeModule(ClassName)
-    If Module Is Nothing Then Exit Function
+    Dim module As CodeModule, StartLine As Long, LineCount As Long, BodyLine As Long
+    Set module = GetCodeModule(ClassName)
+    If module Is Nothing Then Exit Function
     'On Error GoTo NO_METHOD
-    StartLine = BodyStartLine(Module, methodName)
-    LineCount = BodyLineCount(Module, methodName)
+    StartLine = BodyStartLine(module, methodName)
+    LineCount = BodyLineCount(module, methodName)
     If StartLine = 0 Or LineCount = 0 Then Exit Function
-    GetMethodBody = Module.Lines(StartLine, LineCount)
+    GetMethodBody = module.Lines(StartLine, LineCount)
 'NO_METHOD:
 '    Exit Function
 End Function
 
-Private Function BodyStartLine(Module As codemodule, methodName As String) As Long
+Private Function BodyStartLine(module As CodeModule, methodName As String) As Long
     Dim BodyLine As Long, NumFuncLines As Long
     NumFuncLines = 1
-    If Module Is Nothing Then Exit Function
+    If module Is Nothing Then Exit Function
     On Error GoTo NO_METHOD
-    BodyLine = Module.ProcBodyLine(methodName, vbext_pk_Proc)
+    BodyLine = module.ProcBodyLine(methodName, vbext_pk_Proc)
     BodyStartLine = BodyLine + NumFuncLines
 NO_METHOD:
     Exit Function
 End Function
 
-Public Function BodyLineCount(Module As codemodule, methodName As String) As Long
+Public Function BodyLineCount(module As CodeModule, methodName As String) As Long
     Dim StartLine As Long, LineCount As Long, BodyLine As Long, NumFuncLines As Long, NumEndFuncLines As Long, BStartLine As Long
     NumFuncLines = 1
     NumEndFuncLines = 1
-    If Module Is Nothing Then Exit Function
+    If module Is Nothing Then Exit Function
     On Error GoTo NO_METHOD
-    StartLine = Module.ProcStartLine(methodName, vbext_pk_Proc)
-    LineCount = Module.ProcCountLines(methodName, vbext_pk_Proc)
-    Do While Module.Lines(StartLine + LineCount - NumEndFuncLines, 1) = ""
+    StartLine = module.ProcStartLine(methodName, vbext_pk_Proc)
+    LineCount = module.ProcCountLines(methodName, vbext_pk_Proc)
+    Do While module.Lines(StartLine + LineCount - NumEndFuncLines, 1) = ""
         NumEndFuncLines = NumEndFuncLines + 1
     Loop
-    BodyLine = Module.ProcBodyLine(methodName, vbext_pk_Proc)
+    BodyLine = module.ProcBodyLine(methodName, vbext_pk_Proc)
     BodyLineCount = LineCount - (BodyLine - StartLine) - NumFuncLines - NumEndFuncLines
-    BStartLine = BodyStartLine(Module, methodName)
+    BStartLine = BodyStartLine(module, methodName)
 NO_METHOD:
     Exit Function
 End Function
 
 
-Public Function GetCodeModule(ClassName) As codemodule
+Public Function GetCodeModule(ClassName) As CodeModule
     Dim Components As VBComponents, Component As VBComponent
     Set Components = Application.VBE.ActiveVBProject.VBComponents
     For Each Component In Components
         If Component.name = ClassName Then
-            Set GetCodeModule = Component.codemodule
+            Set GetCodeModule = Component.CodeModule
             Exit Function
         End If
     Next
 End Function
 
 Public Sub ReplaceMethodBody(ClassName As String, methodName As String, NewMethodBody As String)
-    Dim Module As codemodule, LineStart As Long, LineCount As Long, BodyLine As Long
-    Set Module = GetCodeModule(ClassName)
-    If Module Is Nothing Then Exit Sub
+    Dim module As CodeModule, LineStart As Long, LineCount As Long, BodyLine As Long
+    Set module = GetCodeModule(ClassName)
+    If module Is Nothing Then Exit Sub
     'On Error GoTo NO_METHOD
-    DeleteMethodBody Module, methodName
-    InsertMethodBody Module, methodName, NewMethodBody
+    DeleteMethodBody module, methodName
+    InsertMethodBody module, methodName, NewMethodBody
 NO_METHOD:
     Exit Sub
 End Sub
 
-Public Sub DeleteMethodBody(Module As codemodule, methodName As String)
+Public Sub DeleteMethodBody(module As CodeModule, methodName As String)
     Dim StartLine As Long, LineCount As Long
-    If Module Is Nothing Then Exit Sub
+    If module Is Nothing Then Exit Sub
     'On Error GoTo NO_METHOD
-    StartLine = BodyStartLine(Module, methodName)
-    LineCount = BodyLineCount(Module, methodName)
+    StartLine = BodyStartLine(module, methodName)
+    LineCount = BodyLineCount(module, methodName)
     If StartLine = 0 Or LineCount = 0 Then Exit Sub
-    Module.DeleteLines StartLine, LineCount
+    module.DeleteLines StartLine, LineCount
 'NO_METHOD:
 '    Exit Sub
 End Sub
 
-Private Sub InsertMethodBody(Module As codemodule, methodName As String, MethodBody As String)
+Private Sub InsertMethodBody(module As CodeModule, methodName As String, MethodBody As String)
     Dim StartLine As Long
-    If Module Is Nothing Then Exit Sub
+    If module Is Nothing Then Exit Sub
     'On Error GoTo NO_METHOD
-    StartLine = BodyStartLine(Module, methodName)
+    StartLine = BodyStartLine(module, methodName)
     If StartLine = 0 Then Exit Sub
-    Module.InsertLines StartLine, MethodBody
+    module.InsertLines StartLine, MethodBody
 'NO_METHOD:
 '    Exit Sub
 End Sub
 
 Public Function GetTestMethods(ClassName As String) As Collection
-    Dim Module As codemodule, LineNum As Long
+    Dim module As CodeModule, LineNum As Long
     Set GetTestMethods = New Collection
-    Set Module = GetCodeModule(ClassName)
-    If Module Is Nothing Then Exit Function
-    For LineNum = 1 To Module.CountOfLines
-        If IsTestMethodLine(Module.Lines(LineNum, 1)) Then
-            GetTestMethods.Add Module.ProcOfLine(LineNum, vbext_pk_Set)
+    Set module = GetCodeModule(ClassName)
+    If module Is Nothing Then Exit Function
+    For LineNum = 1 To module.CountOfLines
+        If IsTestMethodLine(module.Lines(LineNum, 1)) Then
+            GetTestMethods.Add module.ProcOfLine(LineNum, vbext_pk_Set)
         End If
     Next
 End Function

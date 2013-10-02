@@ -29,9 +29,9 @@ Option Explicit
 '---------------------------------------------------------------------------------------
 '
 Public Function vtkCreateExcelWorkbook() As Workbook
-    Dim Wb As Workbook
-    Set Wb = Workbooks.Add(xlWBATWorksheet)
-    Set vtkCreateExcelWorkbook = Wb
+    Dim wb As Workbook
+    Set wb = Workbooks.Add(xlWBATWorksheet)
+    Set vtkCreateExcelWorkbook = wb
 End Function
 
 '---------------------------------------------------------------------------------------
@@ -42,10 +42,10 @@ End Function
 '---------------------------------------------------------------------------------------
 '
 Public Function vtkCreateExcelWorkbookForTestWithProjectName(projectName As String) As Workbook
-    Dim Wb As Workbook
-    Set Wb = vtkCreateExcelWorkbookWithPathAndName(vtkPathToTestFolder, vtkProjectForName(projectName).workbookDEVName)
-    Wb.VBProject.name = projectName
-    Set vtkCreateExcelWorkbookForTestWithProjectName = Wb
+    Dim wb As Workbook
+    Set wb = vtkCreateExcelWorkbookWithPathAndName(vtkPathToTestFolder, vtkProjectForName(projectName).workbookDEVName)
+    wb.VBProject.name = projectName
+    Set vtkCreateExcelWorkbookForTestWithProjectName = wb
 End Function
 
 '---------------------------------------------------------------------------------------
@@ -56,10 +56,10 @@ End Function
 '---------------------------------------------------------------------------------------
 '
 Public Function vtkCreateExcelWorkbookWithPathAndName(path As String, name As String) As Workbook
-    Dim Wb As Workbook
-    Set Wb = vtkCreateExcelWorkbook
-    Wb.SaveAs fileName:=path & "\" & name, FileFormat:=xlOpenXMLWorkbookMacroEnabled
-    Set vtkCreateExcelWorkbookWithPathAndName = Wb
+    Dim wb As Workbook
+    Set wb = vtkCreateExcelWorkbook
+    wb.SaveAs fileName:=path & "\" & name, FileFormat:=xlOpenXMLWorkbookMacroEnabled
+    Set vtkCreateExcelWorkbookWithPathAndName = wb
 End Function
 
 '---------------------------------------------------------------------------------------
@@ -69,10 +69,10 @@ End Function
 ' Purpose   : Close the given workbook then kill the Excel File
 '---------------------------------------------------------------------------------------
 '
-Public Sub vtkCloseAndKillWorkbook(Wb As Workbook)
+Public Sub vtkCloseAndKillWorkbook(wb As Workbook)
     Dim fullPath As String
-    fullPath = Wb.FullName
-    Wb.Close savechanges:=False
+    fullPath = wb.FullName
+    wb.Close savechanges:=False
     Kill PathName:=fullPath
 End Sub
 

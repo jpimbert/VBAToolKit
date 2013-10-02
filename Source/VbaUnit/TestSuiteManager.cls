@@ -13,15 +13,15 @@ Implements ITestManager
 Private mClassName
 
 Private Function ITestManager_CountTestCases(test As ITest) As Long
-    Dim Count As Long
+    Dim count As Long
     Dim TestSuite As TestSuite, Tests As Collection
     Dim SubTest As ITest
     Set TestSuite = test
     Set Tests = TestSuite.Tests()
     For Each SubTest In Tests
-        Count = Count + SubTest.Manager.CountTestCases(SubTest)
+        count = count + SubTest.Manager.CountTestCases(SubTest)
     Next
-    ITestManager_CountTestCases = Count
+    ITestManager_CountTestCases = count
 End Function
 
 Private Property Let ITestManager_ClassName(RHS As String)

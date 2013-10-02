@@ -47,7 +47,7 @@ Public Function vtkProjectForName(projectName As String) As vtkProject
     Dim cm As vtkProject
     On Error Resume Next
     Set cm = projects(projectName)
-    If err <> 0 Then
+    If Err <> 0 Then
         Set cm = New vtkProject
         cm.projectName = projectName
         projects.Add Item:=cm, Key:=projectName

@@ -28,6 +28,7 @@ Option Explicit
 '   collection of instances indexed by project names
 Private configurationManagers As Collection
 
+
 '---------------------------------------------------------------------------------------
 ' Procedure : vtkConfigurationManagerForProject
 ' Author    : Jean-Pierre Imbert
@@ -46,7 +47,7 @@ Public Function vtkConfigurationManagerForProject(projectName As String) As vtkC
     Dim cm As vtkConfigurationManager
     On Error Resume Next
     Set cm = configurationManagers(projectName)
-    If err <> 0 Then
+    If Err <> 0 Then
         Set cm = New vtkConfigurationManager
         cm.projectName = projectName
         If cm.projectName Like projectName Then     ' The initialization could fail (if the Workbook is closed)
@@ -110,10 +111,10 @@ Public Sub vtkInitializeConfigurationForActiveWorkBook()
     cn_prod = cm.getConfigurationNumber(configuration:=project.projectName)
     
     ' List all modules
-    For i = 1 To ActiveWorkbook.VBProject.VBComponents.Count
+    For i = 1 To ActiveWorkbook.VBProject.VBComponents.count
         Set c = ActiveWorkbook.VBProject.VBComponents.Item(i)
         If c.Type <> vbext_ct_Document Then
-            nm = cm.AddModule(c.name)
+            nm = cm.addModule(c.name)
             cm.setModulePathWithNumber path:=vtkStandardPathForModule(module:=c), numModule:=nm, numConfiguration:=cn_dev
             If vtkStandardCategoryForModuleName(moduleName:=c.name) Like "Prod" Then
                 cm.setModulePathWithNumber path:=vtkStandardPathForModule(module:=c), numModule:=nm, numConfiguration:=cn_prod
@@ -122,6 +123,6 @@ Public Sub vtkInitializeConfigurationForActiveWorkBook()
     Next
     
     ' Save the new workbook
-    ActiveWorkbook.save
+    ActiveWorkbook.Save
     
 End Sub

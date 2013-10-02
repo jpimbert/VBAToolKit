@@ -146,9 +146,9 @@ Select Case ShellWindowState
 End Select
 
 On Error Resume Next
-err.Clear
+Err.Clear
 TaskID = Shell(ShellCommand, ShellWindowState)
-If (err.Number <> 0) Or (TaskID = 0) Then
+If (Err.number <> 0) Or (TaskID = 0) Then
     ShellAndWait = ShellAndWaitResult.Failure
     Exit Function
 End If
@@ -212,14 +212,14 @@ Exit Function
 
 ErrH:
 Debug.Print "ErrH: Cancel: " & Application.EnableCancelKey
-If err.Number = ERR_BREAK_KEY Then
+If Err.number = ERR_BREAK_KEY Then
     If BreakKey = ActionOnBreak.AbandonWait Then
         CloseHandle ProcHandle
         ShellAndWait = ShellAndWaitResult.UserWaitAbandoned
         Application.EnableCancelKey = SaveCancelKey
         Exit Function
     ElseIf BreakKey = ActionOnBreak.IgnoreBreak Then
-        err.Clear
+        Err.Clear
         Resume
     ElseIf BreakKey = ActionOnBreak.PromptUser Then
         MsgRes = MsgBox("User Process Break." & vbCrLf & _
@@ -229,7 +229,7 @@ If err.Number = ERR_BREAK_KEY Then
             ShellAndWait = ShellAndWaitResult.UserBreak
             Application.EnableCancelKey = SaveCancelKey
         Else
-            err.Clear
+            Err.Clear
             Resume Next
         End If
     Else

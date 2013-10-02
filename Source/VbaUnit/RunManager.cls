@@ -17,7 +17,7 @@ Private mAssertAsResultUser As IResultUser
 Private Sub Class_Initialize()
     Set mAssert = New Assert
     Set mAssertAsResultUser = mAssert
-    Set mAssertAsResultUser.Result = New TestResult
+    Set mAssertAsResultUser.result = New TestResult
 End Sub
 
 Private Property Get IRunManager_Assert() As IAssert
@@ -26,11 +26,11 @@ End Property
 
 Private Sub IRunManager_Report()
     Dim Failure As TestFailure, RM As IRunManager, test As ITest, TestCase As ITestCase
-    If Result.WasSuccessful Then
-        Debug.Print "OK (" & Result.TestCasesRun & ")"
+    If result.WasSuccessful Then
+        Debug.Print "OK (" & result.TestCasesRun & ")"
     Else
-        Debug.Print "Tests run: " & Result.TestCasesRun & " Failures: " & Result.Failures.Count
-        For Each Failure In Result.Failures
+        Debug.Print "Tests run: " & result.TestCasesRun & " Failures: " & result.Failures.count
+        For Each Failure In result.Failures
             Set TestCase = Failure.TestCase
             Set test = TestCase
             Debug.Print test.Manager.ClassName & "." & TestCase.Manager.methodName & ": " & Failure.Comment
@@ -39,9 +39,9 @@ Private Sub IRunManager_Report()
 End Sub
 
 Private Property Get IRunManager_Result() As TestResult
-    Set IRunManager_Result = Result
+    Set IRunManager_Result = result
 End Property
 
-Public Property Get Result() As TestResult
-    Set Result = mAssertAsResultUser.Result
+Public Property Get result() As TestResult
+    Set result = mAssertAsResultUser.result
 End Property

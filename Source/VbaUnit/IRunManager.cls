@@ -11,5 +11,5 @@ Option Explicit
 
 ' assert and result
 Public Property Get Assert() As IAssert
-Public Property Get Result() As TestResult
+Public Property Get result() As TestResult
 Public Sub Report()

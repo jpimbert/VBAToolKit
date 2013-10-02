@@ -248,19 +248,22 @@ End Sub
 ' TODO :    - Replace Filepath functions with new ones in FileSystemUtilities
 '---------------------------------------------------------------------------------------
 '
-Public Sub vtkExportOneModule(project As VBProject, moduleName As String, filePath As String)
-    Dim fso As New FileSystemObject, m As VBComponent
+Public Sub vtkExportOneModule(project As VBProject, moduleName As String, filePath As String, Optional normalize As Boolean = True)
+    Dim fso As New FileSystemObject, M As VBComponent
     
    On Error GoTo vtkExportOneModule_Error
    
     ' Get the module to export
-    Set m = project.VBComponents(moduleName)
+    Set M = project.VBComponents(moduleName)
         
     ' Kill file if it already exists only AFTER get the module, if it not exists the file must not be deleted
     If fso.fileExists(filePath) Then fso.DeleteFile fileSpec:=filePath
     
     ' Export module
-    m.Export fileName:=filePath
+    M.Export fileName:=filePath
+    
+    ' Normalize tokens in file
+    If normalize Then vtkNormalizeFile filePath, vtkListOfProperlyCasedIdentifiers
     
    On Error GoTo 0
     Exit Sub

@@ -106,23 +106,21 @@ End Function
 ' Author    : Lucas Vitorino
 ' Purpose   : - Returns a String containing the name of the file, that is to say without the first extension.
 '             - Works with a path too.
-' Examples  : "dummy.dummy" -> "dummy"
+' Examples  : "dummy.ext" -> "dummy"
 '             "dummy" -> "dummy"
-'             "dummy\dummy" -> "dummy"
-'             "dummy\dummy.dummy" -> "dummy"
-'             "dummy.dummy.dummy" -> "dummy.dummy"
+'             "folder\dummy" -> "dummy"
+'             "folder\dummy.ext" -> "dummy"
+'             "dummy.ext1.ext2" -> "dummy.ext1"
 '---------------------------------------------------------------------------------------
 '
 Public Function vtkStripFilePathOrNameOfExtension(fileNameOrPath As String) As String
 
     On Error GoTo vtkStripFilePathOrNameOfExtension_Error
 
-    Dim backslashPosition As Integer
-    backslashPosition = InStrRev(fileNameOrPath, "\")
-    
     ' Get the filename in the path
+    Dim fso As New FileSystemObject
     Dim substring As String
-    substring = Mid(fileNameOrPath, backslashPosition + 1)
+    substring = fso.GetFileName(fileNameOrPath)
     
     ' Remove the part after the last dot
     Dim dotPosition As Integer
@@ -148,12 +146,12 @@ End Function
 ' Purpose   : - Returns the vtkProjectName associated with a workbook path or name or a configuration name.
 '
 ' Examples  : "Dummy_DEV", "DEV" -> "Dummy"
-'             "Dummy_DEV.dummy", "DEV" -> "Dummy"
-'             "Dummy.dummy" -> "Dummy"
-'             "dummy\Dummy_DEV.dummy", "DEV" -> "Dummy"
+'             "Dummy_DEV.ext", "DEV" -> "Dummy"
+'             "Dummy.ext" -> "Dummy"
+'             "folder\Dummy_DEV.ext", "DEV" -> "Dummy"
 '             "Dummy_DEV", "DEEV" -> "Dummy_DEV"
-'             "Dummy_Dummy_DEV", "DEV", -> "Dummy_Dummy"
-'             "Dummy_Dummy"_DEV", "Dummy" -> "Dummy_Dummy_DEV"
+'             "Dummy_foo_DEV", "DEV", -> "Dummy_foo"
+'             "Dummy_foo_DEV", "foo" -> "Dummy_foo_DEV"
 '---------------------------------------------------------------------------------------
 '
 Public Function vtkStripPathOrNameOfVtkExtension(projectNameOrPath As String, extension As String) As String

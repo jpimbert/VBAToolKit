@@ -53,8 +53,8 @@ On Error GoTo vtkTextFileReader_Error
    Exit Function
 
 vtkTextFileReader_Error:
-    MsgBox "Error " & err.Number & " (" & err.Description & ") in procedure VtkTextFileReader of Module vtkGitFunctions"
-    vtkTextFileReader = err.Number
+    MsgBox "Error " & Err.number & " (" & Err.Description & ") in procedure VtkTextFileReader of Module vtkGitFunctions"
+    vtkTextFileReader = Err.number
     
 End Function
 
@@ -97,8 +97,8 @@ Public Function vtkCleanFolder(folderPath As String) As Integer
     Exit Function
     
 vtkCleanFolder_Error:
-    If err.Number = 76 Then
-        vtkCleanFolder = err.Number
+    If Err.number = 76 Then
+        vtkCleanFolder = Err.number
     Else
         vtkCleanFolder = VTK_UNEXPECTED_ERROR
     End If
@@ -134,8 +134,8 @@ Public Function vtkDeleteFolder(folderPath As String)
     Exit Function
 
 vtkDeleteFolder_Error:
-    If err.Number = 76 Then
-        vtkDeleteFolder = err.Number
+    If Err.number = 76 Then
+        vtkDeleteFolder = Err.number
     Else
         vtkDeleteFolder = VTK_UNEXPECTED_ERROR
     End If

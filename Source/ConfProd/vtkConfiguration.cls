@@ -109,12 +109,12 @@ End Property
 '---------------------------------------------------------------------------------------
 '
 Property Get modules() As Collection
-    Dim col As New Collection, i As Integer, m As vtkModule
+    Dim col As New Collection, i As Integer, M As vtkModule
     For i = 1 To m_parent.moduleCount
         If Not (m_parent.getModulePathWithNumber(numModule:=i, numConfiguration:=m_number) Like "") Then
-            Set m = New vtkModule
-            m.init confManager:=m_parent, modNumber:=i, confNumber:=m_number
-            col.Add Item:=m, Key:=m_parent.module(i)
+            Set M = New vtkModule
+            M.init confManager:=m_parent, modNumber:=i, confNumber:=m_number
+            col.Add Item:=M, Key:=m_parent.module(i)
         End If
     Next i
     Set modules = col

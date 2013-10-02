@@ -13,6 +13,7 @@ Attribute VB_GlobalNameSpace = False
 Attribute VB_Creatable = False
 Attribute VB_PredeclaredId = True
 Attribute VB_Exposed = False
+
 '---------------------------------------------------------------------------------------
 ' Module    : vtkCreateProjectForm
 ' Author    : Jean-Pierre Imbert
@@ -47,7 +48,7 @@ Private Sub BrowseButton_Click()
     With Application.FileDialog(msoFileDialogFolderPicker)
         .AllowMultiSelect = False
         .Show
-        If .SelectedItems.Count > 0 Then
+        If .SelectedItems.count > 0 Then
             ProjectPathTextBox.Text = .SelectedItems(1)
         End If
     End With
@@ -115,13 +116,13 @@ Private Sub enableCreateButton()
     ' Validate the path textField, the path must exist
    On Error Resume Next
     fso.GetFolder (ProjectPathTextBox.Text)
-    folderExists = err.Number = 0
+    folderExists = Err.number = 0
     If folderExists Then ProjectPathTextBox.BackColor = GREEN Else ProjectPathTextBox.BackColor = PINK
     
     ' Validate the Project name textField ; the project folder must not exist
     If Right$(ProjectPathTextBox.Text, 1) Like "\" Then sep = "" Else sep = "\"
     fso.GetFolder (ProjectPathTextBox.Text & sep & ProjectNameTextBox.Text) 'Will raise an error 76 if wrong path or not a folder
-    projectDoesntExists = err.Number = 76
+    projectDoesntExists = Err.number = 76
     If (Not folderExists And ProjectNameTextBox.Text Like "") Or (folderExists And Not projectDoesntExists) _
             Then ProjectNameTextBox.BackColor = PINK Else ProjectNameTextBox.BackColor = GREEN
    On Error GoTo 0

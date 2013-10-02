@@ -297,4 +297,14 @@
 		<path confName="VBAToolKit"/>
 		<path confName="VBAToolKit_DEV">Source\ConfTest\vtkXMLExportTester.cls</path>
 	</module>
+	<module>
+		<name>vtkNormalize</name>
+		<path confName="VBAToolKit">Source\ConfProd\vtkNormalize.bas</path>
+		<path confName="VBAToolKit_DEV">Source\ConfProd\vtkNormalize.bas</path>
+	</module>
+	<module>
+		<name>vtkNormalizeTester</name>
+		<path confName="VBAToolKit"/>
+		<path confName="VBAToolKit_DEV">Source\ConfTest\vtkNormalizeTester.cls</path>
+	</module>
 </vtkConf>
