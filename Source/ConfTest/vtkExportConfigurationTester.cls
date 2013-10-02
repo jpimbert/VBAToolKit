@@ -82,8 +82,8 @@ Private Sub ITestCase_TearDown()
     On Error Resume Next
     
     vtkResetConfigurationManagers
-    vtkCloseAndKillWorkbook wb:=testWorkbook
-    vtkCloseAndKillWorkbook wb:=newlyCreatedWorkbook
+    vtkCloseAndKillWorkbook Wb:=testWorkbook
+    vtkCloseAndKillWorkbook Wb:=newlyCreatedWorkbook
     vtkCleanFolder VBAToolKit.vtkTestPath
 
 End Sub
@@ -134,11 +134,18 @@ End Sub
 '    - expected : 0 module is exported since it has not been added to the configuration itself.
 '    - Test_vtkExportConfiguration_importedModuleAddeToConfigurationManagerMustNotBeExported
 '
-' - BeforeSave handler is added in a new project, the modules are exported, a module is modified, the workbook is saved
-'   - expected : the modified module is reexported
-'   - Test_vtkAddBeforeSaveHandlerInDEVWorkbook_validWorkbook()
+' - Source files are exported, 1 module is modified, onlyModified = True
+'    - expected : one module is exported and modified
+'
+' - Souce files are exported, 1 module is modified, onlyModified = True
+'    - expected : 1 module is exported, the unexported modules are not normalized
+'
+' - Source files are exported, no module is modified, onlyModified = False
+'    - expected : all modules are exported, already existing modules are normalized
 '
 ' -------------------------------------------------------------------------
+
+
 Public Sub Test_vtkExportConfiguration_filesNotYetCreatedTrue()
 ' Source files are not yet created, onlyModified = True => expected : all modules are exported
     
@@ -149,14 +156,14 @@ Public Sub Test_vtkExportConfiguration_filesNotYetCreatedTrue()
     retVal = vtkExportConfiguration(testWorkbook.VBProject, testProjectName, testConf.name, onlyModified:=True)
     mAssert.Equals retVal, totalNumberOfModules, totalNumberOfModules & " should be exported as files do not yet exist."
     
-    mAssert.Should fso.fileExists(VBAToolKit.vtkTestPath & "\" & testModule1FileName), testModule1FileName & " should have been created."
-    mAssert.Should fso.fileExists(VBAToolKit.vtkTestPath & "\" & testModule2FileName), testModule2FileName & " should have been created."
+    mAssert.Should fso.FileExists(VBAToolKit.vtkTestPath & "\" & testModule1FileName), testModule1FileName & " should have been created."
+    mAssert.Should fso.FileExists(VBAToolKit.vtkTestPath & "\" & testModule2FileName), testModule2FileName & " should have been created."
 
     On Error GoTo 0
     Exit Sub
 
 Test_vtkExportConfiguration_filesNotYetCreatedTrue_Error:
-    mAssert.Should False, "Unexpected error " & Err.number & " (" & Err.Description & ") in procedure Test_vtkExportConfiguration_filesNotYetCreatedTrue of Class Module vtkExportConfigurationTester"
+    mAssert.Should False, "Unexpected error " & Err.Number & " (" & Err.Description & ") in procedure Test_vtkExportConfiguration_filesNotYetCreatedTrue of Class Module vtkExportConfigurationTester"
     Resume Next
     
 End Sub
@@ -171,14 +178,14 @@ Public Sub Test_vtkExportConfiguration_filesNotYetCreatedFalse()
     retVal = vtkExportConfiguration(testWorkbook.VBProject, testProjectName, testConf.name, onlyModified:=False)
     mAssert.Equals retVal, totalNumberOfModules, totalNumberOfModules & " should be exported as files do not yet exist."
 
-    mAssert.Should fso.fileExists(VBAToolKit.vtkTestPath & "\" & testModule1FileName), testModule1FileName & " should have been created."
-    mAssert.Should fso.fileExists(VBAToolKit.vtkTestPath & "\" & testModule2FileName), testModule2FileName & " should have been created."
+    mAssert.Should fso.FileExists(VBAToolKit.vtkTestPath & "\" & testModule1FileName), testModule1FileName & " should have been created."
+    mAssert.Should fso.FileExists(VBAToolKit.vtkTestPath & "\" & testModule2FileName), testModule2FileName & " should have been created."
 
     On Error GoTo 0
     Exit Sub
 
 Test_vtkExportConfiguration_filesNotYetCreatedFalse_Error:
-    mAssert.Should False, "Unexpected error " & Err.number & " (" & Err.Description & ") in procedure Test_vtkExportConfiguration_filesNotYetCreatedFalse of Class Module vtkExportConfigurationTester"
+    mAssert.Should False, "Unexpected error " & Err.Number & " (" & Err.Description & ") in procedure Test_vtkExportConfiguration_filesNotYetCreatedFalse of Class Module vtkExportConfigurationTester"
     Resume Next
 
 End Sub
@@ -215,7 +222,7 @@ Public Sub Test_vtkExportConfiguration_filesJustExportedTrue()
     Exit Sub
 
 Test_vtkExportConfiguration_filesYetCreatedTrue_Error:
-    mAssert.Should False, "Unexpected error " & Err.number & " (" & Err.Description & ") in procedure Test_vtkExportConfiguration_filesYetCreatedTrue of Class Module vtkExportConfigurationTester"
+    mAssert.Should False, "Unexpected error " & Err.Number & " (" & Err.Description & ") in procedure Test_vtkExportConfiguration_filesYetCreatedTrue of Class Module vtkExportConfigurationTester"
     Resume Next
 End Sub
 
@@ -251,7 +258,7 @@ Public Sub Test_vtkExportConfiguration_filesJustExportedFalse()
     Exit Sub
 
 Test_vtkExportConfiguration_filesJustExportedFalse_Error:
-    mAssert.Should False, "Unexpected error " & Err.number & " (" & Err.Description & ") in procedure Test_vtkExportConfiguration_filesJustExportedFalse of Class Module vtkExportConfigurationTester"
+    mAssert.Should False, "Unexpected error " & Err.Number & " (" & Err.Description & ") in procedure Test_vtkExportConfiguration_filesJustExportedFalse of Class Module vtkExportConfigurationTester"
     Resume Next
 End Sub
 
@@ -287,7 +294,7 @@ Public Sub Test_vtkExportConfiguration_oneFileModifiedTrue()
     Exit Sub
 
 Test_vtkExportConfiguration_oneFileModifiedTrue_Error:
-    mAssert.Should False, "Unexpected error " & Err.number & " (" & Err.Description & ") in procedure Test_vtkExportConfiguration_oneFileModifiedTrue of Class Module vtkExportConfigurationTester"
+    mAssert.Should False, "Unexpected error " & Err.Number & " (" & Err.Description & ") in procedure Test_vtkExportConfiguration_oneFileModifiedTrue of Class Module vtkExportConfigurationTester"
     Resume Next
     
 End Sub
@@ -326,7 +333,7 @@ Public Sub Test_vtkExportConfiguration_oneFileModifiedFalse()
     Exit Sub
 
 Test_vtkExportConfiguration_oneFileModifiedFalse_Error:
-    mAssert.Should False, "Unexpected error " & Err.number & " (" & Err.Description & ") in procedure Test_vtkExportConfiguration_oneFileModifiedFalse of Class Module vtkExportConfigurationTester"
+    mAssert.Should False, "Unexpected error " & Err.Number & " (" & Err.Description & ") in procedure Test_vtkExportConfiguration_oneFileModifiedFalse of Class Module vtkExportConfigurationTester"
     Resume Next
     
 End Sub
@@ -366,7 +373,7 @@ Public Sub Test_vtkExportConfiguration_twoFilesModifiedTrue()
     Exit Sub
 
 Test_vtkExportConfiguration_twoFilesModifiedTrue_Error:
-    mAssert.Should False, "Unexpected error " & Err.number & " (" & Err.Description & ") in procedure Test_vtkExportConfiguration_twoFilesModifiedTrue of Class Module vtkExportConfigurationTester"
+    mAssert.Should False, "Unexpected error " & Err.Number & " (" & Err.Description & ") in procedure Test_vtkExportConfiguration_twoFilesModifiedTrue of Class Module vtkExportConfigurationTester"
     Resume Next
 
 End Sub
@@ -405,7 +412,7 @@ Public Sub Test_vtkExportConfiguration_twoFilesModifiedFalse()
     Exit Sub
 
 Test_vtkExportConfiguration_twoFilesModifiedFalse_Error:
-    mAssert.Should False, "Unexpected error " & Err.number & " (" & Err.Description & ") in procedure Test_vtkExportConfiguration_twoFilesModifiedFalse of Class Module vtkExportConfigurationTester"
+    mAssert.Should False, "Unexpected error " & Err.Number & " (" & Err.Description & ") in procedure Test_vtkExportConfiguration_twoFilesModifiedFalse of Class Module vtkExportConfigurationTester"
     Resume Next
 
 End Sub
@@ -418,7 +425,7 @@ Public Sub Test_vtkExportConfiguration_notReferencedModuleMustNotBeExported()
 
     On Error GoTo Test_vtkExportConfiguration_notReferencedModuleMustNotBeExported_Error
 
-    ' We export the modules already present so that they don't get exported again
+    ' Export the modules already present so that they don't get exported again
     vtkExportOneModule testWorkbook.VBProject, testModule1Name, VBAToolKit.vtkTestPath & "\" & testModule1FileName
     vtkExportOneModule testWorkbook.VBProject, testModule2Name, VBAToolKit.vtkTestPath & "\" & testModule2FileName
 
@@ -431,13 +438,13 @@ Public Sub Test_vtkExportConfiguration_notReferencedModuleMustNotBeExported()
     
     mAssert.Equals retVal, 0, "The module should not be exported as it has not been added to the configuration."
     
-    mAssert.Should Not fso.fileExists(VBAToolKit.vtkTestPath & "\" & importedModuleFileName), importedModuleName & " should not have been created."
+    mAssert.Should Not fso.FileExists(VBAToolKit.vtkTestPath & "\" & importedModuleFileName), importedModuleName & " should not have been created."
 
     On Error GoTo 0
     Exit Sub
 
 Test_vtkExportConfiguration_notReferencedModuleMustNotBeExported_Error:
-    mAssert.Should False, "Unexpected error " & Err.number & " (" & Err.Description & ") in procedure Test_vtkExportConfiguration_importedFileMustBeExported of Class Module vtkExportConfigurationTester"
+    mAssert.Should False, "Unexpected error " & Err.Number & " (" & Err.Description & ") in procedure Test_vtkExportConfiguration_importedFileMustBeExported of Class Module vtkExportConfigurationTester"
     Resume Next
 End Sub
 
@@ -449,7 +456,7 @@ Public Sub Test_vtkExportConfiguration_importedModuleAddedToConfigurationManager
 
     On Error GoTo Test_vtkExportConfiguration_importedModuleAddedToConfigurationManagerMustBeExported_Error
 
-    ' We export the modules already present so that they don't get exported again
+    ' Export the modules already present so that they don't get exported again
     vtkExportOneModule testWorkbook.VBProject, testModule1Name, VBAToolKit.vtkTestPath & "\" & testModule1FileName
     vtkExportOneModule testWorkbook.VBProject, testModule2Name, VBAToolKit.vtkTestPath & "\" & testModule2FileName
 
@@ -463,13 +470,13 @@ Public Sub Test_vtkExportConfiguration_importedModuleAddedToConfigurationManager
     
     mAssert.Equals retVal, 0, "No module should be exported as none has been added to the configuration."
     
-    mAssert.Should Not fso.fileExists(VBAToolKit.vtkTestPath & "\" & importedModuleFileName), importedModuleName & " should not have been created."
+    mAssert.Should Not fso.FileExists(VBAToolKit.vtkTestPath & "\" & importedModuleFileName), importedModuleName & " should not have been created."
 
     On Error GoTo 0
     Exit Sub
 
 Test_vtkExportConfiguration_importedModuleAddedToConfigurationManagerMustBeExported_Error:
-    mAssert.Should False, "Unexpected error " & Err.number & " (" & Err.Description & ") in procedure Test_vtkExportConfiguration_importedFileMustBeExported of Class Module vtkExportConfigurationTester"
+    mAssert.Should False, "Unexpected error " & Err.Number & " (" & Err.Description & ") in procedure Test_vtkExportConfiguration_importedFileMustBeExported of Class Module vtkExportConfigurationTester"
     Resume Next
 End Sub
 
@@ -513,56 +520,152 @@ Public Sub Test_vtkAddBeforeSaveHandlerInDEVWorkbook_validWorkbook()
     Exit Sub
 
 Test_vtkAddBeforeSaveHandlerInDEVWorkbook_validWorkbook_Error:
-    mAssert.Should False, "Unexpected error " & Err.number & " (" & Err.Description & ") in procedure Test_vtkAddBeforeSaveHandlerInDEVWorkbook_validWorkbook of Class Module vtkBeforeSaveHandlerTester"
+    mAssert.Should False, "Unexpected error " & Err.Number & " (" & Err.Description & ") in procedure Test_vtkAddBeforeSaveHandlerInDEVWorkbook_validWorkbook of Class Module vtkBeforeSaveHandlerTester"
     ITestCase_TearDown
     Exit Sub
     
 End Sub
 
+'-----------------------------------------------
+' TESTS REGARDING NORMALIZATION
+'-----------------------------------------------
 
-'Public Sub Test_vtkCreateProject_handlerAddedInDEVWorkbook()
-' creating a project, modifying an existing module in the DEV workbook, save => module must be exported
+Private Sub insertDummyLineInCodeModule(codemo As VBIDE.CodeModule, dummyLine As String)
+    With codemo
+        .InsertLines .CountOfLines + 1, dummyLine
+    End With
+End Sub
+
+Private Function getLastLineOfTextFile(textFilePath As String) As String
+    Dim str As String
+    Dim tmp As String
     
-'    Dim retVal As Integer
-'    Dim oldSize1 As Integer
-'    Dim oldSize2 As Integer
-'    Dim newSize1 As Integer
-'    Dim newSize2 As Integer
-
-'    Dim projectName As String
-
-'    On Error GoTo Test_vtkAddBeforeSaveHandlerInDEVWorkbook_justCreatedWorkbook_Error
-
-'    vtkCreateProject VBAToolKit.vtkTestPath, newlyCreatedProjectName
-
-'    Set newlyCreatedWorkbook = Workbooks(newlyCreatedProjectFileName)
-
-    ' Get the size of the exported modules before the save
-'    oldSize1 = fso.GetFile(VBAToolKit.vtkTestPath & "\" & newlyCreatedProjectName & "\Source\VbaUnit\VbaUnitMain.bas").Size
-'    oldSize2 = fso.GetFile(VBAToolKit.vtkTestPath & "\" & newlyCreatedProjectName & "\Source\VbaUnit\Assert.cls").Size
-
-    ' Modify a module
-'    insertDummyProcedureInCodeModule newlyCreatedWorkbook.VBProject.VBComponents("VbaUnitMain").CodeModule, dummyInt:=1
-
-    ' Save the workbook
-'    newlyCreatedWorkbook.Save
-
-    ' Get the new size of the exported modules
-'    newSize1 = fso.GetFile(VBAToolKit.vtkTestPath & "\" & newlyCreatedProjectName & "\Source\VbaUnit\VbaUnitMain.bas").Size
-'    newSize2 = fso.GetFile(VBAToolKit.vtkTestPath & "\" & newlyCreatedProjectName & "\Source\VbaUnit\Assert.cls").Size
+    str = vtkTextFileReader(textFilePath)
+    tmp = Split(str, Chr(10))(UBound(Split(str, Chr(10))))
+    If Len(tmp) < 2 Then tmp = Split(str, Chr(10))(UBound(Split(str, Chr(10))) - 1)
+    getLastLineOfTextFile = tmp
     
-'    mAssert.Should oldSize1 < newSize1, "VbaUnitMain.bas must be bigger after the save."
-'    mAssert.Should oldSize2 = newSize2, "Assert.cls must be of equal size after the save."
+End Function
 
-'    On Error GoTo 0
-'    Exit Sub
 
-'Test_vtkAddBeforeSaveHandlerInDEVWorkbook_justCreatedWorkbook_Error:
-'    mAssert.Should False, "Unexpected error " & Err.number & " (" & Err.Description & ") in procedure Test_vtkAddBeforeSaveHandlerInDEVWorkbook_justCreatedWorkbook of Class Module vtkBeforeSaveHandlerTester"
-'    ITestCase_TearDown
-'    Exit Sub
+Public Sub Test_vtkExportConfiguration_modifiedModuleIsNormalizedOMTrue()
+' - Source files are exported, 1 module is modified, onlyModified = True
+'    - expected : one module is exported and modified
+
+    Dim retVal As Integer
+
+    On Error GoTo vtkExportConfiguration_modifiedModuleIsNormalizedOMTrue_Error
+
+    ' Export the modules already present so that they don't get exported again
+    vtkExportOneModule testWorkbook.VBProject, testModule1Name, VBAToolKit.vtkTestPath & "\" & testModule1FileName
+    vtkExportOneModule testWorkbook.VBProject, testModule2Name, VBAToolKit.vtkTestPath & "\" & testModule2FileName
     
-'End Sub
+    ' Insert a line that contains key words badly cased
+    insertDummyLineInCodeModule testWorkbook.VBProject.VBComponents(testModule1Name).CodeModule, "err dim"
+    
+    ' Export the modified modules
+    retVal = vtkExportConfiguration(testWorkbook.VBProject, testProjectName, testConf.name, onlyModified:=True)
+    
+    ' Check the casing of the last line of the modified module
+    Dim expected As String
+    Dim result As String
+    expected = "Err Dim"
+    result = getLastLineOfTextFile(VBAToolKit.vtkTestPath & "\" & testModule1FileName)
+    
+    mAssert.Should StrComp(expected, result) = 0, _
+                    "File should have been formatted." & vbNewLine & _
+                    "Expected : " & expected & vbNewLine & _
+                    "Result   : " & result
+    
+    ' Last check
+    mAssert.Equals retVal, 1, "Only one module should have been exported."
+    
+    On Error GoTo 0
+    Exit Sub
+
+vtkExportConfiguration_modifiedModuleIsNormalizedOMTrue_Error:
+    mAssert.Should False, "Unexpected error " & Err.Number & " (" & Err.Description & ") in procedure vtkExportConfiguration_modifiedModuleIsNormalizedTure of Class Module vtkExportConfigurationTester"
+    Resume Next
+End Sub
+
+Public Sub Test_vtkExportConfiguration_notModifiedModulesAreNotNormalizedOMTrue()
+' - Souce files are exported, 1 module is modified, onlyModified = True
+'    - expected : 1 module is exported, the unexported modules are not normalized
+
+    On Error GoTo vtkExportConfiguration_notModifiedModulesAreNotNormalizedOMTrue_Error
+
+    ' Export the modules already present so that they don't get exported again
+    vtkExportOneModule testWorkbook.VBProject, testModule1Name, VBAToolKit.vtkTestPath & "\" & testModule1FileName, normalize:=False
+    vtkExportOneModule testWorkbook.VBProject, testModule2Name, VBAToolKit.vtkTestPath & "\" & testModule2FileName, normalize:=False
+
+    ' Insert a line in code module 1 that contains key words badly cased
+    insertDummyLineInCodeModule testWorkbook.VBProject.VBComponents(testModule1Name).CodeModule, "dim retval"
+
+    ' Export the modified modules
+    vtkExportConfiguration testWorkbook.VBProject, testProjectName, testConf.name, onlyModified:=True
+
+    ' Check the casing of the last line of the untouched module. This line contained "Dim retval" before the export.
+    Dim expected As String
+    Dim result As String
+    expected = "Dim retval"
+    result = getLastLineOfTextFile(VBAToolKit.vtkTestPath & "\" & testModule2FileName)
+
+    mAssert.Should StrComp(expected, result) = 0, _
+                    "File should not have been fomatted as it has not been modified." & vbNewLine & _
+                    "Expected : " & expected & vbNewLine & _
+                    "Result   : " & result
+
+    On Error GoTo 0
+    Exit Sub
+vtkExportConfiguration_notModifiedModulesAreNotNormalizedOMTrue_Error:
+    mAssert.Should False, "Unexpected error " & Err.Number & " (" & Err.Description & ") in procedure vtkExportConfiguration_notModifiedModulesAreNotNormalizedOMTrue of Class Module vtkExportConfigurationTester"
+    Resume Next
+End Sub
+
+
+Public Sub Test_vtkExportConfiguration_notModifiedModulesAreNormalizedOMFalse()
+' - Source files are exported, no module is modified, onlyModified = False
+'    - expected : all modules are exported, already existing modules are normalized
+
+    On Error GoTo vtkExportConfiguration_notModifiedModulesAreNormalizedOMFalse
+
+    ' Export the modules already present so that they don't get exported again
+    vtkExportOneModule testWorkbook.VBProject, testModule1Name, VBAToolKit.vtkTestPath & "\" & testModule1FileName
+    vtkExportOneModule testWorkbook.VBProject, testModule2Name, VBAToolKit.vtkTestPath & "\" & testModule2FileName
+
+    ' Insert a line in code module 1 that contains key words badly cased
+    insertDummyLineInCodeModule testWorkbook.VBProject.VBComponents(testModule1Name).CodeModule, "err dim"
+
+    ' Export all the modified modules
+    vtkExportConfiguration testWorkbook.VBProject, testProjectName, testConf.name, onlyModified:=False
+
+    ' Check the casing of the last line of the untouched module. This line contained "Dim retval" before the export.
+    Dim expected As String
+    Dim result As String
+    expected = "Dim retVal"
+    result = getLastLineOfTextFile(VBAToolKit.vtkTestPath & "\" & testModule2FileName)
+
+    mAssert.Should StrComp(expected, result) = 0, _
+                    "File should have been formatted as all modules were formatted." & vbNewLine & _
+                    "Expected : " & expected & vbNewLine & _
+                    "Result   : " & result
+
+    ' Check the casing of the last line of the modified module.
+    expected = "Err Dim"
+    result = getLastLineOfTextFile(VBAToolKit.vtkTestPath & "\" & testModule1FileName)
+
+    mAssert.Should StrComp(expected, result) = 0, _
+                    "File should not have been formatted as all modules were formatted." & vbNewLine & _
+                    "Expected : " & expected & vbNewLine & _
+                    "Result   : " & result
+
+    On Error GoTo 0
+    Exit Sub
+
+vtkExportConfiguration_notModifiedModulesAreNormalizedOMFalse:
+    mAssert.Should False, "Unexpected error " & Err.Number & " (" & Err.Description & ") in procedure vtkExportCOnfiguration_notModifiedModulesAreNormalizedFalse of Class Module vtkExportConfigurationTester"
+    Resume Next
+End Sub
 
 Private Function ITest_Suite() As TestSuite
     Set ITest_Suite = New TestSuite
@@ -577,6 +680,9 @@ Private Function ITest_Suite() As TestSuite
     ITest_Suite.AddTest ITest_Manager.ClassName, "Test_vtkExportConfiguration_notReferencedModuleMustNotBeExported"
     ITest_Suite.AddTest ITest_Manager.ClassName, "Test_vtkExportConfiguration_importedModuleAddedToConfigurationManagerMustNotBeExported"
     ITest_Suite.AddTest ITest_Manager.ClassName, "Test_vtkAddBeforeSaveHandlerInDEVWorkbook_validWorkbook"
+    ITest_Suite.AddTest ITest_Manager.ClassName, "Test_vtkExportConfiguration_modifiedModuleIsNormalizedOMTrue"
+    ITest_Suite.AddTest ITest_Manager.ClassName, "Test_vtkExportConfiguration_notModifiedModulesAreNotNormalizedOMTrue"
+    ITest_Suite.AddTest ITest_Manager.ClassName, "Test_vtkExportConfiguration_notModifiedModulesAreNormalizedOMFalse"
 End Function
 
 Private Sub ITestCase_RunTest()
@@ -592,7 +698,11 @@ Private Sub ITestCase_RunTest()
         Case "Test_vtkExportConfiguration_notReferencedModuleMustNotBeExported": Test_vtkExportConfiguration_notReferencedModuleMustNotBeExported
         Case "Test_vtkExportConfiguration_importedModuleAddedToConfigurationManagerMustNotBeExported": Test_vtkExportConfiguration_importedModuleAddedToConfigurationManagerMustNotBeExported
         Case "Test_vtkAddBeforeSaveHandlerInDEVWorkbook_validWorkbook": Test_vtkAddBeforeSaveHandlerInDEVWorkbook_validWorkbook
+        Case "Test_vtkExportConfiguration_modifiedModuleIsNormalizedOMTrue": Test_vtkExportConfiguration_modifiedModuleIsNormalizedOMTrue
+        Case "Test_vtkExportConfiguration_notModifiedModulesAreNotNormalizedOMTrue": Test_vtkExportConfiguration_notModifiedModulesAreNotNormalizedOMTrue
+        Case "Test_vtkExportConfiguration_notModifiedModulesAreNormalizedOMFalse": Test_vtkExportConfiguration_notModifiedModulesAreNormalizedOMFalse
         Case Else: mAssert.Should False, "Invalid test name: " & mManager.methodName
     End Select
 End Sub
+
 

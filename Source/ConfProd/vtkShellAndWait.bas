@@ -148,7 +148,7 @@ End Select
 On Error Resume Next
 Err.Clear
 TaskID = Shell(ShellCommand, ShellWindowState)
-If (Err.number <> 0) Or (TaskID = 0) Then
+If (Err.Number <> 0) Or (TaskID = 0) Then
     ShellAndWait = ShellAndWaitResult.Failure
     Exit Function
 End If
@@ -212,7 +212,7 @@ Exit Function
 
 ErrH:
 Debug.Print "ErrH: Cancel: " & Application.EnableCancelKey
-If Err.number = ERR_BREAK_KEY Then
+If Err.Number = ERR_BREAK_KEY Then
     If BreakKey = ActionOnBreak.AbandonWait Then
         CloseHandle ProcHandle
         ShellAndWait = ShellAndWaitResult.UserWaitAbandoned

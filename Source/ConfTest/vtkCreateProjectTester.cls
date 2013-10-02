@@ -81,77 +81,78 @@ End Sub
 Public Sub TestCreateProjectDoesNothingWhenPathDoesntExist()
     ' The createProject must does nothing when path doesn't exist
     Dim InexistentPath As String
-    Dim returnvalue As Long
+    Dim returnValue As Long
     InexistentPath = VBAToolKit.vtkTestPath & "\InexistentFolder"
-    returnvalue = vtkCreateProject(path:=InexistentPath, name:=vtkTestProjectName, displayError:=False)
+    returnValue = vtkCreateProject(path:=InexistentPath, name:=vtkTestProjectName, displayError:=False)
     mAssert.Should Dir(InexistentPath & "\" & vtkTestProjectName, vbDirectory) = "", "The project main folder must exist"
-    mAssert.Equals returnvalue, 76, "The project creation must fail"
+    mAssert.Equals returnValue, 76, "The project creation must fail"
 End Sub
 
 Public Sub TestCreateProjectAlreadyExisting()
     ' The createProject must does nothing when project already exists
-    Dim returnvalue As Long
+    Dim returnValue As Long
     MkDir VBAToolKit.vtkTestPath & "\" & vtkTestProjectName 'must respect order mkdir before call vtkcreateproject
-    returnvalue = vtkCreateProject(path:=VBAToolKit.vtkTestPath, name:=vtkTestProjectName, displayError:=False)
+    returnValue = vtkCreateProject(path:=VBAToolKit.vtkTestPath, name:=vtkTestProjectName, displayError:=False)
     mAssert.Should Dir(VBAToolKit.vtkTestPath & "\" & vtkTestProjectName, vbDirectory) <> "", "The existing project main folder must exist"
-    mAssert.Equals returnvalue, 75, "The project creation must fail"
+    mAssert.Equals returnValue, 75, "The project creation must fail"
 End Sub
 
 Public Sub TestMainFolderIsCreated()
     ' The createProject subroutine must create a new folder named like the project in the path
-    Dim returnvalue As Long
-    returnvalue = vtkCreateProject(path:=VBAToolKit.vtkTestPath, name:=vtkTestProjectName, displayError:=False)
+    Dim returnValue As Long
+    returnValue = vtkCreateProject(path:=VBAToolKit.vtkTestPath, name:=vtkTestProjectName, displayError:=False)
     mAssert.Should Dir(VBAToolKit.vtkTestPath & "\" & vtkTestProjectName, vbDirectory) <> "", "The project main folder must exist"
-    mAssert.Equals returnvalue, VTK_OK, "The project creation must succeed"
+    mAssert.Equals returnValue, VTK_OK, "The project creation must succeed"
 End Sub
 
 Public Sub TestDevXlsmFileCreated()
 'test that xlsm file is created in the right path
-    Dim returnvalue As Long
-    returnvalue = vtkCreateProject(path:=VBAToolKit.vtkTestPath, name:=vtkTestProjectName, displayError:=False)
+    Dim returnValue As Long
+    returnValue = vtkCreateProject(path:=VBAToolKit.vtkTestPath, name:=vtkTestProjectName, displayError:=False)
     mAssert.Should Dir(VBAToolKit.vtkTestPath & "\" & vtkTestProjectName & "\" & "Project" & "\" & vtkTestProjectName & "_DEV.xlsm", vbDirectory) <> "", "the workbook must be created"
 End Sub
 
 Public Sub TestDevXlsmFileIsNamedcorrectly()
 'test that xlsm is correctly renamed
-    Dim returnvalue As Long
-    returnvalue = vtkCreateProject(path:=VBAToolKit.vtkTestPath, name:=vtkTestProjectName, displayError:=False)
+    Dim returnValue As Long
+    returnValue = vtkCreateProject(path:=VBAToolKit.vtkTestPath, name:=vtkTestProjectName, displayError:=False)
+
     mAssert.Equals Workbooks(vtkTestProjectName & "_DEV.xlsm").VBProject.name, vtkTestProjectName & "_DEV", "the workbook name must be like " & vtkTestProjectName & "_DEV"
 End Sub
 
 Public Sub TestDelivXlsmFileCreated()
 'test that xlsm file is created in the right path
-    Dim returnvalue As Long
-    returnvalue = vtkCreateProject(path:=VBAToolKit.vtkTestPath, name:=vtkTestProjectName, displayError:=False)
+    Dim returnValue As Long
+    returnValue = vtkCreateProject(path:=VBAToolKit.vtkTestPath, name:=vtkTestProjectName, displayError:=False)
     mAssert.Should Dir(VBAToolKit.vtkTestPath & "\" & vtkTestProjectName & "\" & "Delivery" & "\" & vtkTestProjectName & ".xlsm", vbDirectory) <> "", "the workbook must be created"
 End Sub
 
 Public Sub TestDevProjectIsNamedcorrectly()
 'test that xlsm is correctly renamed
-    Dim returnvalue As Long
-    returnvalue = vtkCreateProject(path:=VBAToolKit.vtkTestPath, name:=vtkTestProjectName, displayError:=False)
+    Dim returnValue As Long
+    returnValue = vtkCreateProject(path:=VBAToolKit.vtkTestPath, name:=vtkTestProjectName, displayError:=False)
     mAssert.Should Workbooks(vtkTestProjectName & "_DEV.xlsm").VBProject.name = vtkTestProjectName & "_DEV", "the workbook name must be like " & vtkTestProjectName & "_DEV"
 End Sub
 
 Public Sub TestDelivProjectIsNamedcorrectly()
 'test that xlsm is correctly renamed
-    Dim returnvalue As Long
-    returnvalue = vtkCreateProject(path:=VBAToolKit.vtkTestPath, name:=vtkTestProjectName, displayError:=False)
+    Dim returnValue As Long
+    returnValue = vtkCreateProject(path:=VBAToolKit.vtkTestPath, name:=vtkTestProjectName, displayError:=False)
     OpenDeliveryProject
     mAssert.Equals Workbooks(vtkTestProjectName & ".xlsm").VBProject.name, vtkTestProjectName, "the workbook name must be like " & vtkTestProjectName & "_DEV"
 End Sub
 
 Public Sub TestReferencesOfDevWorkbookWasActivated()
- Dim returnvalue As Long
+ Dim returnValue As Long
  Dim i As Integer
  Dim j As Integer
  j = 0
 'this function will count extention number before executing function ,
 'and extentions number must be equal to(initial extention number + added extention number )
-returnvalue = vtkCreateProject(path:=VBAToolKit.vtkTestPath, name:=vtkTestProjectName, displayError:=False)
+returnValue = vtkCreateProject(path:=VBAToolKit.vtkTestPath, name:=vtkTestProjectName, displayError:=False)
     OpenDeliveryProject
  
-    For i = 1 To Workbooks(vtkTestProjectName & "_DEV.xlsm").VBProject.References.count
+    For i = 1 To Workbooks(vtkTestProjectName & "_DEV.xlsm").VBProject.References.Count
         If ((Workbooks(vtkTestProjectName & "_DEV.xlsm").VBProject.References(i).GUID) = "{420B2830-E718-11CF-893D-00A0C9054228}") Or (Workbooks(vtkTestProjectName & "_DEV.xlsm").VBProject.References(i).GUID = "{0002E157-0000-0000-C000-000000000046}") Then
         j = j + 1
         End If
@@ -160,16 +161,16 @@ mAssert.Equals j, 2, "the references number must be equal to" & i + 2
 End Sub
 
 Public Sub TestReferencesOfDeliveryWorkbookWasActivated()
- Dim returnvalue As Long
+ Dim returnValue As Long
  Dim i As Integer
  Dim j As Integer
  j = 0
 'this function will count extention number before executing function ,
 'and extentions number must be equal to(initial extention number + added extention number )
-returnvalue = vtkCreateProject(path:=VBAToolKit.vtkTestPath, name:=vtkTestProjectName, displayError:=False)
+returnValue = vtkCreateProject(path:=VBAToolKit.vtkTestPath, name:=vtkTestProjectName, displayError:=False)
     OpenDeliveryProject
     
-    For i = 1 To Workbooks(vtkTestProjectName & ".xlsm").VBProject.References.count
+    For i = 1 To Workbooks(vtkTestProjectName & ".xlsm").VBProject.References.Count
         If ((Workbooks(vtkTestProjectName & ".xlsm").VBProject.References(i).GUID) = "{420B2830-E718-11CF-893D-00A0C9054228}") Or (Workbooks(vtkTestProjectName & ".xlsm").VBProject.References(i).GUID = "{0002E157-0000-0000-C000-000000000046}") Then
         j = j + 1
         End If
@@ -179,18 +180,19 @@ End Sub
 
 Public Sub Test_VBAUnitModulesExportation()
     '   Verify that VBA modules are exported from VBAToolkit to the new project
-    Dim returnvalue As Long, fso As New FileSystemObject
+    Dim returnValue As Long, fso As New FileSystemObject
     
-    returnvalue = vtkCreateProject(path:=VBAToolKit.vtkTestPath, name:=vtkTestProjectName, displayError:=False)
+    returnValue = vtkCreateProject(path:=VBAToolKit.vtkTestPath, name:=vtkTestProjectName, displayError:=False)
     
-    mAssert.Should fso.fileExists(VBAToolKit.vtkTestPath & "\" & vtkTestProjectName & "\" & "Source\VbaUnit\" & "VbaUnitMain.bas"), "VBAUnitMain module have to be exported"
+    mAssert.Should fso.FileExists(VBAToolKit.vtkTestPath & "\" & vtkTestProjectName & "\" & "Source\VbaUnit\" & "VbaUnitMain.bas"), "VBAUnitMain module have to be exported"
 End Sub
 
 Public Sub Test_VBAUnitModulesImportation()
     '   Verify that VBA modules are imported in the new project
-    Dim returnvalue As Long, fso As New FileSystemObject
+    Dim returnValue As Long, fso As New FileSystemObject
     
-    returnvalue = vtkCreateProject(path:=VBAToolKit.vtkTestPath, name:=vtkTestProjectName, displayError:=False)
+    returnValue = vtkCreateProject(path:=VBAToolKit.vtkTestPath, name:=vtkTestProjectName, displayError:=False)
+
     
    On Error GoTo Test_VBAUnitModulesImportation_Error
     mAssert.Should Not Workbooks(vtkTestProjectName & "_DEV.xlsm").VBProject.VBComponents("VBAUnitMain") Is Nothing, "VBAUnitMain module have to be imported"
@@ -202,7 +204,7 @@ Public Sub Test_VBAUnitModulesImportation()
    Exit Sub
 
 Test_VBAUnitModulesImportation_Error:
-    mAssert.Should False, "No error have to be raised during project creation (Err=" & Err.number & ": " & Err.Description & ")"
+    mAssert.Should False, "No error have to be raised during project creation (Err=" & Err.Number & ": " & Err.Description & ")"
 End Sub
 
 Public Sub Test_vtkCreateProject_correctPathGitFolderIsCreated()
@@ -218,7 +220,7 @@ Public Sub Test_vtkCreateProject_correctPathGitFolderIsCreated()
     Exit Sub
 
 Test_vtkCreateProject_correctPathGitFolderIsCreated_Error:
-    mAssert.Should False, "Error " & Err.number & " (" & Err.Description & ") in procedure Test_vtkCreateProject_gitFolderIsCreated of Class Module vtkCreateProjectTester"
+    mAssert.Should False, "Error " & Err.Number & " (" & Err.Description & ") in procedure Test_vtkCreateProject_gitFolderIsCreated of Class Module vtkCreateProjectTester"
     Resume Next
 End Sub
 
@@ -260,7 +262,7 @@ Public Sub Test_vtkCreateProject_handlerAddedInDEVWorkbook()
     Exit Sub
 
 Test_vtkAddBeforeSaveHandlerInDEVWorkbook_justCreatedWorkbook_Error:
-    mAssert.Should False, "Unexpected error " & Err.number & " (" & Err.Description & ") in procedure Test_vtkAddBeforeSaveHandlerInDEVWorkbook_justCreatedWorkbook of Class Module vtkBeforeSaveHandlerTester"
+    mAssert.Should False, "Unexpected error " & Err.Number & " (" & Err.Description & ") in procedure Test_vtkAddBeforeSaveHandlerInDEVWorkbook_justCreatedWorkbook of Class Module vtkBeforeSaveHandlerTester"
     ITestCase_TearDown
     Exit Sub
     

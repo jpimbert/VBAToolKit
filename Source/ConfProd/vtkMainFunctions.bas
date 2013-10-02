@@ -71,7 +71,7 @@ Public Function vtkCreateProject(path As String, name As String, Optional displa
     ' Rename the VBProject of the DEV workbook
     Workbooks(project.workbookDEVName).VBProject.name = project.projectDEVName
     ' Activate references and reference to the current workbook (the VBAToolKit add-in)
-    VtkActivateReferences wb:=Workbooks(project.workbookDEVName), toSelf:=True
+    VtkActivateReferences Wb:=Workbooks(project.workbookDEVName), toSelf:=True
     ' Initialize configuration Sheet with VBAUnit modules
     vtkInitializeVbaUnitNamesAndPathes project:=project.projectName
     ' Save DEV Workbook
@@ -83,24 +83,24 @@ Public Function vtkCreateProject(path As String, name As String, Optional displa
     ' Rename the VBProject of the Delivery workbook
     Workbooks(project.workbookName).VBProject.name = project.projectName
     ' Activate references
-    VtkActivateReferences wb:=Workbooks(project.workbookName), toSelf:=False
+    VtkActivateReferences Wb:=Workbooks(project.workbookName), toSelf:=False
     ' A module must be added in the Excel File for the project parameters to be saved
     Workbooks(project.workbookName).VBProject.VBComponents.Add ComponentType:=vbext_ct_StdModule
     ' Save and Close Delivery Workbook
-    Workbooks(project.workbookName).Close savechanges:=True
+    Workbooks(project.workbookName).Close saveChanges:=True
     
-    Dim wb As Workbook
-    Set wb = Workbooks(project.workbookDEVName)
-    wb.Activate
+    Dim Wb As Workbook
+    Set Wb = Workbooks(project.workbookDEVName)
+    Wb.Activate
     ' Get VBAUnit modules from VBAToolkit (This workbook = current running code)
     vtkExportModulesFromAnotherProject projectWithModules:=ThisWorkbook.VBProject, projectName:=project.projectName, confName:=project.projectDEVName
     ' Import VBAUnit (and lib ?) modules in the new Excel file project
-    vtkImportModulesInAnotherProject projectForModules:=wb.VBProject, projectName:=project.projectName, confName:=project.projectDEVName
+    vtkImportModulesInAnotherProject projectForModules:=Wb.VBProject, projectName:=project.projectName, confName:=project.projectDEVName
     
     ' Insert the BeforeSave handler in the newly created project
-    vtkAddBeforeSaveHandlerInDEVWorkbook wb:=wb, projectName:=project.projectName, confName:=project.projectDEVName
+    vtkAddBeforeSaveHandlerInDEVWorkbook Wb:=Wb, projectName:=project.projectName, confName:=project.projectDEVName
     ' Save configured and updated project for test
-    wb.Save
+    Wb.Save
         
     ' Initialize git
     On Error GoTo vtkCreateProject_ErrorGit
@@ -112,13 +112,13 @@ Public Function vtkCreateProject(path As String, name As String, Optional displa
 
 vtkCreateProject_ErrorTreeFolder:
     vtkCreateProject = internalError
-    If displayError Then MsgBox "Error " & Err.number & " (" & Err.Description & ") in procedure vtkCreateProject of Module MainFunctions"
+    If displayError Then MsgBox "Error " & Err.Number & " (" & Err.Description & ") in procedure vtkCreateProject of Module MainFunctions"
     Exit Function
 vtkCreateProject_Error:
-    vtkCreateProject = Err.number
-    If displayError Then MsgBox "Error " & Err.number & " (" & Err.Description & ") in procedure vtkCreateProject of Module MainFunctions"
+    vtkCreateProject = Err.Number
+    If displayError Then MsgBox "Error " & Err.Number & " (" & Err.Description & ") in procedure vtkCreateProject of Module MainFunctions"
 vtkCreateProject_ErrorGit:
-    vtkCreateProject = Err.number
-    If displayError Then MsgBox "Error " & Err.number & " (" & Err.Description & ") in procedure vtkCreateProject of Module MainFunctions"
+    vtkCreateProject = Err.Number
+    If displayError Then MsgBox "Error " & Err.Number & " (" & Err.Description & ") in procedure vtkCreateProject of Module MainFunctions"
 
 End Function

@@ -98,7 +98,7 @@ Public Function vtkStandardCategoryForModuleName(moduleName As String) As String
    On Error Resume Next
     Dim ret As String
     ret = vtkVBAUnitModulesList.Item(moduleName)
-    If Err.number = 0 Then
+    If Err.Number = 0 Then
         vtkStandardCategoryForModuleName = "VBAUnit"
        On Error GoTo 0
         Exit Function
@@ -225,7 +225,7 @@ Public Sub vtkImportOneModule(project As VBProject, moduleName As String, filePa
             code = code & vbCrLf & buf.ReadAll
             
             ' Replace the code
-            oldModule.CodeModule.DeleteLines StartLine:=1, count:=oldModule.CodeModule.CountOfLines
+            oldModule.CodeModule.DeleteLines StartLine:=1, Count:=oldModule.CodeModule.CountOfLines
             oldModule.CodeModule.InsertLines 1, code
         End If
         Set fso = Nothing
@@ -242,25 +242,25 @@ End Sub
 '           - project, a VBProject from which to export the module
 '           - moduleName, the name of module to export
 '           - filePath, path of the file to export the module
+'           - normalize, if True (default value) the token are nomalized
 ' NOTE      : The file in which to export is deleted prior to export if it already exists
 '             except if the file has readonly attribute
-'
-' TODO :    - Replace Filepath functions with new ones in FileSystemUtilities
+' NOTE      : The tokens in the exported module are normalized (default behavior)
 '---------------------------------------------------------------------------------------
 '
 Public Sub vtkExportOneModule(project As VBProject, moduleName As String, filePath As String, Optional normalize As Boolean = True)
-    Dim fso As New FileSystemObject, M As VBComponent
+    Dim fso As New FileSystemObject, m As VBComponent
     
    On Error GoTo vtkExportOneModule_Error
    
     ' Get the module to export
-    Set M = project.VBComponents(moduleName)
+    Set m = project.VBComponents(moduleName)
         
     ' Kill file if it already exists only AFTER get the module, if it not exists the file must not be deleted
-    If fso.fileExists(filePath) Then fso.DeleteFile fileSpec:=filePath
+    If fso.FileExists(filePath) Then fso.DeleteFile fileSpec:=filePath
     
     ' Export module
-    M.Export fileName:=filePath
+    m.Export fileName:=filePath
     
     ' Normalize tokens in file
     If normalize Then vtkNormalizeFile filePath, vtkListOfProperlyCasedIdentifiers
@@ -269,10 +269,10 @@ Public Sub vtkExportOneModule(project As VBProject, moduleName As String, filePa
     Exit Sub
 
 vtkExportOneModule_Error:
-    If Err.number = 9 Then
-        Err.Raise number:=VTK_UNKNOWN_MODULE, source:="ExportOneModule", Description:="Module to export doesn't exist : " & moduleName
+    If Err.Number = 9 Then
+        Err.Raise Number:=VTK_UNKNOWN_MODULE, Source:="ExportOneModule", Description:="Module to export doesn't exist : " & moduleName
        Else
-        Err.Raise number:=VTK_UNEXPECTED_ERROR, source:="ExportOneModule", Description:="Unexpected error when exporting " & moduleName & " : " & Err.Description
+        Err.Raise Number:=VTK_UNEXPECTED_ERROR, Source:="ExportOneModule", Description:="Unexpected error when exporting " & moduleName & " : " & Err.Description
     End If
 End Sub
 
@@ -371,29 +371,33 @@ End Sub
 '---------------------------------------------------------------------------------------
 '
 Public Sub vtkRecreateConfiguration(projectName As String, configurationName As String)
-    Dim cm As vtkConfigurationManager, rootPath As String, wbPath As String, wb As Workbook
+    Dim cm As vtkConfigurationManager, rootPath As String, wbPath As String, Wb As Workbook
     ' Get the project and the rootPath of the project
     Set cm = vtkConfigurationManagerForProject(projectName)
     rootPath = cm.rootPath
+    ' Create Delivery folder if it doesn't exist
+    Dim path As String
+    path = rootPath & "\Delivery"
+    If Dir(path, vbDirectory) = vbNullString Then MkDir (path)
     ' Get the configuration number in the project and the path of the file
     wbPath = cm.getConfigurationPath(configuration:=configurationName)
     ' Create a new Excel file
-    Set wb = vtkCreateExcelWorkbook()
+    Set Wb = vtkCreateExcelWorkbook()
     ' Set the projectName
-    wb.VBProject.name = configurationName
+    Wb.VBProject.name = configurationName
     ' Import all modules for this configuration from the source directory
-    vtkImportModulesInAnotherProject projectForModules:=wb.VBProject, projectName:=projectName, confName:=configurationName
+    vtkImportModulesInAnotherProject projectForModules:=Wb.VBProject, projectName:=projectName, confName:=configurationName
     ' Recreate references in the new Excel File
-    VtkActivateReferences wb:=wb
+    VtkActivateReferences Wb:=Wb
     ' Set attribute properties WARNING - only for Delivery VBAToolKit
-    wb.BuiltinDocumentProperties("Title").Value = "VBAToolKit"
-    wb.BuiltinDocumentProperties("Comments").Value = "Toolkit improving IDE for VBA projects"
+    Wb.BuiltinDocumentProperties("Title").Value = "VBAToolKit"
+    Wb.BuiltinDocumentProperties("Comments").Value = "Toolkit improving IDE for VBA projects"
     ' Deactivate AddIn if the current Excel file is AddIn and installed
     Dim fso As New FileSystemObject, fileName As String, addInWasActivated As Boolean, wbIsAddin As Boolean
     fileName = fso.GetFileName(wbPath)
    On Error Resume Next
     wbIsAddin = Workbooks(fileName).IsAddin
-    If Err.number = 0 And wbIsAddin Then
+    If Err.Number = 0 And wbIsAddin Then
         addInWasActivated = AddIns(configurationName).Installed
         AddIns(configurationName).Installed = False
        Else
@@ -401,13 +405,13 @@ Public Sub vtkRecreateConfiguration(projectName As String, configurationName As 
     End If
    On Error GoTo 0
     ' Save the Excel file with the good type and erase the previous one (a message is displayed to the user)
-    wb.SaveAs fileName:=rootPath & "\" & wbPath, FileFormat:=vtkDefaultFileFormat(wbPath)
-    wb.Close savechanges:=False
+    Wb.SaveAs fileName:=rootPath & "\" & wbPath, FileFormat:=vtkDefaultFileFormat(wbPath)
+    Wb.Close saveChanges:=False
     ' Copy the AddIn in App Data folder (Only Excel 2007 at the moment)
     Dim appPath As String
     appPath = ""
     If Application.Version = "12.0" Then appPath = Environ("appdata") & "\Microsoft\AddIns\" & fileName ' Path for Excel 2007
-    If Not appPath Like "" Then fso.CopyFile source:=rootPath & "\" & wbPath, destination:=appPath, OverWriteFiles:=True
+    If Not appPath Like "" Then fso.CopyFile Source:=rootPath & "\" & wbPath, destination:=appPath, OverWriteFiles:=True
     ' Reactivate The AddIn if it was activated
     If addInWasActivated Then AddIns(configurationName).Installed = True
 End Sub
@@ -445,7 +449,7 @@ Public Function vtkExportConfiguration(projectWithModules As VBProject, projectN
         ' The conditon to export could be simplified in
         '   If Not (onlyModified And fso.FileExists(modulePath) And mo.VBAModule) Then <export>
         ' but it doesn't seem to work, so we stick to this code.
-        If onlyModified And fso.fileExists(modulePath) Then
+        If onlyModified And fso.FileExists(modulePath) Then
             If mo.VBAModule.Saved = False Then
                 vtkExportOneModule projectWithModules, mo.name, modulePath
                 exportedModulesCount = exportedModulesCount + 1
@@ -462,200 +466,7 @@ Public Function vtkExportConfiguration(projectWithModules As VBProject, projectN
     Exit Function
 
 vtkExportConfiguration_Error:
-    Err.Raise Err.number, "procedure vtkExportConfiguration of Module vtkImportExportUtilities", Err.source
+    Err.Raise Err.Number, "procedure vtkExportConfiguration of Module vtkImportExportUtilities", Err.Source
     Resume Next
 
 End Function
-
-'
-''---------------------------------------------------------------------------------------
-'' Procedure : vtkListAllModules
-'' Author    : user
-'' Date      : 17/05/2013
-'' Purpose   : - call VtkInitializeExcelfileWithVbaUnitModuleName and use his return value
-''             - list all module of current project , verify that the module
-''              is not a vbaunit and write his name in the range
-''
-''---------------------------------------------------------------------------------------
-''
-'Public Function vtkListAllModules() As Integer
-'Dim i As Integer
-'Dim j As Integer
-'Dim k As Integer
-'Dim t As Integer
-'
-'t = VtkInitializeExcelfileWithVbaUnitModuleName()
-'k = 0
-'  For i = 1 To ActiveWorkbook.VBProject.VBComponents.Count
-'    If vtkIsVbaUnit(ActiveWorkbook.VBProject.VBComponents.Item(i).name) = False Then
-'        ActiveWorkbook.Sheets(vtkConfSheet).Range(vtkModuleNameRange & t + k) = ActiveWorkbook.VBProject.VBComponents.Item(i).name
-'        ActiveWorkbook.Sheets(vtkConfSheet).Range(vtkModuleNameRange & t + k).Interior.ColorIndex = 8
-'        k = k + 1
-'    End If
-'  Next
-'vtkListAllModules = k
-'End Function
-'
-''---------------------------------------------------------------------------------------
-'' Procedure : vtkCreateModuleFile
-'' Author    : user
-'' Date      : 17/05/2013
-'' Purpose   : - this function allow to create a file
-''             - return message contain informations: time , file created or replaced
-''---------------------------------------------------------------------------------------
-''
-'Public Function vtkCreateModuleFile(fullPath As String) As String
-'
-'Dim fso As New FileSystemObject
-'
-'If fso.FileExists(fullPath) = False Then
-'    fso.CreateTextFile (fullPath)
-'vtkCreateModuleFile = "File created successfully at" & Now
-'Else
-'vtkCreateModuleFile = "File last update at" & Now
-'End If
-'End Function
-'
-'
-'
-''---------------------------------------------------------------------------------------
-'' Procedure : vtkExportModule
-'' Author    : user
-'' Date      : 14/05/2013
-'' Purpose   : - function take modulename , and line number , and workbookSource Name
-''             - create files of modules if they don't exist ,or update it
-''             - export module to the right folders  (documents , worksheets)
-''             - write creation file informations
-''             - write exported file location
-''
-''  if "vbaunitclass" then
-''       if vbaUnitMain then ===================>path= vbaunit ".bas"
-''       else                ===================>path= vbaunit ".cls"
-''       endif
-''  else
-''     case module.type
-''
-''       1.module ,to ===========================>path= confprod ".BAS"
-''       2.classmodule, if---nameTester to ======>path= ConfTest ".CLS"
-''                      else ====================>path= ConfProd ".CLS"
-''       3.Form   ,to ===========================>path= confprod ".FRM"
-''     sheet ,worksheet, workbook ===============> do nothing
-''  endif
-''  vtkCreateModuleFile(path)
-''  sheet.range = path
-''---------------------------------------------------------------------------------------
-''
-'Public Function vtkExportModule(modulename As String, lineNumber As Integer, sourceworkbook As String) As String
-'
-' Dim fullPath As String
-' Dim path As String
-' Dim MsgCreationFile As String
-' Dim Test As String
-' Dim DevPath As String
-' Dim DelivPath As String
-' Dim color As Integer
-' color = 2
-' Dim fso As New FileSystemObject
-' path = fso.GetParentFolderName(ActiveWorkbook.path)
-'
-'
-'    If vtkIsVbaUnit(modulename) = True Then
-'          If modulename = "VbaUnitMain" Then
-'                fullPath = path & "\Source\VbaUnit\" & modulename & ".bas"  'full path of file that will be created
-'                DevPath = fullPath
-'                DelivPath = ""
-'                color = 3
-'          Else
-'                fullPath = path & "\Source\VbaUnit\" & modulename & ".cls"  'full path of file that will be created
-'                DevPath = fullPath
-'                DelivPath = ""
-'                color = 3
-'          End If
-'    Else
-'
-'        On Error Resume Next
-'
-'
-'    Select Case Workbooks(sourceworkbook).VBProject.VBComponents(modulename).Type
-'
-'        Case 1 '1module : export to confprod
-'
-'           fullPath = path & "\Source\ConfProd\" & modulename & ".bas"  'full path of file that will be created
-'            DevPath = fullPath
-'            DelivPath = fullPath
-'
-'
-'        Case 2 '2 class module : export to ConfTest or ConfProd
-'
-'            If Right(modulename, 6) Like "Tester" Then ' verify if modulename end is like Tester
-'
-'                ' This Document is a test module export to confTest
-'                fullPath = path & "\Source\ConfTest\" & modulename & ".CLS"
-'                DevPath = fullPath
-'                DelivPath = ""
-'                color = 3
-'            Else
-'
-'                'the document is a classmodule export to confprod
-'                fullPath = path & "\Source\ConfProd\" & modulename & ".CLS"
-'                DevPath = fullPath
-'                DelivPath = fullPath
-'            End If
-'        Case 3 '3 forms
-'
-'                'the document is a classmodule export to confprod
-'                fullPath = path & "\Source\ConfProd\" & modulename & ".FRM"
-'                DevPath = fullPath
-'                DelivPath = fullPath
-'
-'        Case 100 'excel sheets , we will not export them for the moment
-'                DevPath = ""
-'                DelivPath = ""
-'                color = 3
-'                ActiveWorkbook.Sheets(vtkConfSheet).Range(vtkModuleDevRange & lineNumber).Interior.ColorIndex = color
-'
-'        Case Else 'normally we haven't other type but if we find another type we will export it to main project folder
-'                DevPath = ""
-'                DelivPath = ""
-'                color = 3
-'                ActiveWorkbook.Sheets(vtkConfSheet).Range(vtkModuleDevRange & lineNumber).Interior.ColorIndex = color
-'          Exit Function
-'
-'      End Select
-'    End If
-'
-'   MsgCreationFile = vtkCreateModuleFile(fullPath)
-'   Workbooks(sourceworkbook).VBProject.VBComponents(modulename).Export (fullPath) 'export module to the right folder
-'
-'   ActiveWorkbook.Sheets(vtkConfSheet).Range(vtkModuleDevRange & lineNumber) = DevPath
-'
-'   ActiveWorkbook.Sheets(vtkConfSheet).Range(vtkModuleDeliveryRange & lineNumber) = DelivPath
-'   ActiveWorkbook.Sheets(vtkConfSheet).Range(vtkModuleDeliveryRange & lineNumber).Interior.ColorIndex = color
-'
-'   ActiveWorkbook.Sheets(vtkConfSheet).Range(vtkInformationRange & lineNumber) = MsgCreationFile
-'
-'   On Error GoTo 0
-'End Function
-'
-''---------------------------------------------------------------------------------------
-'' Procedure : vtkExportAll
-'' Author    : user
-'' Date      : 16/05/2013
-'' Purpose   : - call function how list all module
-''             -
-''---------------------------------------------------------------------------------------
-''
-'Public Function vtkExportAll(sourceworkbookname As String)
-'Dim i As Integer
-'Dim ttt As String
-'Dim a As String
-'
-'a = vtkListAllModules()
-'i = 0
-'
-'    While ActiveWorkbook.Sheets(vtkConfSheet).Range(vtkModuleNameRange & vtkFirstLine + i) <> ""
-'        a = vtkExportModule(Range(vtkModuleNameRange & vtkFirstLine + i), vtkFirstLine + i, sourceworkbookname)
-'        i = i + 1
-'    Wend
-'End Function
-'

@@ -31,7 +31,7 @@ Private Sub ITestCase_SetUp(Assert As IAssert)
 End Sub
 
 Private Sub ITestCase_TearDown()
-
+    VBAToolKit.resetTestFolder
 End Sub
 
 Public Sub TestNothing()

@@ -22,7 +22,7 @@ Option Explicit
 '   limitations under the License.
 '---------------------------------------------------------------------------------------
 
-Public pWorkBook As Workbook
+Private pWorkBook As Workbook
 
 '---------------------------------------------------------------------------------------
 ' Procedure : prepare
@@ -31,8 +31,8 @@ Public pWorkBook As Workbook
 ' Purpose   : Prepare the module before use in test
 '---------------------------------------------------------------------------------------
 '
-Public Sub prepare()
-    Set pWorkBook = ActiveWorkbook    ' VBAToolKit works on Active Workbook by default
+Public Sub prepare(Wb As Workbook)
+    Set pWorkBook = Wb    ' VBAToolKit works on Active Workbook by default
 End Sub
 
 '---------------------------------------------------------------------------------------
@@ -59,37 +59,120 @@ End Function
 '
 ' Note      : In case of Err 1004, 5 retries are attempted before return Nothing
 '             The Err 1004 can be raised if the file copy is not completely performed before opening
+' Error raised :
+'           - VTK_FILE_NOT_FOUND, in case of file name not found in template folder
+'           - VTK_UNEXPECTED_ERROR, all other case
 '---------------------------------------------------------------------------------------
 '
 Public Function getTestFileFromTemplate(fileName As String, Optional destinationName As String = "", Optional openExcel As Boolean = False) As Workbook
-    Dim source As String, destination As String, errCount As Integer
+    Dim Source As String, destination As String, errCount As Integer
     
+   On Error GoTo M_Error
+   
     ' Copy file
-    source = vtkPathToTemplateFolder(pWorkBook) & "\" & fileName
+    Source = vtkPathToTemplateFolder(pWorkBook) & "\" & fileName
     If destinationName Like "" Then
         destination = vtkTestPath & "\" & fileName
        Else
         destination = vtkTestPath & "\" & destinationName
     End If
-    FileCopy source:=source, destination:=destination
-    
+    FileCopy Source:=Source, destination:=destination
     ' Open Excel file if required
     Set getTestFileFromTemplate = Nothing
     If openExcel Then
         errCount = 0
-       On Error GoTo M_Error
         Set getTestFileFromTemplate = Workbooks.Open(destination)
-       On Error GoTo 0
     End If
+    
+   On Error GoTo 0
     Exit Function
 
 M_Error:
     errCount = errCount + 1
-    If Err.number = 1004 And errCount < 5 Then Resume    ' It's possible that the file is not ready, just after copy : in this case retry
+    If Err.Number = 1004 And errCount < 5 Then Resume    ' It's possible that the file is not ready, just after copy : in this case retry
     Set getTestFileFromTemplate = Nothing
-    Err.Raise number:=Err.number, source:=Err.source, Description:=Err.Description
+    Select Case Err.Number
+        Case 53
+            Err.Raise Number:=VTK_FILE_NOT_FOUND, Source:="getTestFileFromTemplate", Description:="File not found : " & Source
+        Case 75
+            Err.Raise Number:=VTK_DOESNT_COPY_FOLDER, Source:="getTestFileFromTemplate", Description:="A file can't be copied : " & Source
+        Case Else
+            Err.Raise VTK_UNEXPECTED_ERROR, "getTestFileFromTemplate", "(" & Err.Number & ") " & Err.Description
+    End Select
 End Function
 
+
+'---------------------------------------------------------------------------------------
+' Procedure  : vtkGetTestFolderFromTemplate
+' Author     : Champonnois
+' Date       : 23/09/2013
+' Purpose    : Copy a folder from the Template folder to the Test folder
+' Parameters :
+'           - fileName as string, folder to get from the Template folder
+'           - Optional destinationName as string, name of folder to create in the Test folder (same as folderName by default)
+'---------------------------------------------------------------------------------------
+Public Function getTestFolderFromTemplate(folderName As String, Optional destinationName As String = "")
+
+    Dim Source As String, destination As String, errCount As Integer, fso As FileSystemObject
+
+    On Error GoTo getTestFolderFromTemplate_Error
+    
+    Set fso = CreateObject("Scripting.FileSystemObject")
+    
+    ' Copy folder
+    Source = vtkPathToTemplateFolder(pWorkBook) & "\" & folderName
+    
+    If destinationName Like "" Then
+        destination = vtkTestPath & "\" & folderName
+       Else
+        destination = vtkTestPath & "\" & destinationName
+    End If
+    
+    fso.CopyFolder Source:=Source, destination:=destination, OverWriteFiles:=True
+    
+    On Error GoTo 0
+    Exit Function
+
+getTestFolderFromTemplate_Error:
+    Select Case Err.Number
+        Case 76
+            Err.Raise Number:=VTK_FOLDER_NOT_FOUND, Source:="getTestFolderFromTemplate", Description:="Folder not found : " & Source
+        Case Else
+            Err.Raise VTK_UNEXPECTED_ERROR, "getTestFolderFromTemplate", "(" & Err.Number & ") " & Err.Description
+    End Select
+    Resume Next
+End Function
+
+
+'---------------------------------------------------------------------------------------
+' Procedure : ResetTestFolder
+' Author    : Champonnois
+' Date      : 25/09/2013
+' Purpose   : Remove the contents of the folder test
+'
+' Raise error :
+'           - VTK_FILE_OPEN_OR_LOCKED, the folder can't be clean up
+'           - VTK_UNEXPECTED_ERROR
+'---------------------------------------------------------------------------------------
+'
+Public Sub resetTestFolder()
+    Dim fso As New FileSystemObject
+   On Error GoTo resetTestFolder_Error
+
+    fso.DeleteFolder VBAToolKit.vtkTestPath & "\*"
+    fso.DeleteFile VBAToolKit.vtkTestPath & "\*.*"
+
+   On Error GoTo 0
+   Exit Sub
+
+resetTestFolder_Error:
+    Select Case Err.Number
+        Case 70
+            Err.Raise Number:=VTK_FILE_OPEN_OR_LOCKED, Source:="resetTestFolder", Description:=Err.Description
+        Case Else
+            Err.Raise VTK_UNEXPECTED_ERROR, "resetTestFolder", "(" & Err.Number & ") " & Err.Description
+    End Select
+End Sub
 
 '---------------------------------------------------------------------------------------
 ' Procedure : insertDummyProcedureInCodeModule

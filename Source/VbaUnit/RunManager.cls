@@ -29,7 +29,7 @@ Private Sub IRunManager_Report()
     If result.WasSuccessful Then
         Debug.Print "OK (" & result.TestCasesRun & ")"
     Else
-        Debug.Print "Tests run: " & result.TestCasesRun & " Failures: " & result.Failures.count
+        Debug.Print "Tests run: " & result.TestCasesRun & " Failures: " & result.Failures.Count
         For Each Failure In result.Failures
             Set TestCase = Failure.TestCase
             Set test = TestCase

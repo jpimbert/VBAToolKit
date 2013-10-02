@@ -70,8 +70,8 @@ End Property
 ' Purpose   : The number of the configuration in its parent
 '---------------------------------------------------------------------------------------
 '
-Property Get number() As Integer
-    number = m_number
+Property Get Number() As Integer
+    Number = m_number
 End Property
 
 '---------------------------------------------------------------------------------------

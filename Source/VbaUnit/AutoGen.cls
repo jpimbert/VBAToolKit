@@ -13,8 +13,8 @@ Public Function CountOfLines(module As CodeModule) As Long
     CountOfLines = module.CountOfLines
 End Function
 
-Public Function Lines(module As CodeModule, StartLine As Long, count As Long) As String
-    Lines = module.Lines(StartLine, count)
+Public Function Lines(module As CodeModule, StartLine As Long, Count As Long) As String
+    Lines = module.Lines(StartLine, Count)
 End Function
 
 Public Function SuiteMethodBody(TestMethodNames As Collection) As String
