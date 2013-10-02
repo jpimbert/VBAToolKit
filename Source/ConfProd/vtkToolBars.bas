@@ -111,8 +111,6 @@ Public Sub vtkCreateToolbars(Optional vbeToolbar As Boolean = True, Optional exc
 '    doesn't work because it's a Hara-Kiri for VBAToolKit itself
 '    vtkCreateToolbarButton caption:="Recreate Delivery", helpText:="Click here to recreate the configuration for delivery", faceId:=680, action:=projectName & ".vtkRecreateDeliveryClicked", vbeToolbar:=vbeToolbar, excToolbar:=excToolbar
 
-    ' Export XML File
-    vtkCreateToolbarButton caption:="Export as XML", helpText:="Click here to export the vtkConfigurations sheet as an XML", faceId:=5402, action:=projectName & ".vtkXMLExportButtonClicked", vbeToolbar:=vbeToolbar, excToolbar:=excToolbar
 End Sub
 
 '---------------------------------------------------------------------------------------
@@ -264,38 +262,3 @@ Public Sub vtkClickForVBAToolKitDEVRecreation()
     vtkRecreateConfiguration projectName:="VBAToolKit2", configurationName:="VBAToolKit_DEV"
 End Sub
 
-'---------------------------------------------------------------------------------------
-' Procedure : vtkXMLExportButtonClicked
-' Author    : Lucas Vitorino
-' Purpose   : Handler of the XML button clicked() event.
-'
-' Notes     : Not unit tested yet.
-'---------------------------------------------------------------------------------------
-'
-Private Sub vtkXMLExportButtonClicked()
-    Dim fso As New FileSystemObject
-
-    Dim xmlFileFullPath As String
-    xmlFileFullPath = fso.GetFile(ActiveWorkbook.FullName).ParentFolder.path & "\" & _
-                      vtkStripFilePathOrNameOfExtension(ActiveWorkbook.name) & ".xml"
-    
-    ' If workbook is not a DEV one, error
-    ' TODO : Implement better testing of the DEVness of a workbook
-    If Len(vtkStripPathOrNameOfVtkExtension(ActiveWorkbook.name, "DEV")) = Len(vtkStripFilePathOrNameOfExtension(ActiveWorkbook.name)) Then
-        MsgBox "You can't use the XML Export on a non DEV Workbook", vbOKOnly + vbExclamation, "Impossible operation"
-        Exit Sub
-    End If
-    
-    If fso.fileExists(xmlFileFullPath) Then
-        Dim ret As Integer
-        ret = MsgBox("An XML export of this workbook already exists. Would you like to overwrite it ?", vbYesNo + vbQuestion, "XML Export already existing")
-        If ret = 6 Then
-            vtkWriteXMLDOMToFile vtkExportAsXMLDOM(ActiveWorkbook, vtkStripPathOrNameOfVtkExtension(ActiveWorkbook.name, "DEV")), xmlFileFullPath
-            MsgBox "Export complete.", vbOKOnly + vbInformation, "Success"
-        End If
-    Else
-        vtkWriteXMLDOMToFile vtkExportAsXMLDOM(ActiveWorkbook, vtkStripPathOrNameOfVtkExtension(ActiveWorkbook.name, "DEV")), xmlFileFullPath
-        MsgBox "Export complete.", vbOKOnly + vbInformation, "Success"
-    End If
-        
-End Sub

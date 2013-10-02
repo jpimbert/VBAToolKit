@@ -516,24 +516,6 @@ Test_vtkWriteXMLDomToFile_fileContentIsValidDom_Error:
     Exit Sub
 End Sub
 
-Public Sub Test_utilities()
-
-    On Error GoTo Test_utilities_Error
-
-    Dim retStr As String
-    
-    retStr = vtkGetElementTextInNode(retDom.getElementsByTagName("configuration").Item(0), "name", 1)
-    Debug.Print "retstr = " & retStr
-
-    On Error GoTo 0
-    Exit Sub
-
-Test_utilities_Error:
-    Err.source = "Test_utilities of module vtkXMLExportTester"
-    mAssert.Should False, "Unexpected error " & Err.number & " (" & Err.Description & ") in " & Err.source
-    ITestCase_TearDown
-    Exit Sub
-End Sub
 
 Private Function ITest_Suite() As TestSuite
     Set ITest_Suite = New TestSuite
