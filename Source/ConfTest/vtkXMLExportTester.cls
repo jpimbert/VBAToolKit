@@ -249,29 +249,29 @@ Public Sub Text_vtkExportAsDom_correctConfigurationContent()
     Dim expected As String
     Dim actual As String
     
+    ' For each configuration in the configuration manager
     Dim conf As vtkConfiguration
     For Each conf In cm.configurations
         
         ' Testing the name of the first child node (name)
         expected = "name"
         actual = retDom.getElementsByTagName("configuration").Item(conf.number - 1).ChildNodes.Item(0).BaseName
-        mAssert.Equals expected, actual, "First child node of the reference in the XML DOM has an incorrect name."
+        mAssert.Equals expected, actual, "First child node of the configuration in the XML DOM has an incorrect name."
 
         ' Testing the content of the first child node (name)
         expected = conf.name
         actual = retDom.getElementsByTagName("configuration").Item(conf.number - 1).ChildNodes.Item(0).Text
-        mAssert.Equals expected, actual, "First child node of the reference in the XML DOM has an incorrect value."
+        mAssert.Equals expected, actual, "First child node of the configuration in the XML DOM has an incorrect value."
         
         ' Testing the name of the second child node (path)
         expected = "path"
         actual = retDom.getElementsByTagName("configuration").Item(conf.number - 1).ChildNodes.Item(1).BaseName
-        mAssert.Equals expected, actual, "Second child node of the reference in the XML DOM has an incorrect name."
+        mAssert.Equals expected, actual, "Second child node of the configuration in the XML DOM has an incorrect name."
         
         ' Testing the content of the second child node (path)
         expected = conf.path
-        If testWorkbook.VBProject.References(conf.number).GUID = "" Then expected = testWorkbook.VBProject.References(conf.number).fullPath
         actual = retDom.getElementsByTagName("configuration").Item(conf.number - 1).ChildNodes.Item(1).Text
-        mAssert.Equals expected, actual, "Reference in the XML DOM has an incorrect GUID or Path."
+        mAssert.Equals expected, actual, "Second child node of the configuration in the XML DOM has an incorrect content."
 
     Next
 
@@ -316,6 +316,7 @@ Public Sub Test_vtkExportAsDom_correctModuleContent()
     Dim expected As String
     Dim actual As String
     
+    ' For each module in the configuration manager
     Dim mo As vtkModule
     For Each mo In cm.modules
         
@@ -515,25 +516,40 @@ Test_vtkWriteXMLDomToFile_fileContentIsValidDom_Error:
     Exit Sub
 End Sub
 
+Public Sub Test_utilities()
+
+    On Error GoTo Test_utilities_Error
+
+    Dim retStr As String
+    
+    retStr = vtkGetElementTextInNode(retDom.getElementsByTagName("configuration").Item(0), "name", 1)
+    Debug.Print "retstr = " & retStr
+
+    On Error GoTo 0
+    Exit Sub
+
+Test_utilities_Error:
+    Err.source = "Test_utilities of module vtkXMLExportTester"
+    mAssert.Should False, "Unexpected error " & Err.number & " (" & Err.Description & ") in " & Err.source
+    ITestCase_TearDown
+    Exit Sub
+End Sub
 
 Private Function ITest_Suite() As TestSuite
     Set ITest_Suite = New TestSuite
     ITest_Suite.AddTest ITest_Manager.ClassName, "Test_vtkExportAsXMLDom_correctNameForRoot"
     ITest_Suite.AddTest ITest_Manager.ClassName, "Test_vtkExportAsXMLDom_correctNumberOfInfoObject"
     ITest_Suite.AddTest ITest_Manager.ClassName, "Test_vtkExportAsXMLDom_correctInfoContent"
-    ITest_Suite.AddTest ITest_Manager.ClassName, "Test_vtkExportAsXMLDom_correctReferenceNumber"
-    ITest_Suite.AddTest ITest_Manager.ClassName, "Test_vtkExportAsXMLDom_correctReferenceContent"
     ITest_Suite.AddTest ITest_Manager.ClassName, "Test_vtkExportAsXMLDom_correctConfigurationNumber"
     ITest_Suite.AddTest ITest_Manager.ClassName, "Test_vtkExportAsXMLDom_correctModuleNumber"
     ITest_Suite.AddTest ITest_Manager.ClassName, "Test_vtkExportAsDom_correctModuleContent"
-    ITest_Suite.AddTest ITest_Manager.ClassName, "Test_vtkExportAsDom_dummyWorkbook"
-    ITest_Suite.AddTest ITest_Manager.ClassName, "Test_vtkExportAsXMLDom_closedWorkbook"
     ITest_Suite.AddTest ITest_Manager.ClassName, "Test_vtkExportAsXMLDom_dummyProject"
     ITest_Suite.AddTest ITest_Manager.ClassName, "Test_vtkWriteXMLDomToFile_dummyDom"
     ITest_Suite.AddTest ITest_Manager.ClassName, "Test_vtkWriteXMLDomToFile_fileIsCreated"
     ITest_Suite.AddTest ITest_Manager.ClassName, "Test_vtkWriteXMLDomToFile_fileIsOverWritten"
     ITest_Suite.AddTest ITest_Manager.ClassName, "Test_vtkWriteXMLDomToFile_filepathIsCreated"
     ITest_Suite.AddTest ITest_Manager.ClassName, "Test_vtkWriteXMLDomToFile_fileContentIsValidDom"
+    ITest_Suite.AddTest ITest_Manager.ClassName, "Test_utilities"
 End Function
 
 Private Sub ITestCase_RunTest()
@@ -541,19 +557,16 @@ Private Sub ITestCase_RunTest()
         Case "Test_vtkExportAsXMLDom_correctNameForRoot": Test_vtkExportAsXMLDom_correctNameForRoot
         Case "Test_vtkExportAsXMLDom_correctNumberOfInfoObject": Test_vtkExportAsXMLDom_correctNumberOfInfoObject
         Case "Test_vtkExportAsXMLDom_correctInfoContent": Test_vtkExportAsXMLDom_correctInfoContent
-        Case "Test_vtkExportAsXMLDom_correctReferenceNumber": Test_vtkExportAsXMLDom_correctReferenceNumber
-        Case "Test_vtkExportAsXMLDom_correctReferenceContent": Test_vtkExportAsXMLDom_correctReferenceContent
         Case "Test_vtkExportAsXMLDom_correctConfigurationNumber": Test_vtkExportAsXMLDom_correctConfigurationNumber
         Case "Test_vtkExportAsXMLDom_correctModuleNumber": Test_vtkExportAsXMLDom_correctModuleNumber
         Case "Test_vtkExportAsDom_correctModuleContent": Test_vtkExportAsDom_correctModuleContent
-        Case "Test_vtkExportAsDom_dummyWorkbook": Test_vtkExportAsDom_dummyWorkbook
-        Case "Test_vtkExportAsXMLDom_closedWorkbook": Test_vtkExportAsXMLDom_closedWorkbook
         Case "Test_vtkExportAsXMLDom_dummyProject": Test_vtkExportAsXMLDom_dummyProject
         Case "Test_vtkWriteXMLDomToFile_dummyDom": Test_vtkWriteXMLDomToFile_dummyDom
         Case "Test_vtkWriteXMLDomToFile_fileIsCreated": Test_vtkWriteXMLDomToFile_fileIsCreated
         Case "Test_vtkWriteXMLDomToFile_fileIsOverWritten": Test_vtkWriteXMLDomToFile_fileIsOverWritten
         Case "Test_vtkWriteXMLDomToFile_filepathIsCreated": Test_vtkWriteXMLDomToFile_filepathIsCreated
         Case "Test_vtkWriteXMLDomToFile_fileContentIsValidDom": Test_vtkWriteXMLDomToFile_fileContentIsValidDom
+        Case "Test_utilities": Test_utilities
         Case Else: mAssert.Should False, "Invalid test name: " & mManager.methodName
     End Select
 End Sub
