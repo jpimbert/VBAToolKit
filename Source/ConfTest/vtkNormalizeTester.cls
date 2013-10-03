@@ -609,7 +609,7 @@ Public Sub Test_vtkNormalizeFile_onlyOneFileInFolder()
 
     vtkNormalizeFile dummyFile, getListOfIdentifiersToNormalize
 
-    mAssert.Equals fso.GetFolder(VBAToolKit.vtkTestPath).Files.Count, 1, _
+    mAssert.Equals fso.GetFolder(VBAToolKit.vtkTestPath).Files.count, 1, _
             "There must only be one file in the directory, no tmp file or old file."
     
     On Error GoTo 0

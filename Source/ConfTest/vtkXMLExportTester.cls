@@ -78,7 +78,7 @@ Private Sub ITestCase_TearDown()
     On Error Resume Next
     
     vtkResetConfigurationManagers
-    vtkCloseAndKillWorkbook wb:=testWorkbook
+    vtkCloseAndKillWorkbook Wb:=testWorkbook
     vtkCleanFolder VBAToolKit.vtkTestPath
     
 End Sub
@@ -123,29 +123,29 @@ Private Function countElementsInDom(elementName As String, dom As MSXML2.DOMDocu
     Exit Function
 
 countElementsInDom_Error:
-    Debug.Print "Unexpected error " & Err.number & " (" & Err.Description & ") in procedure countElementsInDom of Class Module vtkXMLExportTester"
+    Debug.Print "Unexpected error " & Err.Number & " (" & Err.Description & ") in procedure countElementsInDom of Class Module vtkXMLExportTester"
     Exit Function
     
 End Function
 
 Private Function countElementsInNode(elementName As String, node As MSXML2.IXMLDOMNode) As Integer
     
-    Dim count As Integer: count = 0
+    Dim Count As Integer: Count = 0
     
     On Error GoTo countElementsInNode_Error
 
     Dim subNode As MSXML2.IXMLDOMNode
     For Each subNode In node.ChildNodes
-        If StrComp(subNode.BaseName, elementName) = 0 Then count = count + 1
+        If StrComp(subNode.BaseName, elementName) = 0 Then Count = Count + 1
     Next
         
-    countElementsInNode = count
+    countElementsInNode = Count
 
     On Error GoTo 0
     Exit Function
 
 countElementsInNode_Error:
-    mAssert.Should False, "Unexpected error " & Err.number & " (" & Err.Description & ") in procedure countElementsInNode of Class Module vtkXMLExportTester"
+    mAssert.Should False, "Unexpected error " & Err.Number & " (" & Err.Description & ") in procedure countElementsInNode of Class Module vtkXMLExportTester"
     ITestCase_TearDown
     Exit Function
 End Function
@@ -171,7 +171,7 @@ Public Sub Test_vtkExportAsXMLDom_correctNameForRoot()
     Exit Sub
 
 Test_vtkExportAsXMLDom_correctNameForRoot_Error:
-    mAssert.Should False, "Unexpected error " & Err.number & " (" & Err.Description & ") in procedure" & Err.source
+    mAssert.Should False, "Unexpected error " & Err.Number & " (" & Err.Description & ") in procedure" & Err.Source
     ITestCase_TearDown
     Exit Sub
 End Sub
@@ -188,8 +188,8 @@ Public Sub Test_vtkExportAsXMLDom_correctNumberOfInfoObject()
     Exit Sub
 
 Test_vtkExportAsXMLDom_correctNumberOfInfoObject_Error:
-    Err.source = "Test_vtkExportAsXMLDom_correctNumberOfInfoObject of module vtkXMLExportTester"
-    mAssert.Should False, "Unexpected error " & Err.number & " (" & Err.Description & ") in " & Err.source
+    Err.Source = "Test_vtkExportAsXMLDom_correctNumberOfInfoObject of module vtkXMLExportTester"
+    mAssert.Should False, "Unexpected error " & Err.Number & " (" & Err.Description & ") in " & Err.Source
     ITestCase_TearDown
     Exit Sub
 End Sub
@@ -210,7 +210,7 @@ Public Sub Test_vtkExportAsXMLDom_correctInfoContent()
     Exit Sub
 
 Test_vtkExportAsXMLDom_correctDomContent_Error:
-    mAssert.Should False, "Unexpected error " & Err.number & " (" & Err.Description & ") in procedure Test_vtkExportAsXMLDom_correctDomContent of Class Module vtkXMLExportTester"
+    mAssert.Should False, "Unexpected error " & Err.Number & " (" & Err.Description & ") in procedure Test_vtkExportAsXMLDom_correctDomContent of Class Module vtkXMLExportTester"
     Resume Next
 End Sub
 
@@ -229,8 +229,8 @@ Public Sub Test_vtkExportAsXMLDom_correctConfigurationNumber()
     Exit Sub
 
 Test_vtkExportAsXMLDom_correctConfigurationNumber_Error:
-    Err.source = "Test_vtkExportAsXMLDom_correctConfigurationNumber of module vtkXMLExportTester"
-    mAssert.Should False, "Unexpected error " & Err.number & " (" & Err.Description & ") in " & Err.source
+    Err.Source = "Test_vtkExportAsXMLDom_correctConfigurationNumber of module vtkXMLExportTester"
+    mAssert.Should False, "Unexpected error " & Err.Number & " (" & Err.Description & ") in " & Err.Source
     ITestCase_TearDown
     Exit Sub
 End Sub
@@ -255,22 +255,22 @@ Public Sub Text_vtkExportAsDom_correctConfigurationContent()
         
         ' Testing the name of the first child node (name)
         expected = "name"
-        actual = retDom.getElementsByTagName("configuration").Item(conf.number - 1).ChildNodes.Item(0).BaseName
+        actual = retDom.getElementsByTagName("configuration").Item(conf.Number - 1).ChildNodes.Item(0).BaseName
         mAssert.Equals expected, actual, "First child node of the configuration in the XML DOM has an incorrect name."
 
         ' Testing the content of the first child node (name)
         expected = conf.name
-        actual = retDom.getElementsByTagName("configuration").Item(conf.number - 1).ChildNodes.Item(0).Text
+        actual = retDom.getElementsByTagName("configuration").Item(conf.Number - 1).ChildNodes.Item(0).Text
         mAssert.Equals expected, actual, "First child node of the configuration in the XML DOM has an incorrect value."
         
         ' Testing the name of the second child node (path)
         expected = "path"
-        actual = retDom.getElementsByTagName("configuration").Item(conf.number - 1).ChildNodes.Item(1).BaseName
+        actual = retDom.getElementsByTagName("configuration").Item(conf.Number - 1).ChildNodes.Item(1).BaseName
         mAssert.Equals expected, actual, "Second child node of the configuration in the XML DOM has an incorrect name."
         
         ' Testing the content of the second child node (path)
         expected = conf.path
-        actual = retDom.getElementsByTagName("configuration").Item(conf.number - 1).ChildNodes.Item(1).Text
+        actual = retDom.getElementsByTagName("configuration").Item(conf.Number - 1).ChildNodes.Item(1).Text
         mAssert.Equals expected, actual, "Second child node of the configuration in the XML DOM has an incorrect content."
 
     Next
@@ -279,8 +279,8 @@ Public Sub Text_vtkExportAsDom_correctConfigurationContent()
     Exit Sub
 
 Text_vtkExportAsDom_correctConfigurationContent_Error:
-    Err.source = "Text_vtkExportAsDom_correctConfigurationContent of module vtkXMLExportTester"
-    mAssert.Should False, "Unexpected error " & Err.number & " (" & Err.Description & ") in " & Err.source
+    Err.Source = "Text_vtkExportAsDom_correctConfigurationContent of module vtkXMLExportTester"
+    mAssert.Should False, "Unexpected error " & Err.Number & " (" & Err.Description & ") in " & Err.Source
     ITestCase_TearDown
     Exit Sub
 End Sub
@@ -300,8 +300,8 @@ Public Sub Test_vtkExportAsXMLDom_correctModuleNumber()
     Exit Sub
 
 Test_vtkExportAsXMLDom_correctModuleNumber_Error:
-    Err.source = "Test_vtkExportAsXMLDom_correctModuleNumber of module vtkXMLExportTester"
-    mAssert.Should False, "Unexpected error " & Err.number & " (" & Err.Description & ") in " & Err.source
+    Err.Source = "Test_vtkExportAsXMLDom_correctModuleNumber of module vtkXMLExportTester"
+    mAssert.Should False, "Unexpected error " & Err.Number & " (" & Err.Description & ") in " & Err.Source
     ITestCase_TearDown
     Exit Sub
 End Sub
@@ -322,12 +322,12 @@ Public Sub Test_vtkExportAsDom_correctModuleContent()
         
         ' Testing the name of the first child node (name)
         expected = "name"
-        actual = retDom.getElementsByTagName("module").Item(mo.number - 1).ChildNodes.Item(0).BaseName
+        actual = retDom.getElementsByTagName("module").Item(mo.Number - 1).ChildNodes.Item(0).BaseName
         mAssert.Equals expected, actual, "First child node of the reference in the XML DOM has an incorrect name."
        
         ' Testing the content of the first child node (name)
         expected = mo.name
-        actual = retDom.getElementsByTagName("module").Item(mo.number - 1).ChildNodes.Item(0).Text
+        actual = retDom.getElementsByTagName("module").Item(mo.Number - 1).ChildNodes.Item(0).Text
         mAssert.Equals expected, actual, "First child node of the reference in the XML DOM has an incorrect value."
         
         ' Testing the "path" nodes - one for each configuration
@@ -336,23 +336,23 @@ Public Sub Test_vtkExportAsDom_correctModuleContent()
         
             ' Testing the name of the node
             expected = "path"
-            actual = retDom.getElementsByTagName("module").Item(mo.number - 1).ChildNodes.Item(conf.number).BaseName
-            mAssert.Equals expected, actual, "Child node #" & conf.number & " of the reference in the XML DOM has an incorrect name."
+            actual = retDom.getElementsByTagName("module").Item(mo.Number - 1).ChildNodes.Item(conf.Number).BaseName
+            mAssert.Equals expected, actual, "Child node #" & conf.Number & " of the reference in the XML DOM has an incorrect name."
 
             ' Testing the name of the attribute of the node
             expected = "confName"
-            actual = retDom.getElementsByTagName("module").Item(mo.number - 1).ChildNodes.Item(conf.number).Attributes(0).BaseName
-            mAssert.Equals expected, actual, "Child node #" & conf.number & " of the reference in the XML DOM has an incorrect attribute name."
+            actual = retDom.getElementsByTagName("module").Item(mo.Number - 1).ChildNodes.Item(conf.Number).Attributes(0).BaseName
+            mAssert.Equals expected, actual, "Child node #" & conf.Number & " of the reference in the XML DOM has an incorrect attribute name."
             
             ' Testing the content of the attribute of the node
             expected = conf.name
-            actual = retDom.getElementsByTagName("module").Item(mo.number - 1).ChildNodes.Item(conf.number).Attributes(0).Text
-            mAssert.Equals expected, actual, "Child node #" & conf.number & "  the reference in the XML DOM has an incorrect attribute value."
+            actual = retDom.getElementsByTagName("module").Item(mo.Number - 1).ChildNodes.Item(conf.Number).Attributes(0).Text
+            mAssert.Equals expected, actual, "Child node #" & conf.Number & "  the reference in the XML DOM has an incorrect attribute value."
 
             ' Testing the content of the node
             expected = mo.getPathForConfiguration(conf.name)
-            actual = retDom.getElementsByTagName("module").Item(mo.number - 1).ChildNodes.Item(conf.number).Text
-            mAssert.Equals expected, actual, "Child node #" & conf.number & "  has an incorrect content."
+            actual = retDom.getElementsByTagName("module").Item(mo.Number - 1).ChildNodes.Item(conf.Number).Text
+            mAssert.Equals expected, actual, "Child node #" & conf.Number & "  has an incorrect content."
 
         Next
 
@@ -362,8 +362,8 @@ Public Sub Test_vtkExportAsDom_correctModuleContent()
     Exit Sub
 
 Text_vtkExportAsDom_correctModuleContent_Error:
-    Err.source = "Text_vtkExportAsDom_correctModuleContent of module vtkXMLExportTester"
-    mAssert.Should False, "Unexpected error " & Err.number & " (" & Err.Description & ") in " & Err.source
+    Err.Source = "Text_vtkExportAsDom_correctModuleContent of module vtkXMLExportTester"
+    mAssert.Should False, "Unexpected error " & Err.Number & " (" & Err.Description & ") in " & Err.Source
     ITestCase_TearDown
     Exit Sub
 End Sub
@@ -386,7 +386,7 @@ Public Sub Test_vtkExportAsXMLDom_dummyProject()
     Exit Sub
 
 Test_vtkExportAsXMLDom_dummyProject_Error:
-    error = Err.number
+    error = Err.Number
     Resume Next
 End Sub
 
@@ -410,7 +410,7 @@ Public Sub Test_vtkWriteXMLDomToFile_dummyDom()
     Exit Sub
 
 Test_vtkWriteXMLDomToFile_dummyDom_Error:
-    error = Err.number
+    error = Err.Number
     Resume Next
 End Sub
 
@@ -430,8 +430,8 @@ Public Sub Test_vtkWriteXMLDomToFile_fileIsCreated()
     Exit Sub
 
 Test_vtkvtkWriteXMLDomToFile_fileIsCreated_Error:
-    Err.source = "Test_vtkvtkWriteXMLDomToFile_fileIsCreated of module aavtkXMLExportTester"
-    mAssert.Should False, "Unexpected error " & Err.number & " (" & Err.Description & ") in " & Err.source
+    Err.Source = "Test_vtkvtkWriteXMLDomToFile_fileIsCreated of module aavtkXMLExportTester"
+    mAssert.Should False, "Unexpected error " & Err.Number & " (" & Err.Description & ") in " & Err.Source
     ITestCase_TearDown
     Exit Sub
 End Sub
@@ -460,8 +460,8 @@ Public Sub Test_vtkWriteXMLDomToFile_fileIsOverWritten()
     Exit Sub
 
 Test_vtkWriteXMLDomToFile_fileIsOverWritten_Error:
-    Err.source = "Test_vtkWriteXMLDomToFile_fileIsOverWritten of module aavtkXMLExportTester"
-    mAssert.Should False, "Unexpected error " & Err.number & " (" & Err.Description & ") in " & Err.source
+    Err.Source = "Test_vtkWriteXMLDomToFile_fileIsOverWritten of module aavtkXMLExportTester"
+    mAssert.Should False, "Unexpected error " & Err.Number & " (" & Err.Description & ") in " & Err.Source
     ITestCase_TearDown
     Exit Sub
 End Sub
@@ -488,7 +488,7 @@ Public Sub Test_vtkWriteXMLDomToFile_filepathIsCreated()
     Exit Sub
 
 Test_vtkWriteXMLDomTOFile_filepathIsCreated_Error:
-    error = Err.number
+    error = Err.Number
     Resume Next
 End Sub
 
@@ -510,8 +510,8 @@ Public Sub Test_vtkWriteXMLDomToFile_fileContentIsValidDom()
     Exit Sub
 
 Test_vtkWriteXMLDomToFile_fileContentIsValidDom_Error:
-    Err.source = "Test_vtkWriteXMLDomToFile_fileContentIsValidDom of module aavtkXMLExportTester"
-    mAssert.Should False, "Unexpected error " & Err.number & " (" & Err.Description & ") in " & Err.source
+    Err.Source = "Test_vtkWriteXMLDomToFile_fileContentIsValidDom of module aavtkXMLExportTester"
+    mAssert.Should False, "Unexpected error " & Err.Number & " (" & Err.Description & ") in " & Err.Source
     ITestCase_TearDown
     Exit Sub
 End Sub

@@ -72,7 +72,7 @@ Public Sub Test_ModuleCollection_Count()
     ' This test verifies the count of modules collection property of Configuration Management
     ' just initialized from an Excel worlbook
     
-    mAssert.Equals confManager.modules.Count, 4, "Number of modules in the Test workbook"
+    mAssert.Equals confManager.modules.count, 4, "Number of modules in the Test workbook"
 End Sub
 
 Public Sub Test_AddedConfigurationCollection_Count()
@@ -81,7 +81,7 @@ Public Sub Test_AddedConfigurationCollection_Count()
     
     confManager.addModule ("NewModule")
     
-    mAssert.Equals confManager.modules.Count, 5, "Number of modules in the Test workbook with added module"
+    mAssert.Equals confManager.modules.count, 5, "Number of modules in the Test workbook with added module"
 End Sub
 
 Public Sub Test_ModuleCollection_Parent()

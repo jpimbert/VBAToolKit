@@ -44,13 +44,7 @@ Private Sub Workbook_AddinUninstall()
 End Sub
 
 Private Sub Workbook_BeforeSave(ByVal SaveAsUI As Boolean, Cancel As Boolean)
-    ' Export and normalize the modified modules
     VBAToolKit.vtkExportConfiguration ThisWorkbook.VBProject, "VBAToolKit", "VBAToolKit_DEV", True
-    
-    ' Export as XML
-    Dim fso As New FileSystemObject
-    VBAToolKit_DEV.vtkWriteXMLDOMToFile vtkExportAsXMLDOM("VBAToolKit"), fso.GetFile(ThisWorkbook.FullName).ParentFolder.path & "\" & "VBAToolKit_DEV.xml"
-
 End Sub
 
 
