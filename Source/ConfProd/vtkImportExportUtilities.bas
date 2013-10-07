@@ -354,6 +354,9 @@ End Sub
 '             - the exported modules located in the Source folder
 ' Params    - projectName
 '           - configurationName
+'
+' Raises    : VTK_UNEXPECTED_ERROR
+'
 ' WARNING : We use vtkImportOneModule because the document module importation is
 '           not efficient with VBComponents.Import (creation of a double class module
 '           instead of import the Document code)
@@ -366,54 +369,62 @@ End Sub
 '   il faudrait aussi récupérer les modules non exportés du projet DEV (tmptest)
 '   il faut tester avec un miniprojet où les deux fichiers Excel sont dans Tests
 '
-' WARNING : Cette fonction devra être reprise en profondeur pour être généralisée
-'           Elle sera testée formellement à ce moment là
 '---------------------------------------------------------------------------------------
 '
 Public Sub vtkRecreateConfiguration(projectName As String, configurationName As String)
-    Dim cm As vtkConfigurationManager, rootPath As String, wbPath As String, Wb As Workbook
+    Dim cm As vtkConfigurationManager
+    Dim rootPath As String
+    Dim wbPath As String
+    Dim Wb As Workbook
+    
     ' Get the project and the rootPath of the project
+    On Error GoTo vtkRecreateConfiguration_Error
+
     Set cm = vtkConfigurationManagerForProject(projectName)
     rootPath = cm.rootPath
-    ' Create Delivery folder if it doesn't exist
-    Dim path As String
-    path = rootPath & "\Delivery"
-    If Dir(path, vbDirectory) = vbNullString Then MkDir (path)
+    
     ' Get the configuration number in the project and the path of the file
     wbPath = cm.getConfigurationPath(configuration:=configurationName)
+    
     ' Create a new Excel file
     Set Wb = vtkCreateExcelWorkbook()
+    
     ' Set the projectName
     Wb.VBProject.name = configurationName
+    
     ' Import all modules for this configuration from the source directory
     vtkImportModulesInAnotherProject projectForModules:=Wb.VBProject, projectName:=projectName, confName:=configurationName
+    
     ' Recreate references in the new Excel File
     VtkActivateReferences Wb:=Wb
+    
     ' Set attribute properties WARNING - only for Delivery VBAToolKit
-    Wb.BuiltinDocumentProperties("Title").Value = "VBAToolKit"
-    Wb.BuiltinDocumentProperties("Comments").Value = "Toolkit improving IDE for VBA projects"
-    ' Deactivate AddIn if the current Excel file is AddIn and installed
-    Dim fso As New FileSystemObject, fileName As String, addInWasActivated As Boolean, wbIsAddin As Boolean
-    fileName = fso.GetFileName(wbPath)
-   On Error Resume Next
-    wbIsAddin = Workbooks(fileName).IsAddin
-    If Err.Number = 0 And wbIsAddin Then
-        addInWasActivated = AddIns(configurationName).Installed
-        AddIns(configurationName).Installed = False
-       Else
-        addInWasActivated = False
-    End If
-   On Error GoTo 0
+    'wb.BuiltinDocumentProperties("Title").Value = "VBAToolKit"
+    'wb.BuiltinDocumentProperties("Comments").Value = "Toolkit improving IDE for VBA projects"
+    
+    On Error GoTo 0
+    
     ' Save the Excel file with the good type and erase the previous one (a message is displayed to the user)
     Wb.SaveAs fileName:=rootPath & "\" & wbPath, FileFormat:=vtkDefaultFileFormat(wbPath)
     Wb.Close saveChanges:=False
-    ' Copy the AddIn in App Data folder (Only Excel 2007 at the moment)
-    Dim appPath As String
-    appPath = ""
-    If Application.Version = "12.0" Then appPath = Environ("appdata") & "\Microsoft\AddIns\" & fileName ' Path for Excel 2007
-    If Not appPath Like "" Then fso.CopyFile Source:=rootPath & "\" & wbPath, destination:=appPath, OverWriteFiles:=True
-    ' Reactivate The AddIn if it was activated
-    If addInWasActivated Then AddIns(configurationName).Installed = True
+    
+
+    On Error GoTo 0
+    Exit Sub
+
+vtkRecreateConfiguration_Error:
+    Err.Source = "vtkRecreateConfiguration of module vtkImportExportUtilities"
+    
+    Select Case Err.Number
+        Case 0
+        Case Else
+            Err.Number = VTK_UNEXPECTED_ERROR
+    End Select
+    
+    Err.Raise Err.Number, Err.Description, Err.Source
+    
+    Exit Sub
+    
 End Sub
 
 '---------------------------------------------------------------------------------------
