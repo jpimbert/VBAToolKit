@@ -47,5 +47,5 @@ Private Sub Class_Initialize()
 End Sub
 
 Public Property Get WasSuccessful() As Boolean
-    WasSuccessful = Failures.count = 0
+    WasSuccessful = Failures.Count = 0
 End Property

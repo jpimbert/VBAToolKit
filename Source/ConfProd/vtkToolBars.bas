@@ -110,7 +110,6 @@ Public Sub vtkCreateToolbars(Optional vbeToolbar As Boolean = True, Optional exc
     vtkCreateToolbarButton caption:="Create Project", helpText:="Click here to create a new project", faceId:=2031, action:=projectName & ".vtkShowCreateProjectForm", vbeToolbar:=vbeToolbar, excToolbar:=excToolbar
 '    doesn't work because it's a Hara-Kiri for VBAToolKit itself
 '    vtkCreateToolbarButton caption:="Recreate Delivery", helpText:="Click here to recreate the configuration for delivery", faceId:=680, action:=projectName & ".vtkRecreateDeliveryClicked", vbeToolbar:=vbeToolbar, excToolbar:=excToolbar
-
 End Sub
 
 '---------------------------------------------------------------------------------------
@@ -261,4 +260,5 @@ Public Sub vtkClickForVBAToolKitDEVRecreation()
     If Not ActiveWorkbook.name Like "VBAToolKit2_DEV.xlsm" Then Exit Sub
     vtkRecreateConfiguration projectName:="VBAToolKit2", configurationName:="VBAToolKit_DEV"
 End Sub
+
 

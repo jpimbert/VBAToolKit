@@ -111,7 +111,7 @@ Public Sub vtkInitializeConfigurationForActiveWorkBook()
     cn_prod = cm.getConfigurationNumber(configuration:=project.projectName)
     
     ' List all modules
-    For i = 1 To ActiveWorkbook.VBProject.VBComponents.count
+    For i = 1 To ActiveWorkbook.VBProject.VBComponents.Count
         Set c = ActiveWorkbook.VBProject.VBComponents.Item(i)
         If c.Type <> vbext_ct_Document Then
             nm = cm.addModule(c.name)

@@ -174,7 +174,7 @@ End Property
 ' Purpose   : Get the VBComponent of the module in the configuration attached
 ' Error Raised :
 '           VTK_MODULE_NOTATTACHED if the module is not attached to a configuration
-'           VTK_WORKBOOK_NOT_OPEN if the Workbook of the configuration is not open
+'           VTK_WORKBOOK_NOTOPEN if the Workbook of the configuration is not open
 '           no error raised if Component is not in the configuration, just return Nothing
 '---------------------------------------------------------------------------------------
 '
@@ -183,7 +183,7 @@ Public Property Get VBAModule() As VBComponent
     Set VBAModule = Nothing
     If confNumber = 0 Then Err.Raise VTK_MODULE_NOTATTACHED, "vtkModule::VBAModule()", "Module """ & parent.module(Number) & """ not attached to a configuration"
     wbName = fso.GetFileName(parent.getConfigurationPathWithNumber(confNumber))
-    If Not VtkWorkbookIsOpen(wbName) Then Err.Raise VTK_WORKBOOK_NOT_OPEN, "vtkModule::configuration()", "Workbook """ & wbName & """ is not open"
+    If Not VtkWorkbookIsOpen(wbName) Then Err.Raise VTK_WORKBOOK_NOTOPEN, "vtkModule::configuration()", "Workbook """ & wbName & """ is not open"
    On Error Resume Next
     Set VBAModule = Workbooks(wbName).VBProject.VBComponents(name)
    On Error GoTo 0

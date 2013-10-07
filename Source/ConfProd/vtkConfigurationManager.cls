@@ -212,7 +212,7 @@ End Property
 '
 Public Property Get configurationCount() As Integer
     ' The number of configurations is the number of used columns minus one
-    configurationCount = configurationSheet.UsedRange.Columns.count - 1
+    configurationCount = configurationSheet.UsedRange.Columns.Count - 1
 End Property
 
 '---------------------------------------------------------------------------------------
@@ -367,7 +367,7 @@ End Sub
 '
 Public Property Get moduleCount() As Integer
     ' The number of modules is the number of used rows minus two
-    moduleCount = configurationSheet.UsedRange.Rows.count - nbTitleRows
+    moduleCount = configurationSheet.UsedRange.Rows.Count - nbTitleRows
 End Property
 
 '---------------------------------------------------------------------------------------
@@ -378,11 +378,11 @@ End Property
 '---------------------------------------------------------------------------------------
 '
 Public Function modules() As Collection
-    Dim col As New Collection, i As Integer, M As vtkModule
+    Dim col As New Collection, i As Integer, m As vtkModule
     For i = 1 To moduleCount
-        Set M = New vtkModule
-        M.init confManager:=Me, modNumber:=i
-        col.Add Item:=M, Key:=module(i)
+        Set m = New vtkModule
+        m.init confManager:=Me, modNumber:=i
+        col.Add Item:=m, Key:=module(i)
     Next i
     Set modules = col
 End Function

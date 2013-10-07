@@ -124,24 +124,24 @@ Public Function vtkExportAsXMLDOM(projectName As String) As MSXML2.DOMDocument
     Exit Function
 
 vtkExportAsXMLDOM_Error:
-    Err.source = "function vtkExportAsDOMXML of module vtkXMLutilities"
+    Err.Source = "function vtkExportAsDOMXML of module vtkXMLutilities"
     
-    Select Case Err.number
+    Select Case Err.Number
         Case VTK_WORKBOOK_NOT_OPEN
             Err.Description = "Workbook should be open."
         Case VTK_WORKBOOK_NOT_INITIALIZED
             Err.Description = "Workbook not initialized."
         Case -2147221080 ' Automation error undocumented by Microsoft
-            Err.number = VTK_WORKBOOK_NOT_OPEN
+            Err.Number = VTK_WORKBOOK_NOT_OPEN
             Err.Description = "Workbook should be open."
         Case VTK_PROJECT_NOT_INITIALIZED
             Err.Description = "Project " & projectName & " has not been initialized. The name might be wrong."
         Case Else
-            Debug.Print "Unexpected error " & Err.number & " (" & Err.Description & ") in " & Err.source
-            Err.number = VTK_UNEXPECTED_ERROR
+            Debug.Print "Unexpected error " & Err.Number & " (" & Err.Description & ") in " & Err.Source
+            Err.Number = VTK_UNEXPECTED_ERROR
     End Select
 
-    Err.Raise Err.number
+    Err.Raise Err.Number
 
     Exit Function
     
@@ -194,19 +194,19 @@ Public Sub vtkWriteXMLDOMToFile(dom As MSXML2.DOMDocument, filePath As String)
     Exit Sub
 
 vtkWriteXMLDOMToFile_Error:
-    Err.source = "function vtkWriteXMLDOMToFile of module vtkXMLutilities"
+    Err.Source = "function vtkWriteXMLDOMToFile of module vtkXMLutilities"
     
-    Select Case Err.number
+    Select Case Err.Number
         Case VTK_DOM_NOT_INITIALIZED
             Err.Description = "Dom object is not initialized."
         Case 3004 ' ADODB.Stream.SaveToFile failed because it couldn't find the path
-            Err.number = VTK_WRONG_FILE_PATH
+            Err.Number = VTK_WRONG_FILE_PATH
             Err.Description = "File path is wrong. Make sure the folder tree is valid."
         Case Else
-            Err.number = VTK_UNEXPECTED_ERROR
+            Err.Number = VTK_UNEXPECTED_ERROR
     End Select
 
-    Err.Raise Err.number
+    Err.Raise Err.Number
     
     Exit Sub
 
