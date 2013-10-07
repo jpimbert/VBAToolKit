@@ -404,7 +404,7 @@ Public Sub Test_vtkWriteXMLDomToFile_dummyDom()
     
     mAssert.Equals error, VTK_DOM_NOT_INITIALIZED, "Dom is not initialized : VTK_DOM_NOT_INITIALIZED should be raised."
     
-    mAssert.Should (fso.fileExists(testFilePath) = False), "File should not have been created as there has been an error."
+    mAssert.Should (fso.FileExists(testFilePath) = False), "File should not have been created as there has been an error."
     
     On Error GoTo 0
     Exit Sub
@@ -424,7 +424,7 @@ Public Sub Test_vtkWriteXMLDomToFile_fileIsCreated()
 
     vtkWriteXMLDOMToFile retDom, testFilePath
     
-    mAssert.Should fso.fileExists(testFilePath), "File should have been created as everything is normal."
+    mAssert.Should fso.FileExists(testFilePath), "File should have been created as everything is normal."
 
     On Error GoTo 0
     Exit Sub
@@ -480,7 +480,7 @@ Public Sub Test_vtkWriteXMLDomToFile_filepathIsCreated()
     vtkWriteXMLDOMToFile retDom, newFilePath
     
     Dim fso As New FileSystemObject
-    mAssert.Should Not fso.fileExists(newFilePath), "File should not have been created."
+    mAssert.Should Not fso.FileExists(newFilePath), "File should not have been created."
 
     mAssert.Equals error, VTK_WRONG_FILE_PATH
 

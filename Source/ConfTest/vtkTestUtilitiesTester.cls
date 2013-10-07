@@ -328,8 +328,8 @@ Private Sub assertFolderIsCopied(folderName As String, mAssert As IAssert)
     Dim fso As New FileSystemObject
     mAssert.Should fso.folderExists(VBAToolKit.vtkTestPath & "\" & folderName), "The folder " & folderName & " should have been copied in folder Test"
     mAssert.Should fso.folderExists(VBAToolKit.vtkTestPath & "\" & folderName & "\SubFolder"), "The folder " & folderName & "\SubFolder should have been copied in folder Test"
-    mAssert.Should fso.fileExists(VBAToolKit.vtkTestPath & "\" & folderName & "\TestClass.cls"), "The file " & folderName & "\TestClass.cls should have been copied in folder Test"
-    mAssert.Should fso.fileExists(VBAToolKit.vtkTestPath & "\" & folderName & "\SubFolder\TestModule.bas"), "The file " & folderName & "\SubFolder\TestModule.bas should have been copied in folder Test"
+    mAssert.Should fso.FileExists(VBAToolKit.vtkTestPath & "\" & folderName & "\TestClass.cls"), "The file " & folderName & "\TestClass.cls should have been copied in folder Test"
+    mAssert.Should fso.FileExists(VBAToolKit.vtkTestPath & "\" & folderName & "\SubFolder\TestModule.bas"), "The file " & folderName & "\SubFolder\TestModule.bas should have been copied in folder Test"
 End Sub
 
 '---------------------------------------------------------------------------------------

@@ -288,16 +288,6 @@
 		<path confName="VBAToolKit_DEV">Source\ConfTest\vtkExportConfigurationTester.cls</path>
 	</module>
 	<module>
-		<name>vtkXMLUtilities</name>
-		<path confName="VBAToolKit">Source\ConfProd\vtkXMLUtilities.bas</path>
-		<path confName="VBAToolKit_DEV">Source\ConfProd\vtkXMLUtilities.bas</path>
-	</module>
-	<module>
-		<name>vtkXMLExportTester</name>
-		<path confName="VBAToolKit"/>
-		<path confName="VBAToolKit_DEV">Source\ConfTest\vtkXMLExportTester.cls</path>
-	</module>
-	<module>
 		<name>vtkNormalize</name>
 		<path confName="VBAToolKit">Source\ConfProd\vtkNormalize.bas</path>
 		<path confName="VBAToolKit_DEV">Source\ConfProd\vtkNormalize.bas</path>
@@ -306,5 +296,20 @@
 		<name>vtkNormalizeTester</name>
 		<path confName="VBAToolKit"/>
 		<path confName="VBAToolKit_DEV">Source\ConfTest\vtkNormalizeTester.cls</path>
+	</module>
+	<module>
+		<name>vtkTestUtilitiesTester</name>
+		<path confName="VBAToolKit"/>
+		<path confName="VBAToolKit_DEV">Source\ConfTest\vtkTestUtilitiesTester.cls</path>
+	</module>
+	<module>
+		<name>vtkXMLUtilities</name>
+		<path confName="VBAToolKit">Source\ConfProd\vtkXMLUtilities.bas</path>
+		<path confName="VBAToolKit_DEV">Source\ConfProd\vtkXMLUtilities.bas</path>
+	</module>
+	<module>
+		<name>vtkXMLExportTester</name>
+		<path confName="VBAToolKit"/>
+		<path confName="VBAToolKit_DEV">Source\ConfTest\vtkXMLExportTester.cls</path>
 	</module>
 </vtkConf>
