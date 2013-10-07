@@ -52,6 +52,8 @@ Private Sub initializeList()
     "retVal" & "," & _
     "fileName" & "," & _
     "saveChanges" & "," & _
+    "FileExists" & "," & _
+    "m" & "," & _
     ""
     
     properlyCasedIdentifiersArray = Split(properlyCasedIdentifiersString, ",")

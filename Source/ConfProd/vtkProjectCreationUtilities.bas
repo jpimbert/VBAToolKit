@@ -91,7 +91,8 @@ End Sub
 ' Procedure : vtkAddBeforeSaveHandlerInDEVWorkbook
 ' Author    : Lucas Vitorino
 ' Purpose   : - Adds a Workbook_BeforeSave handler in a DEV workbook. This handler exports
-'               the modified modules of the _DEV configuration associated to this workbook.
+'               the modified modules of the _DEV configuration associated to this workbook,
+'               and exports the vtkConfigurations sheet as an XML file in the same folder.
 '             - The handler will call vtkExportConfiguration on
 '                 - the project of the current workbook
 '                 - a project name that is the name of the worbook without "_DEV.xlsm"
@@ -105,13 +106,22 @@ Public Sub vtkAddBeforeSaveHandlerInDEVWorkbook(Wb As Workbook, projectName As S
     
     On Error GoTo vtkAddBeforeSaveHandlerInDEVWorkbook_Error
           
+    Dim wbProjectName As String
+    wbProjectName = ThisWorkbook.VBProject.name
+    
     Dim handlerString As String
     handlerString = _
     "Private Sub Workbook_BeforeSave(ByVal SaveAsUI As Boolean, Cancel As Boolean)" & vbNewLine & _
-    "   " & ThisWorkbook.VBProject.name & ".vtkExportConfiguration projectWithModules:=ThisWorkbook.VBProject, projectName:=" & """" & projectName & """" & _
+    "   " & wbProjectName & ".vtkExportConfiguration projectWithModules:=ThisWorkbook.VBProject, projectName:=" & """" & projectName & """" & _
                                                                     " , confName:=" & """" & confName & """" & _
                                                                     " , onlyModified:=True" & _
                                                                     vbNewLine & _
+                                                                    vbNewLine & _
+    "   " & "Dim fso As New Scripting.FileSystemObject" & vbNewLine & _
+    "   " & wbProjectName & ".vtkWriteXMLDOMToFile " & wbProjectName & _
+    ".vtkExportAsXMLDOM(" & """" & projectName & """" & "), fso.GetFile(ThisWorkbook.FullName).ParentFolder.Path & " & """" & "\" & """" & " & " & _
+    """" & vtkStripFilePathOrNameOfExtension(Wb.name) & ".xml" & """" & _
+    vbNewLine & _
     "End Sub" & vbNewLine
     
     With Wb.VBProject.VBComponents("ThisWorkbook").CodeModule

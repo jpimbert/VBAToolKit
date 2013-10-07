@@ -523,8 +523,8 @@ Private Sub assertTestFolderIsEmpty(mAssert As IAssert)
     Dim fso As New FileSystemObject, folderTest As Folder
     Set folderTest = fso.GetFolder(VBAToolKit.vtkTestPath)
     
-    mAssert.Equals folderTest.Files.Count, 0, "All files hasn't been deleted"
-    mAssert.Equals folderTest.SubFolders.Count, 0, "All folders hasn't been deleted"
+    mAssert.Equals folderTest.Files.count, 0, "All files hasn't been deleted"
+    mAssert.Equals folderTest.SubFolders.count, 0, "All folders hasn't been deleted"
 End Sub
 '---------------------------------------------------------------------------------------
 ' Procedure : Test_vtkResetTestFolder_OneFile

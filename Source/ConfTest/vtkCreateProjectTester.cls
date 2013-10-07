@@ -224,7 +224,7 @@ Test_vtkCreateProject_correctPathGitFolderIsCreated_Error:
     Resume Next
 End Sub
 
-Public Sub Test_vtkCreateProject_handlerAddedInDEVWorkbook()
+Public Sub Test_vtkCreateProject_handlerAddedInDEVWorkbook_modulesAreExported()
 ' creating a project, modifying an existing module in the DEV workbook, save => module must be exported
     
     Dim retVal As Integer
@@ -268,6 +268,29 @@ Test_vtkAddBeforeSaveHandlerInDEVWorkbook_justCreatedWorkbook_Error:
     
 End Sub
 
+Public Sub Test_vtkCreateProject_handlerAddedInDEVWorkbook_xmlIsCreated()
+' creating a project : the xml export of its configuration should exist as the DEV workbook is saved in vtkCreateProject
+
+    Dim newlyCreatedWorkbook As Workbook
+    Dim fso As New FileSystemObject
+
+    On Error GoTo Test_vtkCreateProject_handlerAddedInDEVWorkbook_xmlIsCreated_Error
+
+    vtkCreateProject VBAToolKit.vtkTestPath, vtkTestProjectName
+    
+    mAssert.Should fso.FileExists(VBAToolKit.vtkTestPath & "\" & vtkTestProjectName & "\Project\" & vtkTestProjectName & "_DEV.xml") = True, _
+                   "The XML file should exist at this point."
+
+    On Error GoTo 0
+    Exit Sub
+
+Test_vtkCreateProject_handlerAddedInDEVWorkbook_xmlIsCreated_Error:
+    Err.Source = "Test_vtkCreateProject_handlerAddedInDEVWorkbook_xmlIsCreated of module vtkCreateProjectTester"
+    mAssert.Should False, "Unexpected error " & Err.Number & " (" & Err.Description & ") in " & Err.Source
+    ITestCase_TearDown
+    Exit Sub
+End Sub
+
 Private Function ITest_Suite() As TestSuite
     Set ITest_Suite = New TestSuite
     ITest_Suite.AddTest ITest_Manager.ClassName, "TestCreateProjectDoesNothingWhenPathDoesntExist"
@@ -283,7 +306,8 @@ Private Function ITest_Suite() As TestSuite
     ITest_Suite.AddTest ITest_Manager.ClassName, "Test_VBAUnitModulesExportation"
     ITest_Suite.AddTest ITest_Manager.ClassName, "Test_VBAUnitModulesImportation"
     ITest_Suite.AddTest ITest_Manager.ClassName, "Test_vtkCreateProject_correctPathGitFolderIsCreated"
-    ITest_Suite.AddTest ITest_Manager.ClassName, "Test_vtkCreateProject_handlerAddedInDEVWorkbook"
+    ITest_Suite.AddTest ITest_Manager.ClassName, "Test_vtkCreateProject_handlerAddedInDEVWorkbook_modulesAreExported"
+    ITest_Suite.AddTest ITest_Manager.ClassName, "Test_vtkCreateProject_handlerAddedInDEVWorkbook_xmlIsCreated"
 End Function
 
 Private Sub ITestCase_RunTest()
@@ -301,7 +325,8 @@ Private Sub ITestCase_RunTest()
         Case "Test_VBAUnitModulesExportation": Test_VBAUnitModulesExportation
         Case "Test_VBAUnitModulesImportation": Test_VBAUnitModulesImportation
         Case "Test_vtkCreateProject_correctPathGitFolderIsCreated": Test_vtkCreateProject_correctPathGitFolderIsCreated
-        Case "Test_vtkCreateProject_handlerAddedInDEVWorkbook": Test_vtkCreateProject_handlerAddedInDEVWorkbook
+        Case "Test_vtkCreateProject_handlerAddedInDEVWorkbook_modulesAreExported": Test_vtkCreateProject_handlerAddedInDEVWorkbook_modulesAreExported
+        Case "Test_vtkCreateProject_handlerAddedInDEVWorkbook_xmlIsCreated": Test_vtkCreateProject_handlerAddedInDEVWorkbook_xmlIsCreated
         Case Else: mAssert.Should False, "Invalid test name: " & mManager.methodName
     End Select
 End Sub

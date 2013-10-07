@@ -88,7 +88,7 @@ End Sub
 
 Public Sub TestNumberOfVBAUnitModules()
     ' Verify the correct number of VBAUnit Modules in the list
-    mAssert.Equals vtkVBAUnitModulesList.Count, 18, "There are 18 VBAUnit Modules"
+    mAssert.Equals vtkVBAUnitModulesList.count, 18, "There are 18 VBAUnit Modules"
 End Sub
 
 Public Sub TestVBAUnitMainIsTheFirstVBAUnitModule()
