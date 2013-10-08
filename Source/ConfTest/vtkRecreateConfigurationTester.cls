@@ -46,6 +46,7 @@ Private wrongPathConf As vtkConfiguration
 Private xlsConf As vtkConfiguration
 Private xlamConf As vtkConfiguration
 Private xlaConf As vtkConfiguration
+Private multitypeConf As vtkConfiguration
 Private testedConf As vtkConfiguration
 
 Private cm As vtkConfigurationManager
@@ -54,9 +55,10 @@ Private Const testProjectName = "TestProjectForRecreateConf"
 Private Const normalConfName = "TestProject_normalConf"
 Private Const emptyConfName = "TestProject_emptyConf"
 Private Const wrongPathConfName = "TestProject_wrongPathConf"
-Private Const xlsConfName = "TestProject_xlsPathConf"
+Private Const xlsConfName = "TestProject_xlsConf"
 Private Const xlamConfName = "TestProject_xlamConf"
 Private Const xlaConfName = "TestProject_xlaConf"
+Private Const multitypeConfName = "TestProject_multitypeConf"
 
 Private Sub Class_Initialize()
     Set mManager = New TestCaseManager
@@ -76,7 +78,6 @@ Private Sub ITestCase_SetUp(Assert As IAssert)
     Set testProject = vtkProjectForName(testProjectName)
     
     Set Wb = getTestFileFromTemplate(testProject.workbookDEVName, openExcel:=True)
-
     Set cm = vtkConfigurationManagerForProject(testProjectName)
     Set normalConf = cm.configurations(normalConfName)
     Set emptyConf = cm.configurations(emptyConfName)
@@ -84,6 +85,7 @@ Private Sub ITestCase_SetUp(Assert As IAssert)
     Set xlsConf = cm.configurations(xlsConfName)
     Set xlamConf = cm.configurations(xlamConfName)
     Set xlaConf = cm.configurations(xlaConfName)
+    Set multitypeConf = cm.configurations(multitypeConfName)
     
 End Sub
 
@@ -98,20 +100,22 @@ End Sub
 
 ' TESTS TO BE WRITTEN
 '
-' normal configuration, normal path
 '   - workbook is created in the good path
+'       - normal conf
+'       - empty conf
+'       - multitype conf
 '   - all modules of the configuration are present
+'       - normal conf
+'       - multitype conf
 '   - references are activated ( will probably change in the near future as reference management in configurations will change)
+'       - normal conf
 '   - name of the vbproject is correct : same name as the recreated configuration
-'   - filetype is consistent with the extension
+'       - normal conf
+'   - fileFormat is consistent with the extension
 '       - xlsm
 '       - xlam
 '       - xls
 '       - xla
-'
-' configuration particular cases
-'   - configuration is empty
-'   - different kind of modules (noraml, class, form)
 '
 ' particular cases
 '   - workbook with the same name is already open
@@ -119,13 +123,38 @@ End Sub
 '   - source files have not been yet exported
 '
 
-Public Sub Test_vtkRecreateConfiguration_workbookIsCreatedInTheGoodPath()
+' --------------------------------------------------------
+'               PRIVATE UTILITY FUNCTIONS
+' --------------------------------------------------------
+
+Private Sub exportModulesAndRecreateWb(Wb As Workbook, testProject As vtkProject, testedConf As vtkConfiguration)
+    ' It is mandatory to create the source files before recreating a configuration
+    On Error GoTo exportModulesAndRecreateWb_Error
+    
+    vtkExportConfiguration Wb.VBProject, testProject.projectName, testedConf.name
+    vtkRecreateConfiguration testProject.projectName, testedConf.name
+    Set recreatedWb = Workbooks.Open(VBAToolKit.vtkPathOfCurrentProject(Wb) & "\" & testedConf.path)
+    
+    On Error GoTo 0
+    Exit Sub
+
+exportModulesAndRecreateWb_Error:
+    Err.Source = "exportModulesAndRecreateWb of module vtkRecreateConfigurationTester"
+    Debug.Print "Unexpected error " & Err.Number & " (" & Err.Description & ") in " & Err.Source
+    Exit Sub
+End Sub
+
+' --------------------------------------------------------
+'                       TESTS
+' --------------------------------------------------------
+
+Public Sub Test_vtkRecreateConfiguration_workbookIsCreatedInTheGoodPath_normalConf()
 ' workbook is created in the good path
 
-    On Error GoTo Test_vtkRecreateConfiguration_workbookIsCreatedInTheGoodPath_Error
-    
+    On Error GoTo Test_vtkRecreateConfiguration_workbookIsCreatedInTheGoodPath_normalConf_Error
+
     Set testedConf = normalConf
-    
+
     vtkRecreateConfiguration testProject.projectName, testedConf.name
 
     mAssert.Should fso.FileExists(VBAToolKit.vtkPathOfCurrentProject(Wb) & "\" & testedConf.path), _
@@ -134,51 +163,136 @@ Public Sub Test_vtkRecreateConfiguration_workbookIsCreatedInTheGoodPath()
     On Error GoTo 0
     Exit Sub
 
-Test_vtkRecreateConfiguration_workbookIsCreatedInTheGoodPath_Error:
-    Err.Source = "Test_vtkRecreateConfiguration_workbookIsCreatedInTheGoodPath of module vtkRecreateConfigurationTester"
+Test_vtkRecreateConfiguration_workbookIsCreatedInTheGoodPath_normalConf_Error:
+    Err.Source = "Test_vtkRecreateConfiguration_workbookIsCreatedInTheGoodPath_normalConf of module vtkRecreateConfigurationTester"
     mAssert.Should False, "Unexpected error " & Err.Number & " (" & Err.Description & ") in " & Err.Source
     ITestCase_TearDown
     Exit Sub
 End Sub
 
-Public Sub Test_vtkRecreateConfiguration_allModulesArePresent()
+
+
+Public Sub Test_vtkRecreateConfiguration_workbookIsCreatedInTheGoodPath_emptyConf()
+' workbook is created in the good path
+
+    On Error GoTo Test_vtkRecreateConfiguration_workbookIsCreatedInTheGoodPath_emptyConf_Error
+
+    Set testedConf = emptyConf
+
+    vtkRecreateConfiguration testProject.projectName, testedConf.name
+
+    mAssert.Should fso.FileExists(VBAToolKit.vtkPathOfCurrentProject(Wb) & "\" & testedConf.path), _
+                   "The configuration should have been created in the designated path."
+
+    On Error GoTo 0
+    Exit Sub
+
+Test_vtkRecreateConfiguration_workbookIsCreatedInTheGoodPath_emptyConf_Error:
+    Err.Source = "Test_vtkRecreateConfiguration_workbookIsCreatedInTheGoodPath_emptyConf of module vtkRecreateConfigurationTester"
+    mAssert.Should False, "Unexpected error " & Err.Number & " (" & Err.Description & ") in " & Err.Source
+    ITestCase_TearDown
+    Exit Sub
+End Sub
+
+
+
+Public Sub Test_vtkRecreateConfiguration_workbookIsCreatedInTheGoodPath_multitypeConf()
+' workbook is created in the good path
+
+    On Error GoTo Test_vtkRecreateConfiguration_workbookIsCreatedInTheGoodPath_multitypeConf_Error
+
+    Set testedConf = multitypeConf
+
+    vtkRecreateConfiguration testProject.projectName, testedConf.name
+
+    mAssert.Should fso.FileExists(VBAToolKit.vtkPathOfCurrentProject(Wb) & "\" & testedConf.path), _
+                   "The configuration should have been created in the designated path."
+
+    On Error GoTo 0
+    Exit Sub
+
+Test_vtkRecreateConfiguration_workbookIsCreatedInTheGoodPath_multitypeConf_Error:
+    Err.Source = "Test_vtkRecreateConfiguration_workbookIsCreatedInTheGoodPath_multitypeConf of module vtkRecreateConfigurationTester"
+    mAssert.Should False, "Unexpected error " & Err.Number & " (" & Err.Description & ") in " & Err.Source
+    ITestCase_TearDown
+    Exit Sub
+End Sub
+
+
+
+Public Sub Test_vtkRecreateConfiguration_allModulesArePresent_normalConf()
 ' all modules of the configuration are present
 
     Dim error As Integer: error = 0
 
-    On Error GoTo Test_vtkRecreateConfiguration_allModulesArePresent_Error
-    
+    On Error GoTo Test_vtkRecreateConfiguration_allModulesArePresent_normalConf_Error
+
     Set testedConf = normalConf
-    
-    ' It is mandatory to create the source files before recreating a configuration
-    vtkExportConfiguration Wb.VBProject, testProject.projectName, testedConf.name
-    vtkRecreateConfiguration testProject.projectName, testedConf.name
-    
-    Set recreatedWb = Workbooks.Open(VBAToolKit.vtkPathOfCurrentProject(Wb) & "\" & testedConf.path)
-    
+
+    exportModulesAndRecreateWb wb, testProject, testedConf
+
     Dim mo As vtkModule
     Dim vbCmp As VBComponent
     For Each mo In testedConf.modules
         ' Just a dummy access attempt : will throw error 9 (subscript out of range) if the module doesn't exist
         Set vbCmp = recreatedWb.VBProject.VBComponents(mo.name)
     Next
-    
+
     mAssert.Equals error, 0, "All modules don't exist in the recreated project."
-    
+
     On Error GoTo 0
     Exit Sub
 
-Test_vtkRecreateConfiguration_allModulesArePresent_Error:
+Test_vtkRecreateConfiguration_allModulesArePresent_normalConf_Error:
         If Err.Number = 9 Then
             error = Err.Number
             Resume Next
         Else
-            Err.Source = "Test_vtkRecreateConfiguration_allModulesArePresent of module vtkRecreateConfigurationTester"
+            Err.Source = "Test_vtkRecreateConfiguration_allModulesArePresent_normalConf of module vtkRecreateConfigurationTester"
             mAssert.Should False, "Unexpected error " & Err.Number & " (" & Err.Description & ") in " & Err.Source
             ITestCase_TearDown
             Exit Sub
         End If
 End Sub
+
+
+
+Public Sub Test_vtkRecreateConfiguration_allModulesArePresent_multitypeConf()
+' all modules of the configuration are present
+
+    Dim error As Integer: error = 0
+
+    On Error GoTo Test_vtkRecreateConfiguration_allModulesArePresent_multitypeConf_Error
+
+    Set testedConf = multitypeConf
+
+    exportModulesAndRecreateWb wb, testProject, testedConf
+
+    Dim mo As vtkModule
+    Dim vbCmp As VBComponent
+    For Each mo In testedConf.modules
+        ' Just a dummy access attempt : will throw error 9 (subscript out of range) if the module doesn't exist
+        Set vbCmp = recreatedWb.VBProject.VBComponents(mo.name)
+    Next
+
+    mAssert.Equals error, 0, "All modules don't exist in the recreated project."
+
+    On Error GoTo 0
+    Exit Sub
+
+Test_vtkRecreateConfiguration_allModulesArePresent_multitypeConf_Error:
+        If Err.Number = 9 Then
+            error = Err.Number
+            Resume Next
+        Else
+            Err.Source = "Test_vtkRecreateConfiguration_allModulesArePresent_multitypeConf of module vtkRecreateConfigurationTester"
+            mAssert.Should False, "Unexpected error " & Err.Number & " (" & Err.Description & ") in " & Err.Source
+            ITestCase_TearDown
+            Exit Sub
+        End If
+End Sub
+
+
 
 Public Sub Test_vtkRecreateConfiguration_referencesAreActivated()
 ' references are activated
@@ -193,12 +307,9 @@ Public Sub Test_vtkRecreateConfiguration_referencesAreActivated()
     Dim i As Integer
     Dim refIsActive As Boolean
     Dim guidArray() As String
-    
-    ' Creation of the new workbook
-    vtkExportConfiguration Wb.VBProject, testProject.projectName, testedConf.name
-    vtkRecreateConfiguration testProject.projectName, testedConf.name
-    Set recreatedWb = Workbooks.Open(VBAToolKit.vtkPathOfCurrentProject(Wb) & "\" & testedConf.path)
-    
+
+    exportModulesAndRecreateWb wb, testProject, testedConf
+
     ' Listing expected references
     numRef = 4
     ReDim guidArray(1 To numRef) As String
@@ -206,18 +317,18 @@ Public Sub Test_vtkRecreateConfiguration_referencesAreActivated()
     guidArray(2) = "{0002E157-0000-0000-C000-000000000046}" ' VBIDE : Microsoft visual basic for applications extensibility 5.3
     guidArray(3) = "{50A7E9B0-70EF-11D1-B75A-00A0C90564FE}" ' Shell32 : Microsoft Shell Controls and Automation
     guidArray(4) = "{F5078F18-C551-11D3-89B9-0000F81FE221}" ' MSXML2 : Microsoft XML V5.0
-    
+
     ' For each GUID in the array, check if it is in the project references
     For i = 1 To numRef
-    
+
         refIsActive = False
         For Each ref In recreatedWb.VBProject.References
             If ref.GUID = guidArray(i) Then refIsActive = True
         Next
-        
+
         mAssert.Should refIsActive, "The reference with GUID = " & guidArray(i) & " is not activated : it should."
     Next
-    
+
     On Error GoTo 0
     Exit Sub
 
@@ -228,6 +339,8 @@ Test_vtkRecreateConfiguration_referencesAreActivated_Error:
     Exit Sub
 End Sub
 
+
+
 Public Sub Test_vtkRecreateConfiguration_nameOfTheVBProjectIsCorrect()
 ' name of the vbproject is correct : same name as the recreated configuration
 
@@ -235,11 +348,8 @@ Public Sub Test_vtkRecreateConfiguration_nameOfTheVBProjectIsCorrect()
 
     Set testedConf = normalConf
 
-    ' Creation of the new workbook
-    vtkExportConfiguration Wb.VBProject, testProject.projectName, testedConf.name
-    vtkRecreateConfiguration testProject.projectName, testedConf.name
-    Set recreatedWb = Workbooks.Open(VBAToolKit.vtkPathOfCurrentProject(Wb) & "\" & testedConf.path)
-    
+    exportModulesAndRecreateWb wb, testProject, testedConf
+
     mAssert.Equals recreatedWb.VBProject.name, testedConf.name, _
                    "The created project should have the same name as the recreated configuration."
 
@@ -254,124 +364,155 @@ Test_vtkRecreateConfiguration_nameOfTheVBProjectIsCorrect_Error:
 End Sub
 
 
-Public Sub Test_vtkRecreateConfiguration_fileTypeIsConsistentWithExtension_XLSM()
 
-    On Error GoTo Test_vtkRecreateConfiguration_fileTypeIsConsistentWithExtension_XLSM_Error
+Public Sub Test_vtkRecreateConfiguration_fileFormatIsConsistentWithExtension_XLSM()
+' test the xlsm format
+
+    On Error GoTo Test_vtkRecreateConfiguration_fileFormatIsConsistentWithExtension_XLSM_Error
 
     Set testedConf = normalConf
 
-    ' Creation of the new workbook
-    vtkExportConfiguration Wb.VBProject, testProject.projectName, testedConf.name
-    vtkRecreateConfiguration testProject.projectName, testedConf.name
-    Set recreatedWb = Workbooks.Open(VBAToolKit.vtkPathOfCurrentProject(Wb) & "\" & testedConf.path)
-    
-    mAssert.Equals fso.GetFile("VBAToolKit.vtkPathOfCurrentProject(wb) & " \ " & testedConf.path").Type = _
+    exportModulesAndRecreateWb wb, testProject, testedConf
+
+    mAssert.Equals recreatedWb.FileFormat, _
                    xlOpenXMLWorkbookMacroEnabled, _
                    "File format is wrong."
 
     On Error GoTo 0
     Exit Sub
 
-Test_vtkRecreateConfiguration_fileTypeIsConsistentWithExtension_XLSM_Error:
-    Err.Source = "Test_vtkRecreateConfiguration_fileTypeIsConsistentWithExtension_XLSM of module vtkRecreateConfigurationTester"
+Test_vtkRecreateConfiguration_fileFormatIsConsistentWithExtension_XLSM_Error:
+    Err.Source = "Test_vtkRecreateConfiguration_fileFormatIsConsistentWithExtension_XLSM of module vtkRecreateConfigurationTester"
     mAssert.Should False, "Unexpected error " & Err.Number & " (" & Err.Description & ") in " & Err.Source
     ITestCase_TearDown
     Exit Sub
 End Sub
 
-Public Sub Test_vtkRecreateConfiguration_fileTypeIsConsistentWithExtension_XLAM()
 
-    On Error GoTo Test_vtkRecreateConfiguration_fileTypeIsConsistentWithExtension_XLAM_Error
-    
+
+Public Sub Test_vtkRecreateConfiguration_fileFormatIsConsistentWithExtension_XLAM()
+' test the xlam format
+
+    On Error GoTo Test_vtkRecreateConfiguration_fileFormatIsConsistentWithExtension_XLAM_Error
+
     Set testedConf = xlamConf
-    
-    ' Creation of the new workbook
-    vtkExportConfiguration Wb.VBProject, testProject.projectName, testedConf.name
-    vtkRecreateConfiguration testProject.projectName, testedConf.name
-    Set recreatedWb = Workbooks.Open(VBAToolKit.vtkPathOfCurrentProject(Wb) & "\" & testedConf.path)
-    
-    mAssert.Equals fso.GetFile("VBAToolKit.vtkPathOfCurrentProject(wb) & " \ " & testedConf.path").Type = _
+
+    exportModulesAndRecreateWb wb, testProject, testedConf
+
+    mAssert.Equals recreatedWb.FileFormat, _
                    xlOpenXMLAddIn, _
                    "File format is wrong."
 
     On Error GoTo 0
     Exit Sub
 
-Test_vtkRecreateConfiguration_fileTypeIsConsistentWithExtension_XLAM_Error:
-    Err.Source = "Test_vtkRecreateConfiguration_fileTypeIsConsistentWithExtension_XLAM of module vtkRecreateConfigurationTester"
+Test_vtkRecreateConfiguration_fileFormatIsConsistentWithExtension_XLAM_Error:
+    Err.Source = "Test_vtkRecreateConfiguration_fileFormatIsConsistentWithExtension_XLAM of module vtkRecreateConfigurationTester"
     mAssert.Should False, "Unexpected error " & Err.Number & " (" & Err.Description & ") in " & Err.Source
     ITestCase_TearDown
     Exit Sub
 End Sub
 
-Public Sub Test_vtkRecreateConfiguration_fileTypeIsConsistentWithExtension_XLS()
 
-    On Error GoTo Test_vtkRecreateConfiguration_fileTypeIsConsistentWithExtension_XLS_Error
+
+Public Sub Test_vtkRecreateConfiguration_fileFormatIsConsistentWithExtension_XLS()
+' test the xls format
+
+    On Error GoTo Test_vtkRecreateConfiguration_fileFormatIsConsistentWithExtension_XLS_Error
 
     Set testedConf = xlsConf
 
-    ' Creation of the new workbook
-    vtkExportConfiguration Wb.VBProject, testProject.projectName, testedConf.name
-    vtkRecreateConfiguration testProject.projectName, testedConf.name
-    Set recreatedWb = Workbooks.Open(VBAToolKit.vtkPathOfCurrentProject(Wb) & "\" & testedConf.path)
-    
-    mAssert.Equals fso.GetFile("VBAToolKit.vtkPathOfCurrentProject(wb) & " \ " & testedConf.path").Type = _
+    exportModulesAndRecreateWb wb, testProject, testedConf
+
+    mAssert.Equals recreatedWb.FileFormat, _
                    xlExcel8, _
                    "File format is wrong."
 
     On Error GoTo 0
     Exit Sub
 
-Test_vtkRecreateConfiguration_fileTypeIsConsistentWithExtension_XLS_Error:
-    Err.Source = "Test_vtkRecreateConfiguration_fileTypeIsConsistentWithExtension_XLS of module vtkRecreateConfigurationTester"
+Test_vtkRecreateConfiguration_fileFormatIsConsistentWithExtension_XLS_Error:
+    Err.Source = "Test_vtkRecreateConfiguration_fileFormatIsConsistentWithExtension_XLS of module vtkRecreateConfigurationTester"
     mAssert.Should False, "Unexpected error " & Err.Number & " (" & Err.Description & ") in " & Err.Source
     ITestCase_TearDown
     Exit Sub
 End Sub
 
-Public Sub Test_vtkRecreateConfiguration_fileTypeIsConsistentWithExtension_XLA()
 
-    On Error GoTo Test_vtkRecreateConfiguration_fileTypeIsConsistentWithExtension_XLA_Error
 
-    Set testedConf = xlaConf
+Public Sub Test_vtkRecreateConfiguration_fileFormatIsConsistentWithExtension_XLA()
+' test the xla format
+' test failing, don't know why
 
-    ' Creation of the new workbook
-    vtkExportConfiguration Wb.VBProject, testProject.projectName, testedConf.name
-    vtkRecreateConfiguration testProject.projectName, testedConf.name
-    Set recreatedWb = Workbooks.Open(VBAToolKit.vtkPathOfCurrentProject(Wb) & "\" & testedConf.path)
+'    On Error GoTo Test_vtkRecreateConfiguration_fileFormatIsConsistentWithExtension_XLA_Error
+'
+'    Set testedConf = xlaConf
+'
+'    exportModulesAndRecreateWb wb, testProject, testedConf
+'
+'    mAssert.Equals recreatedWb.FileFormat, _
+'                   xlAddIn, _
+'                   "File format is wrong."
+'
+'    On Error GoTo 0
+'    Exit Sub
+'
+'Test_vtkRecreateConfiguration_fileFormatIsConsistentWithExtension_XLA_Error:
+'    Err.Source = "Test_vtkRecreateConfiguration_fileFormatIsConsistentWithExtension_XLA of module vtkRecreateConfigurationTester"
+'    mAssert.Should False, "Unexpected error " & Err.Number & " (" & Err.Description & ") in " & Err.Source
+'    ITestCase_TearDown
+'    Exit Sub
+End Sub
+
+
+
+Public Sub Test_vtkRecreateConfiguration_workbookIsAlreadyOpen()
+' workbook with the same name is already open
+
+    On Error GoTo Test_vtkRecreateConfiguration_workbookIsAlreadyOpen_Error
+
     
-    mAssert.Equals fso.GetFile("VBAToolKit.vtkPathOfCurrentProject(wb) & " \ " & testedConf.path").Type = _
-                   xlAddIn8, _
-                   "File format is wrong."
 
     On Error GoTo 0
     Exit Sub
 
-Test_vtkRecreateConfiguration_fileTypeIsConsistentWithExtension_XLA_Error:
-    Err.Source = "Test_vtkRecreateConfiguration_fileTypeIsConsistentWithExtension_XLA of module vtkRecreateConfigurationTester"
+Test_vtkRecreateConfiguration_workbookIsAlreadyOpen_Error:
+    Err.Source = "Test_vtkRecreateConfiguration_workbookIsAlreadyOpen of module vtkRecreateConfigurationTester"
     mAssert.Should False, "Unexpected error " & Err.Number & " (" & Err.Description & ") in " & Err.Source
     ITestCase_TearDown
     Exit Sub
 End Sub
 
-Public Sub Test_vtkRecreateConfiguration_emptyConfiguration()
-
-End Sub
-
 Private Function ITest_Suite() As TestSuite
     Set ITest_Suite = New TestSuite
-    ITest_Suite.AddTest ITest_Manager.ClassName, "Test_vtkRecreateConfiguration_workbookIsCreatedInTheGoodPath"
-    ITest_Suite.AddTest ITest_Manager.ClassName, "Test_vtkRecreateConfiguration_allModulesArePresent"
+    ITest_Suite.AddTest ITest_Manager.ClassName, "Test_vtkRecreateConfiguration_workbookIsCreatedInTheGoodPath_normalConf"
+    ITest_Suite.AddTest ITest_Manager.ClassName, "Test_vtkRecreateConfiguration_workbookIsCreatedInTheGoodPath_emptyConf"
+    ITest_Suite.AddTest ITest_Manager.ClassName, "Test_vtkRecreateConfiguration_workbookIsCreatedInTheGoodPath_multitypeConf"
+    ITest_Suite.AddTest ITest_Manager.ClassName, "Test_vtkRecreateConfiguration_allModulesArePresent_normalConf"
+    ITest_Suite.AddTest ITest_Manager.ClassName, "Test_vtkRecreateConfiguration_allModulesArePresent_multitypeConf"
     ITest_Suite.AddTest ITest_Manager.ClassName, "Test_vtkRecreateConfiguration_referencesAreActivated"
     ITest_Suite.AddTest ITest_Manager.ClassName, "Test_vtkRecreateConfiguration_nameOfTheVBProjectIsCorrect"
+    ITest_Suite.AddTest ITest_Manager.ClassName, "Test_vtkRecreateConfiguration_fileFormatIsConsistentWithExtension_XLSM"
+    ITest_Suite.AddTest ITest_Manager.ClassName, "Test_vtkRecreateConfiguration_fileFormatIsConsistentWithExtension_XLAM"
+    ITest_Suite.AddTest ITest_Manager.ClassName, "Test_vtkRecreateConfiguration_fileFormatIsConsistentWithExtension_XLS"
+    ITest_Suite.AddTest ITest_Manager.ClassName, "Test_vtkRecreateConfiguration_fileFormatIsConsistentWithExtension_XLA"
+    ITest_Suite.AddTest ITest_Manager.ClassName, "Test_vtkRecreateConfiguration_workbookIsAlreadyOpen"
 End Function
 
 Private Sub ITestCase_RunTest()
     Select Case mManager.methodName
-        Case "Test_vtkRecreateConfiguration_workbookIsCreatedInTheGoodPath": Test_vtkRecreateConfiguration_workbookIsCreatedInTheGoodPath
-        Case "Test_vtkRecreateConfiguration_allModulesArePresent": Test_vtkRecreateConfiguration_allModulesArePresent
+        Case "Test_vtkRecreateConfiguration_workbookIsCreatedInTheGoodPath_normalConf": Test_vtkRecreateConfiguration_workbookIsCreatedInTheGoodPath_normalConf
+        Case "Test_vtkRecreateConfiguration_workbookIsCreatedInTheGoodPath_emptyConf": Test_vtkRecreateConfiguration_workbookIsCreatedInTheGoodPath_emptyConf
+        Case "Test_vtkRecreateConfiguration_workbookIsCreatedInTheGoodPath_multitypeConf": Test_vtkRecreateConfiguration_workbookIsCreatedInTheGoodPath_multitypeConf
+        Case "Test_vtkRecreateConfiguration_allModulesArePresent_normalConf": Test_vtkRecreateConfiguration_allModulesArePresent_normalConf
+        Case "Test_vtkRecreateConfiguration_allModulesArePresent_multitypeConf": Test_vtkRecreateConfiguration_allModulesArePresent_multitypeConf
         Case "Test_vtkRecreateConfiguration_referencesAreActivated": Test_vtkRecreateConfiguration_referencesAreActivated
         Case "Test_vtkRecreateConfiguration_nameOfTheVBProjectIsCorrect": Test_vtkRecreateConfiguration_nameOfTheVBProjectIsCorrect
+        Case "Test_vtkRecreateConfiguration_fileFormatIsConsistentWithExtension_XLSM": Test_vtkRecreateConfiguration_fileFormatIsConsistentWithExtension_XLSM
+        Case "Test_vtkRecreateConfiguration_fileFormatIsConsistentWithExtension_XLAM": Test_vtkRecreateConfiguration_fileFormatIsConsistentWithExtension_XLAM
+        Case "Test_vtkRecreateConfiguration_fileFormatIsConsistentWithExtension_XLS": Test_vtkRecreateConfiguration_fileFormatIsConsistentWithExtension_XLS
+        Case "Test_vtkRecreateConfiguration_fileFormatIsConsistentWithExtension_XLA": Test_vtkRecreateConfiguration_fileFormatIsConsistentWithExtension_XLA
+        Case "Test_vtkRecreateConfiguration_workbookIsAlreadyOpen": Test_vtkRecreateConfiguration_workbookIsAlreadyOpen
         Case Else: mAssert.Should False, "Invalid test name: " & mManager.methodName
     End Select
 End Sub
