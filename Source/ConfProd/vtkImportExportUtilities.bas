@@ -371,7 +371,7 @@ End Sub
 '
 '---------------------------------------------------------------------------------------
 '
-Public Sub vtkRecreateConfiguration(projectName As String, configurationName As String)
+Public Sub vtkRecreateConfiguration(projectWithModules As VBProject, projectName As String, configurationName As String)
     Dim cm As vtkConfigurationManager
     Dim rootPath As String
     Dim wbPath As String
@@ -399,6 +399,9 @@ Public Sub vtkRecreateConfiguration(projectName As String, configurationName As 
     
     ' Set the projectName
     Wb.VBProject.name = configurationName
+    
+    ' Export the modules of the configuration
+    vtkExportConfiguration projectWithModules, projectName, configurationName
     
     ' Import all modules for this configuration from the source directory
     vtkImportModulesInAnotherProject projectForModules:=Wb.VBProject, projectName:=projectName, confName:=configurationName
