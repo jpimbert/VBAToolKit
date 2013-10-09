@@ -378,13 +378,6 @@ Public Sub vtkRecreateConfiguration(projectName As String, configurationName As 
     Dim Wb As Workbook
     Dim tmpWb As Workbook
     Dim fso As New FileSystemObject
-    
-    
-    ' Make sure the configuration path is different from the path of all the current workbooks
-    ' -> we don't want to overwrite an opened workbook.
-    
-    ' If the workbook is an add-in
-    ' do the stuff JPI did, install and stuff
 
     On Error GoTo vtkRecreateConfiguration_Error
     
@@ -396,6 +389,7 @@ Public Sub vtkRecreateConfiguration(projectName As String, configurationName As 
     wbPath = cm.getConfigurationPath(configuration:=configurationName)
     
     ' Make sure the workbook we want to create is not open
+    ' NB : open add-ins don't count and are managed further down
     For Each tmpWb In Workbooks
         If tmpWb.name Like fso.GetFileName(wbPath) Then Err.Raise VTK_WORKBOOK_ALREADY_OPEN
     Next
@@ -412,13 +406,28 @@ Public Sub vtkRecreateConfiguration(projectName As String, configurationName As 
     ' Recreate references in the new Excel File
     VtkActivateReferences Wb:=Wb
     
-    ' Set attribute properties WARNING - only for Delivery VBAToolKit
-    'wb.BuiltinDocumentProperties("Title").Value = "VBAToolKit"
-    'wb.BuiltinDocumentProperties("Comments").Value = "Toolkit improving IDE for VBA projects"
-    
-    ' Save the Excel file with the good type and erase the previous one (a message is displayed to the user)
-    Wb.SaveAs fileName:=rootPath & "\" & wbPath, FileFormat:=vtkDefaultFileFormat(wbPath)
+    ' VB will not let the workbook be saved under the name of an already opened workbook, which
+    ' is annoying when recreating an add-in (always opened). The following code works around this.
+    Dim tmpPath As String
+    fso.GetParentFolderName (wbPath)
+
+    ' Add a random string to the file name of the workbook that will be saved
+    tmpPath = rootPath & "\" & fso.GetParentFolderName(wbPath) & "\" & _
+              vtkStripFilePathOrNameOfExtension(fso.GetFileName(wbPath)) & _
+              CStr(Round((99999 - 10000 + 1) * Rnd(), 0)) + 10000 & _
+              "." & fso.GetExtensionName(wbPath)
+
+    ' Save the new workbook with the correct extension
+    Wb.SaveAs fileName:=tmpPath, FileFormat:=vtkDefaultFileFormat(wbPath)
     Wb.Close saveChanges:=False
+    
+    ' Delete the old workbook if it exists
+    Dim fullWbpath As String
+    fullWbpath = rootPath & "\" & wbPath
+    If fso.FileExists(fullWbpath) Then fso.DeleteFile (fullWbpath)
+    
+    ' Rename the new workbook without the random string
+    fso.GetFile(tmpPath).name = fso.GetFileName(rootPath & "\" & wbPath)
     
     On Error GoTo 0
     Exit Sub
@@ -435,7 +444,7 @@ vtkRecreateConfiguration_Error:
             Err.Number = VTK_UNEXPECTED_ERROR
     End Select
     
-    Err.Raise Err.Number, Err.Description, Err.Source
+    Err.Raise Err.Number, Err.Source, Err.Description
     
     Exit Sub
     

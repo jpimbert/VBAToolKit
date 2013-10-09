@@ -47,6 +47,7 @@ Private xlsConf As vtkConfiguration
 Private xlamConf As vtkConfiguration
 Private xlaConf As vtkConfiguration
 Private multitypeConf As vtkConfiguration
+Private VTKConf As vtkConfiguration
 Private testedConf As vtkConfiguration
 
 Private cm As vtkConfigurationManager
@@ -59,6 +60,7 @@ Private Const xlsConfName = "TestProject_xlsConf"
 Private Const xlamConfName = "TestProject_xlamConf"
 Private Const xlaConfName = "TestProject_xlaConf"
 Private Const multitypeConfName = "TestProject_multitypeConf"
+Private Const VTKConfName = "TestProject_VTKConf"
 
 Private Sub Class_Initialize()
     Set mManager = New TestCaseManager
@@ -86,6 +88,7 @@ Private Sub ITestCase_SetUp(Assert As IAssert)
     Set xlamConf = cm.configurations(xlamConfName)
     Set xlaConf = cm.configurations(xlaConfName)
     Set multitypeConf = cm.configurations(multitypeConfName)
+    Set VTKConf = cm.configurations(VTKConfName)
 
 End Sub
 
@@ -121,8 +124,9 @@ End Sub
 '   - workbook with the same name is already open : raise error VTK_WORKBOOK_ALREADY_OPEN
 '   - add-in with the same name is activated : export the file normally
 '   - workbook with the same name already exists in the same path : overwrite the file
+'       - normal conf
+'       - xlam
 '   - source files have not been yet exported : file doesn't have the corresponding modules
-'
 
 ' --------------------------------------------------------
 '               PRIVATE UTILITY FUNCTIONS
@@ -500,6 +504,95 @@ Test_vtkRecreateConfiguration_workbookOpen_Error:
         End If
 End Sub
 
+
+
+Public Sub Test_vtkRecreateConfiguration_addInOpen_XLAM()
+' add-in with the same name is activated : recreate the configuration normally
+
+    Dim error As Integer: error = 0
+
+    On Error GoTo Test_vtkRecreateConfiguration_addInOpen_Error
+
+    Set testedConf = VTKConf
+
+    ' Recreate the configuration called just like an actived add-in : "VBAToolKit.xlam"
+    vtkExportConfiguration Wb.VBProject, testProject.projectName, testedConf.name
+    vtkRecreateConfiguration testProject.projectName, testedConf.name
+
+    mAssert.Equals error, 0
+
+    On Error GoTo 0
+    Exit Sub
+
+Test_vtkRecreateConfiguration_addInOpen_Error:
+    error = Err.Number
+    Resume Next
+End Sub
+
+
+
+Public Sub Test_vtkRecreateConfiguration_overwriteFile_normal()
+' file already exists : overwrite it
+    
+    On Error GoTo Test_vtkRecreateConfiguration_overwriteFile_normal_Error
+
+    Dim oldSize As Integer
+    Dim newSize As Integer
+
+    Set testedConf = normalConf
+
+    fso.CreateTextFile (VBAToolKit.vtkPathOfCurrentProject(Wb) & "\" & testedConf.path)
+    oldSize = fso.GetFile(VBAToolKit.vtkPathOfCurrentProject(Wb) & "\" & testedConf.path).Size
+
+    ' Create and open recreatedWb
+    exportModulesAndRecreateWb wb, testProject, testedConf
+    
+    newSize = fso.GetFile(VBAToolKit.vtkPathOfCurrentProject(Wb) & "\" & testedConf.path).Size
+    
+    mAssert.Should newSize > oldSize, "File should have been overwritten."
+
+    On Error GoTo 0
+    Exit Sub
+
+Test_vtkRecreateConfiguration_overwriteFile_normal_Error:
+    Err.Source = "Test_vtkRecreateConfiguration_overwriteFile_normal of module vtkRecreateConfigurationTester"
+    mAssert.Should False, "Unexpected error " & Err.Number & " (" & Err.Description & ") in " & Err.Source
+    ITestCase_TearDown
+    Exit Sub
+End Sub
+
+
+
+Public Sub Test_vtkRecreateConfiguration_overwriteFile_addIn()
+' add-in already exists : overwrite it
+
+    On Error GoTo Test_vtkRecreateConfiguration_overwriteFile_addIn_Error
+
+    Dim oldSize As Integer
+    Dim newSize As Integer
+
+    Set testedConf = xlamConf
+
+    fso.CreateTextFile (VBAToolKit.vtkPathOfCurrentProject(Wb) & "\" & testedConf.path)
+    oldSize = fso.GetFile(VBAToolKit.vtkPathOfCurrentProject(Wb) & "\" & testedConf.path).Size
+
+    ' Create and open recreatedWb
+    exportModulesAndRecreateWb wb, testProject, testedConf
+    
+    newSize = fso.GetFile(VBAToolKit.vtkPathOfCurrentProject(Wb) & "\" & testedConf.path).Size
+    
+    mAssert.Should newSize > oldSize, "File should have been overwritten."
+
+    On Error GoTo 0
+    Exit Sub
+
+Test_vtkRecreateConfiguration_overwriteFile_addIn_Error:
+    Err.Source = "Test_vtkRecreateConfiguration_overwriteFile_addIn of module vtkRecreateConfigurationTester"
+    mAssert.Should False, "Unexpected error " & Err.Number & " (" & Err.Description & ") in " & Err.Source
+    ITestCase_TearDown
+    Exit Sub
+End Sub
+
 Private Function ITest_Suite() As TestSuite
     Set ITest_Suite = New TestSuite
     ITest_Suite.AddTest ITest_Manager.ClassName, "Test_vtkRecreateConfiguration_workbookIsCreatedInTheGoodPath_normalConf"
@@ -513,6 +606,9 @@ Private Function ITest_Suite() As TestSuite
     ITest_Suite.AddTest ITest_Manager.ClassName, "Test_vtkRecreateConfiguration_formatLikeExtension_XLAM"
     ITest_Suite.AddTest ITest_Manager.ClassName, "Test_vtkRecreateConfiguration_formatLikeExtension_XLS"
     ITest_Suite.AddTest ITest_Manager.ClassName, "Test_vtkRecreateConfiguration_workbookOpen"
+    ITest_Suite.AddTest ITest_Manager.ClassName, "Test_vtkRecreateConfiguration_addInOpen_XLAM"
+    ITest_Suite.AddTest ITest_Manager.ClassName, "Test_vtkRecreateConfiguration_overwriteFile_normal"
+    ITest_Suite.AddTest ITest_Manager.ClassName, "Test_vtkRecreateConfiguration_overwriteFile_addIn"
 End Function
 
 Private Sub ITestCase_RunTest()
@@ -528,6 +624,9 @@ Private Sub ITestCase_RunTest()
         Case "Test_vtkRecreateConfiguration_formatLikeExtension_XLAM": Test_vtkRecreateConfiguration_formatLikeExtension_XLAM
         Case "Test_vtkRecreateConfiguration_formatLikeExtension_XLS": Test_vtkRecreateConfiguration_formatLikeExtension_XLS
         Case "Test_vtkRecreateConfiguration_workbookOpen": Test_vtkRecreateConfiguration_workbookOpen
+        Case "Test_vtkRecreateConfiguration_addInOpen_XLAM": Test_vtkRecreateConfiguration_addInOpen_XLAM
+        Case "Test_vtkRecreateConfiguration_overwriteFile_normal": Test_vtkRecreateConfiguration_overwriteFile_normal
+        Case "Test_vtkRecreateConfiguration_overwriteFile_addIn": Test_vtkRecreateConfiguration_overwriteFile_addIn
         Case Else: mAssert.Should False, "Invalid test name: " & mManager.methodName
     End Select
 End Sub
