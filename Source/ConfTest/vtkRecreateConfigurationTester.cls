@@ -74,9 +74,9 @@ End Property
 
 Private Sub ITestCase_SetUp(Assert As IAssert)
     Set mAssert = Assert
-    
+
     Set testProject = vtkProjectForName(testProjectName)
-    
+
     Set Wb = getTestFileFromTemplate(testProject.workbookDEVName, openExcel:=True)
     Set cm = vtkConfigurationManagerForProject(testProjectName)
     Set normalConf = cm.configurations(normalConfName)
@@ -86,7 +86,7 @@ Private Sub ITestCase_SetUp(Assert As IAssert)
     Set xlamConf = cm.configurations(xlamConfName)
     Set xlaConf = cm.configurations(xlaConfName)
     Set multitypeConf = cm.configurations(multitypeConfName)
-    
+
 End Sub
 
 Private Sub ITestCase_TearDown()
@@ -118,9 +118,10 @@ End Sub
 '       - xla
 '
 ' particular cases
-'   - workbook with the same name is already open
-'   - workbook with the same name already exists in the same path
-'   - source files have not been yet exported
+'   - workbook with the same name is already open : raise error VTK_WORKBOOK_ALREADY_OPEN
+'   - add-in with the same name is activated : export the file normally
+'   - workbook with the same name already exists in the same path : overwrite the file
+'   - source files have not been yet exported : file doesn't have the corresponding modules
 '
 
 ' --------------------------------------------------------
@@ -130,11 +131,11 @@ End Sub
 Private Sub exportModulesAndRecreateWb(Wb As Workbook, testProject As vtkProject, testedConf As vtkConfiguration)
     ' It is mandatory to create the source files before recreating a configuration
     On Error GoTo exportModulesAndRecreateWb_Error
-    
+
     vtkExportConfiguration Wb.VBProject, testProject.projectName, testedConf.name
     vtkRecreateConfiguration testProject.projectName, testedConf.name
     Set recreatedWb = Workbooks.Open(VBAToolKit.vtkPathOfCurrentProject(Wb) & "\" & testedConf.path)
-    
+
     On Error GoTo 0
     Exit Sub
 
@@ -348,6 +349,7 @@ Public Sub Test_vtkRecreateConfiguration_nameOfTheVBProjectIsCorrect()
 
     Set testedConf = normalConf
 
+    ' Set recreatedWb and open it
     exportModulesAndRecreateWb wb, testProject, testedConf
 
     mAssert.Equals recreatedWb.VBProject.name, testedConf.name, _
@@ -365,10 +367,10 @@ End Sub
 
 
 
-Public Sub Test_vtkRecreateConfiguration_fileFormatIsConsistentWithExtension_XLSM()
+Public Sub Test_vtkRecreateConfiguration_formatLikeExtension_XLSM()
 ' test the xlsm format
 
-    On Error GoTo Test_vtkRecreateConfiguration_fileFormatIsConsistentWithExtension_XLSM_Error
+    On Error GoTo Test_vtkRecreateConfiguration_formatLikeExtension_XLSM_Error
 
     Set testedConf = normalConf
 
@@ -381,8 +383,8 @@ Public Sub Test_vtkRecreateConfiguration_fileFormatIsConsistentWithExtension_XLS
     On Error GoTo 0
     Exit Sub
 
-Test_vtkRecreateConfiguration_fileFormatIsConsistentWithExtension_XLSM_Error:
-    Err.Source = "Test_vtkRecreateConfiguration_fileFormatIsConsistentWithExtension_XLSM of module vtkRecreateConfigurationTester"
+Test_vtkRecreateConfiguration_formatLikeExtension_XLSM_Error:
+    Err.Source = "Test_vtkRecreateConfiguration_formatLikeExtension_XLSM of module vtkRecreateConfigurationTester"
     mAssert.Should False, "Unexpected error " & Err.Number & " (" & Err.Description & ") in " & Err.Source
     ITestCase_TearDown
     Exit Sub
@@ -390,10 +392,10 @@ End Sub
 
 
 
-Public Sub Test_vtkRecreateConfiguration_fileFormatIsConsistentWithExtension_XLAM()
+Public Sub Test_vtkRecreateConfiguration_formatLikeExtension_XLAM()
 ' test the xlam format
 
-    On Error GoTo Test_vtkRecreateConfiguration_fileFormatIsConsistentWithExtension_XLAM_Error
+    On Error GoTo Test_vtkRecreateConfiguration_formatLikeExtension_XLAM_Error
 
     Set testedConf = xlamConf
 
@@ -406,8 +408,8 @@ Public Sub Test_vtkRecreateConfiguration_fileFormatIsConsistentWithExtension_XLA
     On Error GoTo 0
     Exit Sub
 
-Test_vtkRecreateConfiguration_fileFormatIsConsistentWithExtension_XLAM_Error:
-    Err.Source = "Test_vtkRecreateConfiguration_fileFormatIsConsistentWithExtension_XLAM of module vtkRecreateConfigurationTester"
+Test_vtkRecreateConfiguration_formatLikeExtension_XLAM_Error:
+    Err.Source = "Test_vtkRecreateConfiguration_formatLikeExtension_XLAM of module vtkRecreateConfigurationTester"
     mAssert.Should False, "Unexpected error " & Err.Number & " (" & Err.Description & ") in " & Err.Source
     ITestCase_TearDown
     Exit Sub
@@ -415,10 +417,10 @@ End Sub
 
 
 
-Public Sub Test_vtkRecreateConfiguration_fileFormatIsConsistentWithExtension_XLS()
+Public Sub Test_vtkRecreateConfiguration_formatLikeExtension_XLS()
 ' test the xls format
 
-    On Error GoTo Test_vtkRecreateConfiguration_fileFormatIsConsistentWithExtension_XLS_Error
+    On Error GoTo Test_vtkRecreateConfiguration_formatLikeExtension_XLS_Error
 
     Set testedConf = xlsConf
 
@@ -431,8 +433,8 @@ Public Sub Test_vtkRecreateConfiguration_fileFormatIsConsistentWithExtension_XLS
     On Error GoTo 0
     Exit Sub
 
-Test_vtkRecreateConfiguration_fileFormatIsConsistentWithExtension_XLS_Error:
-    Err.Source = "Test_vtkRecreateConfiguration_fileFormatIsConsistentWithExtension_XLS of module vtkRecreateConfigurationTester"
+Test_vtkRecreateConfiguration_formatLikeExtension_XLS_Error:
+    Err.Source = "Test_vtkRecreateConfiguration_formatLikeExtension_XLS of module vtkRecreateConfigurationTester"
     mAssert.Should False, "Unexpected error " & Err.Number & " (" & Err.Description & ") in " & Err.Source
     ITestCase_TearDown
     Exit Sub
@@ -440,11 +442,11 @@ End Sub
 
 
 
-Public Sub Test_vtkRecreateConfiguration_fileFormatIsConsistentWithExtension_XLA()
-' test the xla format
-' test failing, don't know why
-
-'    On Error GoTo Test_vtkRecreateConfiguration_fileFormatIsConsistentWithExtension_XLA_Error
+'Public Sub Test_vtkRecreateConfiguration_formatLikeExtension_XLA()
+'' test the xla format
+'' test failing, don 't know why
+'
+'    On Error GoTo Test_vtkRecreateConfiguration_formatLikeExtension_XLA_Error
 '
 '    Set testedConf = xlaConf
 '
@@ -457,30 +459,45 @@ Public Sub Test_vtkRecreateConfiguration_fileFormatIsConsistentWithExtension_XLA
 '    On Error GoTo 0
 '    Exit Sub
 '
-'Test_vtkRecreateConfiguration_fileFormatIsConsistentWithExtension_XLA_Error:
-'    Err.Source = "Test_vtkRecreateConfiguration_fileFormatIsConsistentWithExtension_XLA of module vtkRecreateConfigurationTester"
+'Test_vtkRecreateConfiguration_formatLikeExtension_XLA_Error:
+'    Err.Source = "Test_vtkRecreateConfiguration_formatLikeExtension_XLA of module vtkRecreateConfigurationTester"
 '    mAssert.Should False, "Unexpected error " & Err.Number & " (" & Err.Description & ") in " & Err.Source
 '    ITestCase_TearDown
 '    Exit Sub
-End Sub
+'End Sub
 
 
 
-Public Sub Test_vtkRecreateConfiguration_workbookIsAlreadyOpen()
-' workbook with the same name is already open
+Public Sub Test_vtkRecreateConfiguration_workbookOpen()
+'  workbook with the same name is already open : raise error VTK_WORKBOOK_ALREADY_OPEN
 
-    On Error GoTo Test_vtkRecreateConfiguration_workbookIsAlreadyOpen_Error
+    Dim error As Integer: error = 0
 
-    
+    On Error GoTo Test_vtkRecreateConfiguration_workbookOpen_Error
+
+    Set testedConf = normalConf
+
+    ' Create and open recreatedWb
+    exportModulesAndRecreateWb wb, testProject, testedConf
+
+    ' Recreate configuration
+    vtkRecreateConfiguration testProject.projectName, testedConf.name
+
+    mAssert.Equals error, VTK_WORKBOOK_ALREADY_OPEN
 
     On Error GoTo 0
     Exit Sub
 
-Test_vtkRecreateConfiguration_workbookIsAlreadyOpen_Error:
-    Err.Source = "Test_vtkRecreateConfiguration_workbookIsAlreadyOpen of module vtkRecreateConfigurationTester"
-    mAssert.Should False, "Unexpected error " & Err.Number & " (" & Err.Description & ") in " & Err.Source
-    ITestCase_TearDown
-    Exit Sub
+Test_vtkRecreateConfiguration_workbookOpen_Error:
+        If Err.Number = VTK_WORKBOOK_ALREADY_OPEN Then
+            error = Err.Number
+            Resume Next
+        Else
+            Err.Source = "Test_vtkRecreateConfiguration_workbookOpen of module vtkRecreateConfigurationTester"
+            mAssert.Should False, "Unexpected error " & Err.Number & " (" & Err.Description & ") in " & Err.Source
+            ITestCase_TearDown
+            Exit Sub
+        End If
 End Sub
 
 Private Function ITest_Suite() As TestSuite
@@ -492,11 +509,10 @@ Private Function ITest_Suite() As TestSuite
     ITest_Suite.AddTest ITest_Manager.ClassName, "Test_vtkRecreateConfiguration_allModulesArePresent_multitypeConf"
     ITest_Suite.AddTest ITest_Manager.ClassName, "Test_vtkRecreateConfiguration_referencesAreActivated"
     ITest_Suite.AddTest ITest_Manager.ClassName, "Test_vtkRecreateConfiguration_nameOfTheVBProjectIsCorrect"
-    ITest_Suite.AddTest ITest_Manager.ClassName, "Test_vtkRecreateConfiguration_fileFormatIsConsistentWithExtension_XLSM"
-    ITest_Suite.AddTest ITest_Manager.ClassName, "Test_vtkRecreateConfiguration_fileFormatIsConsistentWithExtension_XLAM"
-    ITest_Suite.AddTest ITest_Manager.ClassName, "Test_vtkRecreateConfiguration_fileFormatIsConsistentWithExtension_XLS"
-    ITest_Suite.AddTest ITest_Manager.ClassName, "Test_vtkRecreateConfiguration_fileFormatIsConsistentWithExtension_XLA"
-    ITest_Suite.AddTest ITest_Manager.ClassName, "Test_vtkRecreateConfiguration_workbookIsAlreadyOpen"
+    ITest_Suite.AddTest ITest_Manager.ClassName, "Test_vtkRecreateConfiguration_formatLikeExtension_XLSM"
+    ITest_Suite.AddTest ITest_Manager.ClassName, "Test_vtkRecreateConfiguration_formatLikeExtension_XLAM"
+    ITest_Suite.AddTest ITest_Manager.ClassName, "Test_vtkRecreateConfiguration_formatLikeExtension_XLS"
+    ITest_Suite.AddTest ITest_Manager.ClassName, "Test_vtkRecreateConfiguration_workbookOpen"
 End Function
 
 Private Sub ITestCase_RunTest()
@@ -508,11 +524,10 @@ Private Sub ITestCase_RunTest()
         Case "Test_vtkRecreateConfiguration_allModulesArePresent_multitypeConf": Test_vtkRecreateConfiguration_allModulesArePresent_multitypeConf
         Case "Test_vtkRecreateConfiguration_referencesAreActivated": Test_vtkRecreateConfiguration_referencesAreActivated
         Case "Test_vtkRecreateConfiguration_nameOfTheVBProjectIsCorrect": Test_vtkRecreateConfiguration_nameOfTheVBProjectIsCorrect
-        Case "Test_vtkRecreateConfiguration_fileFormatIsConsistentWithExtension_XLSM": Test_vtkRecreateConfiguration_fileFormatIsConsistentWithExtension_XLSM
-        Case "Test_vtkRecreateConfiguration_fileFormatIsConsistentWithExtension_XLAM": Test_vtkRecreateConfiguration_fileFormatIsConsistentWithExtension_XLAM
-        Case "Test_vtkRecreateConfiguration_fileFormatIsConsistentWithExtension_XLS": Test_vtkRecreateConfiguration_fileFormatIsConsistentWithExtension_XLS
-        Case "Test_vtkRecreateConfiguration_fileFormatIsConsistentWithExtension_XLA": Test_vtkRecreateConfiguration_fileFormatIsConsistentWithExtension_XLA
-        Case "Test_vtkRecreateConfiguration_workbookIsAlreadyOpen": Test_vtkRecreateConfiguration_workbookIsAlreadyOpen
+        Case "Test_vtkRecreateConfiguration_formatLikeExtension_XLSM": Test_vtkRecreateConfiguration_formatLikeExtension_XLSM
+        Case "Test_vtkRecreateConfiguration_formatLikeExtension_XLAM": Test_vtkRecreateConfiguration_formatLikeExtension_XLAM
+        Case "Test_vtkRecreateConfiguration_formatLikeExtension_XLS": Test_vtkRecreateConfiguration_formatLikeExtension_XLS
+        Case "Test_vtkRecreateConfiguration_workbookOpen": Test_vtkRecreateConfiguration_workbookOpen
         Case Else: mAssert.Should False, "Invalid test name: " & mManager.methodName
     End Select
 End Sub

@@ -376,15 +376,29 @@ Public Sub vtkRecreateConfiguration(projectName As String, configurationName As 
     Dim rootPath As String
     Dim wbPath As String
     Dim Wb As Workbook
+    Dim tmpWb As Workbook
+    Dim fso As New FileSystemObject
+    
+    
+    ' Make sure the configuration path is different from the path of all the current workbooks
+    ' -> we don't want to overwrite an opened workbook.
+    
+    ' If the workbook is an add-in
+    ' do the stuff JPI did, install and stuff
+
+    On Error GoTo vtkRecreateConfiguration_Error
     
     ' Get the project and the rootPath of the project
-    On Error GoTo vtkRecreateConfiguration_Error
-
     Set cm = vtkConfigurationManagerForProject(projectName)
     rootPath = cm.rootPath
     
     ' Get the configuration number in the project and the path of the file
     wbPath = cm.getConfigurationPath(configuration:=configurationName)
+    
+    ' Make sure the workbook we want to create is not open
+    For Each tmpWb In Workbooks
+        If tmpWb.name Like fso.GetFileName(wbPath) Then Err.Raise VTK_WORKBOOK_ALREADY_OPEN
+    Next
     
     ' Create a new Excel file
     Set Wb = vtkCreateExcelWorkbook()
@@ -402,13 +416,10 @@ Public Sub vtkRecreateConfiguration(projectName As String, configurationName As 
     'wb.BuiltinDocumentProperties("Title").Value = "VBAToolKit"
     'wb.BuiltinDocumentProperties("Comments").Value = "Toolkit improving IDE for VBA projects"
     
-    On Error GoTo 0
-    
     ' Save the Excel file with the good type and erase the previous one (a message is displayed to the user)
     Wb.SaveAs fileName:=rootPath & "\" & wbPath, FileFormat:=vtkDefaultFileFormat(wbPath)
     Wb.Close saveChanges:=False
     
-
     On Error GoTo 0
     Exit Sub
 
@@ -416,7 +427,10 @@ vtkRecreateConfiguration_Error:
     Err.Source = "vtkRecreateConfiguration of module vtkImportExportUtilities"
     
     Select Case Err.Number
-        Case 0
+        Case VTK_WORKBOOK_ALREADY_OPEN
+            Err.Number = VTK_WORKBOOK_ALREADY_OPEN
+            Err.Description = "The configuration you're trying to create corresponds to an open workbook. " & _
+                              "Please close it before recreating the configuration."
         Case Else
             Err.Number = VTK_UNEXPECTED_ERROR
     End Select
