@@ -371,7 +371,7 @@ End Sub
 '
 '---------------------------------------------------------------------------------------
 '
-Public Sub vtkRecreateConfiguration(projectWithModules As VBProject, projectName As String, configurationName As String)
+Public Sub vtkRecreateConfiguration(projectName As String, configurationName As String)
     Dim cm As vtkConfigurationManager
     Dim rootPath As String
     Dim wbPath As String
@@ -394,14 +394,22 @@ Public Sub vtkRecreateConfiguration(projectWithModules As VBProject, projectName
         If tmpWb.name Like fso.GetFileName(wbPath) Then Err.Raise VTK_WORKBOOK_ALREADY_OPEN
     Next
     
+    'Make sure the source files exist
+    Dim mo As vtkModule
+    Dim conf As vtkConfiguration
+    Set conf = cm.configurations(configurationName)
+    For Each mo In conf.modules
+    'Debug.Print rootPath & "\" & mo.getPathForConfiguration(configurationName)
+        If fso.FileExists(rootPath & "\" & mo.getPathForConfiguration(configurationName)) = False Then
+            Err.Raise VTK_NO_SOURCE_FILES
+        End If
+    Next
+    
     ' Create a new Excel file
     Set Wb = vtkCreateExcelWorkbook()
     
     ' Set the projectName
     Wb.VBProject.name = configurationName
-    
-    ' Export the modules of the configuration
-    vtkExportConfiguration projectWithModules, projectName, configurationName
     
     ' Import all modules for this configuration from the source directory
     vtkImportModulesInAnotherProject projectForModules:=Wb.VBProject, projectName:=projectName, confName:=configurationName
@@ -443,10 +451,14 @@ vtkRecreateConfiguration_Error:
             Err.Number = VTK_WORKBOOK_ALREADY_OPEN
             Err.Description = "The configuration you're trying to create corresponds to an open workbook. " & _
                               "Please close it before recreating the configuration."
+        Case VTK_NO_SOURCE_FILES
+            Err.Number = VTK_NO_SOURCE_FILES
+            Err.Description = "The configuration you're trying to create is missing one or several source files." & _
+                              "Please export the modules in their relevant path before recreating the configuration."
         Case Else
             Err.Number = VTK_UNEXPECTED_ERROR
     End Select
-    
+
     Err.Raise Err.Number, Err.Source, Err.Description
     
     Exit Sub

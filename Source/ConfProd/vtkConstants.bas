@@ -35,6 +35,7 @@ Public Const VTK_MODULE_NOTATTACHED = 4001              ' The module must be att
 Public Const VTK_INEXISTANT_CONFIGURATION = 4002        ' Unknown configuration
 Public Const VTK_WORKBOOK_NOTOPEN = 4003
 Public Const VTK_WORKBOOK_ALREADY_OPEN = 4004
+Public Const VTK_NO_SOURCE_FILES = 4005
 
 Public Const VTK_UNEXPECTED_CHAR = 5001
 Public Const VTK_UNEXPECTED_EOS = 5002
