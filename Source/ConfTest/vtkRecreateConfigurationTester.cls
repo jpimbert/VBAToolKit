@@ -48,6 +48,7 @@ Private xlamConf As vtkConfiguration
 Private xlaConf As vtkConfiguration
 Private multitypeConf As vtkConfiguration
 Private VTKConf As vtkConfiguration
+Private VTKProjectConf As vtkConfiguration
 Private testedConf As vtkConfiguration
 
 Private cm As vtkConfigurationManager
@@ -61,6 +62,7 @@ Private Const xlamConfName = "TestProject_xlamConf"
 Private Const xlaConfName = "TestProject_xlaConf"
 Private Const multitypeConfName = "TestProject_multitypeConf"
 Private Const VTKConfName = "TestProject_VTKConf"
+Private Const VTKProjectConfName = "VBAToolKit"
 
 Private Sub Class_Initialize()
     Set mManager = New TestCaseManager
@@ -89,6 +91,7 @@ Private Sub ITestCase_SetUp(Assert As IAssert)
     Set xlaConf = cm.configurations(xlaConfName)
     Set multitypeConf = cm.configurations(multitypeConfName)
     Set VTKConf = cm.configurations(VTKConfName)
+    Set VTKProjectConf = cm.configurations(VTKProjectConfName)
 
 End Sub
 
@@ -125,6 +128,7 @@ End Sub
 '
 ' particular cases
 '   - workbook with the same name is already open : raise error VTK_WORKBOOK_ALREADY_OPEN
+'   - VBProject with the same name is already open : raise error VTK_VBPROJECT_ALREADY_OPEN
 '   - add-in with the same name is activated : export the file normally
 '   - workbook with the same name already exists in the same path : overwrite the file
 '       - normal conf
@@ -589,6 +593,32 @@ End Sub
 
 
 
+Public Sub Test_vtkRecreateConfiguration_workbookAndVbProjectAlreadyOpen()
+' workbook and vbproject with the same name already open -> there shouldn't be errors
+
+    Dim error As Integer: error = 0
+
+    On Error GoTo Test_vtkRecreateConfiguration_workbookAndVbProjectAlreadyOpen_Error
+
+    Set testedConf = VTKProjectConf
+    
+    ' Recreate the configuration called just like an actived add-in : "VBAToolKit.xlam"
+    ' NB : the recreated workbook is not opened
+    vtkExportConfiguration Wb.VBProject, testProject.projectName, testedConf.name
+    vtkRecreateConfiguration testProject.projectName, testedConf.name
+    
+    mAssert.Equals error, 0
+
+    On Error GoTo 0
+    Exit Sub
+
+Test_vtkRecreateConfiguration_workbookAndVbProjectAlreadyOpen_Error:
+    error = Err.Number
+    Resume Next
+End Sub
+
+
+
 Public Sub Test_vtkRecreateConfiguration_overwriteFile_normal()
 ' file already exists : overwrite it
 
@@ -661,6 +691,18 @@ Private Function ITest_Suite() As TestSuite
     ITest_Suite.AddTest ITest_Manager.ClassName, "Test_vtkRecreateConfiguration_workbookIsCreatedInTheGoodPath_multitypeConf"
     ITest_Suite.AddTest ITest_Manager.ClassName, "Test_vtkRecreateConfiguration_modulesNotYetExported_normalConf"
     ITest_Suite.AddTest ITest_Manager.ClassName, "Test_vtkRecreateConfiguration_modulesNotYetExported_emptyConf"
+    ITest_Suite.AddTest ITest_Manager.ClassName, "Test_vtkRecreateConfiguration_allModulesArePresent_normalConf"
+    ITest_Suite.AddTest ITest_Manager.ClassName, "Test_vtkRecreateConfiguration_allModulesArePresent_multitypeConf"
+    ITest_Suite.AddTest ITest_Manager.ClassName, "Test_vtkRecreateConfiguration_referencesAreActivated"
+    ITest_Suite.AddTest ITest_Manager.ClassName, "Test_vtkRecreateConfiguration_nameOfTheVBProjectIsCorrect"
+    ITest_Suite.AddTest ITest_Manager.ClassName, "Test_vtkRecreateConfiguration_formatLikeExtension_XLSM"
+    ITest_Suite.AddTest ITest_Manager.ClassName, "Test_vtkRecreateConfiguration_formatLikeExtension_XLAM"
+    ITest_Suite.AddTest ITest_Manager.ClassName, "Test_vtkRecreateConfiguration_formatLikeExtension_XLS"
+    ITest_Suite.AddTest ITest_Manager.ClassName, "Test_vtkRecreateConfiguration_workbookOpen"
+    ITest_Suite.AddTest ITest_Manager.ClassName, "Test_vtkRecreateConfiguration_addInOpen_XLAM"
+    ITest_Suite.AddTest ITest_Manager.ClassName, "Test_vtkRecreateConfiguration_workbookAndVbProjectAlreadyOpen"
+    ITest_Suite.AddTest ITest_Manager.ClassName, "Test_vtkRecreateConfiguration_overwriteFile_normal"
+    ITest_Suite.AddTest ITest_Manager.ClassName, "Test_vtkRecreateConfiguration_overwriteFile_addIn"
 End Function
 
 Private Sub ITestCase_RunTest()
@@ -670,6 +712,18 @@ Private Sub ITestCase_RunTest()
         Case "Test_vtkRecreateConfiguration_workbookIsCreatedInTheGoodPath_multitypeConf": Test_vtkRecreateConfiguration_workbookIsCreatedInTheGoodPath_multitypeConf
         Case "Test_vtkRecreateConfiguration_modulesNotYetExported_normalConf": Test_vtkRecreateConfiguration_modulesNotYetExported_normalConf
         Case "Test_vtkRecreateConfiguration_modulesNotYetExported_emptyConf": Test_vtkRecreateConfiguration_modulesNotYetExported_emptyConf
+        Case "Test_vtkRecreateConfiguration_allModulesArePresent_normalConf": Test_vtkRecreateConfiguration_allModulesArePresent_normalConf
+        Case "Test_vtkRecreateConfiguration_allModulesArePresent_multitypeConf": Test_vtkRecreateConfiguration_allModulesArePresent_multitypeConf
+        Case "Test_vtkRecreateConfiguration_referencesAreActivated": Test_vtkRecreateConfiguration_referencesAreActivated
+        Case "Test_vtkRecreateConfiguration_nameOfTheVBProjectIsCorrect": Test_vtkRecreateConfiguration_nameOfTheVBProjectIsCorrect
+        Case "Test_vtkRecreateConfiguration_formatLikeExtension_XLSM": Test_vtkRecreateConfiguration_formatLikeExtension_XLSM
+        Case "Test_vtkRecreateConfiguration_formatLikeExtension_XLAM": Test_vtkRecreateConfiguration_formatLikeExtension_XLAM
+        Case "Test_vtkRecreateConfiguration_formatLikeExtension_XLS": Test_vtkRecreateConfiguration_formatLikeExtension_XLS
+        Case "Test_vtkRecreateConfiguration_workbookOpen": Test_vtkRecreateConfiguration_workbookOpen
+        Case "Test_vtkRecreateConfiguration_addInOpen_XLAM": Test_vtkRecreateConfiguration_addInOpen_XLAM
+        Case "Test_vtkRecreateConfiguration_workbookAndVbProjectAlreadyOpen": Test_vtkRecreateConfiguration_workbookAndVbProjectAlreadyOpen
+        Case "Test_vtkRecreateConfiguration_overwriteFile_normal": Test_vtkRecreateConfiguration_overwriteFile_normal
+        Case "Test_vtkRecreateConfiguration_overwriteFile_addIn": Test_vtkRecreateConfiguration_overwriteFile_addIn
         Case Else: mAssert.Should False, "Invalid test name: " & mManager.methodName
     End Select
 End Sub
