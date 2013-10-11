@@ -1,6 +1,6 @@
 VERSION 5.00
 Begin {C62A69F0-16DC-11CE-9E98-00AA00574A4F} vtkRecreateConfigurationForm 
-   Caption         =   "Recreate Configration"
+   Caption         =   "Recreate Configuration"
    ClientHeight    =   3120
    ClientLeft      =   45
    ClientTop       =   435
@@ -99,7 +99,6 @@ End Sub
 Private Sub CancelButton_Click()
     Unload VBAToolKit_DEV.vtkRecreateConfigurationForm
 End Sub
-
 
 
 '---------------------------------------------------------------------------------------
