@@ -96,6 +96,21 @@ Public Property Get projectDEVStandardRelativePath() As String
 End Property
 
 '---------------------------------------------------------------------------------------
+' Property  : XMLConfigurationStandardRelativePath
+' Author    : Jean-Pierre Imbert
+' Date      : 04/06/2013
+' Purpose   : Return the relative path of the XML configuration file, or null if the object is not initialized
+'---------------------------------------------------------------------------------------
+'
+Public Property Get XMLConfigurationStandardRelativePath() As String
+    If initialized Then
+        XMLConfigurationStandardRelativePath = "Project\" & XMLConfigurationName
+       Else
+        XMLConfigurationStandardRelativePath = ""
+    End If
+End Property
+
+'---------------------------------------------------------------------------------------
 ' Property  : projectStandardRelativePath
 ' Author    : Jean-Pierre Imbert
 ' Date      : 04/06/2013
@@ -140,4 +155,18 @@ Public Property Get workbookName() As String
     End If
 End Property
 
+'---------------------------------------------------------------------------------------
+' Property  : XMLConfigurationName
+' Author    : Jean-Pierre Imbert
+' Date      : 13/10/2013
+' Purpose   : Return the name of the XML configuration file, or null if the object is not initialized
+'---------------------------------------------------------------------------------------
+'
+Public Property Get XMLConfigurationName() As String
+    If initialized Then
+        XMLConfigurationName = projectName & ".xml"
+       Else
+        XMLConfigurationName = ""
+    End If
+End Property
 

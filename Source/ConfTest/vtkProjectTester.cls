@@ -85,14 +85,24 @@ Public Sub TestProjectRelativePath()
     mAssert.Equals project.projectStandardRelativePath, "Delivery\" & "TestProject.xlsm", "The project development standard path"
 End Sub
 
+Public Sub TestXMLConfigurationStandardRelativePath()
+'       Verify the project path
+    mAssert.Equals project.XMLConfigurationStandardRelativePath, "Project\TestProject.xml", "The project configuration standard path"
+End Sub
+
 Public Sub TestProjectDevelopmentWorkbookName()
 '       Verify the project path for development
-    mAssert.Equals project.workbookDEVName, "TestProject_DEV.xlsm", "The project development standard path"
+    mAssert.Equals project.workbookDEVName, "TestProject_DEV.xlsm", "The project development standard name"
 End Sub
 
 Public Sub TestProjectWorkbookName()
 '       Verify the project path
-    mAssert.Equals project.workbookName, "TestProject.xlsm", "The project development standard path"
+    mAssert.Equals project.workbookName, "TestProject.xlsm", "The project delivery standard name"
+End Sub
+
+Public Sub TestXMLConfigurationName()
+'       Verify the project path
+    mAssert.Equals project.XMLConfigurationName, "TestProject.xml", "The project confighuration standard name"
 End Sub
 
 Private Function ITest_Suite() As TestSuite
@@ -101,8 +111,10 @@ Private Function ITest_Suite() As TestSuite
     ITest_Suite.AddTest ITest_Manager.ClassName, "TestProjectNameForDevelopment"
     ITest_Suite.AddTest ITest_Manager.ClassName, "TestProjectDevelopmentRelativePath"
     ITest_Suite.AddTest ITest_Manager.ClassName, "TestProjectRelativePath"
+    ITest_Suite.AddTest ITest_Manager.ClassName, "TestXMLConfigurationStandardRelativePath"
     ITest_Suite.AddTest ITest_Manager.ClassName, "TestProjectDevelopmentWorkbookName"
     ITest_Suite.AddTest ITest_Manager.ClassName, "TestProjectWorkbookName"
+    ITest_Suite.AddTest ITest_Manager.ClassName, "TestXMLConfigurationName"
 End Function
 
 Private Sub ITestCase_RunTest()
@@ -111,8 +123,10 @@ Private Sub ITestCase_RunTest()
         Case "TestProjectNameForDevelopment": TestProjectNameForDevelopment
         Case "TestProjectDevelopmentRelativePath": TestProjectDevelopmentRelativePath
         Case "TestProjectRelativePath": TestProjectRelativePath
+        Case "TestXMLConfigurationStandardRelativePath": TestXMLConfigurationStandardRelativePath
         Case "TestProjectDevelopmentWorkbookName": TestProjectDevelopmentWorkbookName
         Case "TestProjectWorkbookName": TestProjectWorkbookName
+        Case "TestXMLConfigurationName": TestXMLConfigurationName
         Case Else: mAssert.Should False, "Invalid test name: " & mManager.methodName
     End Select
 End Sub

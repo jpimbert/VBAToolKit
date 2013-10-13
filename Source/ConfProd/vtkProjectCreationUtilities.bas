@@ -67,6 +67,7 @@ Public Sub VtkActivateReferences(Wb As Workbook, Optional toSelf As Boolean = Fa
         Wb.VBProject.References.AddFromGuid "{0002E157-0000-0000-C000-000000000046}", 0, 0  ' VBIDE : Microsoft visual basic for applications extensibility 5.3
         Wb.VBProject.References.AddFromGuid "{50A7E9B0-70EF-11D1-B75A-00A0C90564FE}", 0, 0  ' Shell32 : Microsoft Shell Controls and Automation
         Wb.VBProject.References.AddFromGuid "{F5078F18-C551-11D3-89B9-0000F81FE221}", 0, 0  ' MSXML2 : Microsoft XML V5.0
+        Wb.VBProject.References.AddFromGuid "{00000206-0000-0010-8000-00AA006D2EA4}", 0, 0  ' ADODB : Microsoft ActiveX Data Objects V2.6 Library
         If toSelf Then Wb.VBProject.References.AddFromFile ThisWorkbook.FullName ' if specified, add reference to current workbook.
         On Error GoTo 0
     End If
@@ -106,22 +107,19 @@ Public Sub vtkAddBeforeSaveHandlerInDEVWorkbook(Wb As Workbook, projectName As S
     
     On Error GoTo vtkAddBeforeSaveHandlerInDEVWorkbook_Error
           
-    Dim wbProjectName As String
-    wbProjectName = ThisWorkbook.VBProject.name
+    Dim wbVTKName As String
+    wbVTKName = ThisWorkbook.VBProject.name ' Get the name of the Running project (VBAToolKit)
     
     Dim handlerString As String
     handlerString = _
     "Private Sub Workbook_BeforeSave(ByVal SaveAsUI As Boolean, Cancel As Boolean)" & vbNewLine & _
-    "   " & wbProjectName & ".vtkExportConfiguration projectWithModules:=ThisWorkbook.VBProject, projectName:=" & """" & projectName & """" & _
+    "   " & wbVTKName & ".vtkExportConfiguration projectWithModules:=ThisWorkbook.VBProject, projectName:=" & """" & projectName & """" & _
                                                                     " , confName:=" & """" & confName & """" & _
                                                                     " , onlyModified:=True" & _
                                                                     vbNewLine & _
                                                                     vbNewLine & _
-    "   " & "Dim fso As New Scripting.FileSystemObject" & vbNewLine & _
-    "   " & wbProjectName & ".vtkWriteXMLDOMToFile " & wbProjectName & _
-    ".vtkExportAsXMLDOM(" & """" & projectName & """" & "), fso.GetFile(ThisWorkbook.FullName).ParentFolder.Path & " & """" & "\" & """" & " & " & _
-    """" & vtkStripFilePathOrNameOfExtension(Wb.name) & ".xml" & """" & _
-    vbNewLine & _
+    "   " & wbVTKName & ".vtkWriteXMLDOMToFile " & wbVTKName & ".vtkExportAsXMLDOM(""" & projectName & """), " & _
+    wbVTKName & ".vtkPathOfCurrentProject(ThisWorkbook) & ""\"" & " & wbVTKName & ".vtkProjectForName(""" & projectName & """).XMLConfigurationStandardRelativePath" & vbNewLine & _
     "End Sub" & vbNewLine
     
     With Wb.VBProject.VBComponents("ThisWorkbook").CodeModule
