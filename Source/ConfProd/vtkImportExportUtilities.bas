@@ -347,27 +347,21 @@ End Sub
 
 '---------------------------------------------------------------------------------------
 ' Procedure : vtkRecreateConfiguration
-' Author    : Jean-Pierre Imbert
-' Date      : 09/08/2013
-' Purpose   : recreate a complete configuration based on
+' Author    : JPI-Conseil
+' Purpose   : Recreate a complete configuration based on
 '             - the vtkConfiguration sheet of the project
 '             - the exported modules located in the Source folder
-' Params    - projectName
-'           - configurationName
 '
-' Raises    : VTK_UNEXPECTED_ERROR
+' Params    : - projectName
+'             - configurationName
+'
+' Raises    : - VTK_UNEXPECTED_ERROR
+'             - VTK_WORKBOOK_ALREADY_OPEN
+'             - VTK_NO_SOURCE_FILES
 '
 ' WARNING : We use vtkImportOneModule because the document module importation is
 '           not efficient with VBComponents.Import (creation of a double class module
 '           instead of import the Document code)
-' TEST :
-'   execute 'vtkRecreateConfiguration projectName :="VBAToolKit",configurationName:="VBAToolKit"'
-'   if the Project to reconfigure is installed as AddIn, it must be uninstalled then reinstalled.
-'
-' IMPORTANT TO DO :
-'   il faut récupérer la feuille vtkConfigurations existante pour le projet de DEV
-'   il faudrait aussi récupérer les modules non exportés du projet DEV (tmptest)
-'   il faut tester avec un miniprojet où les deux fichiers Excel sont dans Tests
 '
 '---------------------------------------------------------------------------------------
 '
@@ -399,7 +393,6 @@ Public Sub vtkRecreateConfiguration(projectName As String, configurationName As 
     Dim conf As vtkConfiguration
     Set conf = cm.configurations(configurationName)
     For Each mo In conf.modules
-    'Debug.Print rootPath & "\" & mo.getPathForConfiguration(configurationName)
         If fso.FileExists(rootPath & "\" & mo.getPathForConfiguration(configurationName)) = False Then
             Err.Raise VTK_NO_SOURCE_FILES
         End If
@@ -449,11 +442,11 @@ vtkRecreateConfiguration_Error:
     Select Case Err.Number
         Case VTK_WORKBOOK_ALREADY_OPEN
             Err.Number = VTK_WORKBOOK_ALREADY_OPEN
-            Err.Description = "The configuration you're trying to create corresponds to an open workbook. " & _
+            Err.Description = "The configuration you're trying to create (" & configurationName & ") corresponds to an open workbook. " & _
                               "Please close it before recreating the configuration."
         Case VTK_NO_SOURCE_FILES
             Err.Number = VTK_NO_SOURCE_FILES
-            Err.Description = "The configuration you're trying to create is missing one or several source files." & _
+            Err.Description = "The configuration you're trying to create (" & configurationName & ") is missing one or several source files." & _
                               "Please export the modules in their relevant path before recreating the configuration."
         Case Else
             Err.Number = VTK_UNEXPECTED_ERROR

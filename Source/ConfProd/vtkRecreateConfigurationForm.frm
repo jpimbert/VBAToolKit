@@ -47,9 +47,8 @@ Private currentProjectName As String
 '
 Private Sub UserForm_Initialize()
 
-    ' Temporary
-    ' TODO : implement way of keeping track of the current project
-    currentProjectName = "VBAToolKit"
+    ' Get the name of the current DEV workbook
+    currentProjectName = vtkStripPathOrNameOfVtkExtension(ActiveWorkbook.name, "DEV")
 
     ' Initialize configuration manager
     Set cm = vtkConfigurationManagerForProject(currentProjectName)
@@ -58,10 +57,12 @@ Private Sub UserForm_Initialize()
     enableCreateConfigurationButton
 
     ' Initialize the content of the combo box
-    Dim conf As vtkConfiguration
-    For Each conf In cm.configurations
-        ConfigurationComboBox.AddItem (conf.name)
-    Next
+    If Not cm Is Nothing Then
+        Dim conf As vtkConfiguration
+        For Each conf In cm.configurations
+            ConfigurationComboBox.AddItem (conf.name)
+        Next
+    End If
     
 End Sub
 
@@ -97,7 +98,7 @@ End Sub
 '---------------------------------------------------------------------------------------
 '
 Private Sub CancelButton_Click()
-    Unload VBAToolKit_DEV.vtkRecreateConfigurationForm
+    Unload vtkRecreateConfigurationForm
 End Sub
 
 
@@ -108,7 +109,29 @@ End Sub
 '---------------------------------------------------------------------------------------
 '
 Private Sub CreateConfigurationButton_Click()
+    
+    On Error GoTo CreateConfigurationButton_Click_Error
+
     vtkRecreateConfiguration currentProjectName, currentConf.name
+
+    On Error GoTo 0
+    Exit Sub
+
+CreateConfigurationButton_Click_Error:
+    Err.Source = "CreateConfigurationButton_Click of module vtkRecreateConfigurationForm"
+    
+    Select Case Err.Number
+        Case VTK_WORKBOOK_ALREADY_OPEN ' Trying to replace an open workbook while recreating the configuration
+            MsgBox "Error " & Err.Number & " (" & Err.Description & ")"
+            Resume Next
+        Case VTK_NO_SOURCE_FILES ' A source file is missing
+            MsgBox "Error " & Err.Number & " (" & Err.Description & ")"
+            Resume Next
+        Case Else
+            Err.Raise Err.Number, Err.Source, Err.Description
+    End Select
+    
+    Exit Sub
 End Sub
 
 

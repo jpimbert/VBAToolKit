@@ -42,7 +42,7 @@ Public Function vtkProjectForName(projectName As String) As vtkProject
     ' Create the collection if it doesn't exist
     If projects Is Nothing Then
         Set projects = New Collection
-        End If
+    End If
     ' search for the configuration manager in the collection
     Dim cm As vtkProject
     On Error Resume Next
