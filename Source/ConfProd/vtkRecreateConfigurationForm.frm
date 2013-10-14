@@ -38,7 +38,6 @@ Private cm As vtkConfigurationManager
 Private currentConf As vtkConfiguration
 Private currentProjectName As String
 
-
 '---------------------------------------------------------------------------------------
 ' Procedure : UserForm_Initialize
 ' Author    : Lucas Vitorino
@@ -78,7 +77,10 @@ Private Sub ConfigurationComboBox_Change()
     On Error GoTo ConfigurationComboBox_Change_Error
 
     Set currentConf = cm.configurations(ConfigurationComboBox.Value)
-    PathTextBox.Text = currentConf.path
+    
+    If AllConfigurationsExceptThisOneCheckBox.Value = False Then
+        PathTextBox.Text = currentConf.path
+    End If
     
     enableCreateConfigurationButton
 
@@ -88,6 +90,23 @@ Private Sub ConfigurationComboBox_Change()
 ConfigurationComboBox_Change_Error:
     Set currentConf = Nothing
     Resume Next
+End Sub
+
+
+'---------------------------------------------------------------------------------------
+' Procedure : AllConfigurationsExceptThisOneCheckBox_Change
+' Author    : Lucas Vitorino
+' Purpose   : Manage what happens when the checkbox changes.
+'---------------------------------------------------------------------------------------
+'
+Private Sub AllConfigurationsExceptThisOneCheckBox_Change()
+
+    If AllConfigurationsExceptThisOneCheckBox.Value = True Then
+        PathTextBox.Text = ""
+    Else
+        PathTextBox.Text = currentConf.path
+    End If
+
 End Sub
 
 
@@ -111,9 +130,18 @@ End Sub
 Private Sub CreateConfigurationButton_Click()
     
     On Error GoTo CreateConfigurationButton_Click_Error
-
-    vtkRecreateConfiguration currentProjectName, currentConf.name
-
+    
+    If AllConfigurationsExceptThisOneCheckBox.Value = False Then
+        vtkRecreateConfiguration currentProjectName, currentConf.name
+    Else
+        Dim conf As vtkConfiguration
+        For Each conf In cm.configurations
+            If Not conf.name Like currentConf.name Then
+                vtkRecreateConfiguration currentProjectName, conf.name
+            End If
+        Next
+    End If
+    
     On Error GoTo 0
     Exit Sub
 
