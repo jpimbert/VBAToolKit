@@ -358,6 +358,7 @@ End Sub
 ' Raises    : - VTK_UNEXPECTED_ERROR
 '             - VTK_WORKBOOK_ALREADY_OPEN
 '             - VTK_NO_SOURCE_FILES
+'             - VTK_WRONG_FILE_PATH
 '
 ' WARNING : We use vtkImportOneModule because the document module importation is
 '           not efficient with VBComponents.Import (creation of a double class module
@@ -421,6 +422,19 @@ Public Sub vtkRecreateConfiguration(projectName As String, configurationName As 
               CStr(Round((99999 - 10000 + 1) * Rnd(), 0)) + 10000 & _
               "." & fso.GetExtensionName(wbPath)
 
+    
+    ' Create the the folder containing the workbook if a 1-level or less deep folder structure
+    ' is specified in the configuration path.
+    Dim relativeConfParentFolderPath As String
+    relativeConfParentFolderPath = fso.GetParentFolderName(conf.path)
+    If Not relativeConfParentFolderPath Like "" Then
+       If fso.GetParentFolderName(relativeConfParentFolderPath) Like "" Then
+            fso.CreateFolder fso.BuildPath(rootPath, relativeConfParentFolderPath)
+        Else
+            Err.Raise VTK_WRONG_FILE_PATH
+        End If
+    End If
+    
     ' Save the new workbook with the correct extension
     Wb.SaveAs fileName:=tmpPath, FileFormat:=vtkDefaultFileFormat(wbPath)
     Wb.Close saveChanges:=False
@@ -448,6 +462,10 @@ vtkRecreateConfiguration_Error:
             Err.Number = VTK_NO_SOURCE_FILES
             Err.Description = "The configuration you're trying to create (" & configurationName & ") is missing one or several source files." & _
                               "Please export the modules in their relevant path before recreating the configuration."
+        Case VTK_WRONG_FILE_PATH
+            Err.Number = VTK_WRONG_FILE_PATH
+            Err.Description = "The configuration you're trying to create (" & configurationName & ") has a invalid path." & _
+                              "Please check if the folder structure it needs is not more than one-level deep."
         Case Else
             Err.Number = VTK_UNEXPECTED_ERROR
     End Select
