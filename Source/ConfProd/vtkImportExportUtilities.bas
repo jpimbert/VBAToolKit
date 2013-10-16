@@ -414,14 +414,11 @@ Public Sub vtkRecreateConfiguration(projectName As String, configurationName As 
     ' VB will not let the workbook be saved under the name of an already opened workbook, which
     ' is annoying when recreating an add-in (always opened). The following code works around this.
     Dim tmpPath As String
-    fso.GetParentFolderName (wbPath)
-
     ' Add a random string to the file name of the workbook that will be saved
-    tmpPath = rootPath & "\" & fso.GetParentFolderName(wbPath) & "\" & _
+    tmpPath = fso.BuildPath(rootPath & "\" & fso.GetParentFolderName(wbPath), _
               vtkStripFilePathOrNameOfExtension(fso.GetFileName(wbPath)) & _
               CStr(Round((99999 - 10000 + 1) * Rnd(), 0)) + 10000 & _
-              "." & fso.GetExtensionName(wbPath)
-
+              "." & fso.GetExtensionName(wbPath))
     
     ' Create the the folder containing the workbook if a 1-level or less deep folder structure
     ' is specified in the configuration path.
@@ -451,6 +448,9 @@ Public Sub vtkRecreateConfiguration(projectName As String, configurationName As 
     Exit Sub
 
 vtkRecreateConfiguration_Error:
+
+    Wb.Close saveChanges:=False
+
     Err.Source = "vtkRecreateConfiguration of module vtkImportExportUtilities"
     
     Select Case Err.Number
