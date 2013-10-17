@@ -193,7 +193,7 @@ Public Sub Test_vtkRecreateConfiguration_workbookIsCreatedInTheGoodPath_normalCo
 
     exportModulesAndRecreateWb wb, testProject, testedConf
 
-    mAssert.Should fso.FileExists(VBAToolKit.vtkPathOfCurrentProject(Wb) & "\" & testedConf.path), _
+    mAssert.Should fso.FileExists(VBAToolKit.vtkTestPath & "\" & testProject.projectName & "\" & testedConf.path), _
                    "The configuration should have been created in the designated path."
 
     On Error GoTo 0
@@ -216,7 +216,7 @@ Public Sub Test_vtkRecreateConfiguration_workbookIsCreatedInTheGoodPath_emptyCon
 
     exportModulesAndRecreateWb wb, testProject, testedConf
 
-    mAssert.Should fso.FileExists(VBAToolKit.vtkPathOfCurrentProject(Wb) & "\" & testedConf.path), _
+    mAssert.Should fso.FileExists(VBAToolKit.vtkTestPath & "\" & testProject.projectName & "\" & testedConf.path), _
                    "The configuration should have been created in the designated path."
 
     On Error GoTo 0
@@ -239,7 +239,7 @@ Public Sub Test_vtkRecreateConfiguration_workbookIsCreatedInTheGoodPath_multityp
 
     exportModulesAndRecreateWb wb, testProject, testedConf
 
-    mAssert.Should fso.FileExists(VBAToolKit.vtkPathOfCurrentProject(Wb) & "\" & testedConf.path), _
+    mAssert.Should fso.FileExists(VBAToolKit.vtkTestPath & "\" & testProject.projectName & "\" & testedConf.path), _
                    "The configuration should have been created in the designated path."
 
     On Error GoTo 0
@@ -248,7 +248,6 @@ Public Sub Test_vtkRecreateConfiguration_workbookIsCreatedInTheGoodPath_multityp
 Test_vtkRecreateConfiguration_workbookIsCreatedInTheGoodPath_multitypeConf_Error:
     Err.Source = "Test_vtkRecreateConfiguration_workbookIsCreatedInTheGoodPath_multitypeConf of module vtkRecreateConfigurationTester"
     mAssert.Should False, "Unexpected error " & Err.Number & " (" & Err.Description & ") in " & Err.Source
-    ITestCase_TearDown
     Exit Sub
 End Sub
 
@@ -292,7 +291,7 @@ Public Sub Test_vtkRecreateConfiguration_modulesNotYetExported_emptyConf()
     mAssert.Equals error, 0, _
                    "Error " & Err.Number & " (" & Err.Description & ") occured."
 
-    mAssert.Should fso.FileExists(VBAToolKit.vtkPathOfCurrentProject(Wb) & "\" & testedConf.path), _
+    mAssert.Should fso.FileExists(VBAToolKit.vtkTestPath & "\" & testProject.projectName & "\" & testedConf.path), _
                    "The file shoud have been created normally as configuration is empty."
 
     On Error GoTo 0
@@ -316,10 +315,10 @@ Public Sub Test_vtkRecreateConfiguration_pathDoesNotExistYet1()
     exportModulesAndRecreateWb wb, testProject, testedConf
 
     mAssert.Equals error, 0, _
-                    "Error " & error & " (" & Err.Description & ") occured."
+                    "Error " & error & " (" & Err.Description & ") occured. It shouldn't have."
 
-    mAssert.Should fso.FileExists(VBAToolKit.vtkPathOfCurrentProject(Wb) & "\" & testedConf.path), _
-                   "The file shoud have been created normally as the relative folder structure is only one level deep."
+    mAssert.Should fso.FileExists(VBAToolKit.vtkTestPath & "\" & testProject.projectName & "\" & testedConf.path), _
+                   "The file shoud have been created normally."
 
     On Error GoTo 0
     Exit Sub
@@ -341,12 +340,11 @@ Public Sub Test_vtkRecreateConfiguration_pathDoesNotExistYet2()
 
     exportModulesAndRecreateWb wb, testProject, testedConf
 
-    mAssert.Equals error, VTK_WRONG_FILE_PATH, _
-                    "Error " & error & " (" & Err.Description & ") occured."
+    mAssert.Equals error, 0, _
+                    "Error " & error & " (" & Err.Description & ") occured. It shouldn't have."
 
-    mAssert.Should fso.FileExists(VBAToolKit.vtkPathOfCurrentProject(Wb) & "\" & testedConf.path) = False, _
-                   "The file shoud not have been created as the relative folder structure is more than one level deep."
-
+    mAssert.Should fso.FileExists(VBAToolKit.vtkTestPath & "\" & testProject.projectName & "\" & testedConf.path), _
+                   "The file shoud have been created normally."
     On Error GoTo 0
     Exit Sub
 
@@ -691,13 +689,13 @@ Public Sub Test_vtkRecreateConfiguration_overwriteFile_normal()
 
     Set testedConf = normalConf
 
-    fso.CreateTextFile (VBAToolKit.vtkPathOfCurrentProject(Wb) & "\" & testedConf.path)
-    oldSize = fso.GetFile(VBAToolKit.vtkPathOfCurrentProject(Wb) & "\" & testedConf.path).Size
+    fso.CreateTextFile (VBAToolKit.vtkTestPath & "\" & testProject.projectName & "\" & testedConf.path)
+    oldSize = fso.GetFile(VBAToolKit.vtkTestPath & "\" & testProject.projectName & "\" & testedConf.path).Size
 
     ' Create and open recreatedWb
     exportModulesAndRecreateWb wb, testProject, testedConf
 
-    newSize = fso.GetFile(VBAToolKit.vtkPathOfCurrentProject(Wb) & "\" & testedConf.path).Size
+    newSize = fso.GetFile(VBAToolKit.vtkTestPath & "\" & testProject.projectName & "\" & testedConf.path).Size
 
     mAssert.Should newSize > oldSize, "File should have been overwritten."
 
@@ -722,13 +720,13 @@ Public Sub Test_vtkRecreateConfiguration_overwriteFile_addIn()
 
     Set testedConf = xlamConf
 
-    fso.CreateTextFile (VBAToolKit.vtkPathOfCurrentProject(Wb) & "\" & testedConf.path)
-    oldSize = fso.GetFile(VBAToolKit.vtkPathOfCurrentProject(Wb) & "\" & testedConf.path).Size
+    fso.CreateTextFile (VBAToolKit.vtkTestPath & "\" & testProject.projectName & "\" & testedConf.path)
+    oldSize = fso.GetFile(VBAToolKit.vtkTestPath & "\" & testProject.projectName & "\" & testedConf.path).Size
 
     ' Create and open recreatedWb
     exportModulesAndRecreateWb wb, testProject, testedConf
 
-    newSize = fso.GetFile(VBAToolKit.vtkPathOfCurrentProject(Wb) & "\" & testedConf.path).Size
+    newSize = fso.GetFile(VBAToolKit.vtkTestPath & "\" & testProject.projectName & "\" & testedConf.path).Size
 
     mAssert.Should newSize > oldSize, "File should have been overwritten."
 

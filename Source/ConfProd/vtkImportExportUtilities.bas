@@ -422,15 +422,7 @@ Public Sub vtkRecreateConfiguration(projectName As String, configurationName As 
     
     ' Create the the folder containing the workbook if a 1-level or less deep folder structure
     ' is specified in the configuration path.
-    Dim relativeConfParentFolderPath As String
-    relativeConfParentFolderPath = fso.GetParentFolderName(conf.path)
-    If Not relativeConfParentFolderPath Like "" Then
-       If fso.GetParentFolderName(relativeConfParentFolderPath) Like "" Then
-            fso.CreateFolder fso.BuildPath(rootPath, relativeConfParentFolderPath)
-        Else
-            Err.Raise VTK_WRONG_FILE_PATH
-        End If
-    End If
+    vtkCreateFolderPath tmpPath
     
     ' Save the new workbook with the correct extension
     Wb.SaveAs fileName:=tmpPath, FileFormat:=vtkDefaultFileFormat(wbPath)
@@ -449,7 +441,7 @@ Public Sub vtkRecreateConfiguration(projectName As String, configurationName As 
 
 vtkRecreateConfiguration_Error:
 
-    Wb.Close saveChanges:=False
+    If Not Wb Is Nothing Then Wb.Close saveChanges:=False
 
     Err.Source = "vtkRecreateConfiguration of module vtkImportExportUtilities"
     
