@@ -68,3 +68,14 @@ Public Sub vtkResetProjects()
     Set projects = Nothing
 End Sub
 
+
+'---------------------------------------------------------------------------------------
+' Procedure : getCurrentProjectName
+' Author    : Lucas Vitorino
+' Purpose   : Get the project name associated with the active DEV workbook.
+' Notes     : Temporary and not tested
+'---------------------------------------------------------------------------------------
+'
+Public Function getCurrentProjectName() As String
+    getCurrentProjectName = vtkStripPathOrNameOfVtkExtension(ActiveWorkbook.FullName, "DEV")
+End Function

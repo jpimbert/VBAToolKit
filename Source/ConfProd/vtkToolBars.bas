@@ -121,14 +121,6 @@ Public Sub vtkCreateToolbars(Optional vbeToolbar As Boolean = True, Optional exc
                            action:=projectName & ".vtkShowCreateProjectForm", _
                            vbeToolbar:=vbeToolbar, _
                            excToolbar:=excToolbar
-                           
-'    doesn't work because it's a Hara-Kiri for VBAToolKit itself
-'    vtkCreateToolbarButton caption:="Recreate Delivery", _
-'                           helpText:="Click here to recreate the configuration for delivery", _
-'                           faceId:=680, _
-'                           action:=projectName & ".vtkRecreateDeliveryClicked", _
-'                           vbeToolbar:=vbeToolbar, _
-'                           excToolbar:=excToolbar
 
     ' Create the button for recreate configuration
     vtkCreateToolbarButton caption:="Recreate Configuration", _
@@ -204,10 +196,10 @@ End Sub
 '---------------------------------------------------------------------------------------
 '
 Public Sub vtkReactivateVBEToolBar()
-    Dim c As CommandBarControl
+    Dim C As CommandBarControl
     vtkClearEventHandlers
-    For Each c In Application.VBE.CommandBars(toolBarName).Controls
-        vtkAddEventHandler action:=c.onAction, cmdBarCtl:=c
+    For Each C In Application.VBE.CommandBars(toolBarName).Controls
+        vtkAddEventHandler action:=C.onAction, cmdBarCtl:=C
     Next
 End Sub
 

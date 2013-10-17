@@ -47,7 +47,7 @@ Private currentProjectName As String
 Private Sub UserForm_Initialize()
 
     ' Get the name of the current DEV workbook
-    currentProjectName = vtkStripPathOrNameOfVtkExtension(ActiveWorkbook.name, "DEV")
+    currentProjectName = getCurrentProjectName
 
     ' Initialize configuration manager
     Set cm = vtkConfigurationManagerForProject(currentProjectName)
@@ -101,7 +101,7 @@ End Sub
 '
 Private Sub AllConfigurationsExceptThisOneCheckBox_Change()
 
-    If AllConfigurationsExceptThisOneCheckBox.Value = True Then
+    If AllConfigurationsExceptThisOneCheckBox.Value = True Or currentConf Is Nothing Then
         PathTextBox.Text = ""
     Else
         PathTextBox.Text = currentConf.path

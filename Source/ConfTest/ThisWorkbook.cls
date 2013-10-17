@@ -47,13 +47,3 @@ Private Sub Workbook_BeforeSave(ByVal SaveAsUI As Boolean, Cancel As Boolean)
     VBAToolKit.vtkExportConfiguration ThisWorkbook.VBProject, "VBAToolKit", "VBAToolKit_DEV", True
 End Sub
 
-Private Sub Workbook_Open()
-    VBAToolKit_DEV.vtkToolBars.vtkCreateToolbars
-End Sub
-
-Private Sub Workbook_BeforeClose(Cancel As Boolean)
-    VBAToolKit_DEV.vtkToolBars.vtkDeleteToolbars
-End Sub
-
-
-
