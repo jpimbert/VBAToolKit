@@ -261,7 +261,10 @@ End Sub
 '---------------------------------------------------------------------------------------
 ' Procedure : vtkAddProjectToListOfRememberedProjects
 ' Author    : Lucas Vitorino
-' Purpose   : Add a project to a list of remembered projects.
+' Purpose   : Add a project to a list of remembered projects
+' Raises    : - VTK_PROJECT_ALREADY_IN_LIST
+'             - VTK_WRONG_FILE_PATH
+'             - VTK_UNEXEPECTED_ERROR
 '---------------------------------------------------------------------------------------
 '
 Public Sub vtkAddProjectToListOfRememberedProjects(listPath As String, _
@@ -313,6 +316,7 @@ Public Sub vtkAddProjectToListOfRememberedProjects(listPath As String, _
 
 vtkAddProjectToListOfRememberedProjects_Error:
     Err.Source = "vtkAddProjectToListOfRememberedProjects of module vtkXMLUtilities"
+    
     Select Case Err.Number
         Case VTK_PROJECT_ALREADY_IN_LIST
             Err.Description = "There is already a project with that name in the list."
@@ -329,8 +333,106 @@ vtkAddProjectToListOfRememberedProjects_Error:
 End Sub
 
 
+'---------------------------------------------------------------------------------------
+' Procedure : vtkModifyProjectInList
+' Author    : Lucas Vitorino
+' Purpose   : Modify the field of a given project in the project list.
+' Raises    : VTK_WRONG_FILE_PATH
+' Notes     : It's impossible to modify the name of a project.
+'---------------------------------------------------------------------------------------
+'
+Public Sub vtkModifyProjectInList(listPath As String, _
+                                  projectName As String, _
+                                  Optional projectRootFolder, _
+                                  Optional projectXMLRelativePath)
+                                               
+    On Error GoTo vtkModifyProjectInList_Error
 
+    ' Check existence of the file
+    Dim fso As New FileSystemObject
+    If fso.FileExists(listPath) = False Then Err.Raise VTK_WRONG_FILE_PATH
 
-' TODO
-' "Modify project" function with optional arguments
-' "Remove project"
+    ' Load the list
+    Dim dom As New MSXML2.DOMDocument
+    dom.Load listPath
+    
+    ' For all the childnodes of the root node
+    Dim projectFound As Boolean: projectFound = False
+    Dim tmpNode As MSXML2.IXMLDOMNode
+    For Each tmpNode In dom.ChildNodes.Item(1).ChildNodes
+        ' If the name of the node is the one given as a parameter
+        If tmpNode.ChildNodes.Item(0).Text Like projectName Then
+            projectFound = True
+            ' Update projectRootFolder if needed
+            If Not IsEmpty(projectRootFolder) Then tmpNode.ChildNodes.Item(1).Text = projectRootFolder
+            ' Update projectXMLRelativePath if needed
+            If Not IsEmpty(projectXMLRelativePath) Then tmpNode.ChildNodes.Item(2).Text = projectXMLRelativePath
+        End If
+    Next
+    
+    ' Raise error if the project has not been found in the list
+    If Not projectFound Then Err.Raise VTK_NO_SUCH_PROJECT
+    
+    ' Save changes to the list
+    vtkWriteXMLDOMToFile dom, listPath
+
+    On Error GoTo 0
+    Exit Sub
+
+vtkModifyProjectInList_Error:
+    Err.Source = "vtkModifyProjectInList of module vtkXMLUtilities"
+    
+    Select Case Err.Number
+        Case VTK_WRONG_FILE_PATH
+            Err.Description = "The file path you specified is wrong. Make sure the folder tree is valid."
+        Case VTK_NO_SUCH_PROJECT
+            Err.Description = "No project with this name has been found in the list."
+        Case Else
+            Err.Number = VTK_UNEXPECTED_ERROR
+    End Select
+    
+    Err.Raise Err.Number, Err.Source, Err.Description
+    
+    Exit Sub
+End Sub
+                                  
+
+'---------------------------------------------------------------------------------------
+' UNTESTED UTILITY FUNCTIONS
+'---------------------------------------------------------------------------------------
+'
+Public Function getProjectRootPathInList(listPath As String, projectName As String) As String
+    
+    ' Load the list
+    Dim dom As New MSXML2.DOMDocument
+    dom.Load listPath
+    
+    ' For all the childnodes of the root node
+    Dim tmpNode As MSXML2.IXMLDOMNode
+    For Each tmpNode In dom.ChildNodes.Item(1).ChildNodes
+        ' If the name of the node is the one given as a parameter
+        If tmpNode.ChildNodes.Item(0).Text Like projectName Then
+            getProjectRootPathInList = tmpNode.ChildNodes.Item(1).Text
+            Exit Function
+        End If
+    Next
+
+End Function
+
+Public Function getProjectXMLRelativePathInList(listPath As String, projectName As String) As String
+
+    ' Load the list
+    Dim dom As New MSXML2.DOMDocument
+    dom.Load listPath
+    
+    ' For all the childnodes of the root node
+    Dim tmpNode As MSXML2.IXMLDOMNode
+    For Each tmpNode In dom.ChildNodes.Item(1).ChildNodes
+        ' If the name of the node is the one given as a parameter
+        If tmpNode.ChildNodes.Item(0).Text Like projectName Then
+            getProjectXMLRelativePathInList = tmpNode.ChildNodes.Item(2).Text
+            Exit Function
+        End If
+    Next
+
+End Function

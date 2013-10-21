@@ -56,6 +56,10 @@ Private Property Get ITest_Manager() As ITestManager
 End Property
 
 Private Sub ITestCase_SetUp(Assert As IAssert)
+
+    'TMP
+    resetTestFolder
+
     Set mAssert = Assert
     
     vtkCreateTreeFolder fso.BuildPath(VBAToolKit.vtkTestPath, testProjectName)
@@ -87,6 +91,11 @@ End Sub
 '   - correct path, list has already one project with a different name : file added normally
 '   - wrong path : raise error VTK_WRONG_FILE_PATH
 '   - correct path, list has already one project with the same name  : raise error VTK_PROJECT_ALREADY_IN_LIST
+'
+' vtkModifyProjectInList
+'   - correct path : fields updated
+'   - wrong path : VTK_WRONG_FILE_PATH
+'   - correct path, no such project : VTK_NO_SUCH_PROJECT
 '
 
 Public Sub Test_vtkCreateListOfRememberedProjects_correctPathExistence()
@@ -177,7 +186,7 @@ Public Sub Test_vtkAddProjectToListOfRememberedProjects_correctPath()
     On Error GoTo 0
     Exit Sub
 
-Test_vtkAddProjectToListOfRememberedProjects_correctPath_Error:
+Test_vtkAddvtkAddProjectToListOfRememberedProjects_correctPath_Error:
     Err.Source = "Test_vtkAddProjectToListOfRememberedProjects_correctPath of module vtkXMLUtilitiesTester"
     mAssert.Should False, "Unexpected error " & Err.Number & " (" & Err.Description & ") in " & Err.Source
     Exit Sub
@@ -245,6 +254,80 @@ End Sub
 
 
 
+Public Sub Test_vtkModifyProjectInList_correctPath()
+' correct path : fields updated
+
+    On Error GoTo Test_vtkModifyProjectInList_correctPath_Error
+    
+    ' Create list and add project
+    vtkCreateListOfRememberedProjects (listFullPath)
+    vtkAddProjectToListOfRememberedProjects listFullPath, testProjectName, testProjectRootPath, testProjectXMLPath
+
+    ' Modify the fields we want
+    vtkModifyProjectInList listFullPath, testProjectName, "foo", "bar"
+    
+    ' Test
+    mAssert.Equals getProjectRootPathInList(listFullPath, testProjectName), "foo", _
+                   "Project root path should have been changed."
+                   
+    mAssert.Equals getProjectXMLRelativePathInList(listFullPath, testProjectName), "bar", _
+                   "Project relative path should have been changed."
+                    
+    On Error GoTo 0
+    Exit Sub
+
+Test_vtkModifyProjectInList_correctPath_Error:
+    Err.Source = "Test_vtkModifyProjectInList_correctPath of module vtkXMLUtilitiesTester"
+    mAssert.Should False, "Unexpected error " & Err.Number & " (" & Err.Description & ") in " & Err.Source
+    Exit Sub
+End Sub
+
+
+
+Public Sub Test_vtkModifyProjectInList_wrongPath()
+' wrong path : raise error VTK_WRONG_FILE_PATH
+
+    On Error GoTo Tesst_vtkModifyProjectInList_wrongPath_Error
+    
+    vtkModifyProjectInList fso.BuildPath(VBAToolKit.vtkTestPath, "dummyFolder\dummyList.xml"), testProjectName, "foo", "bar"
+
+    mAssert.Equals error, VTK_WRONG_FILE_PATH, _
+                   "File path is wrong, the relevant error should have been raised."
+
+    On Error GoTo 0
+    Exit Sub
+
+Tesst_vtkModifyProjectInList_wrongPath_Error:
+    error = Err.Number
+    Resume Next
+End Sub
+
+
+
+Public Sub Test_vtkModifyProjectInList_correctPathNoSuchProject()
+' correct path, no such project : raise error VTK_NO_SUCH_PROJECT
+
+    On Error GoTo Test_vtkModifyProjectInList_correctPathNoSuchProject_Error
+
+    ' Create list and add project
+    vtkCreateListOfRememberedProjects (listFullPath)
+    vtkAddProjectToListOfRememberedProjects listFullPath, testProjectName, testProjectRootPath, testProjectXMLPath
+
+    ' Modify the fields we want
+    vtkModifyProjectInList listFullPath, testProjectName & "2", "foo", "bar"
+
+    mAssert.Equals error, VTK_NO_SUCH_PROJECT, _
+                   "No such project has been put in the list, the relevant error should be raised."
+
+    On Error GoTo 0
+    Exit Sub
+
+Test_vtkModifyProjectInList_correctPathNoSuchProject_Error:
+    error = Err.Number
+    Exit Sub
+End Sub
+
+
 
 Private Function ITest_Suite() As TestSuite
     Set ITest_Suite = New TestSuite
@@ -252,6 +335,11 @@ Private Function ITest_Suite() As TestSuite
     ITest_Suite.AddTest ITest_Manager.ClassName, "Test_vtkCreateListOfRememberedProjects_correctPathContent"
     ITest_Suite.AddTest ITest_Manager.ClassName, "Test_vtkCreateListOfRememberedProjects_wrongPathExistence"
     ITest_Suite.AddTest ITest_Manager.ClassName, "Test_vtkAddProjectToListOfRememberedProjects_correctPath"
+    ITest_Suite.AddTest ITest_Manager.ClassName, "Test_vtkAddProjectToListOfRememberedProjects_correctPathDifferentName"
+    ITest_Suite.AddTest ITest_Manager.ClassName, "Test_vtkAddProjectToListOfRememberedProjects_correctPathSameName"
+    ITest_Suite.AddTest ITest_Manager.ClassName, "Test_vtkModifyProjectInList_correctPath"
+    ITest_Suite.AddTest ITest_Manager.ClassName, "Test_vtkModifyProjectInList_wrongPath"
+    ITest_Suite.AddTest ITest_Manager.ClassName, "Test_vtkModifyProjectInList_correctPathNoSuchProject"
 End Function
 
 Private Sub ITestCase_RunTest()
@@ -260,6 +348,11 @@ Private Sub ITestCase_RunTest()
         Case "Test_vtkCreateListOfRememberedProjects_correctPathContent": Test_vtkCreateListOfRememberedProjects_correctPathContent
         Case "Test_vtkCreateListOfRememberedProjects_wrongPathExistence": Test_vtkCreateListOfRememberedProjects_wrongPathExistence
         Case "Test_vtkAddProjectToListOfRememberedProjects_correctPath": Test_vtkAddProjectToListOfRememberedProjects_correctPath
+        Case "Test_vtkAddProjectToListOfRememberedProjects_correctPathDifferentName": Test_vtkAddProjectToListOfRememberedProjects_correctPathDifferentName
+        Case "Test_vtkAddProjectToListOfRememberedProjects_correctPathSameName": Test_vtkAddProjectToListOfRememberedProjects_correctPathSameName
+        Case "Test_vtkModifyProjectInList_correctPath": Test_vtkModifyProjectInList_correctPath
+        Case "Test_vtkModifyProjectInList_wrongPath": Test_vtkModifyProjectInList_wrongPath
+        Case "Test_vtkModifyProjectInList_correctPathNoSuchProject": Test_vtkModifyProjectInList_correctPathNoSuchProject
         Case Else: mAssert.Should False, "Invalid test name: " & mManager.methodName
     End Select
 End Sub
