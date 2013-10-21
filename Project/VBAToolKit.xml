@@ -312,4 +312,14 @@
 		<path confName="VBAToolKit"/>
 		<path confName="VBAToolKit_DEV">Source\ConfTest\vtkXMLExportTester.cls</path>
 	</module>
+	<module>
+		<name>vtkRecreateConfigurationTester</name>
+		<path confName="VBAToolKit"/>
+		<path confName="VBAToolKit_DEV">Source\ConfTest\vtkRecreateConfigurationTester.cls</path>
+	</module>
+	<module>
+		<name>vtkRecreateConfigurationForm</name>
+		<path confName="VBAToolKit">Source\ConfProd\vtkRecreateConfigurationForm.frm</path>
+		<path confName="VBAToolKit_DEV">Source\ConfProd\vtkRecreateConfigurationForm.frm</path>
+	</module>
 </vtkConf>

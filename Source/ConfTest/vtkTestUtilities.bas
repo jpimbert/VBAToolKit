@@ -76,7 +76,9 @@ Public Function getTestFileFromTemplate(fileName As String, Optional destination
        Else
         destination = vtkTestPath & "\" & destinationName
     End If
+    
     FileCopy Source:=Source, destination:=destination
+    
     ' Open Excel file if required
     Set getTestFileFromTemplate = Nothing
     If openExcel Then
