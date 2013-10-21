@@ -38,6 +38,10 @@ Private fso As New FileSystemObject
 Private Const listName As String = "projects_list.xml"
 Private Const testProjectName As String = "TestProject"
 Private listFullPath As String
+Private testProjectRootPath As String
+Private testProjectXMLPath As String
+
+Private error As Integer
 
 Private Sub Class_Initialize()
     Set mManager = New TestCaseManager
@@ -56,13 +60,17 @@ Private Sub ITestCase_SetUp(Assert As IAssert)
     
     vtkCreateTreeFolder fso.BuildPath(VBAToolKit.vtkTestPath, testProjectName)
     testProjectRootPath = fso.BuildPath(VBAToolKit.vtkTestPath, testProjectName)
+    testProjectXMLPath = "Project\"
     
     listFullPath = fso.BuildPath(VBAToolKit.vtkTestPath, listName)
+    
+    
+    error = 0
 
 End Sub
 
 Private Sub ITestCase_TearDown()
-    'VBAToolKit.resetTestFolder
+    VBAToolKit.resetTestFolder
 End Sub
 
 ' Tests to do
@@ -76,10 +84,9 @@ End Sub
 '
 ' vtkAddProjectToList
 '   - correct path, list empty : file added normally
-'   - correct path, list has already one project : file added normally
-'   - correct path, list is not initialized : raise error VTK_DOM_NOT_INITIALIZED
+'   - correct path, list has already one project with a different name : file added normally
 '   - wrong path : raise error VTK_WRONG_FILE_PATH
-'   - correct path, project already in the list : raise error VTK_PROJECT_ALREADY_IN_LIST
+'   - correct path, list has already one project with the same name  : raise error VTK_PROJECT_ALREADY_IN_LIST
 '
 
 Public Sub Test_vtkCreateListOfRememberedProjects_correctPathExistence()
@@ -109,7 +116,7 @@ Public Sub Test_vtkCreateListOfRememberedProjects_correctPathContent()
     On Error GoTo Test_vtkCreateListOfRememberedProjects_correctPathContent_Error
 
     vtkCreateListOfRememberedProjects (listFullPath)
-    
+
     mAssert.Equals vtkTextFileReader(listFullPath), _
                      Chr(10) & _
                      "<?xml version=""1.0"" encoding=""ISO-8859-1"" standalone=""no""?>" & Chr(10) & _
@@ -159,17 +166,85 @@ Public Sub Test_vtkAddProjectToListOfRememberedProjects_correctPath()
 
     vtkCreateListOfRememberedProjects (listFullPath)
 
-    vtkAddProjectToListOfRememberedProjects (listFullPath,
+    vtkAddProjectToListOfRememberedProjects listFullPath, testProjectName, testProjectRootPath, testProjectXMLPath
+
+    Dim dom As New MSXML2.DOMDocument
+    dom.Load listFullPath
+
+    mAssert.Equals countElementsInDom("project", dom), 1, _
+                   "The project has not been added properly."
 
     On Error GoTo 0
     Exit Sub
 
-Test_vtkAddvtkAddProjectToListOfRememberedProjects_correctPath_Error:
-    Err.Source = "Test_vtkAddvtkAddProjectToListOfRememberedProjects_correctPath of module vtkXMLUtilitiesTester"
+Test_vtkAddProjectToListOfRememberedProjects_correctPath_Error:
+    Err.Source = "Test_vtkAddProjectToListOfRememberedProjects_correctPath of module vtkXMLUtilitiesTester"
     mAssert.Should False, "Unexpected error " & Err.Number & " (" & Err.Description & ") in " & Err.Source
     Exit Sub
 
 End Sub
+
+
+Public Sub Test_vtkAddProjectToListOfRememberedProjects_correctPathDifferentName()
+' correct path, list has already one project with a different name : project added normally
+
+    On Error GoTo Test_vtkAddProjectToListOfRememberedProjects_correctPathDifferentName_Error
+
+    vtkCreateListOfRememberedProjects (listFullPath)
+
+    ' Add 2 projects with different names
+    vtkAddProjectToListOfRememberedProjects listFullPath, testProjectName, testProjectRootPath, testProjectXMLPath
+    vtkAddProjectToListOfRememberedProjects listFullPath, testProjectName & "2", testProjectRootPath, testProjectXMLPath
+
+    Dim dom As New MSXML2.DOMDocument
+    dom.Load listFullPath
+
+    mAssert.Equals countElementsInDom("project", dom), 2, _
+                   "The project has not been added properly."
+
+
+    mAssert.Equals error, 0, "No error should have occured as the project names are different"
+
+    On Error GoTo 0
+    Exit Sub
+
+Test_vtkAddProjectToListOfRememberedProjects_correctPathDifferentName_Error:
+    error = Err.Number
+    Resume Next
+End Sub
+
+
+
+Public Sub Test_vtkAddProjectToListOfRememberedProjects_correctPathSameName()
+' correct path, list has already one project with a same name : project not added and error raised
+
+    On Error GoTo Test_vtkAddProjectToListOfRememberedProjects_correctPathSameName_Error
+
+    vtkCreateListOfRememberedProjects (listFullPath)
+
+    ' Add 2 projects with same names
+    vtkAddProjectToListOfRememberedProjects listFullPath, testProjectName, testProjectRootPath, testProjectXMLPath
+    vtkAddProjectToListOfRememberedProjects listFullPath, testProjectName, testProjectRootPath, testProjectXMLPath
+
+    Dim dom As New MSXML2.DOMDocument
+    dom.Load listFullPath
+
+    mAssert.Equals countElementsInDom("project", dom), 1, _
+                   "The project should not have been added."
+
+    mAssert.Equals error, VTK_PROJECT_ALREADY_IN_LIST, _
+                   "The project is already in the list, an error should have been raised."
+
+    On Error GoTo 0
+    Exit Sub
+
+Test_vtkAddProjectToListOfRememberedProjects_correctPathSameName_Error:
+    error = Err.Number
+    Resume Next
+End Sub
+
+
+
 
 Private Function ITest_Suite() As TestSuite
     Set ITest_Suite = New TestSuite

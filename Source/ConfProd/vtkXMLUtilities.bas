@@ -154,7 +154,7 @@ End Function
 ' Purpose   : - Write an XML DOM to a xml text file.
 '             - The content of the file is nicely indented, to be human-readable.
 '             - Overwrite the output file if it exists.
-' Raises    : - VTK_DOM_NOT_INTIALIZED
+' Raises    : - VTK_DOM_NOT_INITIALIZED
 '             - VTK_UNEXPECTED_ERRROR
 ' Notes     : Heavily based on code from Baptiste Wicht, http://baptiste-wicht.developpez.com/
 '---------------------------------------------------------------------------------------
@@ -206,7 +206,7 @@ vtkWriteXMLDOMToFile_Error:
             Err.Number = VTK_UNEXPECTED_ERROR
     End Select
 
-    Err.Raise Err.Number
+    Err.Raise Err.Number, Err.Source, Err.Description
     
     Exit Sub
 
@@ -225,19 +225,16 @@ End Sub
 Public Sub vtkCreateListOfRememberedProjects(filePath As String)
     
     Dim dom As MSXML2.DOMDocument
-    Dim procInstr As MSXML2.IXMLDOMNode
     Dim rootNode As MSXML2.IXMLDOMNode
     
     On Error GoTo vtkCreateListOfRememberedProjects_Error
 
     ' Create the processing instruction
     Set dom = New MSXML2.DOMDocument
-    Set procInstr = dom.createProcessingInstruction("xml", "version=""1.0"" encoding=""ISO-8859-1""")
-    dom.appendChild procInstr
+    dom.appendChild dom.createProcessingInstruction("xml", "version=""1.0"" encoding=""ISO-8859-1""")
 
     ' Create the root node
-    With dom.appendChild(dom.createElement("rememberedProjects"))
-    End With
+    dom.appendChild dom.createElement("rememberedProjects")
 
     vtkWriteXMLDOMToFile dom, filePath
 
@@ -248,9 +245,7 @@ vtkCreateListOfRememberedProjects_Error:
     Err.Source = "vtkCreateXMLListOfRememberedProjects of module vtkXMLUtilities"
     
     Select Case Err.Number
-        Case VTK_DOM_NOT_INITIALIZED
-            ' Do nothing but forward the error
-        Case 3004 ' ADODB.Stream.SaveToFile failed because it couldn't find the path
+        Case VTK_WRONG_FILE_PATH ' ADODB.Stream.SaveToFile failed because it couldn't find the path
             ' Do nothing but forward the error
         Case Else
             Err.Number = VTK_UNEXPECTED_ERROR
@@ -276,36 +271,66 @@ Public Sub vtkAddProjectToListOfRememberedProjects(listPath As String, _
                                                                                          
     On Error GoTo vtkAddProjectToListOfRememberedProjects_Error
 
+    ' Check existence of the file
+    Dim fso As New FileSystemObject
+    If fso.FileExists(listPath) = False Then Err.Raise VTK_WRONG_FILE_PATH
+
     ' Load the list
-    Dim loadedDom As New MSXML2.DOMDocument
-    newDom.Load listPath
+    Dim dom As New MSXML2.DOMDocument
+    dom.Load listPath
     
+    ' Filter projects with the same name
+    Dim tmpNode As MSXML2.IXMLDOMNode
+    For Each tmpNode In dom.ChildNodes.Item(1).ChildNodes
+        If tmpNode.ChildNodes.Item(0).Text Like projectName Then Err.Raise VTK_PROJECT_ALREADY_IN_LIST
+    Next
 
-    ' Insert in the root node
-    With dom.appendChild(dom.ChildNodes.Item(1))
+    ' Insert a project node in the root node
+    With dom.ChildNodes.Item(1).appendChild(dom.createElement("project"))
         
-        ' The project element
-        With .appendChild(dom.createElement("project"))
-        
-            ' Project root folder
-            With .appendChild(dom.createElement("rootFolder"))
-                .Text = projectName
-            End With
-            
-            ' Relative path of the xml file
-            With .appendChild(dom.createElement("xmlRelativePath"))
-                .Text = projectName
-            End With
-            
+        'Project name
+        With .appendChild(dom.createElement("name"))
+            .Text = projectName
         End With
-
+        
+        ' Project root folder
+        With .appendChild(dom.createElement("rootFolder"))
+            .Text = projectRootFolder
+        End With
+        
+        ' Relative path of the xml file
+        With .appendChild(dom.createElement("xmlRelativePath"))
+            .Text = projectXMLRelativePath
+        End With
+        
     End With
+    
+    ' Save changes to the list
+    vtkWriteXMLDOMToFile dom, listPath
 
     On Error GoTo 0
     Exit Sub
 
 vtkAddProjectToListOfRememberedProjects_Error:
     Err.Source = "vtkAddProjectToListOfRememberedProjects of module vtkXMLUtilities"
-    mAssert.Should False, "Unexpected error " & Err.Number & " (" & Err.Description & ") in " & Err.Source
+    Select Case Err.Number
+        Case VTK_PROJECT_ALREADY_IN_LIST
+            Err.Description = "There is already a project with that name in the list."
+        Case VTK_WRONG_FILE_PATH
+            Err.Description = "The file path you specified is wrong. Make sure the folder tree is valid."
+        Case Else
+            Err.Number = VTK_UNEXEPECTED_ERROR
+    End Select
+    
+    Err.Raise Err.Number, Err.Source, Err.Description
+    
     Exit Sub
+
 End Sub
+
+
+
+
+' TODO
+' "Modify project" function with optional arguments
+' "Remove project"
