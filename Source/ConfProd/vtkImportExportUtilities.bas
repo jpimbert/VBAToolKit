@@ -410,7 +410,7 @@ Public Sub vtkRecreateConfiguration(projectName As String, configurationName As 
     
     ' Recreate references in the new Excel File
     Dim toSelf As Boolean
-    toSelf = Right(Wb.VBProject.name) Like "_DEV"
+    toSelf = Right(Wb.VBProject.name, 4) Like "_DEV"
     VtkActivateReferences Wb:=Wb, toSelf:=toSelf
     
     ' VB will not let the workbook be saved under the name of an already opened workbook, which
@@ -520,7 +520,7 @@ Public Function vtkExportConfiguration(projectWithModules As VBProject, projectN
     Exit Function
 
 vtkExportConfiguration_Error:
-    Err.Raise Err.Number, "procedure vtkExportConfiguration of Module vtkImportExportUtilities", Err.Source
+    Err.Raise Err.Number, "procedure vtkExportConfiguration of Module vtkImportExportUtilities", Err.Description
     Resume Next
 
 End Function

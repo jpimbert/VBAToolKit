@@ -55,6 +55,7 @@ Private Sub initializeList()
     "FileExists" & "," & _
     "m" & "," & _
     "c" & "," & _
+    "Tests" & "," & _
     ""
     
     properlyCasedIdentifiersArray = Split(properlyCasedIdentifiersString, ",")
