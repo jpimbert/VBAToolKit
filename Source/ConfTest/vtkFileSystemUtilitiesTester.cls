@@ -51,8 +51,6 @@ Private Sub ITestCase_SetUp(Assert As IAssert)
     
     Set fso = New FileSystemObject
     
-    resetTestFolder
-    
     'Creating a hierarchy of folders (mainly for vtkCleanFolder)
     ' -----------------------------------------------------------------------------
     fso.CreateFolder (VBAToolKit.vtkTestPath & "\" & "visible_folder")
@@ -91,7 +89,7 @@ Private Sub ITestCase_TearDown()
     
     fso = Nothing
 
-    resetTestFolder
+    vtkCleanFolder (VBAToolKit.vtkTestPath)
     
 End Sub
 
@@ -110,15 +108,6 @@ Private Function ITest_Suite() As TestSuite
     ITest_Suite.AddTest ITest_Manager.ClassName, "Test_vtkDoesFolderExist_wrongPath"
     ITest_Suite.AddTest ITest_Manager.ClassName, "Test_vtkDoesFolderExist_visibleFile"
     ITest_Suite.AddTest ITest_Manager.ClassName, "Test_vtkDoesFolderExist_hiddenFile"
-    ITest_Suite.AddTest ITest_Manager.ClassName, "Test_vtkCreateFolderPath_folderName1"
-    ITest_Suite.AddTest ITest_Manager.ClassName, "Test_vtkCreateFolderPath_folderName2"
-    ITest_Suite.AddTest ITest_Manager.ClassName, "Test_vtkCreateFolderPath_fileName"
-    ITest_Suite.AddTest ITest_Manager.ClassName, "Test_vtkCreateFolderPath_relativePath1"
-    ITest_Suite.AddTest ITest_Manager.ClassName, "Test_vtkCreateFolderPath_relativePath2"
-    ITest_Suite.AddTest ITest_Manager.ClassName, "Test_vtkCreateFolderPath_wrongDrive"
-    ITest_Suite.AddTest ITest_Manager.ClassName, "Test_vtkCreateFolderPath_noDotsInPath_dot"
-    ITest_Suite.AddTest ITest_Manager.ClassName, "Test_vtkCreateFolderPath_noDotsInPath_doubleDot"
-    ITest_Suite.AddTest ITest_Manager.ClassName, "Test_vtkCreateFolderPath_noDotsInPath_tripleDot"
 End Function
 
 Private Sub ITestCase_RunTest()
@@ -136,15 +125,6 @@ Private Sub ITestCase_RunTest()
         Case "Test_vtkDoesFolderExist_wrongPath": Test_vtkDoesFolderExist_wrongPath
         Case "Test_vtkDoesFolderExist_visibleFile": Test_vtkDoesFolderExist_visibleFile
         Case "Test_vtkDoesFolderExist_hiddenFile": Test_vtkDoesFolderExist_hiddenFile
-        Case "Test_vtkCreateFolderPath_folderName1": Test_vtkCreateFolderPath_folderName1
-        Case "Test_vtkCreateFolderPath_folderName2": Test_vtkCreateFolderPath_folderName2
-        Case "Test_vtkCreateFolderPath_fileName": Test_vtkCreateFolderPath_fileName
-        Case "Test_vtkCreateFolderPath_relativePath1": Test_vtkCreateFolderPath_relativePath1
-        Case "Test_vtkCreateFolderPath_relativePath2": Test_vtkCreateFolderPath_relativePath2
-        Case "Test_vtkCreateFolderPath_wrongDrive": Test_vtkCreateFolderPath_wrongDrive
-        Case "Test_vtkCreateFolderPath_noDotsInPath_dot": Test_vtkCreateFolderPath_noDotsInPath_dot
-        Case "Test_vtkCreateFolderPath_noDotsInPath_doubleDot": Test_vtkCreateFolderPath_noDotsInPath_doubleDot
-        Case "Test_vtkCreateFolderPath_noDotsInPath_tripleDot": Test_vtkCreateFolderPath_noDotsInPath_tripleDot
         Case Else: mAssert.Should False, "Invalid test name: " & mManager.methodName
     End Select
 End Sub
@@ -256,227 +236,6 @@ End Sub
 
 
 
-Public Sub Test_vtkCreateFolderPath_folderName1()
-' correct folder path : folder should be created
 
-    On Error GoTo Test_vtkCreateFolderPath_folderName_Error
 
-    Dim folderPath As String
-    folderPath = fso.BuildPath(VBAToolKit.vtkTestPath, "testFolder10")
-
-    vtkCreateFolderPath folderPath
-
-    mAssert.Should fso.folderExists(folderPath), "Folder should have been created."
-
-    On Error GoTo 0
-    Exit Sub
-
-Test_vtkCreateFolderPath_folderName_Error:
-    Err.Source = "Test_vtkCreateFolderPath_folderName of module vtkFileSystemUtilitiesTester"
-    mAssert.Should False, "Unexpected error " & Err.Number & " (" & Err.Description & ") in " & Err.Source
-    Exit Sub
-End Sub
-
-
-
-Public Sub Test_vtkCreateFolderPath_folderName2()
-' correct folder path : folder tree should be created
-
-    On Error GoTo Test_vtkCreateFolderPath_folderName_Error
-
-    Dim folderPath As String
-    folderPath = fso.BuildPath(VBAToolKit.vtkTestPath, "testFolder10\testFolder20")
-
-    vtkCreateFolderPath folderPath
-
-    mAssert.Should fso.folderExists(folderPath), "Folder should have been created."
-
-    On Error GoTo 0
-    Exit Sub
-
-Test_vtkCreateFolderPath_folderName_Error:
-    Err.Source = "Test_vtkCreateFolderPath_folderName of module vtkFileSystemUtilitiesTester"
-    mAssert.Should False, "Unexpected error " & Err.Number & " (" & Err.Description & ") in " & Err.Source
-    Exit Sub
-End Sub
-
-
-
-Public Sub Test_vtkCreateFolderPath_fileName()
-' correct file path : folder tree should be created, but not the file
-
-    On Error GoTo Test_vtkCreateFolderPath_fileName_Error
-
-    Dim filePath As String
-    Dim folderPath As String
-    filePath = fso.BuildPath(VBAToolKit.vtkTestPath, "testFolder10\testFolder20\dummy.txt")
-    folderPath = fso.GetParentFolderName(filePath)
-
-    vtkCreateFolderPath filePath
-
-    mAssert.Should fso.folderExists(folderPath), _
-                   "Folder tree should have been created."
-
-    mAssert.Should Not fso.folderExists(filePath), _
-                   "No folder with the same name as the file should have been created"
-
-    mAssert.Should Not fso.FileExists(filePath), _
-                   "File should not have been created : function is just supposed to create the folder tree."
-
-    On Error GoTo 0
-    Exit Sub
-
-Test_vtkCreateFolderPath_fileName_Error:
-    Err.Source = "Test_vtkCreateFolderPath_fileName of module vtkFileSystemUtilitiesTester"
-    mAssert.Should False, "Unexpected error " & Err.Number & " (" & Err.Description & ") in " & Err.Source
-    Exit Sub
-End Sub
-
-
-
-Public Sub Test_vtkCreateFolderPath_relativePath1()
-' relative folder path : VTK_FORBIDDEN_PARAMETER should be raised
-
-    On Error GoTo Test_vtkCreateFolderPath_relativePath1_Error
-
-    Dim error As Long: error = 0
-
-    Dim folderPath As String
-    folderPath = "testFolder10"
-
-    vtkCreateFolderPath folderPath
-
-    mAssert.Equals error, VTK_FORBIDDEN_PARAMETER, _
-                   "Function should not accept relative paths"
-
-    On Error GoTo 0
-    Exit Sub
-
-Test_vtkCreateFolderPath_relativePath1_Error:
-    error = Err.Number
-    Exit Sub
-End Sub
-
-
-Public Sub Test_vtkCreateFolderPath_relativePath2()
-' relative folder path : VTK_FORBIDDEN_PARAMETER should be raised
-
-    On Error GoTo Test_vtkCreateFolderPath_relativePath2_Error
-
-    Dim error As Long: error = 0
-
-    Dim folderPath As String
-    folderPath = "\testFolder10"
-
-    vtkCreateFolderPath folderPath
-
-    mAssert.Equals error, VTK_FORBIDDEN_PARAMETER, _
-                   "Function should not accept relative paths"
-
-    On Error GoTo 0
-    Exit Sub
-
-Test_vtkCreateFolderPath_relativePath2_Error:
-    error = Err.Number
-    Exit Sub
-End Sub
-
-
-
-Public Sub Test_vtkCreateFolderPath_wrongDrive()
-' absolute path is given on a unmounted drive : VTK_WRONG_FOLDER_PATH is raised
-
-    On Error GoTo Test_vtkCreateFolderPath_wrongDrive_Error
-
-    Dim error As Long: error = 0
-
-    Dim folderPath As String
-    folderPath = "Z:\testFolder1\testFolder2"
-
-    vtkCreateFolderPath folderPath
-
-    mAssert.Equals error, VTK_WRONG_FOLDER_PATH, _
-                   "The drive is not mounted, the call is supposed to fail."
-
-    On Error GoTo 0
-    Exit Sub
-
-Test_vtkCreateFolderPath_wrongDrive_Error:
-    error = Err.Number
-    Exit Sub
-End Sub
-
-
-
-Public Sub Test_vtkCreateFolderPath_noDotsInPath_dot()
-' path with a dot inside is given : VTK_FORBIDDEN_PARAMETER should be raised
-
-    On Error GoTo Test_vtkCreateFolderPath_noDotsInPath_dot_Error
-
-    Dim error As Long: error = 0
-
-    Dim folderPath As String
-    folderPath = fso.BuildPath(VBAToolKit.vtkTestPath, ".\testFolder10")
-
-    vtkCreateFolderPath folderPath
-
-    mAssert.Equals error, VTK_FORBIDDEN_PARAMETER, _
-                   "The function should not accept dots in its path."
-
-    On Error GoTo 0
-    Exit Sub
-
-Test_vtkCreateFolderPath_noDotsInPath_dot_Error:
-    error = Err.Number
-    Exit Sub
-End Sub
-
-
-
-Public Sub Test_vtkCreateFolderPath_noDotsInPath_doubleDot()
-' path with two dots inside is given : VTK_FORBIDDEN_PARAMETER should be raised
-
-    On Error GoTo Test_vtkCreateFolderPath_noDotsInPath_doubleDot_Error
-
-    Dim error As Long: error = 0
-
-    Dim folderPath As String
-    folderPath = fso.BuildPath(VBAToolKit.vtkTestPath, "testFolder10\..\testFolder20")
-
-    vtkCreateFolderPath folderPath
-
-    mAssert.Equals error, VTK_FORBIDDEN_PARAMETER, _
-                   "The function should not accept dots in its path."
-
-    On Error GoTo 0
-    Exit Sub
-
-Test_vtkCreateFolderPath_noDotsInPath_doubleDot_Error:
-    error = Err.Number
-    Exit Sub
-End Sub
-
-
-Public Sub Test_vtkCreateFolderPath_noDotsInPath_tripleDot()
-' path with three dots inside is given : VTK_FORBIDDEN_PARAMETER should be raised
-
-    On Error GoTo Test_vtkCreateFolderPath_noDotsInPath_tripleDot_Error
-
-    Dim error As Long: error = 0
-
-    Dim folderPath As String
-    folderPath = fso.BuildPath(VBAToolKit.vtkTestPath, "testFolder10\...\testFolder20")
-
-    vtkCreateFolderPath folderPath
-
-    mAssert.Equals error, VTK_FORBIDDEN_PARAMETER, _
-                   "The function should not accept dots in its path."
-
-    On Error GoTo 0
-    Exit Sub
-
-Test_vtkCreateFolderPath_noDotsInPath_tripleDot_Error:
-    error = Err.Number
-    Exit Sub
-End Sub
 
