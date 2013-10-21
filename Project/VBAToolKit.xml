@@ -312,4 +312,9 @@
 		<path confName="VBAToolKit"/>
 		<path confName="VBAToolKit_DEV">Source\ConfTest\vtkXMLExportTester.cls</path>
 	</module>
+	<module>
+		<name>vtkXMLUtilitiesTester</name>
+		<path confName="VBAToolKit"/>
+		<path confName="VBAToolKit_DEV">Source\ConfTest\vtkXMLUtilitiesTester.cls</path>
+	</module>
 </vtkConf>

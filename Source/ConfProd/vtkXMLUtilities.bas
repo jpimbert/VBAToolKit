@@ -212,3 +212,52 @@ vtkWriteXMLDOMToFile_Error:
 
 End Sub
 
+
+'---------------------------------------------------------------------------------------
+' Procedure : vtkCreateListOfRememberedProjects
+' Author    : Lucas Vitorino
+' Purpose   : Create the xml file containing the list of the remembered projects.
+' Raises    : - VTK_UNEXPECTED_ERROR
+'             - VTK_DOM_NOT_INITIALIZED
+'             - VTK_WRONG_FILE_PATH
+'---------------------------------------------------------------------------------------
+'
+Public Sub vtkCreateListOfRememberedProjects(filePath As String)
+    
+    Dim dom As MSXML2.DOMDocument
+    Dim procInstr As MSXML2.IXMLDOMNode
+    Dim rootNode As MSXML2.IXMLDOMNode
+    
+    On Error GoTo vtkCreateListOfRememberedProjects_Error
+
+    ' Create the processing instruction
+    Set dom = New MSXML2.DOMDocument
+    Set procInstr = dom.createProcessingInstruction("xml", "version=""1.0"" encoding=""ISO-8859-1""")
+    dom.appendChild procInstr
+
+    ' Create the root node
+    With dom.appendChild(dom.createElement("rememberedProjects"))
+    End With
+
+    vtkWriteXMLDOMToFile dom, filePath
+
+    On Error GoTo 0
+    Exit Sub
+
+vtkCreateListOfRememberedProjects_Error:
+    Err.Source = "vtkCreateXMLListOfRememberedProjects of module vtkXMLUtilities"
+    
+    Select Case Err.Number
+        Case VTK_DOM_NOT_INITIALIZED
+            ' Do nothing but forward the error
+        Case 3004 ' ADODB.Stream.SaveToFile failed because it couldn't find the path
+            ' Do nothing but forward the error
+        Case Else
+            Err.Number = VTK_UNEXPECTED_ERROR
+    End Select
+
+    Err.Raise Err.Number, Err.Source, Err.Description
+    
+    Exit Sub
+    
+End Sub
