@@ -338,6 +338,8 @@ End Sub
 ' Author    : Lucas Vitorino
 ' Purpose   : Modify the field of a given project in the project list.
 ' Raises    : VTK_WRONG_FILE_PATH
+'             VTK_UNEXEPECTED_ERROR
+'             VTK_NO_SUCH_PROJECT
 ' Notes     : It's impossible to modify the name of a project.
 '---------------------------------------------------------------------------------------
 '
@@ -396,6 +398,70 @@ vtkModifyProjectInList_Error:
     Exit Sub
 End Sub
                                   
+
+'---------------------------------------------------------------------------------------
+' Procedure : vtkRemoveProjectFromList
+' Author    : Lucas Vitorino
+' Purpose   : Removes a project from the list of projects
+' Raises    : VTK_UNEXPECTED_ERROR
+'             VTK_WRONG_FILE_PATH
+'             VTK_NO_SUCH_PROJECT
+'---------------------------------------------------------------------------------------
+'
+Public Sub vtkRemoveProjectFromList(listPath As String, projectName As String)
+
+    On Error GoTo vtkRemoveProjectFromList_Error
+
+    Dim tmpNode As MSXML2.IXMLDOMNode
+
+    ' Check existence of the file
+    Dim fso As New FileSystemObject
+    If fso.FileExists(listPath) = False Then Err.Raise VTK_WRONG_FILE_PATH
+
+    ' Load the list
+    Dim dom As New MSXML2.DOMDocument
+    dom.Load listPath
+    
+    ' Main loop
+    Dim index As Integer: index = 0
+    Dim projectFound As Boolean: projectFound = False
+    For Each tmpNode In dom.ChildNodes.Item(1).ChildNodes
+        ' If the name of the node is the one given as a parameter
+        If tmpNode.ChildNodes.Item(0).Text Like projectName Then
+            ' Remove this node
+            dom.ChildNodes.Item(1).RemoveChild dom.ChildNodes.Item(1).ChildNodes.Item(index)
+            projectFound = True
+        End If
+        index = index + 1
+    Next
+    
+    ' Raise error if the project has not been found in the list
+    If Not projectFound Then Err.Raise VTK_NO_SUCH_PROJECT
+    
+    ' Save changes to the list
+    vtkWriteXMLDOMToFile dom, listPath
+
+    On Error GoTo 0
+    Exit Sub
+
+vtkRemoveProjectFromList_Error:
+    Err.Source = "vtkModifyProjectInList of module vtkXMLUtilities"
+    
+    Select Case Err.Number
+        Case VTK_WRONG_FILE_PATH
+            Err.Description = "The file path you specified is wrong. Make sure the folder tree is valid."
+        Case VTK_NO_SUCH_PROJECT
+            Err.Description = "No project with this name has been found in the list."
+        Case Else
+            Err.Number = VTK_UNEXPECTED_ERROR
+    End Select
+    
+    Err.Raise Err.Number, Err.Source, Err.Description
+    
+    Exit Sub
+End Sub
+
+
 
 '---------------------------------------------------------------------------------------
 ' UNTESTED UTILITY FUNCTIONS

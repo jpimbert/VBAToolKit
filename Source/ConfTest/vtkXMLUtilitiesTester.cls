@@ -97,6 +97,12 @@ End Sub
 '   - wrong path : VTK_WRONG_FILE_PATH
 '   - correct path, no such project : VTK_NO_SUCH_PROJECT
 '
+' vtkRemoveProjectFromList
+'   - correct path : project removed
+'   - wrong path : VTK_WRONG_FILE_PATH
+'   - correct path, no such project : VTK_NO_SUCH_PROJECT
+'
+'
 
 Public Sub Test_vtkCreateListOfRememberedProjects_correctPathExistence()
 ' correct path : file exists
@@ -287,7 +293,7 @@ End Sub
 Public Sub Test_vtkModifyProjectInList_wrongPath()
 ' wrong path : raise error VTK_WRONG_FILE_PATH
 
-    On Error GoTo Tesst_vtkModifyProjectInList_wrongPath_Error
+    On Error GoTo Test_vtkModifyProjectInList_wrongPath_Error
     
     vtkModifyProjectInList fso.BuildPath(VBAToolKit.vtkTestPath, "dummyFolder\dummyList.xml"), testProjectName, "foo", "bar"
 
@@ -297,7 +303,7 @@ Public Sub Test_vtkModifyProjectInList_wrongPath()
     On Error GoTo 0
     Exit Sub
 
-Tesst_vtkModifyProjectInList_wrongPath_Error:
+Test_vtkModifyProjectInList_wrongPath_Error:
     error = Err.Number
     Resume Next
 End Sub
@@ -328,6 +334,78 @@ Test_vtkModifyProjectInList_correctPathNoSuchProject_Error:
 End Sub
 
 
+Public Sub Test_vtkRemoveProjectFromList_correctPath()
+
+' correct path : project removed
+
+    On Error GoTo Test_vtkRemoveProjectFromList_correctPath_Error
+    
+    ' Create list and add one project
+    vtkCreateListOfRememberedProjects (listFullPath)
+    vtkAddProjectToListOfRememberedProjects listFullPath, testProjectName, testProjectRootPath, testProjectXMLPath
+    
+    ' Remove the project
+    vtkRemoveProjectFromList listFullPath, testProjectName
+    
+    ' Test
+    Dim dom As New MSXML2.DOMDocument
+    dom.Load listFullPath
+    mAssert.Equals countElementsInDom("project", dom), 0, _
+                   "The project should have been deleted."
+                   
+    On Error GoTo 0
+    Exit Sub
+
+Test_vtkRemoveProjectFromList_correctPath_Error:
+    Err.Source = "Test_vtkRemoveProjectFromList_correctPath of module vtkXMLUtilitiesTester"
+    mAssert.Should False, "Unexpected error " & Err.Number & " (" & Err.Description & ") in " & Err.Source
+Exit Sub
+
+
+
+Public Sub Test_vtkRemoveProjectFromList_wrongPath()
+' wrong path : raise error VTK_WRONG_FILE_PATH
+
+    On Error GoTo Test_vtkRemoveProjectFromList_wrongPath_Error
+    
+    vtkRemoveProjectFromList listFullPath, testProjectName
+
+    mAssert.Equals error, VTK_WRONG_FILE_PATH, _
+                   "File path is wrong, the relevant error should have been raised."
+
+    On Error GoTo 0
+    Exit Sub
+
+Test_vtkRemoveProjectFromList_wrongPath_Error:
+    error = Err.Number
+    Resume Next
+End Sub
+
+
+
+Public Sub Test_vtkRemoveProjectFromList_correctPathNoSuchProject()
+' correct path, no such project : raise error VTK_NO_SUCH_PROJECT
+
+    On Error GoTo Test_vtkRemoveProjectFromList_correctPathNoSuchProject_Error
+
+    ' Create list and add project
+    vtkCreateListOfRememberedProjects (listFullPath)
+    vtkAddProjectToListOfRememberedProjects listFullPath, testProjectName, testProjectRootPath, testProjectXMLPath
+
+    ' Modify the fields we want
+    vtkRemoveProjectFromList listFullPath, testProjectName & "2"
+
+    mAssert.Equals error, VTK_NO_SUCH_PROJECT, _
+                   "No such project has been put in the list, the relevant error should be raised."
+
+    On Error GoTo 0
+    Exit Sub
+
+Test_vtkRemoveProjectFromList_correctPathNoSuchProject_Error:
+    error = Err.Number
+    Exit Sub
+End Sub
+
 
 Private Function ITest_Suite() As TestSuite
     Set ITest_Suite = New TestSuite
@@ -340,6 +418,9 @@ Private Function ITest_Suite() As TestSuite
     ITest_Suite.AddTest ITest_Manager.ClassName, "Test_vtkModifyProjectInList_correctPath"
     ITest_Suite.AddTest ITest_Manager.ClassName, "Test_vtkModifyProjectInList_wrongPath"
     ITest_Suite.AddTest ITest_Manager.ClassName, "Test_vtkModifyProjectInList_correctPathNoSuchProject"
+    ITest_Suite.AddTest ITest_Manager.ClassName, "Test_vtkRemoveProjectFromList_correctPath"
+    ITest_Suite.AddTest ITest_Manager.ClassName, "Test_vtkRemoveProjectFromList_wrongPath"
+    ITest_Suite.AddTest ITest_Manager.ClassName, "Test_vtkRemoveProjectFromList_correctPathNoSuchProject"
 End Function
 
 Private Sub ITestCase_RunTest()
@@ -353,6 +434,9 @@ Private Sub ITestCase_RunTest()
         Case "Test_vtkModifyProjectInList_correctPath": Test_vtkModifyProjectInList_correctPath
         Case "Test_vtkModifyProjectInList_wrongPath": Test_vtkModifyProjectInList_wrongPath
         Case "Test_vtkModifyProjectInList_correctPathNoSuchProject": Test_vtkModifyProjectInList_correctPathNoSuchProject
+        Case "Test_vtkRemoveProjectFromList_correctPath": Test_vtkRemoveProjectFromList_correctPath
+        Case "Test_vtkRemoveProjectFromList_wrongPath": Test_vtkRemoveProjectFromList_wrongPath
+        Case "Test_vtkRemoveProjectFromList_correctPathNoSuchProject": Test_vtkRemoveProjectFromList_correctPathNoSuchProject
         Case Else: mAssert.Should False, "Invalid test name: " & mManager.methodName
     End Select
 End Sub
