@@ -261,3 +261,51 @@ vtkCreateListOfRememberedProjects_Error:
     Exit Sub
     
 End Sub
+
+
+'---------------------------------------------------------------------------------------
+' Procedure : vtkAddProjectToListOfRememberedProjects
+' Author    : Lucas Vitorino
+' Purpose   : Add a project to a list of remembered projects.
+'---------------------------------------------------------------------------------------
+'
+Public Sub vtkAddProjectToListOfRememberedProjects(listPath As String, _
+                                                   projectName As String, _
+                                                   projectRootFolder As String, _
+                                                   projectXMLRelativePath As String)
+                                                                                         
+    On Error GoTo vtkAddProjectToListOfRememberedProjects_Error
+
+    ' Load the list
+    Dim loadedDom As New MSXML2.DOMDocument
+    newDom.Load listPath
+    
+
+    ' Insert in the root node
+    With dom.appendChild(dom.ChildNodes.Item(1))
+        
+        ' The project element
+        With .appendChild(dom.createElement("project"))
+        
+            ' Project root folder
+            With .appendChild(dom.createElement("rootFolder"))
+                .Text = projectName
+            End With
+            
+            ' Relative path of the xml file
+            With .appendChild(dom.createElement("xmlRelativePath"))
+                .Text = projectName
+            End With
+            
+        End With
+
+    End With
+
+    On Error GoTo 0
+    Exit Sub
+
+vtkAddProjectToListOfRememberedProjects_Error:
+    Err.Source = "vtkAddProjectToListOfRememberedProjects of module vtkXMLUtilities"
+    mAssert.Should False, "Unexpected error " & Err.Number & " (" & Err.Description & ") in " & Err.Source
+    Exit Sub
+End Sub

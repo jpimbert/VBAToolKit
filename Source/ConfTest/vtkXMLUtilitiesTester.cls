@@ -33,10 +33,11 @@ Implements ITestCase
 Private mManager As TestCaseManager
 Private mAssert As IAssert
 
-Private Const listName As String = "projects_list.xml"
-
-Private listFullPath As String
 Private fso As New FileSystemObject
+
+Private Const listName As String = "projects_list.xml"
+Private Const testProjectName As String = "TestProject"
+Private listFullPath As String
 
 Private Sub Class_Initialize()
     Set mManager = New TestCaseManager
@@ -52,7 +53,12 @@ End Property
 
 Private Sub ITestCase_SetUp(Assert As IAssert)
     Set mAssert = Assert
+    
+    vtkCreateTreeFolder fso.BuildPath(VBAToolKit.vtkTestPath, testProjectName)
+    testProjectRootPath = fso.BuildPath(VBAToolKit.vtkTestPath, testProjectName)
+    
     listFullPath = fso.BuildPath(VBAToolKit.vtkTestPath, listName)
+
 End Sub
 
 Private Sub ITestCase_TearDown()
@@ -61,13 +67,20 @@ End Sub
 
 ' Tests to do
 '
-' vtkCreateXMLListOfRememberedProjects
+' vtkCreateListOfRememberedProjects
 '   - correct path : file exists
 '   - correct path : file content is right
 '       - XML version
 '       - rootNode name
 '   - wrong path : raise error VTK_WRONG_FILE_PATH
-
+'
+' vtkAddProjectToList
+'   - correct path, list empty : file added normally
+'   - correct path, list has already one project : file added normally
+'   - correct path, list is not initialized : raise error VTK_DOM_NOT_INITIALIZED
+'   - wrong path : raise error VTK_WRONG_FILE_PATH
+'   - correct path, project already in the list : raise error VTK_PROJECT_ALREADY_IN_LIST
+'
 
 Public Sub Test_vtkCreateListOfRememberedProjects_correctPathExistence()
 ' correct path : file exists
@@ -127,6 +140,8 @@ Public Sub Test_vtkCreateListOfRememberedProjects_wrongPathExistence()
 
     mAssert.Equals error, VTK_WRONG_FILE_PATH, "An error should have been raised as the folder tree is not valid."
 
+    mAssert.Should fso.FileExists(listFullPath) = False, "The file shouldn't have been created."
+
     On Error GoTo 0
     Exit Sub
 
@@ -134,11 +149,34 @@ Test_vtkCreateListOfRememberedProjects_wrongPathExistence_Error:
     error = Err.Number
     Exit Sub
 End Sub
+
+
+
+Public Sub Test_vtkAddProjectToListOfRememberedProjects_correctPath()
+' correct path, list empty : file added normally
+
+    On Error GoTo Test_vtkAddvtkAddProjectToListOfRememberedProjects_correctPath_Error
+
+    vtkCreateListOfRememberedProjects (listFullPath)
+
+    vtkAddProjectToListOfRememberedProjects (listFullPath,
+
+    On Error GoTo 0
+    Exit Sub
+
+Test_vtkAddvtkAddProjectToListOfRememberedProjects_correctPath_Error:
+    Err.Source = "Test_vtkAddvtkAddProjectToListOfRememberedProjects_correctPath of module vtkXMLUtilitiesTester"
+    mAssert.Should False, "Unexpected error " & Err.Number & " (" & Err.Description & ") in " & Err.Source
+    Exit Sub
+
+End Sub
+
 Private Function ITest_Suite() As TestSuite
     Set ITest_Suite = New TestSuite
     ITest_Suite.AddTest ITest_Manager.ClassName, "Test_vtkCreateListOfRememberedProjects_correctPathExistence"
     ITest_Suite.AddTest ITest_Manager.ClassName, "Test_vtkCreateListOfRememberedProjects_correctPathContent"
     ITest_Suite.AddTest ITest_Manager.ClassName, "Test_vtkCreateListOfRememberedProjects_wrongPathExistence"
+    ITest_Suite.AddTest ITest_Manager.ClassName, "Test_vtkAddProjectToListOfRememberedProjects_correctPath"
 End Function
 
 Private Sub ITestCase_RunTest()
@@ -146,6 +184,7 @@ Private Sub ITestCase_RunTest()
         Case "Test_vtkCreateListOfRememberedProjects_correctPathExistence": Test_vtkCreateListOfRememberedProjects_correctPathExistence
         Case "Test_vtkCreateListOfRememberedProjects_correctPathContent": Test_vtkCreateListOfRememberedProjects_correctPathContent
         Case "Test_vtkCreateListOfRememberedProjects_wrongPathExistence": Test_vtkCreateListOfRememberedProjects_wrongPathExistence
+        Case "Test_vtkAddProjectToListOfRememberedProjects_correctPath": Test_vtkAddProjectToListOfRememberedProjects_correctPath
         Case Else: mAssert.Should False, "Invalid test name: " & mManager.methodName
     End Select
 End Sub
