@@ -18,12 +18,12 @@ Private Sub AddFailure(TestCase As ITestCase, Comment As String)
     'Debug.Print "Test failed: " & Comment
 End Sub
 
-Private Sub IAssert_Delta(Actual As Variant, expected As Variant, Delta As Variant, Optional Comment As String)
+Private Sub IAssert_Delta(actual As Variant, expected As Variant, Delta As Variant, Optional Comment As String)
 
 End Sub
 
-Private Sub IAssert_Equals(Actual As Variant, expected As Variant, Optional Comment As String)
-    If Actual <> expected Then AddFailure CurrentTestCase, NotEqualsComment(Comment, Actual, expected)
+Private Sub IAssert_Equals(actual As Variant, expected As Variant, Optional Comment As String)
+    If actual <> expected Then AddFailure CurrentTestCase, NotEqualsComment(Comment, actual, expected)
 End Sub
 
 Private Sub IAssert_Should(Condition As Boolean, Optional Comment As String)
@@ -42,6 +42,6 @@ Private Property Get IResultUser_Result() As TestResult
     Set IResultUser_Result = mResult
 End Property
 
-Private Function NotEqualsComment(Comment As String, Actual As Variant, expected As Variant) As String
-    NotEqualsComment = Comment & ":" & vbCrLf & "expected: " & vbCrLf & QW(CStr(expected)) & vbCrLf & "but was: " & vbCrLf & QW(CStr(Actual))
+Private Function NotEqualsComment(Comment As String, actual As Variant, expected As Variant) As String
+    NotEqualsComment = Comment & ":" & vbCrLf & "expected: " & vbCrLf & QW(CStr(expected)) & vbCrLf & "but was: " & vbCrLf & QW(CStr(actual))
 End Function
