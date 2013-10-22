@@ -51,8 +51,6 @@ Private Sub ITestCase_SetUp(Assert As IAssert)
     
     Set fso = New FileSystemObject
     
-    resetTestFolder
-    
     'Creating a hierarchy of folders (mainly for vtkCleanFolder)
     ' -----------------------------------------------------------------------------
     fso.CreateFolder (VBAToolKit.vtkTestPath & "\" & "visible_folder")
@@ -91,7 +89,7 @@ Private Sub ITestCase_TearDown()
     
     fso = Nothing
 
-    resetTestFolder
+    VBAToolKit.resetTestFolder
     
 End Sub
 
@@ -391,7 +389,7 @@ Public Sub Test_vtkCreateFolderPath_wrongDrive()
     Dim error As Long: error = 0
 
     Dim folderPath As String
-    folderPath = "Z:\testFolder1\testFolder2"
+    folderPath = "O:\testFolder1\testFolder2"
 
     vtkCreateFolderPath folderPath
 
