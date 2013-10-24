@@ -38,7 +38,7 @@ Private fso As New FileSystemObject
 Private Const listName As String = "projects_list.xml"
 Private Const testProjectName As String = "TestProject"
 Private listFullPath As String
-Private testProjectRootPath As String
+Private testProjectBeforeRootPath As String
 Private testProjectXMLPath As String
 
 Private error As Integer
@@ -63,7 +63,7 @@ Private Sub ITestCase_SetUp(Assert As IAssert)
     Set mAssert = Assert
     
     vtkCreateTreeFolder fso.BuildPath(VBAToolKit.vtkTestPath, testProjectName)
-    testProjectRootPath = fso.BuildPath(VBAToolKit.vtkTestPath, testProjectName)
+    testProjectBeforeRootPath = VBAToolKit.vtkTestPath
     testProjectXMLPath = "Project\"
     
     listFullPath = fso.BuildPath(VBAToolKit.vtkTestPath, listName)
@@ -181,7 +181,7 @@ Public Sub Test_vtkAddProjectToListOfRememberedProjects_correctPath()
 
     vtkCreateListOfRememberedProjects (listFullPath)
 
-    vtkAddProjectToListOfRememberedProjects listFullPath, testProjectName, testProjectRootPath, testProjectXMLPath
+    vtkAddProjectToListOfRememberedProjects listFullPath, testProjectName, testProjectBeforeRootPath, testProjectXMLPath
 
     Dim dom As New MSXML2.DOMDocument
     dom.Load listFullPath
@@ -208,8 +208,8 @@ Public Sub Test_vtkAddProjectToListOfRememberedProjects_correctPathDifferentName
     vtkCreateListOfRememberedProjects (listFullPath)
 
     ' Add 2 projects with different names
-    vtkAddProjectToListOfRememberedProjects listFullPath, testProjectName, testProjectRootPath, testProjectXMLPath
-    vtkAddProjectToListOfRememberedProjects listFullPath, testProjectName & "2", testProjectRootPath, testProjectXMLPath
+    vtkAddProjectToListOfRememberedProjects listFullPath, testProjectName, testProjectBeforeRootPath, testProjectXMLPath
+    vtkAddProjectToListOfRememberedProjects listFullPath, testProjectName & "2", testProjectBeforeRootPath, testProjectXMLPath
 
     Dim dom As New MSXML2.DOMDocument
     dom.Load listFullPath
@@ -238,8 +238,8 @@ Public Sub Test_vtkAddProjectToListOfRememberedProjects_correctPathSameName()
     vtkCreateListOfRememberedProjects (listFullPath)
 
     ' Add 2 projects with same names
-    vtkAddProjectToListOfRememberedProjects listFullPath, testProjectName, testProjectRootPath, testProjectXMLPath
-    vtkAddProjectToListOfRememberedProjects listFullPath, testProjectName, testProjectRootPath, testProjectXMLPath
+    vtkAddProjectToListOfRememberedProjects listFullPath, testProjectName, testProjectBeforeRootPath, testProjectXMLPath
+    vtkAddProjectToListOfRememberedProjects listFullPath, testProjectName, testProjectBeforeRootPath, testProjectXMLPath
 
     Dim dom As New MSXML2.DOMDocument
     dom.Load listFullPath
@@ -267,13 +267,13 @@ Public Sub Test_vtkModifyProjectInList_correctPath()
     
     ' Create list and add project
     vtkCreateListOfRememberedProjects (listFullPath)
-    vtkAddProjectToListOfRememberedProjects listFullPath, testProjectName, testProjectRootPath, testProjectXMLPath
+    vtkAddProjectToListOfRememberedProjects listFullPath, testProjectName, testProjectBeforeRootPath, testProjectXMLPath
 
     ' Modify the fields we want
     vtkModifyProjectInList listFullPath, testProjectName, "foo", "bar"
     
     ' Test
-    mAssert.Equals getProjectRootPathInList(listFullPath, testProjectName), "foo", _
+    mAssert.Equals getProjectBeforeRootPathInList(listFullPath, testProjectName), "foo", _
                    "Project root path should have been changed."
                    
     mAssert.Equals getProjectXMLRelativePathInList(listFullPath, testProjectName), "bar", _
@@ -317,7 +317,7 @@ Public Sub Test_vtkModifyProjectInList_correctPathNoSuchProject()
 
     ' Create list and add project
     vtkCreateListOfRememberedProjects (listFullPath)
-    vtkAddProjectToListOfRememberedProjects listFullPath, testProjectName, testProjectRootPath, testProjectXMLPath
+    vtkAddProjectToListOfRememberedProjects listFullPath, testProjectName, testProjectBeforeRootPath, testProjectXMLPath
 
     ' Modify the fields we want
     vtkModifyProjectInList listFullPath, testProjectName & "2", "foo", "bar"
@@ -342,7 +342,7 @@ Public Sub Test_vtkRemoveProjectFromList_correctPath()
     
     ' Create list and add one project
     vtkCreateListOfRememberedProjects (listFullPath)
-    vtkAddProjectToListOfRememberedProjects listFullPath, testProjectName, testProjectRootPath, testProjectXMLPath
+    vtkAddProjectToListOfRememberedProjects listFullPath, testProjectName, testProjectBeforeRootPath, testProjectXMLPath
     
     ' Remove the project
     vtkRemoveProjectFromList listFullPath, testProjectName
@@ -391,7 +391,7 @@ Public Sub Test_vtkRemoveProjectFromList_correctPathNoSuchProject()
 
     ' Create list and add project
     vtkCreateListOfRememberedProjects (listFullPath)
-    vtkAddProjectToListOfRememberedProjects listFullPath, testProjectName, testProjectRootPath, testProjectXMLPath
+    vtkAddProjectToListOfRememberedProjects listFullPath, testProjectName, testProjectBeforeRootPath, testProjectXMLPath
 
     ' Modify the fields we want
     vtkRemoveProjectFromList listFullPath, testProjectName & "2"

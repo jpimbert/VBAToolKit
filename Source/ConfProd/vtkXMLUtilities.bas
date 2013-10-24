@@ -269,7 +269,7 @@ End Sub
 '
 Public Sub vtkAddProjectToListOfRememberedProjects(listPath As String, _
                                                    projectName As String, _
-                                                   projectRootFolder As String, _
+                                                   projectBeforeRootFolder As String, _
                                                    projectXMLRelativePath As String)
                                                                                          
     On Error GoTo vtkAddProjectToListOfRememberedProjects_Error
@@ -297,7 +297,7 @@ Public Sub vtkAddProjectToListOfRememberedProjects(listPath As String, _
         End With
         
         ' Project root folder
-        With .appendChild(dom.createElement("rootFolder"))
+        With .appendChild(dom.createElement("beforeRootFolder"))
             .Text = projectRootFolder
         End With
         
@@ -345,7 +345,7 @@ End Sub
 '
 Public Sub vtkModifyProjectInList(listPath As String, _
                                   projectName As String, _
-                                  Optional projectRootFolder, _
+                                  Optional projectBeforeRootFolder, _
                                   Optional projectXMLRelativePath)
                                                
     On Error GoTo vtkModifyProjectInList_Error
@@ -366,7 +366,7 @@ Public Sub vtkModifyProjectInList(listPath As String, _
         If tmpNode.ChildNodes.Item(0).Text Like projectName Then
             projectFound = True
             ' Update projectRootFolder if needed
-            If Not IsEmpty(projectRootFolder) Then tmpNode.ChildNodes.Item(1).Text = projectRootFolder
+            If Not IsEmpty(projectBeforeRootFolder) Then tmpNode.ChildNodes.Item(1).Text = projectBeforeRootFolder
             ' Update projectXMLRelativePath if needed
             If Not IsEmpty(projectXMLRelativePath) Then tmpNode.ChildNodes.Item(2).Text = projectXMLRelativePath
         End If
@@ -467,7 +467,7 @@ End Sub
 ' UNTESTED UTILITY FUNCTIONS
 '---------------------------------------------------------------------------------------
 '
-Public Function getProjectRootPathInList(listPath As String, projectName As String) As String
+Public Function getProjectBeforeRootPathInList(listPath As String, projectName As String) As String
     
     ' Load the list
     Dim dom As New MSXML2.DOMDocument
@@ -478,7 +478,7 @@ Public Function getProjectRootPathInList(listPath As String, projectName As Stri
     For Each tmpNode In dom.ChildNodes.Item(1).ChildNodes
         ' If the name of the node is the one given as a parameter
         If tmpNode.ChildNodes.Item(0).Text Like projectName Then
-            getProjectRootPathInList = tmpNode.ChildNodes.Item(1).Text
+            getProjectBeforeRootPathInList = tmpNode.ChildNodes.Item(1).Text
             Exit Function
         End If
     Next
