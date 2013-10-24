@@ -204,7 +204,7 @@ End Property
 Public Property Get projectRootFolderPath() As String
     If initialized Then
         Dim fso As New FileSystemObject
-        If m_projectRootFolderPath <> "" Then
+        If m_projectBeforeRootFolderPath <> "" Then
             projectRootFolderPath = fso.BuildPath(m_projectBeforeRootFolderPath, projectName)
         Else
             projectRootFolderPath = fso.BuildPath(VBAToolKit.vtkTestPath, projectName)
@@ -213,6 +213,29 @@ Public Property Get projectRootFolderPath() As String
         projectRootFolderPath = ""
     End If
 End Property
+
+
+'---------------------------------------------------------------------------------------
+' Procedure : projectBeforeRootFolderPath
+' Author    : Lucas Vitorino
+' Purpose   : Return the absolute path of the "before root" folder of the project.
+'             - If the name is not set, return "".
+'             - If the name is set but no other path has been set, return the $testFolderPath
+'             - If the name is set and the before root folder path has been set, $beforeRootFolderPath
+'---------------------------------------------------------------------------------------
+'
+Public Property Get projectBeforeRootFolderPath() As String
+    If initialized Then
+        If m_projectBeforeRootFolderPath <> "" Then
+            projectBeforeRootFolderPath = m_projectBeforeRootFolderPath
+        Else
+            projectBeforeRootFolderPath = VBAToolKit.vtkTestPath
+        End If
+    Else
+        projectBeforeRootFolderPath = ""
+    End If
+End Property
+
 
 '---------------------------------------------------------------------------------------
 ' Procedure : xmlRelativeFolderPath
@@ -245,5 +268,5 @@ Public Property Get xmlSheetFullPath() As String
         xmlSheetFullPath = fso.BuildPath(fso.BuildPath(projectRootFolderPath, xmlRelativeFolderPath), XMLConfigurationName)
     Else
         xmlSheetFullPath = ""
-    End
+    End If
 End Property

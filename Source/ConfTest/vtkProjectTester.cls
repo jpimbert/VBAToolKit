@@ -111,17 +111,32 @@ End Sub
 
 
 Public Sub Test_RootFolderPath_BeforeSet()
-' verify the folder path before it has been set
+' verify the root folder path before the "before root" folder path has been set
     mAssert.Equals project.projectRootFolderPath, fso.BuildPath(VBAToolKit.vtkTestPath, "TestProject"), _
                    "The absolute path of the project's folder before it has been set."
 End Sub
 
 Public Sub Test_RootFolderPath_AfterSet()
-' verify the folder path after it has been set
+' verify the root folder path after the "before root" folder path has been set
     project.projectBeforeRootFolderPath = fso.BuildPath(VBAToolKit.vtkTestPath, "folder1\")
     mAssert.Equals project.projectRootFolderPath, fso.BuildPath(VBAToolKit.vtkTestPath, "\folder1\TestProject"), _
                    "The absolute path of the project's folder after it has been set."
 End Sub
+
+
+Public Sub Test_beforeRootFolderPath_BeforeSet()
+' verify the before root folder path after it has been set
+    mAssert.Equals project.projectBeforeRootFolderPath, VBAToolKit.vtkTestPath, _
+                   "The absolute path of the project's folder before it has been set."
+End Sub
+
+Public Sub Test_beforeRootFolderPath_afterSet()
+' verify the before root folder path after it has been set
+    project.projectBeforeRootFolderPath = fso.BuildPath(VBAToolKit.vtkTestPath, "folder1")
+    mAssert.Equals project.projectBeforeRootFolderPath, fso.BuildPath(VBAToolKit.vtkTestPath, "\folder1"), _
+                   "The absolute path of the project's folder after it has been set."
+End Sub
+
 
 Public Sub Test_xmlRelativeFolderPath_BeforeSet()
 ' verify the xml relative path before it has been set
@@ -170,6 +185,8 @@ Private Function ITest_Suite() As TestSuite
     ITest_Suite.AddTest ITest_Manager.ClassName, "TestXMLConfigurationName"
     ITest_Suite.AddTest ITest_Manager.ClassName, "Test_RootFolderPath_BeforeSet"
     ITest_Suite.AddTest ITest_Manager.ClassName, "Test_RootFolderPath_AfterSet"
+    ITest_Suite.AddTest ITest_Manager.ClassName, "Test_beforeRootFolderPath_BeforeSet"
+    ITest_Suite.AddTest ITest_Manager.ClassName, "Test_beforeRootFolderPath_afterSet"
     ITest_Suite.AddTest ITest_Manager.ClassName, "Test_xmlRelativeFolderPath_BeforeSet"
     ITest_Suite.AddTest ITest_Manager.ClassName, "Test_xmlRelativeFolderPath_afterSet"
     ITest_Suite.AddTest ITest_Manager.ClassName, "Test_xmlSheetFullPath_beforeRootAndRelativePathAreSet"
@@ -190,6 +207,8 @@ Private Sub ITestCase_RunTest()
         Case "TestXMLConfigurationName": TestXMLConfigurationName
         Case "Test_RootFolderPath_BeforeSet": Test_RootFolderPath_BeforeSet
         Case "Test_RootFolderPath_AfterSet": Test_RootFolderPath_AfterSet
+        Case "Test_beforeRootFolderPath_BeforeSet": Test_beforeRootFolderPath_BeforeSet
+        Case "Test_beforeRootFolderPath_afterSet": Test_beforeRootFolderPath_afterSet
         Case "Test_xmlRelativeFolderPath_BeforeSet": Test_xmlRelativeFolderPath_BeforeSet
         Case "Test_xmlRelativeFolderPath_afterSet": Test_xmlRelativeFolderPath_afterSet
         Case "Test_xmlSheetFullPath_beforeRootAndRelativePathAreSet": Test_xmlSheetFullPath_beforeRootAndRelativePathAreSet
