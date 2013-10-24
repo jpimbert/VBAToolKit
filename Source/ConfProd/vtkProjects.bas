@@ -46,6 +46,10 @@ Public Function vtkProjectForName(projectName As String) As vtkProject
     If projects Is Nothing Then
         Set projects = New Collection
     End If
+    
+    ' load the collection
+    loadProjectsFromList
+    
     ' search for the configuration manager in the collection
     Dim cm As vtkProject
     On Error Resume Next
@@ -56,6 +60,7 @@ Public Function vtkProjectForName(projectName As String) As vtkProject
         projects.Add Item:=cm, Key:=projectName
     End If
     On Error GoTo 0
+    
     ' return the configuration manager
     Set vtkProjectForName = cm
 End Function
@@ -123,7 +128,8 @@ Private Sub loadProjectsFromList()
     ' If it doesn't exist, raise an error
     Dim fso As New FileSystemObject
     If fso.FileExists(xmlRememberedProjectsFullPath) = False Then
-        Err.Raise VTK_NO_PROJECT_LIST
+        'Err.Raise VTK_NO_PROJECT_LIST
+        Exit Function
     End If
     
     ' Load the dom
