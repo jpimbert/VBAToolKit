@@ -360,6 +360,7 @@ Test_vtkRemoveProjectFromList_correctPath_Error:
     Err.Source = "Test_vtkRemoveProjectFromList_correctPath of module vtkXMLUtilitiesTester"
     mAssert.Should False, "Unexpected error " & Err.Number & " (" & Err.Description & ") in " & Err.Source
 Exit Sub
+End Sub
 
 
 
