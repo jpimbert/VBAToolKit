@@ -129,12 +129,12 @@ Private Sub loadProjectsFromList()
     Dim fso As New FileSystemObject
     If fso.FileExists(xmlRememberedProjectsFullPath) = False Then
         'Err.Raise VTK_NO_PROJECT_LIST
-        Exit Function
+        Exit Sub
     End If
     
     ' Load the dom
     Dim dom As MSXML2.DOMDocument
-    dom.Load xmlRememberedProjetsFullPath
+    dom.Load xmlRememberedProjectsFullPath
     
     ' Loop in the dom
     Dim tmpProj As vtkProject
@@ -145,7 +145,10 @@ Private Sub loadProjectsFromList()
         tmpProj.projectBeforeRootFolderPath = tmpNode.ChildNodes.Item(1).Text
         tmpProj.xmlRelativeFolderPath = tmpNode.ChildNodes.Item(2).Text
         
-        projects.Add Item:=tmpProj, Key:=tmpProj.projectName
+        ' Add the project if it is not already in the collection
+        If projects(tmpProj.projectName) Is Nothing Then
+            projects.Add Item:=tmpProj, Key:=tmpProj.projectName
+        End If
         
         Set tmpProj = Nothing
     Next
