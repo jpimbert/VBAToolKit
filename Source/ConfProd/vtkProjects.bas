@@ -29,6 +29,10 @@ Option Explicit
 '   collection of instances indexed by project names
 Private projects As Collection
 
+' collection of Strings indexed by project names
+Private rootPathsCol As Collection
+Private xmlRelPathsCol As Collection
+
 Private xmlRememberedProjectsFolder As String
 Private Const xmlFileDefaultName As String = "VBAToolKitProjects.xml"
 
@@ -42,13 +46,13 @@ Private Const xmlFileDefaultName As String = "VBAToolKitProjects.xml"
 '---------------------------------------------------------------------------------------
 '
 Public Function vtkProjectForName(projectName As String) As vtkProject
-    ' Create the collection if it doesn't exist
-    If projects Is Nothing Then
+    ' Create and intialize the collections if they don't exist
+    If (projects Is Nothing) Or (xmlRelPathsCol Is Nothing) Or (xmlRelPathsCol Is Nothing) Then
         Set projects = New Collection
+        Set rootPathsCol = New Collection
+        Set xmlRelPathsCol = New Collection
+        initFromList
     End If
-    
-    ' load the collection
-    loadProjectsFromList
     
     ' search for the configuration manager in the collection
     Dim cm As vtkProject
@@ -74,6 +78,9 @@ End Function
 '
 Public Sub vtkResetProjects()
     Set projects = Nothing
+    Set rootPathsCol = Nothing
+    Set xmlRelPathsCol = Nothing
+    xmlRememberedProjectsFolder = ""
 End Sub
 
 '---------------------------------------------------------------------------------------
@@ -105,35 +112,25 @@ Public Sub vtkSetRememberedProjectsFolder(ByVal folderPath As String)
 End Sub
 
 '---------------------------------------------------------------------------------------
-' Procedure : vtkResetRememberedProjectsFolder
-' Author    : Lucas Vitorino
-' Purpose   : Reset the private variable xmlRememberedProjectsFolder
-'---------------------------------------------------------------------------------------
-'
-Public Sub vtkResetRememberedProjectsFolder()
-    xmlRememberedProjectsFolder = ""
-End Sub
-
-'---------------------------------------------------------------------------------------
-' Procedure : loadProjectsFromList
+' Procedure : initFromList
 ' Author    : Lucas Vitorino
 ' Purpose   : Load projets from the xml list in the private Collection.
 '---------------------------------------------------------------------------------------
 '
-Private Sub loadProjectsFromList()
+Private Sub initFromList()
     
-    On Error GoTo loadProjectsFromList_Error
+    On Error GoTo initFromList_Error
     
     ' Check the existence of the file
     ' If it doesn't exist, raise an error
     Dim fso As New FileSystemObject
     If fso.FileExists(xmlRememberedProjectsFullPath) = False Then
-        'Err.Raise VTK_NO_PROJECT_LIST
+        'Err.Raise VTK_NO_PROJECT_LIST 'Disabled temporarily for the tests
         Exit Sub
     End If
     
     ' Load the dom
-    Dim dom As MSXML2.DOMDocument
+    Dim dom As New MSXML2.DOMDocument
     dom.Load xmlRememberedProjectsFullPath
     
     ' Loop in the dom
@@ -142,13 +139,11 @@ Private Sub loadProjectsFromList()
     For Each tmpNode In dom.getElementsByTagName("project")
         Set tmpProj = New vtkProject
         tmpProj.projectName = tmpNode.ChildNodes.Item(0).Text
-        tmpProj.projectBeforeRootFolderPath = tmpNode.ChildNodes.Item(1).Text
-        tmpProj.xmlRelativeFolderPath = tmpNode.ChildNodes.Item(2).Text
-        
-        ' Add the project if it is not already in the collection
-        If projects(tmpProj.projectName) Is Nothing Then
-            projects.Add Item:=tmpProj, Key:=tmpProj.projectName
-        End If
+
+        ' Add the relevant informations in the collections
+        projects.Add Item:=tmpProj, Key:=tmpProj.projectName
+        rootPathsCol.Add Item:=tmpNode.ChildNodes.Item(1).Text, Key:=tmpProj.projectName
+        xmlRelPathsCol.Add Item:=tmpNode.ChildNodes.Item(2).Text, Key:=tmpProj.projectName
         
         Set tmpProj = Nothing
     Next
@@ -156,8 +151,8 @@ Private Sub loadProjectsFromList()
     On Error GoTo 0
     Exit Sub
 
-loadProjectsFromList_Error:
-    Err.Source = "loadProjectsFromList in vtkProjects"
+initFromList_Error:
+    Err.Source = "initFromList in vtkProjects"
     
     Select Case Err.Number
         Case Else
@@ -177,50 +172,50 @@ End Sub
 ' Notes     : Overwrites the list.
 '---------------------------------------------------------------------------------------
 '
-Private Sub saveProjectsInList()
-    
-    On Error GoTo saveProjectsInList_Error
-
-    Dim fso As New FileSystemObject
-
-    ' Save in a tmp file with a random name, if all goes well, we remove the old file
-    ' and rename the new.
-    Dim tmpPath As String
-    tmpPath = fso.BuildPath(fso.GetParentFolderName(xmlRememberedProjectsFullPath), _
-              vtkStripFilePathOrNameOfExtension(xmlRememberedProjectsFullPath) & _
-              CStr(Round((99999 - 10000 + 1) * Rnd(), 0)) + 10000 & _
-              "." & fso.GetExtensionName(xmlRememberedProjectsFullPath))
-    
-    vtkCreateListOfRememberedProjects tmpPath
-    
-    ' Loop in the collection
-    Dim tmpProj As vtkProject
-    For Each tmpProj In projects
-        vtkAddProjectToListOfRememberedProjects tmpPath, _
-                                                tmpProj.projectName, _
-                                                tmpProj.projectRootFolderPath, _
-                                                tmpProj.xmlRelativeFolderPath
-    Next
-
-    ' All went well, remove the old file, rename the new one
-    Kill xmlRememberedProjectsFullPath
-    fso.GetFile(tmpPath).name = fso.GetFileName(xmlRememberedProjectsFullPath)
-
-    On Error GoTo 0
-    Exit Sub
-
-saveProjectsInList_Error:
-    Err.Source = "saveProjectsInList in vtkProjects"
-    
-    Select Case Err.Number
-        Case 53
-            ' Error raised by Kill because there was no file
-            Resume Next
-        Case Else
-            Err.Number = VTK_UNEXPECTED_ERROR
-    End Select
-    
-    Err.Raise Err.Number, Err.Source, Err.Description
-    
-    Exit Sub
-End Sub
+'Private Sub saveProjectsInList()
+'
+'    On Error GoTo saveProjectsInList_Error
+'
+'    Dim fso As New FileSystemObject
+'
+'    ' Save in a tmp file with a random name, if all goes well, we remove the old file
+'    ' and rename the new.
+'    Dim tmpPath As String
+'    tmpPath = fso.BuildPath(fso.GetParentFolderName(xmlRememberedProjectsFullPath), _
+'              vtkStripFilePathOrNameOfExtension(xmlRememberedProjectsFullPath) & _
+'              CStr(Round((99999 - 10000 + 1) * Rnd(), 0)) + 10000 & _
+'              "." & fso.GetExtensionName(xmlRememberedProjectsFullPath))
+'
+'    vtkCreateListOfRememberedProjects tmpPath
+'
+'    ' Loop in the collection
+'    Dim tmpProj As vtkProject
+'    For Each tmpProj In projects
+'        vtkAddProjectToListOfRememberedProjects tmpPath, _
+'                                                tmpProj.projectName, _
+'                                                tmpProj.projectRootFolderPath, _
+'                                                tmpProj.xmlRelativeFolderPath
+'    Next
+'
+'    ' All went well, remove the old file, rename the new one
+'    Kill xmlRememberedProjectsFullPath
+'    fso.GetFile(tmpPath).name = fso.GetFileName(xmlRememberedProjectsFullPath)
+'
+'    On Error GoTo 0
+'    Exit Sub
+'
+'saveProjectsInList_Error:
+'    Err.Source = "saveProjectsInList in vtkProjects"
+'
+'    Select Case Err.Number
+'        Case 53
+'            ' Error raised by Kill because there was no file
+'            Resume Next
+'        Case Else
+'            Err.Number = VTK_UNEXPECTED_ERROR
+'    End Select
+'
+'    Err.Raise Err.Number, Err.Source, Err.Description
+'
+'    Exit Sub
+'End Sub

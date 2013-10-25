@@ -120,16 +120,6 @@ Private Function ITest_Suite() As TestSuite
     ITest_Suite.AddTest ITest_Manager.ClassName, "TestProjectDevelopmentWorkbookName"
     ITest_Suite.AddTest ITest_Manager.ClassName, "TestProjectWorkbookName"
     ITest_Suite.AddTest ITest_Manager.ClassName, "TestXMLConfigurationName"
-    ITest_Suite.AddTest ITest_Manager.ClassName, "Test_RootFolderPath_BeforeSet"
-    ITest_Suite.AddTest ITest_Manager.ClassName, "Test_RootFolderPath_AfterSet"
-    ITest_Suite.AddTest ITest_Manager.ClassName, "Test_beforeRootFolderPath_BeforeSet"
-    ITest_Suite.AddTest ITest_Manager.ClassName, "Test_beforeRootFolderPath_afterSet"
-    ITest_Suite.AddTest ITest_Manager.ClassName, "Test_xmlRelativeFolderPath_BeforeSet"
-    ITest_Suite.AddTest ITest_Manager.ClassName, "Test_xmlRelativeFolderPath_afterSet"
-    ITest_Suite.AddTest ITest_Manager.ClassName, "Test_xmlSheetFullPath_beforeRootAndRelativePathAreSet"
-    ITest_Suite.AddTest ITest_Manager.ClassName, "Test_xmlSheetFullPath_rootPathSetNotRelativePath"
-    ITest_Suite.AddTest ITest_Manager.ClassName, "Test_xmlSheetFullPath_relativePathSetNotRootPath"
-    ITest_Suite.AddTest ITest_Manager.ClassName, "Test_xmlSheetFullPath_rootAndRelativePathSet"
 End Function
 
 Private Sub ITestCase_RunTest()
@@ -142,16 +132,6 @@ Private Sub ITestCase_RunTest()
         Case "TestProjectDevelopmentWorkbookName": TestProjectDevelopmentWorkbookName
         Case "TestProjectWorkbookName": TestProjectWorkbookName
         Case "TestXMLConfigurationName": TestXMLConfigurationName
-        Case "Test_RootFolderPath_BeforeSet": Test_RootFolderPath_BeforeSet
-        Case "Test_RootFolderPath_AfterSet": Test_RootFolderPath_AfterSet
-        Case "Test_beforeRootFolderPath_BeforeSet": Test_beforeRootFolderPath_BeforeSet
-        Case "Test_beforeRootFolderPath_afterSet": Test_beforeRootFolderPath_afterSet
-        Case "Test_xmlRelativeFolderPath_BeforeSet": Test_xmlRelativeFolderPath_BeforeSet
-        Case "Test_xmlRelativeFolderPath_afterSet": Test_xmlRelativeFolderPath_afterSet
-        Case "Test_xmlSheetFullPath_beforeRootAndRelativePathAreSet": Test_xmlSheetFullPath_beforeRootAndRelativePathAreSet
-        Case "Test_xmlSheetFullPath_rootPathSetNotRelativePath": Test_xmlSheetFullPath_rootPathSetNotRelativePath
-        Case "Test_xmlSheetFullPath_relativePathSetNotRootPath": Test_xmlSheetFullPath_relativePathSetNotRootPath
-        Case "Test_xmlSheetFullPath_rootAndRelativePathSet": Test_xmlSheetFullPath_rootAndRelativePathSet
         Case Else: mAssert.Should False, "Invalid test name: " & mManager.methodName
     End Select
 End Sub

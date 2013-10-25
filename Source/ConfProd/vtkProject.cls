@@ -173,91 +173,91 @@ Public Property Get XMLConfigurationName() As String
 End Property
 
 
-'---------------------------------------------------------------------------------------
-' Procedure : xmlRelativeFolderPath
-' Author    : Lucas Vitorino
-' Purpose   : Set the the relative path of the folder in which the xml sheet is created.
-'---------------------------------------------------------------------------------------
+''---------------------------------------------------------------------------------------
+'' Procedure : xmlRelativeFolderPath
+'' Author    : Lucas Vitorino
+'' Purpose   : Set the the relative path of the folder in which the xml sheet is created.
+''---------------------------------------------------------------------------------------
+''
+'Public Property Let xmlRelativeFolderPath(ByVal folderPath As String)
+'    m_xmlRelativeFolderPath = folderPath
+'End Property
 '
-Public Property Let xmlRelativeFolderPath(ByVal folderPath As String)
-    m_xmlRelativeFolderPath = folderPath
-End Property
-
-'---------------------------------------------------------------------------------------
-' Procedure : projectRootFolderPath
-' Author    : Lucas Vitorino
-' Purpose   : Return the absolute path of the root folder of the project.
-'             - If the name is not set, return "".
-'             - If the name is set but no other path has been set, return the $testFolderPath \ $projectName
-'             - If the name is set and the before root folder path has been set, $beforeRootFolderPath \ $projectname
-'---------------------------------------------------------------------------------------
+''---------------------------------------------------------------------------------------
+'' Procedure : projectRootFolderPath
+'' Author    : Lucas Vitorino
+'' Purpose   : Return the absolute path of the root folder of the project.
+''             - If the name is not set, return "".
+''             - If the name is set but no other path has been set, return the $testFolderPath \ $projectName
+''             - If the name is set and the before root folder path has been set, $beforeRootFolderPath \ $projectname
+''---------------------------------------------------------------------------------------
+''
+'Public Property Get projectRootFolderPath() As String
+'    If initialized Then
+'        Dim fso As New FileSystemObject
+'        If m_projectBeforeRootFolderPath <> "" Then
+'            projectRootFolderPath = fso.BuildPath(m_projectBeforeRootFolderPath, projectName)
+'        Else
+'            projectRootFolderPath = fso.BuildPath(VBAToolKit.vtkTestPath, projectName)
+'        End If
+'    Else
+'        projectRootFolderPath = ""
+'    End If
+'End Property
 '
-Public Property Get projectRootFolderPath() As String
-    If initialized Then
-        Dim fso As New FileSystemObject
-        If m_projectBeforeRootFolderPath <> "" Then
-            projectRootFolderPath = fso.BuildPath(m_projectBeforeRootFolderPath, projectName)
-        Else
-            projectRootFolderPath = fso.BuildPath(VBAToolKit.vtkTestPath, projectName)
-        End If
-    Else
-        projectRootFolderPath = ""
-    End If
-End Property
-
-
-'---------------------------------------------------------------------------------------
-' Procedure : projectBeforeRootFolderPath
-' Author    : Lucas Vitorino
-' Purpose   : Return the absolute path of the "before root" folder of the project.
-'             - If the name is not set, return "".
-'             - If the name is set but no other path has been set, return the $testFolderPath
-'             - If the name is set and the before root folder path has been set, $beforeRootFolderPath
-'---------------------------------------------------------------------------------------
 '
-Public Property Get projectBeforeRootFolderPath() As String
-    If initialized Then
-        If m_projectBeforeRootFolderPath <> "" Then
-            projectBeforeRootFolderPath = m_projectBeforeRootFolderPath
-        Else
-            projectBeforeRootFolderPath = VBAToolKit.vtkTestPath
-        End If
-    Else
-        projectBeforeRootFolderPath = ""
-    End If
-End Property
-
-
-'---------------------------------------------------------------------------------------
-' Procedure : xmlRelativeFolderPath
-' Author    : Lucas Vitorino
-' Purpose   : Return the relative path of the folder where the xml sheet is stored.
-'             If the path has not been set, return "".
-'---------------------------------------------------------------------------------------
+''---------------------------------------------------------------------------------------
+'' Procedure : projectBeforeRootFolderPath
+'' Author    : Lucas Vitorino
+'' Purpose   : Return the absolute path of the "before root" folder of the project.
+''             - If the name is not set, return "".
+''             - If the name is set but no other path has been set, return the $testFolderPath
+''             - If the name is set and the before root folder path has been set, $beforeRootFolderPath
+''---------------------------------------------------------------------------------------
+''
+'Public Property Get projectBeforeRootFolderPath() As String
+'    If initialized Then
+'        If m_projectBeforeRootFolderPath <> "" Then
+'            projectBeforeRootFolderPath = m_projectBeforeRootFolderPath
+'        Else
+'            projectBeforeRootFolderPath = VBAToolKit.vtkTestPath
+'        End If
+'    Else
+'        projectBeforeRootFolderPath = ""
+'    End If
+'End Property
 '
-Public Property Get xmlRelativeFolderPath() As String
-    If m_xmlRelativeFolderPath <> "" Then
-        xmlRelativeFolderPath = m_xmlRelativeFolderPath
-    Else
-        xmlRelativeFolderPath = ""
-    End If
-End Property
-
-'---------------------------------------------------------------------------------------
-' Procedure : xmlSheetFullPath
-' Author    : Lucas Vitorino
-' Purpose   : Return the full path of the xml sheet, made of
-'               - the absolute path of the project's root folder
-'               - the relative path of the project xml folder
-'               - the name of the xml sheet ($projectName.xml)
-'             If the name or the root path are
-'---------------------------------------------------------------------------------------
 '
-Public Property Get xmlSheetFullPath() As String
-    If initialized And (projectRootFolderPath <> "") Then
-        Dim fso As New FileSystemObject
-        xmlSheetFullPath = fso.BuildPath(fso.BuildPath(projectRootFolderPath, xmlRelativeFolderPath), XMLConfigurationName)
-    Else
-        xmlSheetFullPath = ""
-    End If
-End Property
+''---------------------------------------------------------------------------------------
+'' Procedure : xmlRelativeFolderPath
+'' Author    : Lucas Vitorino
+'' Purpose   : Return the relative path of the folder where the xml sheet is stored.
+''             If the path has not been set, return "".
+''---------------------------------------------------------------------------------------
+''
+'Public Property Get xmlRelativeFolderPath() As String
+'    If m_xmlRelativeFolderPath <> "" Then
+'        xmlRelativeFolderPath = m_xmlRelativeFolderPath
+'    Else
+'        xmlRelativeFolderPath = ""
+'    End If
+'End Property
+'
+''---------------------------------------------------------------------------------------
+'' Procedure : xmlSheetFullPath
+'' Author    : Lucas Vitorino
+'' Purpose   : Return the full path of the xml sheet, made of
+''               - the absolute path of the project's root folder
+''               - the relative path of the project xml folder
+''               - the name of the xml sheet ($projectName.xml)
+''             If the name or the root path are
+''---------------------------------------------------------------------------------------
+''
+'Public Property Get xmlSheetFullPath() As String
+'    If initialized And (projectRootFolderPath <> "") Then
+'        Dim fso As New FileSystemObject
+'        xmlSheetFullPath = fso.BuildPath(fso.BuildPath(projectRootFolderPath, xmlRelativeFolderPath), XMLConfigurationName)
+'    Else
+'        xmlSheetFullPath = ""
+'    End If
+'End Property
