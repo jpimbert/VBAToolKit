@@ -63,12 +63,57 @@ Public Function vtkProjectForName(projectName As String) As vtkProject
         cm.projectName = projectName
         projects.Add Item:=cm, Key:=projectName
     End If
+    
     On Error GoTo 0
     
     ' return the configuration manager
     Set vtkProjectForName = cm
 End Function
 
+
+Public Function vtkRootPathForProject(projectName As String) As String
+    ' Create and intialize the collections if they don't exist
+    If (projects Is Nothing) Or (xmlRelPathsCol Is Nothing) Or (xmlRelPathsCol Is Nothing) Then
+        Set projects = New Collection
+        Set rootPathsCol = New Collection
+        Set xmlRelPathsCol = New Collection
+        initFromList
+    End If
+    
+    On Error Resume Next
+    Dim tmpStr As String
+    tmpStr = rootPathsCol(projectName)
+    If Err <> 0 Then
+        vtkRootPathForProject = ""
+        Exit Sub
+    End If
+    
+    On Error GoTo 0
+    vtkRootPathForProject = tmpStr
+    
+End Function
+
+Public Function vtkXmlRelPathForProject(projectName As String) As String
+    ' Create and intialize the collections if they don't exist
+    If (projects Is Nothing) Or (xmlRelPathsCol Is Nothing) Or (xmlRelPathsCol Is Nothing) Then
+        Set projects = New Collection
+        Set rootPathsCol = New Collection
+        Set xmlRelPathsCol = New Collection
+        initFromList
+    End If
+    
+    On Error Resume Next
+    Dim tmpStr As String
+    tmpStr = xmlRelPathsCol(projectName)
+    If Err <> 0 Then
+        vtkXmlRelPathForProject = ""
+        Exit Sub
+    End If
+    
+    On Error GoTo 0
+    vtkXmlRelPathForProject = tmpStr
+    
+End Function
 '---------------------------------------------------------------------------------------
 ' Procedure : vtkResetProjects
 ' Author    : Jean-Pierre Imbert
