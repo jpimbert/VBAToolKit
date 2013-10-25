@@ -172,15 +172,6 @@ Public Property Get XMLConfigurationName() As String
     End If
 End Property
 
-'---------------------------------------------------------------------------------------
-' Procedure : projectBeforeRootFolderPath
-' Author    : Lucas Vitorino
-' Purpose   : Set the absolute path of the root folder containing the project folder.
-'---------------------------------------------------------------------------------------
-'
-Public Property Let projectBeforeRootFolderPath(ByVal folderPath As String)
-    m_projectBeforeRootFolderPath = folderPath
-End Property
 
 '---------------------------------------------------------------------------------------
 ' Procedure : xmlRelativeFolderPath

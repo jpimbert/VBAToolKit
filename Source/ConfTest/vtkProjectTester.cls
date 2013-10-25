@@ -110,69 +110,6 @@ Public Sub TestXMLConfigurationName()
 End Sub
 
 
-Public Sub Test_RootFolderPath_BeforeSet()
-' verify the root folder path before the "before root" folder path has been set
-    mAssert.Equals project.projectRootFolderPath, fso.BuildPath(VBAToolKit.vtkTestPath, "TestProject"), _
-                   "The absolute path of the project's folder before it has been set."
-End Sub
-
-Public Sub Test_RootFolderPath_AfterSet()
-' verify the root folder path after the "before root" folder path has been set
-    project.projectBeforeRootFolderPath = fso.BuildPath(VBAToolKit.vtkTestPath, "folder1\")
-    mAssert.Equals project.projectRootFolderPath, fso.BuildPath(VBAToolKit.vtkTestPath, "\folder1\TestProject"), _
-                   "The absolute path of the project's folder after it has been set."
-End Sub
-
-
-Public Sub Test_beforeRootFolderPath_BeforeSet()
-' verify the before root folder path after it has been set
-    mAssert.Equals project.projectBeforeRootFolderPath, VBAToolKit.vtkTestPath, _
-                   "The absolute path of the project's folder before it has been set."
-End Sub
-
-Public Sub Test_beforeRootFolderPath_afterSet()
-' verify the before root folder path after it has been set
-    project.projectBeforeRootFolderPath = fso.BuildPath(VBAToolKit.vtkTestPath, "folder1")
-    mAssert.Equals project.projectBeforeRootFolderPath, fso.BuildPath(VBAToolKit.vtkTestPath, "\folder1"), _
-                   "The absolute path of the project's folder after it has been set."
-End Sub
-
-
-Public Sub Test_xmlRelativeFolderPath_BeforeSet()
-' verify the xml relative path before it has been set
-    mAssert.Equals project.xmlRelativeFolderPath, "", "The xml relative folder path before it has been set."
-End Sub
-
-Public Sub Test_xmlRelativeFolderPath_afterSet()
-' verify the xml relative path after it has been set
-    project.xmlRelativeFolderPath = "\folder1"
-    mAssert.Equals project.xmlRelativeFolderPath, "\folder1", "The xml relative folder path after it has been set."
-End Sub
-
-Public Sub Test_xmlSheetFullPath_beforeRootAndRelativePathAreSet()
-' verify the full path of the xml sheet before the project root path and the relative path have been set
-    mAssert.Equals project.xmlSheetFullPath, fso.BuildPath(VBAToolKit.vtkTestPath, "\TestProject\TestProject.xml")
-End Sub
-
-Public Sub Test_xmlSheetFullPath_rootPathSetNotRelativePath()
-' verify the full path of the xml sheet before the relative path has been set
-    project.projectBeforeRootFolderPath = fso.BuildPath(VBAToolKit.vtkTestPath, "\folder1")
-    mAssert.Equals project.xmlSheetFullPath, fso.BuildPath(VBAToolKit.vtkTestPath, "\folder1\TestProject\TestProject.xml")
-End Sub
-
-Public Sub Test_xmlSheetFullPath_relativePathSetNotRootPath()
-' verify the full path of the xml sheet before the project root path has been set
-    project.xmlRelativeFolderPath = "\folder1"
-    mAssert.Equals project.xmlSheetFullPath, fso.BuildPath(VBAToolKit.vtkTestPath, "\TestProject\folder1\TestProject.xml")
-End Sub
-
-Public Sub Test_xmlSheetFullPath_rootAndRelativePathSet()
-' verify the full path of the xml sheet after the project root path and the relative path have been set
-    project.projectBeforeRootFolderPath = fso.BuildPath(VBAToolKit.vtkTestPath, "\beforeRoot")
-    project.xmlRelativeFolderPath = "\folder1"
-    mAssert.Equals project.xmlSheetFullPath, fso.BuildPath(VBAToolKit.vtkTestPath, "beforeRoot\TestProject\folder1\TestProject.xml")
-End Sub
-
 Private Function ITest_Suite() As TestSuite
     Set ITest_Suite = New TestSuite
     ITest_Suite.AddTest ITest_Manager.ClassName, "TestNullProject"
