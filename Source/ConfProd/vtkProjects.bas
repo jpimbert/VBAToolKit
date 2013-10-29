@@ -33,7 +33,7 @@ Private projects As Collection
 Private rootPathsCol As Collection
 Private xmlRelPathsCol As Collection
 
-Private xmlRememberedProjectsFolder As String
+Private xmlRememberedProjectsFullPath As String
 Private Const xmlFileDefaultName As String = "VBAToolKitProjects.xml"
 
 '---------------------------------------------------------------------------------------
@@ -46,13 +46,9 @@ Private Const xmlFileDefaultName As String = "VBAToolKitProjects.xml"
 '---------------------------------------------------------------------------------------
 '
 Public Function vtkProjectForName(projectName As String) As vtkProject
+    
     ' Create and intialize the collections if they don't exist
-    If (projects Is Nothing) Or (xmlRelPathsCol Is Nothing) Or (xmlRelPathsCol Is Nothing) Then
-        Set projects = New Collection
-        Set rootPathsCol = New Collection
-        Set xmlRelPathsCol = New Collection
-        initFromList
-    End If
+    initFromList
     
     ' search for the configuration manager in the collection
     Dim cm As vtkProject
@@ -71,49 +67,59 @@ Public Function vtkProjectForName(projectName As String) As vtkProject
 End Function
 
 
+'---------------------------------------------------------------------------------------
+' Procedure : vtkRootPathForProject
+' Author    : Lucas Vitorino
+' Purpose   : Gives the rootpah of a project given its name. Returns "" if the project
+'             doesn't have a known root path.
+'---------------------------------------------------------------------------------------
+'
 Public Function vtkRootPathForProject(projectName As String) As String
+    
     ' Create and intialize the collections if they don't exist
-    If (projects Is Nothing) Or (xmlRelPathsCol Is Nothing) Or (xmlRelPathsCol Is Nothing) Then
-        Set projects = New Collection
-        Set rootPathsCol = New Collection
-        Set xmlRelPathsCol = New Collection
-        initFromList
-    End If
+    initFromList
     
     On Error Resume Next
     Dim tmpStr As String
     tmpStr = rootPathsCol(projectName)
     If Err <> 0 Then
         vtkRootPathForProject = ""
-        Exit Sub
+        Exit Function
     End If
     
     On Error GoTo 0
     vtkRootPathForProject = tmpStr
+    Exit Function
     
 End Function
 
+
+'---------------------------------------------------------------------------------------
+' Procedure : vtkXmlRelPathForProject
+' Author    : Lucas Vitorino
+' Purpose   : Gives the relative path of the xml vtkConfigurations sheet of a project relatively
+'             too its root path. This path can be "".
+'---------------------------------------------------------------------------------------
+'
 Public Function vtkXmlRelPathForProject(projectName As String) As String
+    
     ' Create and intialize the collections if they don't exist
-    If (projects Is Nothing) Or (xmlRelPathsCol Is Nothing) Or (xmlRelPathsCol Is Nothing) Then
-        Set projects = New Collection
-        Set rootPathsCol = New Collection
-        Set xmlRelPathsCol = New Collection
-        initFromList
-    End If
+    initFromList
     
     On Error Resume Next
     Dim tmpStr As String
     tmpStr = xmlRelPathsCol(projectName)
     If Err <> 0 Then
         vtkXmlRelPathForProject = ""
-        Exit Sub
+        Exit Function
     End If
     
     On Error GoTo 0
     vtkXmlRelPathForProject = tmpStr
+    Exit Function
     
 End Function
+
 '---------------------------------------------------------------------------------------
 ' Procedure : vtkResetProjects
 ' Author    : Jean-Pierre Imbert
@@ -125,35 +131,35 @@ Public Sub vtkResetProjects()
     Set projects = Nothing
     Set rootPathsCol = Nothing
     Set xmlRelPathsCol = Nothing
-    xmlRememberedProjectsFolder = ""
+    xmlRememberedProjectsFullPath = ""
 End Sub
 
 '---------------------------------------------------------------------------------------
-' Procedure : vtkXmlConfigurationsFullPath
+' Procedure : getXmlRememberedProjectsFullPath
 ' Author    : Lucas Vitorino
 ' Purpose   : Returns the full path of the list of the projects remembered by VBAToolKit.
 '             - If the folder in which the list should be located has not been set, it will
 '               be located in the same folder as the current workbook.
 '---------------------------------------------------------------------------------------
 '
-Private Function xmlRememberedProjectsFullPath() As String
+Private Function getXmlRememberedProjectsFullPath() As String
     Dim fso As New FileSystemObject
-    If xmlRememberedProjectsFolder <> "" Then
-        xmlRememberedProjectsFullPath = fso.BuildPath(xmlRememberedProjectsFolder, xmlFileDefaultName)
+    If xmlRememberedProjectsFullPath <> "" Then
+        getXmlRememberedProjectsFullPath = xmlRememberedProjectsFullPath
     Else
-        xmlRememberedProjectsFullPath = fso.BuildPath(fso.GetParentFolderName(ThisWorkbook.FullName), xmlFileDefaultName)
+        getXmlRememberedProjectsFullPath = fso.BuildPath(fso.GetParentFolderName(ThisWorkbook.FullName), xmlFileDefaultName)
     End If
 End Function
 
 '---------------------------------------------------------------------------------------
-' Procedure : vtkSetRememberedProjectsFolder
+' Procedure : vtkSetRememberedProjectsFullPath
 ' Author    : Lucas Vitorino
-' Purpose   : Set the folder in which the list of the remembered projects will be located.
+' Purpose   : Set the full path of the list of the remembered projects.
 '             This path is supposed to be absolute.
 '---------------------------------------------------------------------------------------
 '
-Public Sub vtkSetRememberedProjectsFolder(ByVal folderPath As String)
-    xmlRememberedProjectsFolder = folderPath
+Public Sub vtkSetRememberedProjectsFullPath(ByVal filePath As String)
+    xmlRememberedProjectsFullPath = filePath
 End Sub
 
 '---------------------------------------------------------------------------------------
@@ -162,36 +168,49 @@ End Sub
 ' Purpose   : Load projets from the xml list in the private Collection.
 '---------------------------------------------------------------------------------------
 '
-Private Sub initFromList()
+Public Sub initFromList()
     
     On Error GoTo initFromList_Error
     
-    ' Check the existence of the file
-    ' If it doesn't exist, raise an error
-    Dim fso As New FileSystemObject
-    If fso.FileExists(xmlRememberedProjectsFullPath) = False Then
-        'Err.Raise VTK_NO_PROJECT_LIST 'Disabled temporarily for the tests
-        Exit Sub
-    End If
+    ' If the collections are not yet initialized
+    If (projects Is Nothing) Or (xmlRelPathsCol Is Nothing) Or (xmlRelPathsCol Is Nothing) Then
     
-    ' Load the dom
-    Dim dom As New MSXML2.DOMDocument
-    dom.Load xmlRememberedProjectsFullPath
-    
-    ' Loop in the dom
-    Dim tmpProj As vtkProject
-    Dim tmpNode As MSXML2.IXMLDOMNode
-    For Each tmpNode In dom.getElementsByTagName("project")
-        Set tmpProj = New vtkProject
-        tmpProj.projectName = tmpNode.ChildNodes.Item(0).Text
-
-        ' Add the relevant informations in the collections
-        projects.Add Item:=tmpProj, Key:=tmpProj.projectName
-        rootPathsCol.Add Item:=tmpNode.ChildNodes.Item(1).Text, Key:=tmpProj.projectName
-        xmlRelPathsCol.Add Item:=tmpNode.ChildNodes.Item(2).Text, Key:=tmpProj.projectName
+        ' Create the collections
+        Set projects = New Collection
+        Set rootPathsCol = New Collection
+        Set xmlRelPathsCol = New Collection
         
-        Set tmpProj = Nothing
-    Next
+        ' Check the existence of the file
+        ' If it doesn't exist, exit function without further processing
+        Dim fso As New FileSystemObject
+        If fso.FileExists(xmlRememberedProjectsFullPath) = False Then
+            Exit Sub
+        End If
+
+        ' Load the dom
+        Dim dom As New MSXML2.DOMDocument
+        dom.Load xmlRememberedProjectsFullPath
+        
+        ' Loop in the dom
+        Dim projCount As Integer
+        projCount = 0
+        Dim tmpProj As vtkProject
+        Dim tmpNode As MSXML2.IXMLDOMNode
+        For Each tmpNode In dom.getElementsByTagName("project")
+            Set tmpProj = New vtkProject
+            tmpProj.projectName = dom.getElementsByTagName("name").Item(projCount).Text
+    
+            ' Add the relevant informations in the collections
+            projects.Add Item:=tmpProj, Key:=tmpProj.projectName
+            rootPathsCol.Add Item:=dom.getElementsByTagName("rootFolder").Item(projCount).Text, Key:=tmpProj.projectName
+            xmlRelPathsCol.Add Item:=dom.getElementsByTagName("xmlRelativePath").Item(projCount).Text, Key:=tmpProj.projectName
+            
+            ' Prepare the next roll of the loop
+            Set tmpProj = Nothing
+            projCount = projCount + 1
+        Next
+
+    End If
 
     On Error GoTo 0
     Exit Sub
