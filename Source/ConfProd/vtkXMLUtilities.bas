@@ -269,7 +269,7 @@ End Sub
 '
 Public Sub vtkAddProjectToListOfRememberedProjects(listPath As String, _
                                                    projectName As String, _
-                                                   projectBeforeRootFolder As String, _
+                                                   projectRootFolder As String, _
                                                    projectXMLRelativePath As String)
                                                                                          
     On Error GoTo vtkAddProjectToListOfRememberedProjects_Error
@@ -297,7 +297,7 @@ Public Sub vtkAddProjectToListOfRememberedProjects(listPath As String, _
         End With
         
         ' Project root folder
-        With .appendChild(dom.createElement("beforeRootFolder"))
+        With .appendChild(dom.createElement("rootFolder"))
             .Text = projectRootFolder
         End With
         
@@ -345,7 +345,7 @@ End Sub
 '
 Public Sub vtkModifyProjectInList(listPath As String, _
                                   projectName As String, _
-                                  Optional projectBeforeRootFolder, _
+                                  Optional projectRootFolder, _
                                   Optional projectXMLRelativePath)
                                                
     On Error GoTo vtkModifyProjectInList_Error
@@ -366,7 +366,7 @@ Public Sub vtkModifyProjectInList(listPath As String, _
         If tmpNode.ChildNodes.Item(0).Text Like projectName Then
             projectFound = True
             ' Update projectRootFolder if needed
-            If Not IsEmpty(projectBeforeRootFolder) Then tmpNode.ChildNodes.Item(1).Text = projectBeforeRootFolder
+            If Not IsEmpty(projectRootFolder) Then tmpNode.ChildNodes.Item(1).Text = projectRootFolder
             ' Update projectXMLRelativePath if needed
             If Not IsEmpty(projectXMLRelativePath) Then tmpNode.ChildNodes.Item(2).Text = projectXMLRelativePath
         End If
@@ -467,9 +467,15 @@ End Sub
 ' UNTESTED UTILITY FUNCTIONS
 '---------------------------------------------------------------------------------------
 '
+
 Public Function countElementsInDom(elementName As String, dom As MSXML2.DOMDocument) As Integer
 
     On Error GoTo countElementsInDom_Error
+
+    If dom Is Nothing Then
+        countElementsInDom = -1
+        Exit Function
+    End If
     
     Dim rootNode As MSXML2.IXMLDOMNode
     Set rootNode = dom.ChildNodes.Item(1)
@@ -479,18 +485,26 @@ Public Function countElementsInDom(elementName As String, dom As MSXML2.DOMDocum
     On Error GoTo 0
     Exit Function
 
-countElementsInDom_Error:
-    Debug.Print "Unexpected error " & Err.Number & " (" & Err.Description & ") in procedure countElementsInDom of Class Module vtkXMLExportTester"
+    On Error GoTo 0
     Exit Function
-    
-End Function
 
+countElementsInDom_Error:
+    Err.Source = "Function countElementsInDom in module vtkXMLUtilities"
+    Err.Raise Err.Number, Err.Description, Err.Source
+    Exit Function
+
+End Function
 
 Public Function countElementsInNode(elementName As String, node As MSXML2.IXMLDOMNode) As Integer
     
     Dim Count As Integer: Count = 0
     
     On Error GoTo countElementsInNode_Error
+    
+    If node Is Nothing Then
+        countElementsInNode = -1
+        Exit Function
+    End If
 
     Dim subNode As MSXML2.IXMLDOMNode
     For Each subNode In node.ChildNodes
@@ -503,11 +517,38 @@ Public Function countElementsInNode(elementName As String, node As MSXML2.IXMLDO
     Exit Function
 
 countElementsInNode_Error:
+    Err.Source = "Function countElementsInDom in module vtkXMLUtilities"
+    Debug.Print "Error " & Err.Number & " : " & Err.Description & " in " & Err.Source
+    Err.Raise Err.Number, Err.Description, Err.Source
     Exit Function
 End Function
 
 
-Public Function getProjectBeforeRootPathInList(listPath As String, projectName As String) As String
+Public Function getFirstChildNodeByName(nodeName As String, node As MSXML2.IXMLDOMNode) As MSXML2.IXMLDOMNode
+    
+    On Error GoTo getFirstChildNodeByName_Error
+
+    Dim subNode As MSXML2.IXMLDOMNode
+    For Each subNode In node.ChildNodes
+        If subNode.BaseName = nodeName Then
+            Set getFirstChildNodeByName = subNode
+            Exit Function
+        End If
+    Next
+    
+    Set getFirstChildNodeByName = Nothing
+
+    On Error GoTo 0
+    Exit Function
+
+getFirstChildNodeByName_Error:
+    Err.Source = "Function getFirstChildNodeByName in module vtkXMLUtilities"
+    Debug.Print "Error " & Err.Number & " : " & Err.Description & " in " & Err.Source
+    Err.Raise Err.Number, Err.Source, Err.Description
+    Exit Function
+End Function
+
+Public Function getProjectRootPathInList(listPath As String, projectName As String) As String
     
     ' Load the list
     Dim dom As New MSXML2.DOMDocument
@@ -518,7 +559,7 @@ Public Function getProjectBeforeRootPathInList(listPath As String, projectName A
     For Each tmpNode In dom.ChildNodes.Item(1).ChildNodes
         ' If the name of the node is the one given as a parameter
         If tmpNode.ChildNodes.Item(0).Text Like projectName Then
-            getProjectBeforeRootPathInList = tmpNode.ChildNodes.Item(1).Text
+            getProjectRootPathInList = tmpNode.ChildNodes.Item(1).Text
             Exit Function
         End If
     Next

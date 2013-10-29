@@ -168,7 +168,7 @@ End Sub
 ' Purpose   : Load projets from the xml list in the private Collection.
 '---------------------------------------------------------------------------------------
 '
-Public Sub initFromList()
+Private Sub initFromList()
     
     On Error GoTo initFromList_Error
     
@@ -243,47 +243,55 @@ Private Function isXmlSheetValid() As Boolean
         On Error GoTo isXmlSheetValid_Error
         
         ' Make the verifications only if the file exists
-        If fso.FileExists(xmlRememberedProjectsPath) Then
+        If fso.FileExists(xmlRememberedProjectsFullPath) Then
         
             ' Load the dom from the file
             Dim dom As New MSXML2.DOMDocument
             dom.Load xmlRememberedProjectsFullPath
             
             ' The root node must be called "rememberedProjects"
-            Dim rootNode As MSXML2.IXMLDOMNode: rootNode = dom.ChildNodes.Item(1)
+            Dim rootNode As MSXML2.IXMLDOMNode: Set rootNode = dom.ChildNodes.Item(1)
             If rootNode.BaseName <> "rememberedProjects" Then
                 GoTo xmlSheetNotValid
             End If
             
-            ' There must be one "info" node with a "version" subnode
-            ' For now, the only accepted version of "version" is "1.0"
-            
-            
-            
-            ' All subnodes should have an accepted tag name
-            If checkValidTags(dom.ChildNodes.Item(1)) = False Then
+            ' There must be only one "info" node with a only one "version" subnode
+            If Not (dom.getElementsByTagName("version").Length = 1 And _
+                    countElementsInNode("info", rootNode) = 1 And _
+                    dom.getElementsByTagName("version").Length = 1 And _
+                    countElementsInNode("version", getFirstChildNodeByName("info", rootNode)) = 1) Then
                 GoTo xmlSheetNotValid
             End If
             
-            ' Each "project" node must have 3 subnodes, in this order : name, folderPath, et xmlRelativePath
-            ' These subnodes must not be empty
-            For Each tmpNode In dom.getElementsByTagName("project")
-                If tmpNode.ChildNodes.Length <> 3 Or _
-                   tmpNode.ChildNodes(0).BaseName <> "name" Or _
-                   tmpNode.ChildNodes(0).Text = "" Or _
-                   tmpNode.ChildNodes(1).BaseName <> "folderPath" Or _
-                   tmpNode.ChildNodes(1).Text = "" Or _
-                   tmpNode.ChildNodes(2).BaseName <> "xmlRelativePath" Or _
-                   tmpNode.ChildNodes(2).Text = "" _
-                   Then
-                    GoTo xmlSheetNotValid
-                End If
-            Next
-        
-        
+            ' All subnodes should have an accepted tag name
+            If checkValidTags(rootNode) = False Then
+                GoTo xmlSheetNotValid
+            End If
+            
+            ' For now, the only accepted version of "version" is "1.0"
+            If dom.getElementsByTagName("version").Item(0).Text = "1.0" Then
+                ' Each "project" node must have 3 subnodes, in this order : name, folderPath, et xmlRelativePath
+                ' These subnodes must not be empty (NB : content is not cheked)
+                For Each tmpNode In dom.getElementsByTagName("project")
+                    If (tmpNode.ChildNodes.Length <> 3 Or _
+                       tmpNode.ChildNodes(0).BaseName <> "name" Or _
+                       tmpNode.ChildNodes(0).Text = "" Or _
+                       tmpNode.ChildNodes(1).BaseName <> "rootFolder" Or _
+                       tmpNode.ChildNodes(1).Text = "" Or _
+                       tmpNode.ChildNodes(2).BaseName <> "xmlRelativePath" Or _
+                       tmpNode.ChildNodes(2).Text = "") _
+                       Then
+                        GoTo xmlSheetNotValid
+                    End If
+                Next
+            Else
+                GoTo xmlSheetNotValid
+            End If
+          
         End If
 
     On Error GoTo 0
+    isXmlSheetValid = True
     Exit Function
 
 xmlSheetNotValid:
@@ -292,7 +300,15 @@ xmlSheetNotValid:
 
 isXmlSheetValid_Error:
     Err.Source = "Function isXmlSheetValid in module vtkProjects"
-    mAssert.Should False, "Unexpected Error " & Err.Number & " (" & Err.Description & ") in " & Err.Source
+    
+    Select Case Err.Number
+        Case Else
+            Err.Number = VTK_UNEXPECTED_ERROR
+    End Select
+    
+    Debug.Print "Error " & Err.Number & " : " & Err.Description & " in " & Err.Source
+    Err.Raise Err.Number, Err.Source, Err.Description
+    
     Exit Function
        
 End Function
@@ -301,13 +317,15 @@ End Function
 Public Function checkValidTags(node As MSXML2.IXMLDOMNode) As Boolean
     
     ' Check the name of the node
-    If node.BaseName = "version" Or _
+    If node.BaseName = "info" Or _
+       node.BaseName = "version" Or _
        node.BaseName = "rememberedProjects" Or _
+       node.BaseName = "project" Or _
        node.BaseName = "name" Or _
        node.BaseName = "rootFolder" Or _
-       node.BaseName = "xmlRelativePath" _
-    Then
-       
+       node.BaseName = "xmlRelativePath" Or _
+       node.BaseName = "" _
+        Then
        checkValidTags = True
     Else
         checkValidTags = False
