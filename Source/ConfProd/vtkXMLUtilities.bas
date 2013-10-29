@@ -467,6 +467,46 @@ End Sub
 ' UNTESTED UTILITY FUNCTIONS
 '---------------------------------------------------------------------------------------
 '
+Public Function countElementsInDom(elementName As String, dom As MSXML2.DOMDocument) As Integer
+
+    On Error GoTo countElementsInDom_Error
+    
+    Dim rootNode As MSXML2.IXMLDOMNode
+    Set rootNode = dom.ChildNodes.Item(1)
+    
+    countElementsInDom = countElementsInNode(elementName, rootNode)
+
+    On Error GoTo 0
+    Exit Function
+
+countElementsInDom_Error:
+    Debug.Print "Unexpected error " & Err.Number & " (" & Err.Description & ") in procedure countElementsInDom of Class Module vtkXMLExportTester"
+    Exit Function
+    
+End Function
+
+
+Public Function countElementsInNode(elementName As String, node As MSXML2.IXMLDOMNode) As Integer
+    
+    Dim Count As Integer: Count = 0
+    
+    On Error GoTo countElementsInNode_Error
+
+    Dim subNode As MSXML2.IXMLDOMNode
+    For Each subNode In node.ChildNodes
+        If StrComp(subNode.BaseName, elementName) = 0 Then Count = Count + 1
+    Next
+        
+    countElementsInNode = Count
+
+    On Error GoTo 0
+    Exit Function
+
+countElementsInNode_Error:
+    Exit Function
+End Function
+
+
 Public Function getProjectBeforeRootPathInList(listPath As String, projectName As String) As String
     
     ' Load the list

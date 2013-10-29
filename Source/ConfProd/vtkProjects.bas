@@ -230,6 +230,99 @@ End Sub
 
 
 '---------------------------------------------------------------------------------------
+' Procedure : isXmlSheetValid
+' Author    : Lucas Vitorino
+' Purpose   : Check the validity of xml sheet
+'---------------------------------------------------------------------------------------
+'
+Private Function isXmlSheetValid() As Boolean
+        
+        Dim fso As New FileSystemObject
+        Dim tmpNode As MSXML2.IXMLDOMNode
+        
+        On Error GoTo isXmlSheetValid_Error
+        
+        ' Make the verifications only if the file exists
+        If fso.FileExists(xmlRememberedProjectsPath) Then
+        
+            ' Load the dom from the file
+            Dim dom As New MSXML2.DOMDocument
+            dom.Load xmlRememberedProjectsFullPath
+            
+            ' The root node must be called "rememberedProjects"
+            Dim rootNode As MSXML2.IXMLDOMNode: rootNode = dom.ChildNodes.Item(1)
+            If rootNode.BaseName <> "rememberedProjects" Then
+                GoTo xmlSheetNotValid
+            End If
+            
+            ' There must be one "info" node with a "version" subnode
+            ' For now, the only accepted version of "version" is "1.0"
+            
+            
+            
+            ' All subnodes should have an accepted tag name
+            If checkValidTags(dom.ChildNodes.Item(1)) = False Then
+                GoTo xmlSheetNotValid
+            End If
+            
+            ' Each "project" node must have 3 subnodes, in this order : name, folderPath, et xmlRelativePath
+            ' These subnodes must not be empty
+            For Each tmpNode In dom.getElementsByTagName("project")
+                If tmpNode.ChildNodes.Length <> 3 Or _
+                   tmpNode.ChildNodes(0).BaseName <> "name" Or _
+                   tmpNode.ChildNodes(0).Text = "" Or _
+                   tmpNode.ChildNodes(1).BaseName <> "folderPath" Or _
+                   tmpNode.ChildNodes(1).Text = "" Or _
+                   tmpNode.ChildNodes(2).BaseName <> "xmlRelativePath" Or _
+                   tmpNode.ChildNodes(2).Text = "" _
+                   Then
+                    GoTo xmlSheetNotValid
+                End If
+            Next
+        
+        
+        End If
+
+    On Error GoTo 0
+    Exit Function
+
+xmlSheetNotValid:
+    isXmlSheetValid = False
+    Exit Function
+
+isXmlSheetValid_Error:
+    Err.Source = "Function isXmlSheetValid in module vtkProjects"
+    mAssert.Should False, "Unexpected Error " & Err.Number & " (" & Err.Description & ") in " & Err.Source
+    Exit Function
+       
+End Function
+
+
+Public Function checkValidTags(node As MSXML2.IXMLDOMNode) As Boolean
+    
+    ' Check the name of the node
+    If node.BaseName = "version" Or _
+       node.BaseName = "rememberedProjects" Or _
+       node.BaseName = "name" Or _
+       node.BaseName = "rootFolder" Or _
+       node.BaseName = "xmlRelativePath" _
+    Then
+       
+       checkValidTags = True
+    Else
+        checkValidTags = False
+    End If
+    
+    ' launch the sub for every child node
+    Dim tmpNode As MSXML2.IXMLDOMNode
+    If node.ChildNodes.Length <> 0 Then
+        For Each tmpNode In node.ChildNodes
+            If checkValidTags(tmpNode) = False Then checkValidTags = False
+        Next
+    End If
+    
+End Function
+'---------------------------------------------------------------------------------------
 ' Procedure : saveProjectsInList
 ' Author    : Lucas Vitorino
 ' Purpose   : Save projects in the private collection in the xml list.
