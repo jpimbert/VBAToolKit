@@ -72,6 +72,7 @@ End Function
 ' Author    : Lucas Vitorino
 ' Purpose   : Gives the rootpah of a project given its name. Returns "" if the project
 '             doesn't have a known root path.
+' Notes     : No project should have "" as its root path
 '---------------------------------------------------------------------------------------
 '
 Public Function vtkRootPathForProject(projectName As String) As String
@@ -92,7 +93,8 @@ End Function
 ' Procedure : vtkXmlRelPathForProject
 ' Author    : Lucas Vitorino
 ' Purpose   : Gives the relative path of the xml vtkConfigurations sheet of a project relatively
-'             too its root path. This path can be "".
+'             too its root path.
+' Notes     : No project should have "" as its xmlRelPath. The minimum value is the name of the xmm file.
 '---------------------------------------------------------------------------------------
 '
 Public Function vtkXmlRelPathForProject(projectName As String) As String
@@ -344,57 +346,139 @@ Public Function checkValidTags(node As MSXML2.IXMLDOMNode) As Boolean
     End If
     
 End Function
+
 '---------------------------------------------------------------------------------------
 ' Procedure : saveProjectsInList
 ' Author    : Lucas Vitorino
 ' Purpose   : Save projects in the private collection in the xml list.
-' Notes     : Overwrites the list.
+'             Projects that are not added via the "add remembered projects" function are not saved.
+' Notes     : - Overwrites the existing list.
 '---------------------------------------------------------------------------------------
 '
-'Private Sub saveProjectsInList()
+Private Sub saveProjectsInList()
+
+    On Error GoTo saveProjectsInList_Error
+
+    Dim fso As New FileSystemObject
+
+    ' Save in a tmp file with a random name, if all goes well, we remove the old file
+    ' and rename the new.
+    Dim tmpPath As String
+    tmpPath = fso.BuildPath(fso.GetParentFolderName(xmlRememberedProjectsFullPath), _
+              vtkStripFilePathOrNameOfExtension(xmlRememberedProjectsFullPath) & _
+              CStr(Round((99999 - 10000 + 1) * Rnd(), 0)) + 10000 & _
+              "." & fso.GetExtensionName(xmlRememberedProjectsFullPath))
+
+    vtkCreateListOfRememberedProjects tmpPath
+
+    ' Loop in the collection
+    Dim tmpProj As vtkProject
+    For Each tmpProj In m_projects
+        ' Save only the projects that have an entry in the 3 collections.
+        If vtkRootPathForProject(tmpProj.projectName) <> "" And vtkXmlRelPathForProject(tmpProj.projectName) <> "" Then
+            vtkAddProjectToListOfRememberedProjects tmpPath, _
+                                                    tmpProj.projectName, _
+                                                    vtkRootPathForProject(tmpProj.projectName), _
+                                                    vtkXmlRelPathForProject(tmpProj.projectName)
+        End If
+    Next
+
+    ' All went well, remove the old file, rename the new one
+    Kill xmlRememberedProjectsFullPath
+    fso.GetFile(tmpPath).name = fso.GetFileName(xmlRememberedProjectsFullPath)
+
+    On Error GoTo 0
+    Exit Sub
+
+saveProjectsInList_Error:
+    Err.Source = "saveProjectsInList in vtkProjects"
+
+    Select Case Err.Number
+        Case 53
+            ' Error raised by Kill because there was no file
+            Resume Next
+        Case Else
+            Err.Number = VTK_UNEXPECTED_ERROR
+    End Select
+
+    Err.Raise Err.Number, Err.Source, Err.Description
+
+    Exit Sub
+End Sub
+
+'---------------------------------------------------------------------------------------
+' Procedure : vtkAddRememberedProject
+' Author    : Lucas Vitorino
+' Purpose   : Add a project to the collections and save it to the list.
+' Notes     : This function does not filter the data, it will be done by the form that calls the function.
+'---------------------------------------------------------------------------------------
 '
-'    On Error GoTo saveProjectsInList_Error
+Public Sub vtkAddRememberedProject(projectName As String, rootFolder As String, xmlRelativePath As String)
+
+    On Error GoTo vtkAddRememberedProject_Error
+
+    ' Load from the list if it has't been done yet
+    initFromList
+    
+    ' Add the project to the collections
+    vtkProjectForName projectName
+    m_rootPathsCol.Add Item:=rootFolder, Key:=projectName
+    m_xmlRelPathsCol.Add Item:=xmlRelativePath, Key:=projectName
+
+    ' Save the list
+    saveProjectsInList
+
+    On Error GoTo 0
+    Exit Sub
+
+vtkAddRememberedProject_Error:
+    Err.Source = "Sub vtkAddRememberedProject in module vtkProjects"
+    
+    Select Case Err.Number
+        Case Else
+            Err.Number = VTK_UNEXPECTED_ERROR
+    End Select
+    
+    Err.Raise Err.Number, Err.Source, Err.Description
+
+    Exit Sub
+
+End Sub
+
+
+'---------------------------------------------------------------------------------------
+' Procedure : vtkRemoveRememberedProjects
+' Author    : Lucas Vitorino
+' Purpose   : Remove a project from the collections and from the list.
+'---------------------------------------------------------------------------------------
 '
-'    Dim fso As New FileSystemObject
-'
-'    ' Save in a tmp file with a random name, if all goes well, we remove the old file
-'    ' and rename the new.
-'    Dim tmpPath As String
-'    tmpPath = fso.BuildPath(fso.GetParentFolderName(xmlRememberedProjectsFullPath), _
-'              vtkStripFilePathOrNameOfExtension(xmlRememberedProjectsFullPath) & _
-'              CStr(Round((99999 - 10000 + 1) * Rnd(), 0)) + 10000 & _
-'              "." & fso.GetExtensionName(xmlRememberedProjectsFullPath))
-'
-'    vtkCreateListOfRememberedProjects tmpPath
-'
-'    ' Loop in the collection
-'    Dim tmpProj As vtkProject
-'    For Each tmpProj In projects
-'        vtkAddProjectToListOfRememberedProjects tmpPath, _
-'                                                tmpProj.projectName, _
-'                                                tmpProj.projectRootFolderPath, _
-'                                                tmpProj.xmlRelativeFolderPath
-'    Next
-'
-'    ' All went well, remove the old file, rename the new one
-'    Kill xmlRememberedProjectsFullPath
-'    fso.GetFile(tmpPath).name = fso.GetFileName(xmlRememberedProjectsFullPath)
-'
-'    On Error GoTo 0
-'    Exit Sub
-'
-'saveProjectsInList_Error:
-'    Err.Source = "saveProjectsInList in vtkProjects"
-'
-'    Select Case Err.Number
-'        Case 53
-'            ' Error raised by Kill because there was no file
-'            Resume Next
-'        Case Else
-'            Err.Number = VTK_UNEXPECTED_ERROR
-'    End Select
-'
-'    Err.Raise Err.Number, Err.Source, Err.Description
-'
-'    Exit Sub
-'End Sub
+Public Sub vtkRemoveRememberedProjects(projectName As String)
+
+    On Error GoTo vtkRemoveRememberedProjects_Error
+
+    ' Load the list if it hasn't been done yet
+    initFromList
+    
+    ' Remove the projects from the collection
+    m_rootPathsCol.Remove (projectName)
+    m_xmlRelPathsCol.Remove (projectName)
+    
+    ' Save the list
+    saveProjectsInList
+
+    On Error GoTo 0
+    Exit Sub
+
+vtkRemoveRememberedProjects_Error:
+    Err.Source = "Sub vtkAddRememberedProject in module vtkProjects"
+
+    Select Case Err.Number
+        Case Else
+            Err.Number = VTK_UNEXPECTED_ERROR
+    End Select
+    
+    Err.Raise Err.Number, Err.Source, Err.Description
+
+    Exit Sub
+
+End Sub

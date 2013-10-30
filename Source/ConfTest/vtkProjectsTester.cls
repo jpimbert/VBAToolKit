@@ -39,6 +39,7 @@ Private projectName As String      ' default workbook Name for test
 
 Private fso As New FileSystemObject
 Private Const xmlFileName As String = "VBAToolKitTestProjects.xml"
+Private xmlFileFullPath As String
 Private Const testProject1Name As String = "TestProject1"
 Private Const testProject1XmlRelPath As String = "TestProject1.xml"
 Private Const testProject2Name As String = "TestProject2"
@@ -70,11 +71,9 @@ Private Sub createTestXML()
     With dom.appendChild(dom.createElement("rememberedProjects"))
     
         With .appendChild(dom.createElement("info"))
-        
             With .appendChild(dom.createElement("version"))
                 .Text = "1.0"
             End With
-            
         End With
         
         With .appendChild(dom.createElement("project"))
@@ -105,7 +104,7 @@ Private Sub createTestXML()
 
     End With
     
-    vtkWriteXMLDOMToFile dom, fso.BuildPath(VBAToolKit.vtkTestPath, xmlFileName)
+    vtkWriteXMLDOMToFile dom, xmlFileFullPath
 
     On Error GoTo 0
     Exit Sub
@@ -128,17 +127,19 @@ Private Sub ITestCase_SetUp(Assert As IAssert)
     ' set the missing consts (calling function so can't be set out of a function/sub)
     testProject1RootPath = fso.BuildPath(VBAToolKit.vtkTestPath, testProject1Name)
     testProject2RootPath = fso.BuildPath(VBAToolKit.vtkTestPath, testProject2Name)
+    xmlFileFullPath = fso.BuildPath(VBAToolKit.vtkTestPath, xmlFileName)
+    
+    ' Indicate to the current workbook where is the list of projects
+    xmlRememberedProjectsFullPath = xmlFileFullPath
     
     ' Create the file
     createTestXML
     
-    ' Indicate to the current workbook where is the list of projects
-    xmlRememberedProjectsFullPath = fso.BuildPath(VBAToolKit.vtkTestPath, xmlFileName)
     
 End Sub
 
 Private Sub ITestCase_TearDown()
-    VBAToolKit.vtkResetProjects
+    vtkResetProjects
     VBAToolKit.resetTestFolder
 End Sub
 
@@ -154,9 +155,9 @@ End Sub
 
 Public Sub TestProjectIsInvariant()
 '       Verify that the vtkProject for a project is always the same
-    Dim cm As vtkProject
-    Set cm = vtkProjectForName(projectName)
-    mAssert.Should vtkProjectForName(projectName) Is cm, "The project for a project name must be always the same"
+    Dim project As vtkProject
+    Set project = vtkProjectForName(projectName)
+    mAssert.Should vtkProjectForName(projectName) Is project, "The project for a project name must be always the same"
 End Sub
 
 
@@ -216,7 +217,7 @@ End Sub
 
 
 Public Sub Test_vtkProjects_modifyXmlFileAfterLoading()
-'modifying or deleting the xml file after it has been loaded does not have any effect
+' modifying or deleting the xml file after it has been loaded should not have any effect
 
     On Error GoTo Test_vtkProjects_modifyXmlFileAfterLoading_Error
 
@@ -224,7 +225,7 @@ Public Sub Test_vtkProjects_modifyXmlFileAfterLoading()
 
     beforeModPathStr = vtkRootPathForProject(testProject1Name)
 
-    vtkModifyProjectInList listPath:=fso.BuildPath(VBAToolKit.vtkTestPath, xmlFileName), _
+    vtkModifyProjectInList listPath:=xmlFileFullPath, _
                            projectName:=testProject1Name, _
                            projectRootFolder:=fso.BuildPath(VBAToolKit.vtkTestPath, "\dummy")
 
@@ -244,6 +245,177 @@ Test_vtkProjects_modifyXmlFileAfterLoading_Error:
 
 End Sub
 
+
+Public Sub Test_vtkAddRememberedProject_projectIsAddedToTheCollections()
+' after using the "vtkAddRememberedProject" function, collections must be updated
+
+    On Error GoTo Test_vtkAddRememberedProject_projectIsAddedToTheCollections_Error
+
+    ' Generate the names for the new project
+    Dim newProjectName As String: newProjectName = "NewProject"
+    Dim newProjectRootFolder As String: newProjectRootFolder = fso.BuildPath(VBAToolKit.vtkTestPath, newProjectName)
+    Dim newProjectXmlRelPath As String: newProjectXmlRelPath = newProjectName & ".xml"
+
+    ' Add it
+    vtkAddRememberedProject projectName:=newProjectName, _
+                            rootFolder:=newProjectRootFolder, _
+                            xmlRelativePath:=newProjectXmlRelPath
+
+    mAssert.Equals vtkRootPathForProject(newProjectName), newProjectRootFolder, _
+                   "The collection cotaining the root paths should have been updated."
+
+    mAssert.Equals vtkXmlRelPathForProject(newProjectName), newProjectXmlRelPath, _
+                   "The collection cotaining the xml relative paths should have been updated."
+
+    On Error GoTo 0
+    Exit Sub
+
+Test_vtkAddRememberedProject_projectIsAddedToTheCollections_Error:
+    Err.Source = "Sub Test_vtkAddRememberedProject_projectIsAddedToTheCollections in module vtkProjectsTester"
+    mAssert.Should False, "Unexpected Error " & Err.Number & " (" & Err.Description & ") in " & Err.Source
+    Exit Sub
+
+End Sub
+
+
+Public Sub Test_vtkAddRememberedProject_projectIsAddedToTheList()
+' after using the "vtkAddRememberedProject" function, list must be updated
+
+    On Error GoTo Test_vtkAddRememberedProject_projectIsAddedToTheList_Error
+
+    ' Generate the names for the new project
+    Dim newProjectName As String: newProjectName = "NewProject"
+    Dim newProjectRootFolder As String: newProjectRootFolder = fso.BuildPath(VBAToolKit.vtkTestPath, newProjectName)
+    Dim newProjectXmlRelPath As String: newProjectXmlRelPath = newProjectName & ".xml"
+    
+    ' Add it
+    vtkAddRememberedProject projectName:=newProjectName, _
+                            rootFolder:=newProjectRootFolder, _
+                            xmlRelativePath:=newProjectXmlRelPath
+                            
+    ' Load the dom from the updated file
+    Dim dom As New MSXML2.DOMDocument
+    dom.Load xmlFileFullPath
+    
+    ' Another rain of mAssert, is it justified here ?
+    mAssert.Equals dom.getElementsByTagName("project").Length, 3, "The project must have been added to the list"
+    
+    mAssert.Equals dom.getElementsByTagName("name").Item(2).Text, _
+                   newProjectName, _
+                   "The project must have been added to the list with its name tag"
+    
+    mAssert.Equals dom.getElementsByTagName("rootFolder").Item(2).Text, _
+                   newProjectRootFolder, _
+                   "The project must have been added to the list with its rootFolder tag"
+                   
+    mAssert.Equals dom.getElementsByTagName("xmlRelativePath").Item(2).Text, _
+                    newProjectXmlRelPath, _
+                    "The project must have been added to the list with its xmlRelativePath tag"
+    
+    On Error GoTo 0
+    Exit Sub
+
+Test_vtkAddRememberedProject_projectIsAddedToTheList_Error:
+    Err.Source = "Sub Test_vtkAddRememberedProject_projectIsAddedToTheList in module vtkProjectsTester"
+    mAssert.Should False, "Unexpected Error " & Err.Number & " (" & Err.Description & ") in " & Err.Source
+    Exit Sub
+
+End Sub
+
+
+Public Sub Test_vtkAddRememberdProject_notRememberedProjectIsNotAdded()
+' a project added with vtkProjectForName instead of vtkAddRememberedProject should not be written in the list
+    
+    ' Generate the names for the new project
+    Dim newProjectName As String: newProjectName = "NewProject"
+    Dim newProjectRootFolder As String: newProjectRootFolder = fso.BuildPath(VBAToolKit.vtkTestPath, newProjectName)
+    Dim newProjectXmlRelPath As String: newProjectXmlRelPath = newProjectName & ".xml"
+
+    ' Adding a not remembered project to the collection
+    On Error GoTo Test_vtkAddRememberdProject_notRememberedProjectIsNotAdded_Error
+
+    vtkProjectForName ("notRememberedProject")
+
+    ' Add the remembered project
+    vtkAddRememberedProject projectName:=newProjectName, _
+                            rootFolder:=newProjectRootFolder, _
+                            xmlRelativePath:=newProjectXmlRelPath
+                            
+    ' Load the dom from the updated file
+    Dim dom As New MSXML2.DOMDocument
+    dom.Load xmlFileFullPath
+    
+    ' Make sure the not remembered project has not been remembered
+    mAssert.Equals dom.getElementsByTagName("project").Length, 3, "The not remembered project must not have been added to the list."
+
+    On Error GoTo 0
+    Exit Sub
+
+Test_vtkAddRememberdProject_notRememberedProjectIsNotAdded_Error:
+    Err.Source = "Sub Test_vtkAddRememberdProject_notRememberedProjectIsNotAdded in module vtkProjectsTester"
+    mAssert.Should False, "Unexpected Error " & Err.Number & " (" & Err.Description & ") in " & Err.Source
+    Exit Sub
+
+End Sub
+
+
+Public Sub Test_vtkRemoveRememberedProject_projectIsRemovedFromTheCollections()
+' vtkRemoveRememberedProject should remove a given project from the collections
+
+    On Error GoTo Test_vtkRemoveRememberedProject_projectIsRemovedFromTheCollections_Error
+
+    vtkRemoveRememberedProjects testProject1Name
+    
+    mAssert.Equals vtkRootPathForProject(projectName), "", _
+                   "Project must have been deleted from the root paths collection"
+
+    mAssert.Equals vtkXmlRelPathForProject(projectName), "", _
+                   "Project must have been deleted from the xml relative paths collection"
+
+    On Error GoTo 0
+    Exit Sub
+
+Test_vtkRemoveRememberedProject_projectIsRemovedFromTheCollections_Error:
+    Err.Source = "Sub Test_vtkRemoveRememberedProject_projectIsRemovedFromTheCollections in module vtkProjectsTester"
+    mAssert.Should False, "Unexpected Error " & Err.Number & " (" & Err.Description & ") in " & Err.Source
+    Exit Sub
+
+End Sub
+
+
+Public Sub Test_vtkRemoveRememberedProject_projectIsRemovedFromTheList()
+' vtkRemoveRememberedProject should remove a given project from the collections
+
+    On Error GoTo Test_vtkRemoveRememberedProject_projectIsRemovedFromTheList_Error
+
+    vtkRemoveRememberedProjects testProject1Name
+
+    ' Load the dom from the updated file
+    Dim dom As New MSXML2.DOMDocument
+    dom.Load xmlFileFullPath
+    
+    ' Are these tests enough ?
+    mAssert.Equals dom.getElementsByTagName("project").Length, 1, "Only one project should remain in the list."
+    mAssert.Equals dom.getElementsByTagName("name").Item(0), testProject2Name, "The only remaining project should be TestProject2"
+    
+    On Error GoTo 0
+    Exit Sub
+
+Test_vtkRemoveRememberedProject_projectIsRemovedFromTheList_Error:
+    Err.Source = "Sub Test_vtkRemoveRememberedProject_projectIsRemovedFromTheList in module vtkProjectsTester"
+    mAssert.Should False, "Unexpected Error " & Err.Number & " (" & Err.Description & ") in " & Err.Source
+    Exit Sub
+
+End Sub
+
+'Public Sub Test_vtkModifyRememberedProject_projectIsModifiedInTheCollections()
+'
+'End Sub
+'
+'Public Sub Test_vtkModifyRememberedProject_projectIsModifiedInTheList()
+'
+'End Sub
+
 Private Function ITest_Suite() As TestSuite
     Set ITest_Suite = New TestSuite
     ITest_Suite.AddTest ITest_Manager.ClassName, "TestProjectIsNotNull"
@@ -251,6 +423,11 @@ Private Function ITest_Suite() As TestSuite
     ITest_Suite.AddTest ITest_Manager.ClassName, "TestProjectIsInvariant"
     ITest_Suite.AddTest ITest_Manager.ClassName, "Test_vtkProjects_listIsRead"
     ITest_Suite.AddTest ITest_Manager.ClassName, "Test_vtkProjects_modifyXmlFileAfterLoading"
+    ITest_Suite.AddTest ITest_Manager.ClassName, "Test_vtkAddRememberedProject_projectIsAddedToTheCollections"
+    ITest_Suite.AddTest ITest_Manager.ClassName, "Test_vtkAddRememberedProject_projectIsAddedToTheList"
+    ITest_Suite.AddTest ITest_Manager.ClassName, "Test_vtkAddRememberdProject_notRememberedProjectIsNotAdded"
+    ITest_Suite.AddTest ITest_Manager.ClassName, "Test_vtkRemoveRememberedProject_projectIsRemovedFromTheCollections"
+    ITest_Suite.AddTest ITest_Manager.ClassName, "Test_vtkRemoveRememberedProject_projectIsRemovedFromTheList"
 End Function
 
 Private Sub ITestCase_RunTest()
@@ -260,6 +437,11 @@ Private Sub ITestCase_RunTest()
         Case "TestProjectIsInvariant": TestProjectIsInvariant
         Case "Test_vtkProjects_listIsRead": Test_vtkProjects_listIsRead
         Case "Test_vtkProjects_modifyXmlFileAfterLoading": Test_vtkProjects_modifyXmlFileAfterLoading
+        Case "Test_vtkAddRememberedProject_projectIsAddedToTheCollections": Test_vtkAddRememberedProject_projectIsAddedToTheCollections
+        Case "Test_vtkAddRememberedProject_projectIsAddedToTheList": Test_vtkAddRememberedProject_projectIsAddedToTheList
+        Case "Test_vtkAddRememberdProject_notRememberedProjectIsNotAdded": Test_vtkAddRememberdProject_notRememberedProjectIsNotAdded
+        Case "Test_vtkRemoveRememberedProject_projectIsRemovedFromTheCollections": Test_vtkRemoveRememberedProject_projectIsRemovedFromTheCollections
+        Case "Test_vtkRemoveRememberedProject_projectIsRemovedFromTheList": Test_vtkRemoveRememberedProject_projectIsRemovedFromTheList
         Case Else: mAssert.Should False, "Invalid test name: " & mManager.methodName
     End Select
 End Sub
