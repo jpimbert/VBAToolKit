@@ -28,10 +28,13 @@ Option Explicit
 
 '   collection of instances indexed by project names
 Private m_projects As Collection
+'Private m_projects As Dictionary
 
 ' collection of Strings indexed by project names
 Private m_rootPathsCol As Collection
 Private m_xmlRelPathsCol As Collection
+'Private m_rootPathsCol As Dictionary
+'Private m_xmlRelPathsCol As Dictionary
 
 Private m_xmlRememberedProjectsFullPath As String
 Private Const m_xmlFileDefaultName As String = "VBAToolKitProjects.xml"
@@ -406,6 +409,7 @@ saveProjectsInList_Error:
     Exit Sub
 End Sub
 
+
 '---------------------------------------------------------------------------------------
 ' Procedure : vtkAddRememberedProject
 ' Author    : Lucas Vitorino
@@ -447,14 +451,14 @@ End Sub
 
 
 '---------------------------------------------------------------------------------------
-' Procedure : vtkRemoveRememberedProjects
+' Procedure : vtkRemoveRememberedProject
 ' Author    : Lucas Vitorino
 ' Purpose   : Remove a project from the collections and from the list.
 '---------------------------------------------------------------------------------------
 '
-Public Sub vtkRemoveRememberedProjects(projectName As String)
+Public Sub vtkRemoveRememberedProject(projectName As String)
 
-    On Error GoTo vtkRemoveRememberedProjects_Error
+    On Error GoTo vtkRemoveRememberedProject_Error
 
     ' Load the list if it hasn't been done yet
     initFromList
@@ -469,9 +473,60 @@ Public Sub vtkRemoveRememberedProjects(projectName As String)
     On Error GoTo 0
     Exit Sub
 
-vtkRemoveRememberedProjects_Error:
-    Err.Source = "Sub vtkAddRememberedProject in module vtkProjects"
+vtkRemoveRememberedProject_Error:
+    Err.Source = "Sub vtkRemoveRememberedProject in module vtkProjects"
 
+    Select Case Err.Number
+        Case Else
+            Err.Number = VTK_UNEXPECTED_ERROR
+    End Select
+    
+    Err.Raise Err.Number, Err.Source, Err.Description
+
+    Exit Sub
+
+End Sub
+
+
+
+'---------------------------------------------------------------------------------------
+' Procedure : vtkModifyRememberedProject
+' Author    : Lucas Vitorino
+' Purpose   : Modify the folderPath or xmlRelPath attribute of a project in the collections
+'             and in the list.
+'---------------------------------------------------------------------------------------
+'
+Public Sub vtkModifyRememberedProject(projectName As String, _
+                                      Optional folderPath As String, _
+                                      Optional xmlRelPath As String)
+
+    On Error GoTo vtkModifyRememberedProject_Error
+    
+    ' Remove the project from the list
+    initFromList
+    
+    ' Modify the projects in the collection
+    ' NB : The "modify" is actually a "remove and add", because the Collection object
+    ' doesn't allow modification of items.
+    If Not (IsEmpty(folderPath)) Then
+        m_rootPathsCol.Remove (projectName)
+        m_rootPathsCol.Add Item:=folderPath, Key:=projectName
+    End If
+    
+    If Not (IsEmpty(xmlRelPath)) Then
+        m_xmlRelPathsCol.Remove (projectName)
+        m_xmlRelPathsCol.Add Item:=xmlRelPath, Key:=projectName
+    End If
+    
+    ' Save the list
+    saveProjectsInList
+
+    On Error GoTo 0
+    Exit Sub
+
+vtkModifyRememberedProject_Error:
+    Err.Source = "Sub vtkModifyRememberedProject in module vtkProjects"
+    
     Select Case Err.Number
         Case Else
             Err.Number = VTK_UNEXPECTED_ERROR

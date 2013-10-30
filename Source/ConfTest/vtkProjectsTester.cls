@@ -364,7 +364,7 @@ Public Sub Test_vtkRemoveRememberedProject_projectIsRemovedFromTheCollections()
 
     On Error GoTo Test_vtkRemoveRememberedProject_projectIsRemovedFromTheCollections_Error
 
-    vtkRemoveRememberedProjects testProject1Name
+    vtkRemoveRememberedProject testProject1Name
     
     mAssert.Equals vtkRootPathForProject(projectName), "", _
                    "Project must have been deleted from the root paths collection"
@@ -388,7 +388,7 @@ Public Sub Test_vtkRemoveRememberedProject_projectIsRemovedFromTheList()
 
     On Error GoTo Test_vtkRemoveRememberedProject_projectIsRemovedFromTheList_Error
 
-    vtkRemoveRememberedProjects testProject1Name
+    vtkRemoveRememberedProject testProject1Name
 
     ' Load the dom from the updated file
     Dim dom As New MSXML2.DOMDocument
@@ -396,7 +396,7 @@ Public Sub Test_vtkRemoveRememberedProject_projectIsRemovedFromTheList()
     
     ' Are these tests enough ?
     mAssert.Equals dom.getElementsByTagName("project").Length, 1, "Only one project should remain in the list."
-    mAssert.Equals dom.getElementsByTagName("name").Item(0), testProject2Name, "The only remaining project should be TestProject2"
+    mAssert.Equals dom.getElementsByTagName("name").Item(0).Text, testProject2Name, "The only remaining project should be TestProject2"
     
     On Error GoTo 0
     Exit Sub
@@ -408,13 +408,53 @@ Test_vtkRemoveRememberedProject_projectIsRemovedFromTheList_Error:
 
 End Sub
 
-'Public Sub Test_vtkModifyRememberedProject_projectIsModifiedInTheCollections()
-'
-'End Sub
-'
-'Public Sub Test_vtkModifyRememberedProject_projectIsModifiedInTheList()
-'
-'End Sub
+Public Sub Test_vtkModifyRememberedProject_projectIsModifiedInTheCollections()
+' vtkModifyRememberedProject should modify the given attribute of a project (folderPath or xmlRelPath, not name) in a collection
+
+    On Error GoTo Test_vtkModifyRememberedProject_projectIsModifiedInTheCollections_Error
+
+    vtkModifyRememberedProject testProject1Name, "dummy", "dummy2"
+
+    mAssert.Equals vtkRootPathForProject(testProject1Name), "dummy"
+    mAssert.Equals vtkXmlRelPathForProject(testProject1Name), "dummy2"
+
+    On Error GoTo 0
+    Exit Sub
+
+Test_vtkModifyRememberedProject_projectIsModifiedInTheCollections_Error:
+    Err.Source = "Sub Test_vtkModifyRememberedProject_projectIsModifiedInTheCollections in module vtkProjectsTester"
+    Debug.Print "Error " & Err.Number & " : " & Err.Description & " in " & Err.Source
+    mAssert.Should False, "Unexpected Error " & Err.Number & " (" & Err.Description & ") in " & Err.Source
+    Exit Sub
+
+End Sub
+
+Public Sub Test_vtkModifyRememberedProject_projectIsModifiedInTheList()
+' vtkModifyRememberedProject should modify the given attribute of a project (folderPath or xmlRelPath, not name) in the list
+
+    On Error GoTo Test_vtkModifyRememberedProject_projectIsModifiedInTheList_Error
+
+    vtkModifyRememberedProject testProject1Name, "dummy", "dummy2"
+
+    ' Load the dom from the updated file
+    Dim dom As New MSXML2.DOMDocument
+    dom.Load xmlFileFullPath
+
+    ' Are these tests enough ?
+    mAssert.Equals dom.getElementsByTagName("project").Length, 2
+    mAssert.Equals dom.getElementsByTagName("rootFolder").Item(0).Text, "dummy"
+    mAssert.Equals dom.getElementsByTagName("xmlRelativePath").Item(0).Text, "dummy2"
+
+    On Error GoTo 0
+    Exit Sub
+
+Test_vtkModifyRememberedProject_projectIsModifiedInTheList_Error:
+    Err.Source = "Sub Test_vtkModifyRememberedProject_projectIsModifiedInTheList in module vtkProjectsTester"
+    Debug.Print "Error " & Err.Number & " : " & Err.Description & " in " & Err.Source
+    mAssert.Should False, "Unexpected Error " & Err.Number & " (" & Err.Description & ") in " & Err.Source
+    Exit Sub
+
+End Sub
 
 Private Function ITest_Suite() As TestSuite
     Set ITest_Suite = New TestSuite
@@ -428,6 +468,8 @@ Private Function ITest_Suite() As TestSuite
     ITest_Suite.AddTest ITest_Manager.ClassName, "Test_vtkAddRememberdProject_notRememberedProjectIsNotAdded"
     ITest_Suite.AddTest ITest_Manager.ClassName, "Test_vtkRemoveRememberedProject_projectIsRemovedFromTheCollections"
     ITest_Suite.AddTest ITest_Manager.ClassName, "Test_vtkRemoveRememberedProject_projectIsRemovedFromTheList"
+    ITest_Suite.AddTest ITest_Manager.ClassName, "Test_vtkModifyRememberedProject_projectIsModifiedInTheCollections"
+    ITest_Suite.AddTest ITest_Manager.ClassName, "Test_vtkModifyRememberedProject_projectIsModifiedInTheList"
 End Function
 
 Private Sub ITestCase_RunTest()
@@ -442,6 +484,8 @@ Private Sub ITestCase_RunTest()
         Case "Test_vtkAddRememberdProject_notRememberedProjectIsNotAdded": Test_vtkAddRememberdProject_notRememberedProjectIsNotAdded
         Case "Test_vtkRemoveRememberedProject_projectIsRemovedFromTheCollections": Test_vtkRemoveRememberedProject_projectIsRemovedFromTheCollections
         Case "Test_vtkRemoveRememberedProject_projectIsRemovedFromTheList": Test_vtkRemoveRememberedProject_projectIsRemovedFromTheList
+        Case "Test_vtkModifyRememberedProject_projectIsModifiedInTheCollections": Test_vtkModifyRememberedProject_projectIsModifiedInTheCollections
+        Case "Test_vtkModifyRememberedProject_projectIsModifiedInTheList": Test_vtkModifyRememberedProject_projectIsModifiedInTheList
         Case Else: mAssert.Should False, "Invalid test name: " & mManager.methodName
     End Select
 End Sub
