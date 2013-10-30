@@ -273,7 +273,7 @@ Public Sub Test_vtkModifyProjectInList_correctPath()
     vtkModifyProjectInList listFullPath, testProjectName, "foo", "bar"
     
     ' Test
-    mAssert.Equals getProjectBeforeRootPathInList(listFullPath, testProjectName), "foo", _
+    mAssert.Equals getProjectRootPathInList(listFullPath, testProjectName), "foo", _
                    "Project root path should have been changed."
                    
     mAssert.Equals getProjectXMLRelativePathInList(listFullPath, testProjectName), "bar", _

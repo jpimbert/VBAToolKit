@@ -345,8 +345,8 @@ End Sub
 '
 Public Sub vtkModifyProjectInList(listPath As String, _
                                   projectName As String, _
-                                  Optional projectRootFolder, _
-                                  Optional projectXMLRelativePath)
+                                  Optional projectRootFolder As String, _
+                                  Optional projectXMLRelativePath As String)
                                                
     On Error GoTo vtkModifyProjectInList_Error
 
@@ -366,9 +366,9 @@ Public Sub vtkModifyProjectInList(listPath As String, _
         If tmpNode.ChildNodes.Item(0).Text Like projectName Then
             projectFound = True
             ' Update projectRootFolder if needed
-            If Not IsEmpty(projectRootFolder) Then tmpNode.ChildNodes.Item(1).Text = projectRootFolder
+            If Not (IsEmpty(projectRootFolder)) Then tmpNode.ChildNodes.Item(1).Text = projectRootFolder
             ' Update projectXMLRelativePath if needed
-            If Not IsEmpty(projectXMLRelativePath) Then tmpNode.ChildNodes.Item(2).Text = projectXMLRelativePath
+            If Not (IsEmpty(projectXMLRelativePath)) Then tmpNode.ChildNodes.Item(2).Text = projectXMLRelativePath
         End If
     Next
     

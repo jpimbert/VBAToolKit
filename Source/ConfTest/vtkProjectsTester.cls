@@ -58,39 +58,102 @@ Private Property Get ITest_Manager() As ITestManager
     Set ITest_Manager = mManager
 End Property
 
+Private Sub createTestXML()
+
+    ' Create the processing instruction
+    On Error GoTo createTestXML_Error
+
+    Dim dom As New MSXML2.DOMDocument
+    dom.appendChild dom.createProcessingInstruction("xml", "version=""1.0"" encoding=""ISO-8859-1""")
+
+    ' Create the root node
+    With dom.appendChild(dom.createElement("rememberedProjects"))
+    
+        With .appendChild(dom.createElement("info"))
+        
+            With .appendChild(dom.createElement("version"))
+                .Text = "1.0"
+            End With
+            
+        End With
+        
+        With .appendChild(dom.createElement("project"))
+           With .appendChild(dom.createElement("name"))
+                .Text = testProject1Name
+            End With
+            With .appendChild(dom.createElement("rootFolder"))
+                .Text = testProject1RootPath
+            End With
+            With .appendChild(dom.createElement("xmlRelativePath"))
+                .Text = testProject1XmlRelPath
+            End With
+        End With
+
+        With .appendChild(dom.createElement("project"))
+            With .appendChild(dom.createElement("name"))
+                .Text = testProject2Name
+            End With
+            
+            With .appendChild(dom.createElement("rootFolder"))
+                .Text = testProject2RootPath
+            End With
+                
+            With .appendChild(dom.createElement("xmlRelativePath"))
+                .Text = testProject2XmlRelPath
+            End With
+        End With
+
+    End With
+    
+    vtkWriteXMLDOMToFile dom, fso.BuildPath(VBAToolKit.vtkTestPath, xmlFileName)
+
+    On Error GoTo 0
+    Exit Sub
+
+createTestXML_Error:
+    Err.Source = "Sub createTestXML in module vtkProjectsTester"
+    mAssert.Should False, "Unexpected Error " & Err.Number & " (" & Err.Description & ") in " & Err.Source
+    Exit Sub
+
+End Sub
+
+
+
 Private Sub ITestCase_SetUp(Assert As IAssert)
     Set mAssert = Assert
     projectName = "TestProject"
+    
+    VBAToolKit.vtkResetProjects
     
     ' set the missing consts (calling function so can't be set out of a function/sub)
     testProject1RootPath = fso.BuildPath(VBAToolKit.vtkTestPath, testProject1Name)
     testProject2RootPath = fso.BuildPath(VBAToolKit.vtkTestPath, testProject2Name)
     
-    ' Copy a list of projects
-    getTestFileFromTemplate fileName:=xmlFileName, openExcel:=False
+    ' Create the file
+    createTestXML
     
     ' Indicate to the current workbook where is the list of projects
-    vtkSetRememberedProjectsFullPath fso.BuildPath(VBAToolKit.vtkTestPath, xmlFileName)
+    xmlRememberedProjectsFullPath = fso.BuildPath(VBAToolKit.vtkTestPath, xmlFileName)
     
 End Sub
 
 Private Sub ITestCase_TearDown()
-    vtkResetProjects
-    resetTestFolder
+    VBAToolKit.vtkResetProjects
+    VBAToolKit.resetTestFolder
 End Sub
 
 Public Sub TestProjectIsNotNull()
-'       Verify that the configuration Manager is not null
+'       Verify that the vtkProject is not null
     mAssert.Should Not vtkProjectForName(projectName) Is Nothing, "A project must not be null"
 End Sub
 
 Public Sub TestProjectsAreDifferentForTwoNames()
-'       Verify that the configuration Managers for two project are different
+'       Verify that the vtkProject-s for two projects are different
     mAssert.Should Not vtkProjectForName(projectName) Is vtkProjectForName("SecondProject"), "Two projects must not be equal"
 End Sub
 
 Public Sub TestProjectIsInvariant()
-'       Verify that the configuration Manager for a project is always the same
+'       Verify that the vtkProject for a project is always the same
     Dim cm As vtkProject
     Set cm = vtkProjectForName(projectName)
     mAssert.Should vtkProjectForName(projectName) Is cm, "The project for a project name must be always the same"
@@ -102,7 +165,7 @@ End Sub
 '
 ' The new functionalities of vtkProjects must be tested
 '
-' - vtkProjects must read and provide data for a project that is in the file.
+' - projects in the file must be read
 ' - a sheet with a wrong format is not read and raises an error
 ' - modifying or deleting the xml file after it has been loaded does not have any effect
 ' - the export of the sheet must be readable, contain the information and be conform
@@ -111,12 +174,13 @@ End Sub
 '
 
 Public Sub Test_vtkProjects_listIsRead()
+' projects in the file must be read
 
     On Error GoTo Test_vtkProjects_listIsRead_Error
 
     mAssert.Equals vtkRootPathForProject("TestProject1"), testProject1RootPath, _
                    "vtkProjects should access to the information in the sheet."
-                   
+
     mAssert.Equals vtkXmlRelPathForProject("TestProject1"), testProject1XmlRelPath, _
                     "vtkProjects should access to the information in the sheet."
 
@@ -130,19 +194,51 @@ Test_vtkProjects_listIsRead_Error:
 
 End Sub
 
-Public Sub Test_vtkProjects_listHasWrongFormat()
+' will do later with method from JPI
+'Public Sub Test_vtkProjects_listHasWrongFormat()
+'' a sheet with a wrong format is not read and raises an error
+'
+'On Error GoTo Test_vtkProjects_listHasWrongFormat_Error
+'
+'    Dim error As Integer: error = 0
+'
+'
+'
+'    On Error GoTo 0
+'    Exit Sub
+'
+'Test_vtkProjects_listHasWrongFormat_Error:
+'    Err.Source = "Sub Test_vtkProjects_listHasWrongFormat in module vtkProjectsTester"
+'    mAssert.Should False, "Unexpected Error " & Err.Number & " (" & Err.Description & ") in " & Err.Source
+'    Exit Sub
+'
+'End Sub
 
-    On Error GoTo Test_vtkProjects_listHasWrongFormat_Error
 
-    Dim error As Integer: error = 0
-    
-    
+Public Sub Test_vtkProjects_modifyXmlFileAfterLoading()
+'modifying or deleting the xml file after it has been loaded does not have any effect
+
+    On Error GoTo Test_vtkProjects_modifyXmlFileAfterLoading_Error
+
+    Dim beforeModPathStr As String, afterModPathStr As String
+
+    beforeModPathStr = vtkRootPathForProject(testProject1Name)
+
+    vtkModifyProjectInList listPath:=fso.BuildPath(VBAToolKit.vtkTestPath, xmlFileName), _
+                           projectName:=testProject1Name, _
+                           projectRootFolder:=fso.BuildPath(VBAToolKit.vtkTestPath, "\dummy")
+
+    afterModPathStr = vtkRootPathForProject(testProject1Name)
+
+    mAssert.Equals beforeModPathStr, afterModPathStr, _
+                   "The root path should not have been modified in the data structures of the program, only in the file."
+
 
     On Error GoTo 0
     Exit Sub
 
-Test_vtkProjects_listHasWrongFormat_Error:
-    Err.Source = "Sub Test_vtkProjects_listHasWrongFormat in module vtkProjectsTester"
+Test_vtkProjects_modifyXmlFileAfterLoading_Error:
+    Err.Source = "Sub Test_vtkProjects_modifyXmlFileAfterLoading in module vtkProjectsTester"
     mAssert.Should False, "Unexpected Error " & Err.Number & " (" & Err.Description & ") in " & Err.Source
     Exit Sub
 
@@ -154,7 +250,7 @@ Private Function ITest_Suite() As TestSuite
     ITest_Suite.AddTest ITest_Manager.ClassName, "TestProjectsAreDifferentForTwoNames"
     ITest_Suite.AddTest ITest_Manager.ClassName, "TestProjectIsInvariant"
     ITest_Suite.AddTest ITest_Manager.ClassName, "Test_vtkProjects_listIsRead"
-    ITest_Suite.AddTest ITest_Manager.ClassName, "Test_vtkProjects_listHasWrongFormat"
+    ITest_Suite.AddTest ITest_Manager.ClassName, "Test_vtkProjects_modifyXmlFileAfterLoading"
 End Function
 
 Private Sub ITestCase_RunTest()
@@ -163,7 +259,7 @@ Private Sub ITestCase_RunTest()
         Case "TestProjectsAreDifferentForTwoNames": TestProjectsAreDifferentForTwoNames
         Case "TestProjectIsInvariant": TestProjectIsInvariant
         Case "Test_vtkProjects_listIsRead": Test_vtkProjects_listIsRead
-        Case "Test_vtkProjects_listHasWrongFormat": Test_vtkProjects_listHasWrongFormat
+        Case "Test_vtkProjects_modifyXmlFileAfterLoading": Test_vtkProjects_modifyXmlFileAfterLoading
         Case Else: mAssert.Should False, "Invalid test name: " & mManager.methodName
     End Select
 End Sub

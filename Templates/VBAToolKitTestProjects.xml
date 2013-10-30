@@ -1,5 +1,8 @@
 <?xml version="1.0" encoding="ISO-8859-1" standalone="no"?>
 <rememberedProjects>
+	<info>
+		<version>1.0</version>
+	</info>
 	<project>
 		<name>TestProject1</name>
 		<rootFolder>C:\Documents and Settings\Administrator\Desktop\VTK-LUCAS\VBAToolKit\Tests\TestProject1</rootFolder>

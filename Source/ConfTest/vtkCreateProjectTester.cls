@@ -159,7 +159,7 @@ returnValue = vtkCreateProject(path:=VBAToolKit.vtkTestPath, name:=vtkTestProjec
         End If
     Next
 mAssert.Equals j, 2, "the searched reference number must be equal to " & 2
-mAssert.Equals Workbooks(vtkTestProjectName & "_DEV.xlsm").VBProject.References.count, expectedReferenceCount + 1, "the total references number must be equal to " & expectedReferenceCount + 1
+mAssert.Equals Workbooks(vtkTestProjectName & "_DEV.xlsm").VBProject.References.Count, expectedReferenceCount + 1, "the total references number must be equal to " & expectedReferenceCount + 1
 End Sub
 
 Public Sub TestReferencesOfDeliveryWorkbookWasActivated()
@@ -178,7 +178,7 @@ returnValue = vtkCreateProject(path:=VBAToolKit.vtkTestPath, name:=vtkTestProjec
         End If
     Next
 mAssert.Equals j, 2, "the searched reference number must be equal to " & 2
-mAssert.Equals Workbooks(vtkTestProjectName & ".xlsm").VBProject.References.count, expectedReferenceCount, "the total references number must be equal to " & expectedReferenceCount
+mAssert.Equals Workbooks(vtkTestProjectName & ".xlsm").VBProject.References.Count, expectedReferenceCount, "the total references number must be equal to " & expectedReferenceCount
 End Sub
 
 Public Sub Test_VBAUnitModulesExportation()
