@@ -537,3 +537,40 @@ vtkModifyRememberedProject_Error:
     Exit Sub
 
 End Sub
+
+
+'---------------------------------------------------------------------------------------
+' Procedure : listOfRememberedProjects
+' Author    : Lucas Vitorino
+' Purpose   : Return a list of vtkProjects corresponding
+' Notes     : not tested
+'---------------------------------------------------------------------------------------
+'
+Public Function listOfRememberedProjects() As Collection
+
+    Dim retCol As New Collection
+    Dim tmpProj As vtkProject
+    
+    On Error GoTo listOfRememberedProjects_Error
+    
+    initFromList
+
+    For Each tmpProj In m_projects
+        If vtkRootPathForProject(tmpProj.projectName) <> "" And vtkXmlRelPathForProject(tmpProj.projectName) <> "" Then
+            retCol.Add Item:=tmpProj, Key:=tmpProj.projectName
+        End If
+    Next
+
+    On Error GoTo 0
+    Exit Function
+
+    On Error GoTo 0
+    Exit Function
+
+listOfRememberedProjects_Error:
+    Err.Source = "Function listOfRememberedProjects in module vtkProjects"
+    Debug.Print "Error " & Err.Number & " : " & Err.Description & " in " & Err.Source
+    Exit Function
+
+
+End Function
