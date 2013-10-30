@@ -42,6 +42,8 @@ Private Sub Workbook_AddinUninstall()
 End Sub
 
 Private Sub Workbook_Open()
+    On Error Resume Next
     If AddIns("VBAToolKit").Installed Then VBAToolKit.vtkToolBars.vtkCreateToolbars excToolbar:=False
 End Sub
+
 
