@@ -53,6 +53,14 @@ Private Const currentVersion As String = "vtkConfigurations v1.0"
 Private Const nbTitleColumns As Integer = 1
 Private Const nbTitleRows As Integer = 2
 
+Private m_referencesNamesCol As Collection  ' the collection of references' names, indexed by configuration name
+Private m_referencesGUIDCol As Collection   ' the collection of references' GUID, indexed by reference name
+Private m_referencesPathsCol As Collection  ' the collection of references' paths, indexed by reference name
+Private m_templateCol As Collection         ' the collection of templates paths, indexed by project name
+Private m_modulesCol As Collection          ' the collection of collections of modules, indexed by configuration name
+Private m_titleCol As Collection            ' the collection of titles, indexed by project name
+Private m_commentCol As Collection          ' the collection of comments, indexed bu project nam
+
 Private Sub Class_Terminate()
     Set m_configurationSheet = Nothing
     Set m_workbook = Nothing
@@ -70,7 +78,6 @@ End Sub
 '---------------------------------------------------------------------------------------
 '
 Public Property Get projectName() As String
-Attribute projectName.VB_UserMemId = 0
     projectName = m_projectName
 End Property
 
@@ -491,3 +498,4 @@ Public Sub setModulePathWithNumber(path As String, numModule As Integer, numConf
         configurationSheet.Cells(numModule + nbTitleRows, numConfiguration + nbTitleColumns) = s
     End If
 End Sub
+

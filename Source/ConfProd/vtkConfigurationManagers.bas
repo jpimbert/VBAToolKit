@@ -26,8 +26,7 @@ Option Explicit
 '---------------------------------------------------------------------------------------
 
 '   collection of instances indexed by project names
-Private configurationManagers As Collection
-
+Private m_configurationManagers As Collection
 
 '---------------------------------------------------------------------------------------
 ' Procedure : vtkConfigurationManagerForProject
@@ -35,23 +34,23 @@ Private configurationManagers As Collection
 ' Date      : 25/05/2013
 ' Purpose   : Return the configuration manager attached to the DEV Excel file given its project name
 '               - if the configuration doesn't exist, it is created
-'               - if the configurationManagers collection doesn't exist, it is created
+'               - if the m_configurationManagers collection doesn't exist, it is created
 '---------------------------------------------------------------------------------------
 '
 Public Function vtkConfigurationManagerForProject(projectName As String) As vtkConfigurationManager
     ' Create the collection if it doesn't exist
-    If configurationManagers Is Nothing Then
-        Set configurationManagers = New Collection
+    If m_configurationManagers Is Nothing Then
+        Set m_configurationManagers = New Collection
         End If
     ' search for the configuration manager in the collection
     Dim cm As vtkConfigurationManager
     On Error Resume Next
-    Set cm = configurationManagers(projectName)
+    Set cm = m_configurationManagers(projectName)
     If Err <> 0 Then
         Set cm = New vtkConfigurationManager
         cm.projectName = projectName
         If cm.projectName Like projectName Then     ' The initialization could fail (if the Workbook is closed)
-            configurationManagers.Add Item:=cm, Key:=projectName
+            m_configurationManagers.Add Item:=cm, Key:=projectName
            Else
             Set cm = Nothing
         End If
@@ -69,7 +68,7 @@ End Function
 '---------------------------------------------------------------------------------------
 '
 Public Sub vtkResetConfigurationManagers()
-    Set configurationManagers = Nothing
+    Set m_configurationManagers = Nothing
 End Sub
 
 '---------------------------------------------------------------------------------------

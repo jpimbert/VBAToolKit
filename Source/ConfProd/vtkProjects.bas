@@ -28,13 +28,10 @@ Option Explicit
 
 '   collection of instances indexed by project names
 Private m_projects As Collection
-'Private m_projects As Dictionary
 
 ' collection of Strings indexed by project names
 Private m_rootPathsCol As Collection
 Private m_xmlRelPathsCol As Collection
-'Private m_rootPathsCol As Dictionary
-'Private m_xmlRelPathsCol As Dictionary
 
 Private m_xmlRememberedProjectsFullPath As String
 Private Const m_xmlFileDefaultName As String = "VBAToolKitProjects.xml"

@@ -19,10 +19,10 @@ Attribute VB_Name = "vtkXMLUtilities"
 '   See the License for the specific language governing permissions and
 '   limitations under the License.
 '---------------------------------------------------------------------------------------
-
+'
 
 '---------------------------------------------------------------------------------------
-' Procedure : vtkExportAsXMLDOM
+' Procedure : vtkExportProjectAsXMLDOM
 ' Author    : Lucas Vitorino
 ' Purpose   : Export a DEV workbook as an XML DOM.
 '
@@ -33,14 +33,14 @@ Attribute VB_Name = "vtkXMLUtilities"
 '             - VTK_UNEXPECTED_ERROR
 '---------------------------------------------------------------------------------------
 '
-Public Function vtkExportAsXMLDOM(projectName As String) As MSXML2.DOMDocument
+Public Function vtkExportProjectAsXMLDOM(projectName As String) As MSXML2.DOMDocument
     Dim dom As MSXML2.DOMDocument
     Dim node As MSXML2.IXMLDOMNode
     Dim rootNode As MSXML2.IXMLDOMElement
     Dim tmpEl As MSXML2.IXMLDOMElement
     Dim attr As MSXML2.IXMLDOMAttribute
     
-    On Error GoTo vtkExportAsXMLDOM_Error
+    On Error GoTo vtkExportProjectAsXMLDOM_Error
     
     ' If the project is not initialized
     Dim cm As vtkConfigurationManager
@@ -120,10 +120,10 @@ Public Function vtkExportAsXMLDOM(projectName As String) As MSXML2.DOMDocument
     End With
 
     On Error GoTo 0
-    Set vtkExportAsXMLDOM = dom
+    Set vtkExportProjectAsXMLDOM = dom
     Exit Function
 
-vtkExportAsXMLDOM_Error:
+vtkExportProjectAsXMLDOM_Error:
     Err.Source = "function vtkExportAsDOMXML of module vtkXMLutilities"
     
     Select Case Err.Number
@@ -174,7 +174,7 @@ Public Sub vtkWriteXMLDOMToFile(dom As MSXML2.DOMDocument, filePath As String)
     Set rdr = CreateObject("MSXML2.SAXXMLReader")
     Set wrt = CreateObject("MSXML2.MXXMLWriter")
     
-    Dim oStream As ADODB.STREAM
+    Dim oStream As ADODB.Stream
     Set oStream = CreateObject("ADODB.STREAM")
     oStream.Open
     oStream.Charset = "ISO-8859-1"
