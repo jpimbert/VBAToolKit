@@ -1,4 +1,5 @@
 <?xml version="1.0" encoding="ISO-8859-1" standalone="no"?>
+<!DOCTYPE rememberedProjects SYSTEM "../Project/VTK_files/rememberedProjectsDTD.dtd">
 <rememberedProjects>
 	<info>
 		<version>1.0</version>

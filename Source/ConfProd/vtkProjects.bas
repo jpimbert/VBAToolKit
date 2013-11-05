@@ -94,7 +94,7 @@ End Function
 ' Author    : Lucas Vitorino
 ' Purpose   : Gives the relative path of the xml vtkConfigurations sheet of a project relatively
 '             too its root path.
-' Notes     : No project should have "" as its xmlRelPath. The minimum value is the name of the xmm file.
+' Notes     : No project should have "" as its xmlRelPath. The minimum value is the name of the xml file.
 '---------------------------------------------------------------------------------------
 '
 Public Function vtkXmlRelPathForProject(projectName As String) As String
@@ -236,72 +236,18 @@ End Sub
 ' Procedure : isXmlSheetValid
 ' Author    : Lucas Vitorino
 ' Purpose   : Check the validity of the xml sheet containing all the projects.
+' Notes     : It uses a DTD.
 '---------------------------------------------------------------------------------------
 '
 Private Function isXmlSheetValid() As Boolean
         
-        Dim fso As New FileSystemObject
-        Dim tmpNode As MSXML2.IXMLDOMNode
-        
-        On Error GoTo isXmlSheetValid_Error
-        
-        ' Make the verifications only if the file exists
-        If fso.FileExists(xmlRememberedProjectsFullPath) Then
-        
-            ' Load the dom from the file
-            Dim dom As New MSXML2.DOMDocument
-            dom.Load xmlRememberedProjectsFullPath
-            
-            ' The root node must be called "rememberedProjects"
-            Dim rootNode As MSXML2.IXMLDOMNode: Set rootNode = dom.ChildNodes.Item(1)
-            If rootNode.BaseName <> "rememberedProjects" Then
-                GoTo xmlSheetNotValid
-            End If
-            
-            ' There must be only one "info" node with a only one "version" subnode
-            If Not (dom.getElementsByTagName("version").Length = 1 And _
-                    countElementsInNode("info", rootNode) = 1 And _
-                    dom.getElementsByTagName("version").Length = 1 And _
-                    countElementsInNode("version", getFirstChildNodeByName("info", rootNode)) = 1) Then
-                GoTo xmlSheetNotValid
-            End If
-            
-            ' All subnodes should have an accepted tag name
-            If checkValidTags(rootNode) = False Then
-                GoTo xmlSheetNotValid
-            End If
-            
-            ' For now, the only accepted version of "version" is "1.0"
-            If dom.getElementsByTagName("version").Item(0).Text = "1.0" Then
-                ' Each "project" node must have 3 subnodes, in this order : name, folderPath, et xmlRelativePath
-                ' These subnodes must not be empty (NB : content is not cheked)
-                For Each tmpNode In dom.getElementsByTagName("project")
-                    If (tmpNode.ChildNodes.Length <> 3 Or _
-                       tmpNode.ChildNodes(0).BaseName <> "name" Or _
-                       tmpNode.ChildNodes(0).Text = "" Or _
-                       tmpNode.ChildNodes(1).BaseName <> "rootFolder" Or _
-                       tmpNode.ChildNodes(1).Text = "" Or _
-                       tmpNode.ChildNodes(2).BaseName <> "xmlRelativePath" Or _
-                       tmpNode.ChildNodes(2).Text = "") _
-                       Then
-                        GoTo xmlSheetNotValid
-                    End If
-                Next
-            Else
-                GoTo xmlSheetNotValid
-            End If
-          
-        Else
-            ' If the file doesn't exist, return nothing
-            isXmlSheetValid = False
-        End If
+    Dim xDoc As New MSXML2.DOMDocument
+    xDoc.async = False
+    xDoc.validateOnParse = True
+    
+    isXmlSheetValid = xDoc.Load(xmlRememberedProjectsFullPath)
 
     On Error GoTo 0
-    isXmlSheetValid = True
-    Exit Function
-
-xmlSheetNotValid:
-    isXmlSheetValid = False
     Exit Function
 
 isXmlSheetValid_Error:
@@ -317,34 +263,6 @@ isXmlSheetValid_Error:
     
     Exit Function
        
-End Function
-
-
-Public Function checkValidTags(node As MSXML2.IXMLDOMNode) As Boolean
-    
-    ' Check the name of the node
-    If node.BaseName = "info" Or _
-       node.BaseName = "version" Or _
-       node.BaseName = "rememberedProjects" Or _
-       node.BaseName = "project" Or _
-       node.BaseName = "name" Or _
-       node.BaseName = "rootFolder" Or _
-       node.BaseName = "xmlRelativePath" Or _
-       node.BaseName = "" _
-        Then
-       checkValidTags = True
-    Else
-        checkValidTags = False
-    End If
-    
-    ' launch the sub for every child node
-    Dim tmpNode As MSXML2.IXMLDOMNode
-    If node.ChildNodes.Length <> 0 Then
-        For Each tmpNode In node.ChildNodes
-            If checkValidTags(tmpNode) = False Then checkValidTags = False
-        Next
-    End If
-    
 End Function
 
 '---------------------------------------------------------------------------------------
