@@ -5,7 +5,7 @@
 		<!ELEMENT projectName (#PCDATA)>
 	
 	<!ELEMENT configuration (name,path,templatePath?,title?,comment?)>
-	 <!ATTLIST configuration ID #IMPLIED>
+	 <!ATTLIST configuration ID #REQUIRED>
 		<!ELEMENT name (#PCDATA)>
 		<!ELEMENT path (#PCDATA)>
 		<!ELEMENT templatePath(#PCDATA)>
@@ -13,12 +13,12 @@
 		<!ELEMENT comment (#PCDATA)>
 	
 	<!ELEMENT module (name,path*)>
-	 <!ATTLIST module ID #IMPLIED>
-		<!ATTLIST path 
-			confID IDREF #IMPLIED 
-			confName CDATA #IMPLIED
-		>
+	 <!ATTLIST module ID #REQUIRED>
+		<!ELEMENT modulePath(#PCDATA)>
+		 <!ATTLIST modulePath 
+			confID IDREF #REQUIRED 
+		 >
 	
-	<!ELEMENT reference (guid | path)>
-	 <!ATTLIST reference ID #IMPLIED>
+	<!ELEMENT reference (name,guid | path)>
+	 <!ATTLIST reference ID #REQUIRED>
 		<!ELEMENT guid (#PCDATA)>
