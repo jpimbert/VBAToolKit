@@ -69,7 +69,7 @@ Private Sub ITestCase_SetUp(Assert As IAssert)
 
     testFilePath = VBAToolKit.vtkTestPath & "\" & testFileName
 
-    Set retDom = vtkExportAsXMLDOM(testProjectName)
+    Set retDom = vtkExportProjectAsXMLDOM(testProjectName)
     
 End Sub
 
@@ -202,7 +202,7 @@ Public Sub Text_vtkExportAsDom_correctConfigurationContent()
 
     Dim retDom As MSXML2.DOMDocument
     
-    Set retDom = vtkExportAsXMLDOM(testWorkbook, testProjectName)
+    Set retDom = vtkExportProjectAsXMLDOM(testWorkbook, testProjectName)
     
     Dim i As Integer
     Dim expected As String
@@ -337,7 +337,7 @@ Public Sub Test_vtkExportAsXMLDom_dummyProject()
     Dim dummyProjectName As String
     dummyProjectName = "dummyProject"
     
-    Set retDom = vtkExportAsXMLDOM(dummyProjectName)
+    Set retDom = vtkExportProjectAsXMLDOM(dummyProjectName)
     
     mAssert.Equals error, VTK_PROJECT_NOT_INITIALIZED, "Project is empty : VTK_PROJECT_NOT_INITIALIZED should be raised."
 
