@@ -101,89 +101,89 @@ Public Sub TestConfigurationManagerIsInvariant()
     mAssert.Should vtkConfigurationManagerForProject(projectName) Is cm, "The configuration manager for a project must be always the same"
 End Sub
 
-Public Sub TestInoperantProjectConfigurationSheetInitializationForExistingProject()
-    '   Verifies that the configuration sheet initialization does nothing on existing project
-    
-    ' Active an existing VBAToolKit project
-    vtkCloseAndKillWorkbook Wb:=wbForTest
-    Set wbForTest = Workbooks.Open(fileName:=vtkPathToTestFolder & "\" & existingWorkbookName)
-    
-    ' Try to Initialize workbook
-    vtkInitializeConfigurationForActiveWorkBook
-    
-    ' Verify the project name
-    mAssert.Equals wbForTest.VBProject.name, "ExistingProject", "The project name must not be changed"
-End Sub
+'Public Sub TestInoperantProjectConfigurationSheetInitializationForExistingProject()
+'    '   Verifies that the configuration sheet initialization does nothing on existing project
+'
+'    ' Active an existing VBAToolKit project
+'    vtkCloseAndKillWorkbook Wb:=wbForTest
+'    Set wbForTest = Workbooks.Open(fileName:=vtkPathToTestFolder & "\" & existingWorkbookName)
+'
+'    ' Try to Initialize workbook
+'    vtkInitializeConfigurationForActiveWorkBook
+'
+'    ' Verify the project name
+'    mAssert.Equals wbForTest.VBProject.name, "ExistingProject", "The project name must not be changed"
+'End Sub
 
-Public Sub TestProjectNameAfterProjectConfigurationSheetInitialization()
-    '   Verify the capacity to build a configuration sheet based on existing modules
-    '   The test uses a template project containing different types of empty modules
-    '   This specific test verifies the project name modification of the active workbook
-    
-    ' Open uninitialized workbook
-    vtkCloseAndKillWorkbook Wb:=wbForTest
-    Set wbForTest = Workbooks.Open(fileName:=vtkPathToTestFolder & "\" & uninitializedWorkbookName)
-    
-    ' Initialize workbook
-    vtkInitializeConfigurationForActiveWorkBook
-    
-    ' Verify the project name
-    mAssert.Equals wbForTest.VBProject.name, "TestProject_DEV", "The suffix _DEV must have been appended to the project name"
-End Sub
+'Public Sub TestProjectNameAfterProjectConfigurationSheetInitialization()
+'    '   Verify the capacity to build a configuration sheet based on existing modules
+'    '   The test uses a template project containing different types of empty modules
+'    '   This specific test verifies the project name modification of the active workbook
+'
+'    ' Open uninitialized workbook
+'    vtkCloseAndKillWorkbook Wb:=wbForTest
+'    Set wbForTest = Workbooks.Open(fileName:=vtkPathToTestFolder & "\" & uninitializedWorkbookName)
+'
+'    ' Initialize workbook
+'    vtkInitializeConfigurationForActiveWorkBook
+'
+'    ' Verify the project name
+'    mAssert.Equals wbForTest.VBProject.name, "TestProject_DEV", "The suffix _DEV must have been appended to the project name"
+'End Sub
 
-Public Sub TestWorkbookNameAfterProjectConfigurationSheetInitialization()
-    '   Verify the capacity to build a configuration sheet based on existing modules
-    '   The test uses a template project containing different types of empty modules
-    '   This specific test verifies the workbook name modification of the active workbook
-    
-    ' Open uninitialized workbook
-    vtkCloseAndKillWorkbook Wb:=wbForTest
-    Set wbForTest = Workbooks.Open(fileName:=vtkPathToTestFolder & "\" & uninitializedWorkbookName)
-    
-    ' Initialize workbook
-    vtkInitializeConfigurationForActiveWorkBook
-    
-    ' Verify the workbook name
-    mAssert.Equals wbForTest.name, "TestProject_DEV.xlsm", "The workbook name must be the project name"
-End Sub
+'Public Sub TestWorkbookNameAfterProjectConfigurationSheetInitialization()
+'    '   Verify the capacity to build a configuration sheet based on existing modules
+'    '   The test uses a template project containing different types of empty modules
+'    '   This specific test verifies the workbook name modification of the active workbook
+'
+'    ' Open uninitialized workbook
+'    vtkCloseAndKillWorkbook Wb:=wbForTest
+'    Set wbForTest = Workbooks.Open(fileName:=vtkPathToTestFolder & "\" & uninitializedWorkbookName)
+'
+'    ' Initialize workbook
+'    vtkInitializeConfigurationForActiveWorkBook
+'
+'    ' Verify the workbook name
+'    mAssert.Equals wbForTest.name, "TestProject_DEV.xlsm", "The workbook name must be the project name"
+'End Sub
 
-Public Sub TestConfigurationAfterProjectConfigurationSheetInitialization()
-    '   Verify the capacity to build a configuration sheet based on existing modules
-    '   The test uses a template project containing different types of empty modules
-    '   This specific test verifies the project name modification of the active workbook
-    
-    ' Open uninitialized workbook
-    Dim pName As String
-    vtkCloseAndKillWorkbook Wb:=wbForTest
-    Set wbForTest = Workbooks.Open(fileName:=vtkPathToTestFolder & "\" & uninitializedWorkbookName)
-    pName = wbForTest.VBProject.name
-    
-    ' Initialize workbook
-    vtkInitializeConfigurationForActiveWorkBook
-    
-    ' Verify the configuration
-    Dim cm As vtkConfigurationManager, p As vtkProject
-    Set p = vtkProjectForName(projectName:=pName)
-    Set cm = vtkConfigurationManagerForProject(projectName:=pName)
-    Dim nc_dev As Integer, nc_prod As Integer
-    nc_dev = cm.getConfigurationNumber(configuration:=p.projectDEVName)
-    nc_prod = cm.getConfigurationNumber(configuration:=p.projectName)
-    
-    mAssert.Equals cm.moduleCount, 5, "There are 5 modules to export, the Document modules are not exported"
-    
-    mAssert.Equals cm.getModulePathWithNumber(numModule:=cm.getModuleNumber("IAssert"), numConfiguration:=nc_dev), "Source\VbaUnit\IAssert.cls", "Path for IAssert module for Test configuration"
-    mAssert.Equals cm.getModulePathWithNumber(numModule:=cm.getModuleNumber("UserForm"), numConfiguration:=nc_dev), "Source\ConfProd\UserForm.frm", "Path for UserForm module for Test configuration"
-    mAssert.Equals cm.getModulePathWithNumber(numModule:=cm.getModuleNumber("Module"), numConfiguration:=nc_dev), "Source\ConfProd\Module.bas", "Path for Module module for Test configuration"
-    mAssert.Equals cm.getModulePathWithNumber(numModule:=cm.getModuleNumber("Class"), numConfiguration:=nc_dev), "Source\ConfProd\Class.cls", "Path for Class module for Test configuration"
-    mAssert.Equals cm.getModulePathWithNumber(numModule:=cm.getModuleNumber("ClassTester"), numConfiguration:=nc_dev), "Source\ConfTest\ClassTester.cls", "Path for ClassTester module for Test configuration"
-    
-    mAssert.Equals cm.getModulePathWithNumber(numModule:=cm.getModuleNumber("IAssert"), numConfiguration:=nc_prod), "", "Path for IAssert module for Prod configuration"
-    mAssert.Equals cm.getModulePathWithNumber(numModule:=cm.getModuleNumber("UserForm"), numConfiguration:=nc_prod), "Source\ConfProd\UserForm.frm", "Path for UserForm module for Prod configuration"
-    mAssert.Equals cm.getModulePathWithNumber(numModule:=cm.getModuleNumber("Module"), numConfiguration:=nc_prod), "Source\ConfProd\Module.bas", "Path for Module module for Prod configuration"
-    mAssert.Equals cm.getModulePathWithNumber(numModule:=cm.getModuleNumber("Class"), numConfiguration:=nc_prod), "Source\ConfProd\Class.cls", "Path for Class module for Prod configuration"
-    mAssert.Equals cm.getModulePathWithNumber(numModule:=cm.getModuleNumber("ClassTester"), numConfiguration:=nc_prod), "", "Path for ClassTester module for Prod configuration"
-    
-End Sub
+'Public Sub TestConfigurationAfterProjectConfigurationSheetInitialization()
+'    '   Verify the capacity to build a configuration sheet based on existing modules
+'    '   The test uses a template project containing different types of empty modules
+'    '   This specific test verifies the project name modification of the active workbook
+'
+'    ' Open uninitialized workbook
+'    Dim pName As String
+'    vtkCloseAndKillWorkbook Wb:=wbForTest
+'    Set wbForTest = Workbooks.Open(fileName:=vtkPathToTestFolder & "\" & uninitializedWorkbookName)
+'    pName = wbForTest.VBProject.name
+'
+'    ' Initialize workbook
+'    vtkInitializeConfigurationForActiveWorkBook
+'
+'    ' Verify the configuration
+'    Dim cm As vtkConfigurationManager, p As vtkProject
+'    Set p = vtkProjectForName(projectName:=pName)
+'    Set cm = vtkConfigurationManagerForProject(projectName:=pName)
+'    Dim nc_dev As Integer, nc_prod As Integer
+'    nc_dev = cm.getConfigurationNumber(configuration:=p.projectDEVName)
+'    nc_prod = cm.getConfigurationNumber(configuration:=p.projectName)
+'
+'    mAssert.Equals cm.moduleCount, 5, "There are 5 modules to export, the Document modules are not exported"
+'
+'    mAssert.Equals cm.getModulePathWithNumber(numModule:=cm.getModuleNumber("IAssert"), numConfiguration:=nc_dev), "Source\VbaUnit\IAssert.cls", "Path for IAssert module for Test configuration"
+'    mAssert.Equals cm.getModulePathWithNumber(numModule:=cm.getModuleNumber("UserForm"), numConfiguration:=nc_dev), "Source\ConfProd\UserForm.frm", "Path for UserForm module for Test configuration"
+'    mAssert.Equals cm.getModulePathWithNumber(numModule:=cm.getModuleNumber("Module"), numConfiguration:=nc_dev), "Source\ConfProd\Module.bas", "Path for Module module for Test configuration"
+'    mAssert.Equals cm.getModulePathWithNumber(numModule:=cm.getModuleNumber("Class"), numConfiguration:=nc_dev), "Source\ConfProd\Class.cls", "Path for Class module for Test configuration"
+'    mAssert.Equals cm.getModulePathWithNumber(numModule:=cm.getModuleNumber("ClassTester"), numConfiguration:=nc_dev), "Source\ConfTest\ClassTester.cls", "Path for ClassTester module for Test configuration"
+'
+'    mAssert.Equals cm.getModulePathWithNumber(numModule:=cm.getModuleNumber("IAssert"), numConfiguration:=nc_prod), "", "Path for IAssert module for Prod configuration"
+'    mAssert.Equals cm.getModulePathWithNumber(numModule:=cm.getModuleNumber("UserForm"), numConfiguration:=nc_prod), "Source\ConfProd\UserForm.frm", "Path for UserForm module for Prod configuration"
+'    mAssert.Equals cm.getModulePathWithNumber(numModule:=cm.getModuleNumber("Module"), numConfiguration:=nc_prod), "Source\ConfProd\Module.bas", "Path for Module module for Prod configuration"
+'    mAssert.Equals cm.getModulePathWithNumber(numModule:=cm.getModuleNumber("Class"), numConfiguration:=nc_prod), "Source\ConfProd\Class.cls", "Path for Class module for Prod configuration"
+'    mAssert.Equals cm.getModulePathWithNumber(numModule:=cm.getModuleNumber("ClassTester"), numConfiguration:=nc_prod), "", "Path for ClassTester module for Prod configuration"
+'
+'End Sub
 
 Private Function ITest_Suite() As TestSuite
     Set ITest_Suite = New TestSuite
@@ -191,10 +191,6 @@ Private Function ITest_Suite() As TestSuite
     ITest_Suite.AddTest ITest_Manager.ClassName, "TestConfigurationManagerIsNotNull"
     ITest_Suite.AddTest ITest_Manager.ClassName, "TestConfigurationManagersAreDifferentForTwoProjects"
     ITest_Suite.AddTest ITest_Manager.ClassName, "TestConfigurationManagerIsInvariant"
-    ITest_Suite.AddTest ITest_Manager.ClassName, "TestInoperantProjectConfigurationSheetInitializationForExistingProject"
-    ITest_Suite.AddTest ITest_Manager.ClassName, "TestProjectNameAfterProjectConfigurationSheetInitialization"
-    ITest_Suite.AddTest ITest_Manager.ClassName, "TestWorkbookNameAfterProjectConfigurationSheetInitialization"
-    ITest_Suite.AddTest ITest_Manager.ClassName, "TestConfigurationAfterProjectConfigurationSheetInitialization"
 End Function
 
 Private Sub ITestCase_RunTest()
@@ -203,10 +199,6 @@ Private Sub ITestCase_RunTest()
         Case "TestConfigurationManagerIsNotNull": TestConfigurationManagerIsNotNull
         Case "TestConfigurationManagersAreDifferentForTwoProjects": TestConfigurationManagersAreDifferentForTwoProjects
         Case "TestConfigurationManagerIsInvariant": TestConfigurationManagerIsInvariant
-        Case "TestInoperantProjectConfigurationSheetInitializationForExistingProject": TestInoperantProjectConfigurationSheetInitializationForExistingProject
-        Case "TestProjectNameAfterProjectConfigurationSheetInitialization": TestProjectNameAfterProjectConfigurationSheetInitialization
-        Case "TestWorkbookNameAfterProjectConfigurationSheetInitialization": TestWorkbookNameAfterProjectConfigurationSheetInitialization
-        Case "TestConfigurationAfterProjectConfigurationSheetInitialization": TestConfigurationAfterProjectConfigurationSheetInitialization
         Case Else: mAssert.Should False, "Invalid test name: " & mManager.methodName
     End Select
 End Sub

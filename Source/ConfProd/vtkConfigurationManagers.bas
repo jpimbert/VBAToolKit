@@ -87,41 +87,41 @@ End Sub
 '             - the Delivery version is described in configuration but not created
 '---------------------------------------------------------------------------------------
 '
-Public Sub vtkInitializeConfigurationForActiveWorkBook()
-    ' If a configuration sheet exists, does nothing
-    Dim cm As New vtkConfigurationManager
-    If cm.isConfigurationInitializedForWorkbook(ExcelName:=ActiveWorkbook.name) Then Exit Sub
-    Set cm = Nothing
-    
-    ' Get the project name and initialize a vtkProject with it
-    Dim project As vtkProject
-    Set project = vtkProjectForName(projectName:=ActiveWorkbook.VBProject.name)
-    
-    ' Change the project name
-    ActiveWorkbook.VBProject.name = project.projectDEVName
-    
-    ' Change the workbook name
-    ActiveWorkbook.SaveAs fileName:=ActiveWorkbook.path & "\" & project.workbookDEVName
-    
-    ' Prepare configuration manager
-    Dim i As Integer, c As VBComponent, cn_dev As Integer, cn_prod As Integer, nm As Integer
-    Set cm = vtkConfigurationManagerForProject(projectName:=project.projectName)
-    cn_dev = cm.getConfigurationNumber(configuration:=project.projectDEVName)
-    cn_prod = cm.getConfigurationNumber(configuration:=project.projectName)
-    
-    ' List all modules
-    For i = 1 To ActiveWorkbook.VBProject.VBComponents.Count
-        Set c = ActiveWorkbook.VBProject.VBComponents.Item(i)
-        If c.Type <> vbext_ct_Document Then
-            nm = cm.addModule(c.name)
-            cm.setModulePathWithNumber path:=vtkStandardPathForModule(module:=c), numModule:=nm, numConfiguration:=cn_dev
-            If vtkStandardCategoryForModuleName(moduleName:=c.name) Like "Prod" Then
-                cm.setModulePathWithNumber path:=vtkStandardPathForModule(module:=c), numModule:=nm, numConfiguration:=cn_prod
-            End If
-        End If
-    Next
-    
-    ' Save the new workbook
-    ActiveWorkbook.Save
-    
-End Sub
+'Public Sub vtkInitializeConfigurationForActiveWorkBook()
+'    ' If a configuration sheet exists, does nothing
+'    Dim cm As New vtkConfigurationManager
+'    If cm.isConfigurationInitializedForWorkbook(ExcelName:=ActiveWorkbook.name) Then Exit Sub
+'    Set cm = Nothing
+'
+'    ' Get the project name and initialize a vtkProject with it
+'    Dim project As vtkProject
+'    Set project = vtkProjectForName(projectName:=ActiveWorkbook.VBProject.name)
+'
+'    ' Change the project name
+'    ActiveWorkbook.VBProject.name = project.projectDEVName
+'
+'    ' Change the workbook name
+'    ActiveWorkbook.SaveAs fileName:=ActiveWorkbook.path & "\" & project.workbookDEVName
+'
+'    ' Prepare configuration manager
+'    Dim i As Integer, c As VBComponent, cn_dev As Integer, cn_prod As Integer, nm As Integer
+'    Set cm = vtkConfigurationManagerForProject(projectName:=project.projectName)
+'    cn_dev = cm.getConfigurationNumber(configuration:=project.projectDEVName)
+'    cn_prod = cm.getConfigurationNumber(configuration:=project.projectName)
+'
+'    ' List all modules
+'    For i = 1 To ActiveWorkbook.VBProject.VBComponents.Count
+'        Set c = ActiveWorkbook.VBProject.VBComponents.Item(i)
+'        If c.Type <> vbext_ct_Document Then
+'            nm = cm.addModule(c.name)
+'            cm.setModulePathWithNumber path:=vtkStandardPathForModule(module:=c), numModule:=nm, numConfiguration:=cn_dev
+'            If vtkStandardCategoryForModuleName(moduleName:=c.name) Like "Prod" Then
+'                cm.setModulePathWithNumber path:=vtkStandardPathForModule(module:=c), numModule:=nm, numConfiguration:=cn_prod
+'            End If
+'        End If
+'    Next
+'
+'    ' Save the new workbook
+'    ActiveWorkbook.Save
+'
+'End Sub
