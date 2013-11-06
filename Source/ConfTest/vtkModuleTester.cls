@@ -326,22 +326,22 @@ Public Sub Test_VBAModule_NotAttachedNoError()
     mAssert.Equals Err.Number, VTK_MODULE_NOTATTACHED, "Error raised"
 End Sub
 
-Public Sub Test_VBAModule_NotOpen()
-    ' This test verifies the getting of the VBAModule for a module attached to a configuration
-    ' New configuration, Excel file not open
-    confManager.addConfiguration configuration:="NewConfiguration", path:="path/toto.xlsm"
-    confManager.modules(3).setPathForConfiguration "NewConfiguration", "Toto/Module.cls"
-    
-   On Error GoTo M_Error
-    mAssert.Equals confManager.configurations("NewConfiguration").modules(1).VBAModule.name, "", "Name of VBComponent"
-    mAssert.Should False, "An error must be raised"
-
-   On Error GoTo 0
-   Exit Sub
-
-M_Error:
-    mAssert.Equals Err.Number, VTK_WORKBOOK_NOTOPEN, "Error raised"
-End Sub
+'Public Sub Test_VBAModule_NotOpen()
+'    ' This test verifies the getting of the VBAModule for a module attached to a configuration
+'    ' New configuration, Excel file not open
+'    confManager.addConfiguration configuration:="NewConfiguration", path:="path/toto.xlsm"
+'    confManager.modules(3).setPathForConfiguration "NewConfiguration", "Toto/Module.cls"
+'
+'   On Error GoTo M_Error
+'    mAssert.Equals confManager.configurations("NewConfiguration").modules(1).VBAModule.name, "", "Name of VBComponent"
+'    mAssert.Should False, "An error must be raised"
+'
+'   On Error GoTo 0
+'   Exit Sub
+'
+'M_Error:
+'    mAssert.Equals Err.Number, VTK_WORKBOOK_NOTOPEN, "Error raised"
+'End Sub
 
 Public Sub Test_VBAModule_NoModule()
     ' This test verifies the getting of the VBAModule for a module attached to a configuration
@@ -382,7 +382,6 @@ Private Function ITest_Suite() As TestSuite
     ITest_Suite.AddTest ITest_Manager.ClassName, "Test_VBAModule_Attached"
     ITest_Suite.AddTest ITest_Manager.ClassName, "Test_VBAModule_NotAttachedErrorRaised"
     ITest_Suite.AddTest ITest_Manager.ClassName, "Test_VBAModule_NotAttachedNoError"
-    ITest_Suite.AddTest ITest_Manager.ClassName, "Test_VBAModule_NotOpen"
     ITest_Suite.AddTest ITest_Manager.ClassName, "Test_VBAModule_NoModule"
 End Function
 
@@ -409,7 +408,6 @@ Private Sub ITestCase_RunTest()
         Case "Test_VBAModule_Attached": Test_VBAModule_Attached
         Case "Test_VBAModule_NotAttachedErrorRaised": Test_VBAModule_NotAttachedErrorRaised
         Case "Test_VBAModule_NotAttachedNoError": Test_VBAModule_NotAttachedNoError
-        Case "Test_VBAModule_NotOpen": Test_VBAModule_NotOpen
         Case "Test_VBAModule_NoModule": Test_VBAModule_NoModule
         Case Else: mAssert.Should False, "Invalid test name: " & mManager.methodName
     End Select

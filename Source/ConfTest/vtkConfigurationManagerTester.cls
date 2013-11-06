@@ -190,51 +190,51 @@ Public Sub TestGetConfigurationsFromExistingProject()
     mAssert.Equals existingConfManager.configuration(150), "", "Inexistant configuration number 150"
 End Sub
 
-Public Sub Test_AddConfigurationInExistingProject_Name()
-'       Verify the add of configuration in an existing project
-'       Verify the number and name of the added configuration
-    Dim n As Integer
-    n = existingConfManager.addConfiguration("NewConfiguration", "ConfigurationPath")
+'Public Sub Test_AddConfigurationInExistingProject_Name()
+''       Verify the add of configuration in an existing project
+''       Verify the number and name of the added configuration
+'    Dim n As Integer
+'    n = existingConfManager.addConfiguration("NewConfiguration", "ConfigurationPath")
+'
+'    mAssert.Equals existingConfManager.configurationCount, 3, "There must be two configurations in the existing template project"
+'    mAssert.Equals existingConfManager.configuration(0), "", "Inexistant configuration number 0"
+'    mAssert.Equals existingConfManager.configuration(1), existingProjectName, "Name of the first configuration"
+'    mAssert.Equals existingConfManager.configuration(2), existingProjectName & "_DEV", "Name of the second configuration"
+'    mAssert.Equals existingConfManager.configuration(3), "NewConfiguration", "Name of the new configuration"
+'    mAssert.Equals existingConfManager.getConfigurationPathWithNumber(3), "ConfigurationPath", "Path of new configuration given by number"
+'    mAssert.Equals existingConfManager.configuration(4), "", "Inexistant configuration number 4"
+'    mAssert.Equals existingConfManager.configuration(-23), "", "Inexistant configuration number -23"
+'    mAssert.Equals existingConfManager.configuration(150), "", "Inexistant configuration number 150"
+'End Sub
 
-    mAssert.Equals existingConfManager.configurationCount, 3, "There must be two configurations in the existing template project"
-    mAssert.Equals existingConfManager.configuration(0), "", "Inexistant configuration number 0"
-    mAssert.Equals existingConfManager.configuration(1), existingProjectName, "Name of the first configuration"
-    mAssert.Equals existingConfManager.configuration(2), existingProjectName & "_DEV", "Name of the second configuration"
-    mAssert.Equals existingConfManager.configuration(3), "NewConfiguration", "Name of the new configuration"
-    mAssert.Equals existingConfManager.getConfigurationPathWithNumber(3), "ConfigurationPath", "Path of new configuration given by number"
-    mAssert.Equals existingConfManager.configuration(4), "", "Inexistant configuration number 4"
-    mAssert.Equals existingConfManager.configuration(-23), "", "Inexistant configuration number -23"
-    mAssert.Equals existingConfManager.configuration(150), "", "Inexistant configuration number 150"
-End Sub
+'Public Sub Test_AddConfigurationInExistingProject_Cells()
+''       Verify the add of configuration in an existing project
+''       Verify the cells of the configuration sheet
+'    Dim ws As Worksheet
+'    Dim n As Integer
+'    n = existingConfManager.addConfiguration("NewConfiguration", "ConfigurationPath")
+'
+'    Set ws = existingConfManager.configurationSheet
+'    mAssert.Equals ws.Range("A1"), "vtkConfigurations v1.0", "Expected identification of the configuration sheet"
+'    mAssert.Equals ws.Range("A2"), "Module Name", "Expected Title for Modules column"
+'    mAssert.Equals ws.Range("B1"), existingProjectName, "Expected Title for main project column"
+'    mAssert.Equals ws.Range("B2"), "Delivery\ExistingProject.xlsm", "Expected related Path for new main workbook"
+'    mAssert.Equals ws.Range("C1"), existingProjectName & "_DEV", "Expected Title for development project column"
+'    mAssert.Equals ws.Range("C2"), "Project\ExistingProject_DEV.xlsm", "Expected related Path for new development workbook"
+'    mAssert.Equals ws.Range("D1"), "NewConfiguration", "Expected Title for new configuration column"
+'    mAssert.Equals ws.Range("D2"), "ConfigurationPath", "Expected related Path for new configuration"
+'End Sub
 
-Public Sub Test_AddConfigurationInExistingProject_Cells()
-'       Verify the add of configuration in an existing project
-'       Verify the cells of the configuration sheet
-    Dim ws As Worksheet
-    Dim n As Integer
-    n = existingConfManager.addConfiguration("NewConfiguration", "ConfigurationPath")
-    
-    Set ws = existingConfManager.configurationSheet
-    mAssert.Equals ws.Range("A1"), "vtkConfigurations v1.0", "Expected identification of the configuration sheet"
-    mAssert.Equals ws.Range("A2"), "Module Name", "Expected Title for Modules column"
-    mAssert.Equals ws.Range("B1"), existingProjectName, "Expected Title for main project column"
-    mAssert.Equals ws.Range("B2"), "Delivery\ExistingProject.xlsm", "Expected related Path for new main workbook"
-    mAssert.Equals ws.Range("C1"), existingProjectName & "_DEV", "Expected Title for development project column"
-    mAssert.Equals ws.Range("C2"), "Project\ExistingProject_DEV.xlsm", "Expected related Path for new development workbook"
-    mAssert.Equals ws.Range("D1"), "NewConfiguration", "Expected Title for new configuration column"
-    mAssert.Equals ws.Range("D2"), "ConfigurationPath", "Expected related Path for new configuration"
-End Sub
-
-Public Sub Test_AddConfigurationInExistingProject_NullPathes()
-'       Verify the add of configuration in an existing project
-'       Verify That the module pathes are initialized to null
-    Dim n As Integer, i As Integer
-    n = existingConfManager.addConfiguration("NewConfiguration", "ConfigurationPath")
-    
-    For i = 1 To existingConfManager.configurationCount
-        mAssert.Equals existingConfManager.getModulePathWithNumber(i, n), "", "Path of module " & i & " must be null"
-    Next
-End Sub
+'Public Sub Test_AddConfigurationInExistingProject_NullPathes()
+''       Verify the add of configuration in an existing project
+''       Verify That the module pathes are initialized to null
+'    Dim n As Integer, i As Integer
+'    n = existingConfManager.addConfiguration("NewConfiguration", "ConfigurationPath")
+'
+'    For i = 1 To existingConfManager.configurationCount
+'        mAssert.Equals existingConfManager.getModulePathWithNumber(i, n), "", "Path of module " & i & " must be null"
+'    Next
+'End Sub
 
 Public Sub TestGetConfigurationPathWithNumberFromExistingProject()
 '       Verify the capability to get the configuration path by number
@@ -437,9 +437,6 @@ Private Function ITest_Suite() As TestSuite
     ITest_Suite.AddTest ITest_Manager.ClassName, "TestConfigurationSheetFormatForExistingProjet"
     ITest_Suite.AddTest ITest_Manager.ClassName, "TestGetConfigurationsFromNewProject"
     ITest_Suite.AddTest ITest_Manager.ClassName, "TestGetConfigurationsFromExistingProject"
-    ITest_Suite.AddTest ITest_Manager.ClassName, "Test_AddConfigurationInExistingProject_Name"
-    ITest_Suite.AddTest ITest_Manager.ClassName, "Test_AddConfigurationInExistingProject_Cells"
-    ITest_Suite.AddTest ITest_Manager.ClassName, "Test_AddConfigurationInExistingProject_NullPathes"
     ITest_Suite.AddTest ITest_Manager.ClassName, "TestGetConfigurationPathWithNumberFromExistingProject"
     ITest_Suite.AddTest ITest_Manager.ClassName, "TestSetConfigurationPathWithNumberToNewProject"
     ITest_Suite.AddTest ITest_Manager.ClassName, "TestSetConfigurationPathWithNumberToSavedProject"
@@ -470,9 +467,6 @@ Private Sub ITestCase_RunTest()
         Case "TestConfigurationSheetFormatForExistingProjet": TestConfigurationSheetFormatForExistingProjet
         Case "TestGetConfigurationsFromNewProject": TestGetConfigurationsFromNewProject
         Case "TestGetConfigurationsFromExistingProject": TestGetConfigurationsFromExistingProject
-        Case "Test_AddConfigurationInExistingProject_Name": Test_AddConfigurationInExistingProject_Name
-        Case "Test_AddConfigurationInExistingProject_Cells": Test_AddConfigurationInExistingProject_Cells
-        Case "Test_AddConfigurationInExistingProject_NullPathes": Test_AddConfigurationInExistingProject_NullPathes
         Case "TestGetConfigurationPathWithNumberFromExistingProject": TestGetConfigurationPathWithNumberFromExistingProject
         Case "TestSetConfigurationPathWithNumberToNewProject": TestSetConfigurationPathWithNumberToNewProject
         Case "TestSetConfigurationPathWithNumberToSavedProject": TestSetConfigurationPathWithNumberToSavedProject
