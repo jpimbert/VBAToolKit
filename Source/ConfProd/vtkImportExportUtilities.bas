@@ -440,7 +440,6 @@ Public Function vtkExportConfiguration(projectWithModules As VBProject, projectN
 
     ' Export all modules for this configuration from the projectWithModules
     Set cm = vtkConfigurationManagerForProject(projectName)
-    
     For Each mo In cm.configurations(confName).modules
         
         Dim modulePath As String

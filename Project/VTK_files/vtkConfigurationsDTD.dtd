@@ -1,24 +1,24 @@
 <!ELEMENT vtkConf (info,configuration*, module*, reference*)>
 	
-	<!ELEMENT info (projectName,version)>
-		<!ELEMENT version(#PCDATA)>
+	<!ELEMENT info (vtkConfigurationsVersion,projectName)>
+		<!ELEMENT vtkConfigurationsVersion (#PCDATA)>
 		<!ELEMENT projectName (#PCDATA)>
 	
 	<!ELEMENT configuration (name,path,templatePath?,title?,comment?)>
-	 <!ATTLIST configuration ID #REQUIRED>
+	 <!ATTLIST configuration cID ID #REQUIRED>
 		<!ELEMENT name (#PCDATA)>
 		<!ELEMENT path (#PCDATA)>
-		<!ELEMENT templatePath(#PCDATA)>
+		<!ELEMENT templatePath (#PCDATA)>
 		<!ELEMENT title	(#PCDATA)>
 		<!ELEMENT comment (#PCDATA)>
 	
-	<!ELEMENT module (name,path*)>
-	 <!ATTLIST module ID #REQUIRED>
-		<!ELEMENT modulePath(#PCDATA)>
+	<!ELEMENT module (name, modulePath*)>
+	 <!ATTLIST module mID ID #REQUIRED>
+		<!ELEMENT modulePath (#PCDATA)>
 		 <!ATTLIST modulePath 
-			confID IDREF #REQUIRED 
+			confId IDREF #REQUIRED 
 		 >
 	
-	<!ELEMENT reference (name,guid | path)>
-	 <!ATTLIST reference ID #REQUIRED>
+	<!ELEMENT reference (name, (guid|path), usedByConf*)>
+	 <!ATTLIST reference confIDs IDREFS #REQUIRED>
 		<!ELEMENT guid (#PCDATA)>

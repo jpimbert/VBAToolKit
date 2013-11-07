@@ -65,7 +65,9 @@ Public Function vtkCreateProject(path As String, name As String, Optional displa
     Dim internalError As Long
     internalError = vtkCreateTreeFolder(rootPath)
     If internalError <> VTK_OK Then GoTo vtkCreateProject_ErrorTreeFolder
-     
+    
+    ' This can be done with importing a template, which is ugly
+    '--------------------------------------------
     ' Create DEV workbook with xlsm extension
     Workbooks.Add.SaveAs (rootPath & "\" & project.projectDEVStandardRelativePath), FileFormat:=xlOpenXMLWorkbookMacroEnabled
     ' Rename the VBProject of the DEV workbook
@@ -76,7 +78,7 @@ Public Function vtkCreateProject(path As String, name As String, Optional displa
     vtkInitializeVbaUnitNamesAndPathes project:=project.projectName
     ' Save DEV Workbook
     Workbooks(project.workbookDEVName).Save
-    
+    '--------------------------------------------
     
     ' Create Delivery workbook with xlsm extension
     Workbooks.Add.SaveAs (rootPath & "\" & project.projectStandardRelativePath), FileFormat:=(52) '52 is xlsm format
@@ -98,7 +100,7 @@ Public Function vtkCreateProject(path As String, name As String, Optional displa
     vtkImportModulesInAnotherProject projectForModules:=Wb.VBProject, projectName:=project.projectName, confName:=project.projectDEVName
     
     ' Insert the BeforeSave handler in the newly created project
-    vtkAddBeforeSaveHandlerInDEVWorkbook Wb:=Wb, projectName:=project.projectName, confName:=project.projectDEVName
+    vtkAddBeforeSaveHandlerInDEVWorkbook Wb:=wb, projectName:=project.projectName, confName:=project.projectDEVName
     ' Save configured and updated project for test
     Wb.Save
         
@@ -122,3 +124,47 @@ vtkCreateProject_ErrorGit:
     If displayError Then MsgBox "Error " & Err.Number & " (" & Err.Description & ") in procedure vtkCreateProject of Module MainFunctions"
 
 End Function
+
+
+'---------------------------------------------------------------------------------------
+' Procedure : renameDEVTemplateWorkbook
+' Author    : Lucas Vitorino
+' Purpose   : Ugly hack to allow us to remove the addModule function. Instead of adding modules
+'             in a workbook, we import a template and modify it.
+'---------------------------------------------------------------------------------------
+'
+Public Sub renameDEVTemplateWorkbook(wbPath As String, projectName As String)
+    
+    Dim Wb As New Workbook
+    Set Wb = Workbooks.Open(wbPath)
+    
+    Dim ws As Worksheet
+    On Error GoTo renameDEVTemplateWorkbook_Error
+
+    Set ws = Wb.Worksheets("vtkConfigurations")
+    ws.Range("B1") = vtkProjectForName(projectName).projectName
+    ws.Range("B2") = vtkProjectForName(projectName).projectStandardRelativePath
+    ws.Range("C1") = vtkProjectForName(projectName).projectDEVName
+    ws.Range("C2") = vtkProjectForName(projectName).projectDEVStandardRelativePath
+    
+    Wb.VBProject.name = vtkProjectForName(projectName).projectDEVName
+    Wb.Close saveChanges:=True
+    
+    Dim fso As New FileSystemObject
+    fso.GetFile(wbPath).name = fso.GetFileName(vtkProjectForName(projectName).projectDEVStandardRelativePath)
+    
+    Set Wb = Workbooks.Open(fso.BuildPath(fso.GetParentFolderName(wbPath), vtkProjectForName(projectName).projectDEVName))
+    vtkAddBeforeSaveHandlerInDEVWorkbook Wb:=wb, projectName:=vtkProjectForName(projectName).projectName, confName:=vtkProjectForName(projectName).projectDEVName
+    Wb.Close saveChanges:=True
+
+
+    On Error GoTo 0
+    Exit Sub
+
+renameDEVTemplateWorkbook_Error:
+    Err.Source = "Sub renameDEVTemplateWorkbook in module vtkMainFunctions"
+    Debug.Print "Error " & Err.Number & " : " & Err.Description & " in " & Err.Source
+    Exit Sub
+    
+End Sub
+
