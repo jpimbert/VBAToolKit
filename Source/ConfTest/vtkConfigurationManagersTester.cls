@@ -38,8 +38,16 @@ Private mAssert As IAssert
 Private wbForTest As Workbook       ' default WorkBook for test
 Private workbookName As String      ' default workbook Name for test
 Private Const projectName As String = "TestProject"     ' default project Name for test
+Private Const secondProjectName As String = "Second Test"
 Private Const uninitializedWorkbookName As String = "UninitializedProject.xlsm"     ' unititialized workbook Name for test
 Private Const existingWorkbookName As String = "WorkBookForConfigurationsTests.xlsm"     ' unititialized workbook Name for test
+
+Private Const rememberedProjectsSheetName As String = "BlankRememberedProjectsSheet.xml"
+Private fso As New FileSystemObject
+Private Const rememberedProjectsDTDName As String = "rememberedProjectsDTD.dtd"
+Private Const vtkConfigurationsDTDName As String = "vtkConfigurationsDTD.dtd"
+
+Private Const existingXMLSheetNameForTests As String = "XMLSheetForConfigurationsTests.xml"
 
 Private Sub Class_Initialize()
     Set mManager = New TestCaseManager
@@ -54,36 +62,96 @@ Private Property Get ITest_Manager() As ITestManager
 End Property
 
 Private Sub ITestCase_SetUp(Assert As IAssert)
+    
     Set mAssert = Assert
-    Set wbForTest = vtkCreateExcelWorkbookForTestWithProjectName(projectName)   ' create the default Excel project for tests
-    workbookName = wbForTest.name
-    FileCopy Source:=vtkPathToTemplateFolder & "\" & uninitializedWorkbookName, destination:=vtkPathToTestFolder & "\" & uninitializedWorkbookName
-    FileCopy Source:=vtkPathToTemplateFolder & "\" & existingWorkbookName, destination:=vtkPathToTestFolder & "\" & existingWorkbookName
+    
+    ' Workbook functions - will be deleted in the near future
+    ' --------------------------------------------------------
+'    Set wbForTest = vtkCreateExcelWorkbookForTestWithProjectName(projectName)   ' create the default Excel project for tests
+'    workbookName = wbForTest.name
+'    FileCopy Source:=vtkPathToTemplateFolder & "\" & uninitializedWorkbookName, destination:=vtkPathToTestFolder & "\" & uninitializedWorkbookName
+'    FileCopy Source:=vtkPathToTemplateFolder & "\" & existingWorkbookName, destination:=vtkPathToTestFolder & "\" & existingWorkbookName
+    ' --------------------------------------------------------
+
+    ' Create an XML sheet that references the projects "ExistingProject" and "NewProject"
+    
+    ' Copy a blank sheet
+    FileCopy Source:=fso.BuildPath(vtkPathToTemplateFolder, rememberedProjectsSheetName), _
+             destination:=fso.BuildPath(VBAToolKit.vtkTestPath, rememberedProjectsSheetName)
+    
+    xmlRememberedProjectsFullPath = fso.BuildPath(VBAToolKit.vtkTestPath, rememberedProjectsSheetName)
+    
+    vtkAddRememberedProject projectName:=projectName, _
+                            rootFolder:=VBAToolKit.vtkTestPath, _
+                            xmlRelativePath:=projectName & ".xml"
+                            
+    vtkAddRememberedProject projectName:=secondProjectName, _
+                            rootFolder:=VBAToolKit.vtkTestPath, _
+                            xmlRelativePath:=secondProjectName & ".xml"
+
+
+    ' Copy the XML sheet that describes the project "ExistingProject"
+    ' NB : the content of this file is wrong (projectName is wrong)
+    FileCopy Source:=fso.BuildPath(vtkPathToTemplateFolder, existingXMLSheetNameForTests), _
+             destination:=fso.BuildPath(VBAToolKit.vtkTestPath, projectName & ".xml")
+
+'    ' Copy the XML sheet that describes the project "NewProject"
+'    FileCopy Source:=fso.BuildPath(vtkPathToTemplateFolder, newProjectXMLSheetName), _
+'             destination:=fso.BuildPath(VBAToolKit.vtkTestPath, newProjectXMLSheetName)
+    
+    
+    ' Copy the DTDs
+    FileCopy Source:=fso.BuildPath(vtkPathToTemplateFolder, rememberedProjectsDTDName), _
+             destination:=fso.BuildPath(VBAToolKit.vtkTestPath, rememberedProjectsDTDName)
+    
+    FileCopy Source:=fso.BuildPath(vtkPathToTemplateFolder, vtkConfigurationsDTDName), _
+             destination:=fso.BuildPath(VBAToolKit.vtkTestPath, vtkConfigurationsDTDName)
+    
+    ' --------------------------------------------------------
+
+
 End Sub
 
 Private Sub ITestCase_TearDown()
-    vtkCloseAndKillWorkbook Wb:=wbForTest
-    On Error Resume Next
-    Kill PathName:=vtkPathToTestFolder & "\" & uninitializedWorkbookName
-    Kill PathName:=vtkPathToTestFolder & "\" & existingWorkbookName
-    On Error GoTo 0
+'    vtkCloseAndKillWorkbook wb:=wbForTest
+'    On Error Resume Next
+'    Kill PathName:=vtkPathToTestFolder & "\" & uninitializedWorkbookName
+'    Kill PathName:=vtkPathToTestFolder & "\" & existingWorkbookName
+'    On Error GoTo 0
     vtkResetConfigurationManagers               ' reset all configuration managers
+    vtkResetProjects
+    resetTestFolder
+    
 End Sub
 
-' TESTS TO WRITE
-'
-'
 
+'''Public Sub TestUtilityFunctionCreateExcelProject()
+''''       Verify that the utility function createExcelProjectNamed correctly create a new Excel file with proper project name
+'''    mAssert.Equals wbForTest.name, workbookName, "Expected name for Excel project"
+'''End Sub
 
-
-Public Sub TestUtilityFunctionCreateExcelProject()
-'       Verify that the utility function createExcelProjectNamed correctly create a new Excel file with proper project name
-    mAssert.Equals wbForTest.name, workbookName, "Expected name for Excel project"
-End Sub
-
-Public Sub TestConfigurationManagerIsNotNull()
-'       Verify that the configuration Manager is not null
+Public Sub TestConfigurationManagerForRememberedAndSheetedProjectIsNotNull()
+'       Verify that the configuration Manager is null
     mAssert.Should Not vtkConfigurationManagerForProject(projectName) Is Nothing, "A configuartion manager must not be null"
+End Sub
+
+Public Sub TestConfigurationManagerForNotRememberedAndSheetedProjectIsNull()
+'       Verify that the configuration Manager is null
+    vtkRemoveRememberedProject projectName:=projectName
+    mAssert.Should vtkConfigurationManagerForProject(projectName) Is Nothing
+End Sub
+
+Public Sub TestConfigurationManagerForNotRememberedAndNotSheetedProjectIsNull()
+'       Verify that the configuration Manager is null
+    vtkRemoveRememberedProject projectName:=projectName
+    fso.DeleteFile fso.BuildPath(VBAToolKit.vtkTestPath, projectName & ".xml")
+    mAssert.Should vtkConfigurationManagerForProject(projectName) Is Nothing
+End Sub
+
+Public Sub TestCOnfigurationManagerForRememberedAndNotSheetedProjectIsNull()
+'       Verify that the configuration Manager is null
+    fso.DeleteFile fso.BuildPath(VBAToolKit.vtkTestPath, projectName & ".xml")
+    mAssert.Should vtkConfigurationManagerForProject(projectName) Is Nothing
 End Sub
 
 Public Sub TestConfigurationManagersAreDifferentForTwoProjects()
@@ -187,18 +255,18 @@ End Sub
 
 Private Function ITest_Suite() As TestSuite
     Set ITest_Suite = New TestSuite
-    ITest_Suite.AddTest ITest_Manager.ClassName, "TestUtilityFunctionCreateExcelProject"
-    ITest_Suite.AddTest ITest_Manager.ClassName, "TestConfigurationManagerIsNotNull"
-    ITest_Suite.AddTest ITest_Manager.ClassName, "TestConfigurationManagersAreDifferentForTwoProjects"
-    ITest_Suite.AddTest ITest_Manager.ClassName, "TestConfigurationManagerIsInvariant"
+    ITest_Suite.AddTest ITest_Manager.ClassName, "TestConfigurationManagerForRememberedAndSheetedProjectIsNotNull"
+    ITest_Suite.AddTest ITest_Manager.ClassName, "TestConfigurationManagerForNotRememberedAndSheetedProjectIsNull"
+    ITest_Suite.AddTest ITest_Manager.ClassName, "TestConfigurationManagerForNotRememberedAndNotSheetedProjectIsNull"
+    ITest_Suite.AddTest ITest_Manager.ClassName, "TestCOnfigurationManagerForRememberedAndNotSheetedProjectIsNull"
 End Function
 
 Private Sub ITestCase_RunTest()
     Select Case mManager.methodName
-        Case "TestUtilityFunctionCreateExcelProject": TestUtilityFunctionCreateExcelProject
-        Case "TestConfigurationManagerIsNotNull": TestConfigurationManagerIsNotNull
-        Case "TestConfigurationManagersAreDifferentForTwoProjects": TestConfigurationManagersAreDifferentForTwoProjects
-        Case "TestConfigurationManagerIsInvariant": TestConfigurationManagerIsInvariant
+        Case "TestConfigurationManagerForRememberedAndSheetedProjectIsNotNull": TestConfigurationManagerForRememberedAndSheetedProjectIsNotNull
+        Case "TestConfigurationManagerForNotRememberedAndSheetedProjectIsNull": TestConfigurationManagerForNotRememberedAndSheetedProjectIsNull
+        Case "TestConfigurationManagerForNotRememberedAndNotSheetedProjectIsNull": TestConfigurationManagerForNotRememberedAndNotSheetedProjectIsNull
+        Case "TestCOnfigurationManagerForRememberedAndNotSheetedProjectIsNull": TestCOnfigurationManagerForRememberedAndNotSheetedProjectIsNull
         Case Else: mAssert.Should False, "Invalid test name: " & mManager.methodName
     End Select
 End Sub

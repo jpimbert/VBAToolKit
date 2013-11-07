@@ -75,31 +75,31 @@ Public Sub Test_ConfigurationCollection_Count()
     mAssert.Equals confManager.configurations.Count, 1, "Number of configurations in the Test workbook"
 End Sub
 
-'Public Sub Test_AddedConfigurationCollection_Count()
-'    ' This test verifies the count of configurations collection property of Configuration Management
-'    ' Added configuration to the initialized from an Excel worlbook
-'
-'    confManager.addConfiguration ("NewConfiguration")
-'
-'    mAssert.Equals confManager.configurations.Count, 2, "Number of configurations in the Test workbook with added configuration"
-'End Sub
+'''Public Sub Test_AddedConfigurationCollection_Count()
+'''    ' This test verifies the count of configurations collection property of Configuration Management
+'''    ' Added configuration to the initialized from an Excel worlbook
+'''
+'''    confManager.addConfiguration ("NewConfiguration")
+'''
+'''    mAssert.Equals confManager.configurations.Count, 2, "Number of configurations in the Test workbook with added configuration"
+'''End Sub
 
-'Public Sub Test_ConfigurationCollection_Parent()
-'    ' This test verifies the parent of each vtkConfiguration object
-'    ' collection just initialized from an Excel worlbook
-'
-'    mAssert.Should confManager.configurations(1).parent Is confManager, "The parent of each vtkConfiguration must be initialized"
-'End Sub
+Public Sub Test_ConfigurationCollection_Parent()
+    ' This test verifies the parent of each vtkConfiguration object
+    ' collection just initialized from an Excel worlbook
 
-'Public Sub Test_AddedConfigurationCollection_Parent()
-'    ' This test verifies the parent of each vtkConfiguration object
-'    ' Added configuration to the collection initialized from an Excel worlbook
-'
-'    confManager.addConfiguration ("NewConfiguration")
-'
-'    mAssert.Should confManager.configurations(1).parent Is confManager, "The parent of each vtkConfiguration must be initialized"
-'    mAssert.Should confManager.configurations(2).parent Is confManager, "The parent of each vtkConfiguration must be initialized"
-'End Sub
+    mAssert.Should confManager.configurations(1).parent Is confManager, "The parent of each vtkConfiguration must be initialized"
+End Sub
+
+'''Public Sub Test_AddedConfigurationCollection_Parent()
+'''    ' This test verifies the parent of each vtkConfiguration object
+'''    ' Added configuration to the collection initialized from an Excel worlbook
+'''
+'''    confManager.addConfiguration ("NewConfiguration")
+'''
+'''    mAssert.Should confManager.configurations(1).parent Is confManager, "The parent of each vtkConfiguration must be initialized"
+'''    mAssert.Should confManager.configurations(2).parent Is confManager, "The parent of each vtkConfiguration must be initialized"
+'''End Sub
 
 Public Sub Test_ConfigurationCollection_Number()
     ' This test verifies the number of each vtkConfiguration object
@@ -108,15 +108,15 @@ Public Sub Test_ConfigurationCollection_Number()
     mAssert.Equals confManager.configurations(1).Number, 1, "The number of each vtkConfiguration must be initialized"
 End Sub
 
-'Public Sub Test_AddedConfigurationCollection_Number()
-'    ' This test verifies the number of each vtkConfiguration object
-'    ' Added configuration to the collection initialized from an Excel worlbook
-'
-'    confManager.addConfiguration ("NewConfiguration")
-'
-'    mAssert.Equals confManager.configurations(1).Number, 1, "The number of each vtkConfiguration must be initialized"
-'    mAssert.Equals confManager.configurations(2).Number, 2, "The number of each vtkConfiguration must be initialized"
-'End Sub
+'''Public Sub Test_AddedConfigurationCollection_Number()
+'''    ' This test verifies the number of each vtkConfiguration object
+'''    ' Added configuration to the collection initialized from an Excel worlbook
+'''
+'''    confManager.addConfiguration ("NewConfiguration")
+'''
+'''    mAssert.Equals confManager.configurations(1).Number, 1, "The number of each vtkConfiguration must be initialized"
+'''    mAssert.Equals confManager.configurations(2).Number, 2, "The number of each vtkConfiguration must be initialized"
+'''End Sub
 
 Public Sub Test_ConfigurationGetName()
     ' This test verifies the name of each vtkConfiguration object
@@ -150,22 +150,22 @@ M_Error:
     mAssert.Should False, "Unexpected Error (" & Err.Number & "): " & Err.Description
 End Sub
 
-Public Sub Test_ConfigurationSetPath()
-    ' This test verifies the path setting of each vtkConfiguration object
-    ' collection just initialized from an Excel worlbook
-
-   On Error GoTo M_Error
-    confManager.configurations(1).path = "NewPath"
-    mAssert.Equals confManager.configurations(1).path, "NewPath", "Path of the vtkConfiguration object by index"
-    mAssert.Equals confManager.configurations("InitializedProject_DEV").path, "NewPath", "Path of the vtkConfiguration object by name"
-    mAssert.Equals confManager.getConfigurationPathWithNumber(1), "NewPath", "Path of the modified configuration in the configuration manager"
-
-   On Error GoTo 0
-   Exit Sub
-
-M_Error:
-    mAssert.Should False, "Unexpected Error (" & Err.Number & "): " & Err.Description
-End Sub
+'''Public Sub Test_ConfigurationSetPath()
+'''    ' This test verifies the path setting of each vtkConfiguration object
+'''    ' collection just initialized from an Excel worlbook
+'''
+'''   On Error GoTo M_Error
+'''    confManager.configurations(1).path = "NewPath"
+'''    mAssert.Equals confManager.configurations(1).path, "NewPath", "Path of the vtkConfiguration object by index"
+'''    mAssert.Equals confManager.configurations("InitializedProject_DEV").path, "NewPath", "Path of the vtkConfiguration object by name"
+'''    mAssert.Equals confManager.getConfigurationPathWithNumber(1), "NewPath", "Path of the modified configuration in the configuration manager"
+'''
+'''   On Error GoTo 0
+'''   Exit Sub
+'''
+'''M_Error:
+'''    mAssert.Should False, "Unexpected Error (" & Err.Number & "): " & Err.Description
+'''End Sub
 
 Public Sub Test_ConfigurationModules_Initialized()
     ' This test verifies the modules property of a vtkConfiguration object
@@ -185,38 +185,38 @@ M_Error:
     mAssert.Should False, "Unexpected Error (" & Err.Number & "): " & Err.Description
 End Sub
 
-'Public Sub Test_ConfigurationModules_NewEmpty()
-'    ' This test verifies the modules property of a vtkConfiguration object
-'    ' New collection added in an Excel worlbook
-'
-'    confManager.addConfiguration ("NewConfiguration")
-'
-'   On Error GoTo M_Error
-'    mAssert.Equals confManager.configurations("NewConfiguration").modules.Count, 0, "Number of modules in the Configuration"
-'
-'   On Error GoTo 0
-'   Exit Sub
-'
-'M_Error:
-'    mAssert.Should False, "Unexpected Error (" & Err.Number & "): " & Err.Description
-'End Sub
-
-'Public Sub Test_ConfigurationModules_NewNotEmpty()
-'    ' This test verifies the modules property of a vtkConfiguration object
-'    ' New collection initialized in an Excel worlbook
-'
-'    confManager.addConfiguration ("NewConfiguration")
-'    confManager.setModulePathWithNumber "newPath", 3, 2
-'
-'   On Error GoTo M_Error
-'    mAssert.Equals confManager.configurations("NewConfiguration").modules.Count, 1, "Number of modules in the Configuration"
-'
-'   On Error GoTo 0
-'   Exit Sub
-'
-'M_Error:
-'    mAssert.Should False, "Unexpected Error (" & Err.Number & "): " & Err.Description
-'End Sub
+'''Public Sub Test_ConfigurationModules_NewEmpty()
+'''    ' This test verifies the modules property of a vtkConfiguration object
+'''    ' New collection added in an Excel worlbook
+'''
+'''    confManager.addConfiguration ("NewConfiguration")
+'''
+'''   On Error GoTo M_Error
+'''    mAssert.Equals confManager.configurations("NewConfiguration").modules.Count, 0, "Number of modules in the Configuration"
+'''
+'''   On Error GoTo 0
+'''   Exit Sub
+'''
+'''M_Error:
+'''    mAssert.Should False, "Unexpected Error (" & Err.Number & "): " & Err.Description
+'''End Sub
+''
+'''Public Sub Test_ConfigurationModules_NewNotEmpty()
+'''    ' This test verifies the modules property of a vtkConfiguration object
+'''    ' New collection initialized in an Excel worlbook
+'''
+'''    confManager.addConfiguration ("NewConfiguration")
+'''    confManager.setModulePathWithNumber "newPath", 3, 2
+'''
+'''   On Error GoTo M_Error
+'''    mAssert.Equals confManager.configurations("NewConfiguration").modules.Count, 1, "Number of modules in the Configuration"
+'''
+'''   On Error GoTo 0
+'''   Exit Sub
+'''
+'''M_Error:
+'''    mAssert.Should False, "Unexpected Error (" & Err.Number & "): " & Err.Description
+'''End Sub
 
 Private Function ITest_Suite() As TestSuite
     Set ITest_Suite = New TestSuite

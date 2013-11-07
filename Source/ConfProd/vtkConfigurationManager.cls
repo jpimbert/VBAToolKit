@@ -49,7 +49,7 @@ Private m_workbook As Workbook
 Private m_configurationSheet As Worksheet
 Private m_rootPath As String
 Private Const sheetName As String = "vtkConfigurations"
-Private Const currentVersion As String = "vtkConfigurations v1.0"
+Private Const currentVersion As String = "vtkConfigurations v2.0"
 Private Const nbTitleColumns As Integer = 1
 Private Const nbTitleRows As Integer = 2
 
@@ -60,6 +60,8 @@ Private m_configurationDom As MSXML2.DOMDocument
 Private Sub Class_Terminate()
     Set m_configurationSheet = Nothing
     Set m_workbook = Nothing
+    
+    Set m_configurationDom = Nothing
 End Sub
 
 '---------------------------------------------------------------------------------------
@@ -101,16 +103,16 @@ Public Property Let projectName(ByVal sprojectName As String)
     
 End Property
 
-'---------------------------------------------------------------------------------------
-' Property  : workbook as WorkBook - Read Only - Private
-' Author    : Jean-Pierre Imbert
-' Date      : 09/08/2013
-' Purpose   : return the workbook containing the project
-'---------------------------------------------------------------------------------------
-'
-Private Property Get Workbook() As Workbook
-    Set Workbook = m_workbook
-End Property
+''''---------------------------------------------------------------------------------------
+'''' Property  : workbook as WorkBook - Read Only - Private
+'''' Author    : Jean-Pierre Imbert
+'''' Date      : 09/08/2013
+'''' Purpose   : return the workbook containing the project
+''''---------------------------------------------------------------------------------------
+''''
+'''Private Property Get Workbook() As Workbook
+'''    Set Workbook = m_workbook
+'''End Property
 
 '---------------------------------------------------------------------------------------
 ' Property  : rootPath as String - Read Only - Public
@@ -145,74 +147,74 @@ Public Property Get rootPath() As String
 
 End Property
 
-'---------------------------------------------------------------------------------------
-' Function  : isConfigurationInitializedForWorkbook
-' Author    : Jean-Pierre Imbert
-' Date      : 08/08/2013
-' Purpose   : return True if a configuration sheet is already initialized in the workbook
-'             - the parameter is an Excel Workbook name
-'             - the Excel Workbook must be opened
-' WARNING   : the configuration manager must not be initialized with a project name
-'             because the project name setting implies the configuration sheet initialization
-'---------------------------------------------------------------------------------------
-'
-Public Function isConfigurationInitializedForWorkbook(ExcelName As String) As Boolean
-    Dim ws As Worksheet
-   On Error Resume Next
-    Set ws = Workbooks(ExcelName).Worksheets(sheetName)
-   On Error GoTo 0
-    isConfigurationInitializedForWorkbook = Not (ws Is Nothing)
-End Function
+''''---------------------------------------------------------------------------------------
+'''' Function  : isConfigurationInitializedForWorkbook
+'''' Author    : Jean-Pierre Imbert
+'''' Date      : 08/08/2013
+'''' Purpose   : return True if a configuration sheet is already initialized in the workbook
+''''             - the parameter is an Excel Workbook name
+''''             - the Excel Workbook must be opened
+'''' WARNING   : the configuration manager must not be initialized with a project name
+''''             because the project name setting implies the configuration sheet initialization
+''''---------------------------------------------------------------------------------------
+''''
+'''Public Function isConfigurationInitializedForWorkbook(ExcelName As String) As Boolean
+'''    Dim ws As Worksheet
+'''   On Error Resume Next
+'''    Set ws = Workbooks(ExcelName).Worksheets(sheetName)
+'''   On Error GoTo 0
+'''    isConfigurationInitializedForWorkbook = Not (ws Is Nothing)
+'''End Function
 
-'---------------------------------------------------------------------------------------
-' Procedure : setConfigurationSheet
-' Author    : Jean-Pierre Imbert
-' Date      : 25/05/2013
-' Purpose   : set then configurationSheet property
-'               - Create and initialize the sheet if it doesn't exist in the Project file
-'---------------------------------------------------------------------------------------
-'
-Private Sub setConfigurationSheet()
-    Dim ws As Worksheet
-    On Error Resume Next
-    Set ws = Workbook.Worksheets(sheetName)
-    On Error GoTo 0
-    If ws Is Nothing Then        ' If the Configuration doesn't exist, create one
-        Set ws = Workbook.Worksheets.Add(Type:=xlWorksheet)
-        ws.name = sheetName
-        '   Initialize the configuration sheet
-        initializeConfigurationSheet ws
-        End If
-    ' Verify that the configuration sheet is in last known version
-    If ws.Range("A1") <> currentVersion Then
-        ' Code to convert from previous version will be implemented here
-        End If
-    '   Set the initialized worksheet property
-    Set m_configurationSheet = ws
-End Sub
+''''---------------------------------------------------------------------------------------
+'''' Procedure : setConfigurationSheet
+'''' Author    : Jean-Pierre Imbert
+'''' Date      : 25/05/2013
+'''' Purpose   : set then configurationSheet property
+''''               - Create and initialize the sheet if it doesn't exist in the Project file
+''''---------------------------------------------------------------------------------------
+''''
+'''Private Sub setConfigurationSheet()
+'''    Dim ws As Worksheet
+'''    On Error Resume Next
+'''    Set ws = Workbook.Worksheets(sheetName)
+'''    On Error GoTo 0
+'''    If ws Is Nothing Then        ' If the Configuration doesn't exist, create one
+'''        Set ws = Workbook.Worksheets.Add(Type:=xlWorksheet)
+'''        ws.name = sheetName
+'''        '   Initialize the configuration sheet
+'''        initializeConfigurationSheet ws
+'''    End If
+'''    ' Verify that the configuration sheet is in last known version
+'''    If ws.Range("A1") <> currentVersion Then
+'''        ' Code to convert from previous version will be implemented here
+'''        End If
+'''    '   Set the initialized worksheet property
+'''    Set m_configurationSheet = ws
+'''End Sub
 
-'---------------------------------------------------------------------------------------
-' Procedure : initializeConfigurationSheet
-' Author    : Jean-Pierre Imbert
-' Date      : 25/05/2013
-' Purpose   : Initialize a new configuration sheet
-'---------------------------------------------------------------------------------------
-'
-Private Sub initializeConfigurationSheet(ws As Worksheet)
-    ws.Range("A1") = currentVersion
-    ws.Range("A2") = "Module Name"
-    ws.Range("B1") = vtkProjectForName(projectName).projectName
-    ws.Range("B2") = vtkProjectForName(projectName).projectStandardRelativePath
-    ws.Range("C1") = vtkProjectForName(projectName).projectDEVName
-    ws.Range("C2") = vtkProjectForName(projectName).projectDEVStandardRelativePath
-    
-    ws.Columns("A:C").ColumnWidth = 22
-    ws.Range("A1").Font.Size = 8
-    ws.Range("A2").HorizontalAlignment = xlCenter
-    ws.Range("A2").Font.Bold = True
-    ws.Range("B1:C2").HorizontalAlignment = xlCenter
-    ws.Range("B1:C1").Font.Bold = True
-End Sub
+''''---------------------------------------------------------------------------------------
+'''' Procedure : initializeConfigurationSheet
+'''' Author    : Jean-Pierre Imbert
+'''' Date      : 25/05/2013
+'''' Purpose   : Initialize a new configuration sheet
+''''---------------------------------------------------------------------------------------
+''''
+'''Private Sub initializeConfigurationSheet(ws As Worksheet)
+'''    ws.Range("A1") = currentVersion
+'''    ws.Range("A2") = "Module Name"
+'''    ws.Range("B1") = vtkProjectForName(projectName).projectName
+'''    ws.Range("B2") = vtkProjectForName(projectName).projectStandardRelativePath
+'''    ws.Range("C1") = vtkProjectForName(projectName).projectDEVName
+'''    ws.Range("C2") = vtkProjectForName(projectName).projectDEVStandardRelativePath
+'''
+'''    ws.Columns("A:C").ColumnWidth = 22
+'''    ws.Range("A1").Font.Size = 8
+'''    ws.Range("A2").HorizontalAlignment = xlCenter
+'''    ws.Range("A2").Font.Bold = True
+'''    ws.Range("B1:C2").HorizontalAlignment = xlCenter
+'''    ws.Range("B1:C1").Font.Bold = True
+'''End Sub
 
 '---------------------------------------------------------------------------------------
 ' Procedure : configurationSheet as Worksheet - Read only - Public
@@ -236,7 +238,10 @@ Public Property Get configurationDOM() As MSXML2.DOMDocument
     Dim dom As New MSXML2.DOMDocument
     dom.async = False
     dom.validateOnParse = True
-    If dom.Load(m_xmlSheetPath) <> True Then Debug.Print "error"
+    If dom.Load(m_xmlSheetPath) <> True Then
+        Set configurationDOM = Nothing
+        Exit Property
+    End If
     Set configurationDOM = dom
 End Property
 
@@ -280,34 +285,34 @@ Public Function configuration(n As Integer) As String
     configuration = sResult
 End Function
 
-'---------------------------------------------------------------------------------------
-' Procedure : addConfiguration
-' Author    : Jean-Pierre Imbert
-' Date      : 28/08/2013
-' Purpose   : Add a configuration to the configuration manager
-'             - optionaly a path may be given for the configuration
-'             - all modules pathes are initialized to Null
-'             - if the configuration already exists, it is not added
-' Return    : the number of the added configuration
-'             - if the configuration already exists, return minus the configuration number
-'---------------------------------------------------------------------------------------
-'
-'Public Function addConfiguration(configuration As String, Optional path As String = "") As Integer
-'    Dim n As Integer
-'    n = getConfigurationNumber(configuration)
-'    If n = 0 Then   ' n = 0 means non-existant configuration
-'        n = configurationCount + 1                                        ' Set module number
-'        configurationSheet.Cells(1, n + nbTitleColumns) = configuration   ' Write module name
-'        configurationSheet.Cells(2, n + nbTitleColumns) = path            ' Write module path
-'        Dim i As Integer
-'        For i = 1 To moduleCount                         ' For each module
-'            configurationSheet.Cells(i + nbTitleRows, n + nbTitleColumns) = "-"     ' Set Default path as not initialized
-'        Next i
-'        addConfiguration = n
-'       Else
-'        addConfiguration = -n
-'    End If
-'End Function
+'''---------------------------------------------------------------------------------------
+''' Procedure : addConfiguration
+''' Author    : Jean-Pierre Imbert
+''' Date      : 28/08/2013
+''' Purpose   : Add a configuration to the configuration manager
+'''             - optionaly a path may be given for the configuration
+'''             - all modules pathes are initialized to Null
+'''             - if the configuration already exists, it is not added
+''' Return    : the number of the added configuration
+'''             - if the configuration already exists, return minus the configuration number
+'''---------------------------------------------------------------------------------------
+'''
+'''Public Function addConfiguration(configuration As String, Optional path As String = "") As Integer
+'''    Dim n As Integer
+'''    n = getConfigurationNumber(configuration)
+'''    If n = 0 Then   ' n = 0 means non-existant configuration
+'''        n = configurationCount + 1                                        ' Set module number
+'''        configurationSheet.Cells(1, n + nbTitleColumns) = configuration   ' Write module name
+'''        configurationSheet.Cells(2, n + nbTitleColumns) = path            ' Write module path
+'''        Dim i As Integer
+'''        For i = 1 To moduleCount                         ' For each module
+'''            configurationSheet.Cells(i + nbTitleRows, n + nbTitleColumns) = "-"     ' Set Default path as not initialized
+'''        Next i
+'''        addConfiguration = n
+'''       Else
+'''        addConfiguration = -n
+'''    End If
+'''End Function
 
 '---------------------------------------------------------------------------------------
 ' Procedure : configurations
@@ -380,19 +385,19 @@ Public Function getConfigurationPathWithNumber(n As Integer) As String
     getConfigurationPathWithNumber = sResult
 End Function
 
-'---------------------------------------------------------------------------------------
-' Procedure : setConfigurationPathWithNumber
-' Author    : Jean-Pierre Imbert
-' Date      : 25/05/2013
-' Purpose   : change the n-th relative configuration path of the project, given n as integer
-'               - does nothing if the configuration is inexistant
-'---------------------------------------------------------------------------------------
-'
-Public Sub setConfigurationPathWithNumber(n As Integer, path As String)
-    If n >= 1 And n <= configurationCount Then
-        configurationSheet.Cells(2, n + nbTitleColumns) = path
-    End If
-End Sub
+''''---------------------------------------------------------------------------------------
+'''' Procedure : setConfigurationPathWithNumber
+'''' Author    : Jean-Pierre Imbert
+'''' Date      : 25/05/2013
+'''' Purpose   : change the n-th relative configuration path of the project, given n as integer
+''''               - does nothing if the configuration is inexistant
+''''---------------------------------------------------------------------------------------
+''''
+'''Public Sub setConfigurationPathWithNumber(n As Integer, path As String)
+'''    If n >= 1 And n <= configurationCount Then
+'''        configurationSheet.Cells(2, n + nbTitleColumns) = path
+'''    End If
+'''End Sub
 
 '---------------------------------------------------------------------------------------
 ' Function  : getConfigurationPath
@@ -406,16 +411,16 @@ Public Function getConfigurationPath(configuration As String) As String
     getConfigurationPath = getConfigurationPathWithNumber(getConfigurationNumber(configuration))
 End Function
 
-'---------------------------------------------------------------------------------------
-' Procedure : setConfigurationPath
-' Author    : Jean-Pierre Imbert
-' Date      : 26/05/2013
-' Purpose   : change the path of a configuration given its name
-'---------------------------------------------------------------------------------------
-'
-Public Sub setConfigurationPath(configuration As String, path As String)
-    setConfigurationPathWithNumber n:=getConfigurationNumber(configuration), path:=path
-End Sub
+''''---------------------------------------------------------------------------------------
+'''' Procedure : setConfigurationPath
+'''' Author    : Jean-Pierre Imbert
+'''' Date      : 26/05/2013
+'''' Purpose   : change the path of a configuration given its name
+''''---------------------------------------------------------------------------------------
+''''
+'''Public Sub setConfigurationPath(configuration As String, path As String)
+'''    setConfigurationPathWithNumber n:=getConfigurationNumber(configuration), path:=path
+'''End Sub
 
 '---------------------------------------------------------------------------------------
 ' Property  : moduleCount as Integer - Read Only - Public
@@ -548,25 +553,24 @@ Public Function getModulePathWithNumber(numModule As Integer, numConfiguration A
     End If
     getModulePathWithNumber = sResult
 
-
 End Function
 
-'---------------------------------------------------------------------------------------
-' Procedure : setModulePathWithNumber
-' Author    : Jean-Pierre Imbert
-' Date      : 26/05/2013
-' Purpose   : Set a module relative path given its module and configuration numbers
-'               - if the path given is "", it is replaced by "-" in the configuration sheet cell
-'---------------------------------------------------------------------------------------
-'
-Public Sub setModulePathWithNumber(path As String, numModule As Integer, numConfiguration As Integer)
-    Dim s As String
-    If numModule >= 1 And numModule <= moduleCount And numConfiguration >= 1 And numConfiguration <= configurationCount Then
-        If path = "" Then
-            s = "-"
-           Else
-            s = path
-        End If
-        configurationSheet.Cells(numModule + nbTitleRows, numConfiguration + nbTitleColumns) = s
-    End If
-End Sub
+''''---------------------------------------------------------------------------------------
+'''' Procedure : setModulePathWithNumber
+'''' Author    : Jean-Pierre Imbert
+'''' Date      : 26/05/2013
+'''' Purpose   : Set a module relative path given its module and configuration numbers
+''''               - if the path given is "", it is replaced by "-" in the configuration sheet cell
+''''---------------------------------------------------------------------------------------
+''''
+'''Public Sub setModulePathWithNumber(path As String, numModule As Integer, numConfiguration As Integer)
+'''    Dim s As String
+'''    If numModule >= 1 And numModule <= moduleCount And numConfiguration >= 1 And numConfiguration <= configurationCount Then
+'''        If path = "" Then
+'''            s = "-"
+'''           Else
+'''            s = path
+'''        End If
+'''        configurationSheet.Cells(numModule + nbTitleRows, numConfiguration + nbTitleColumns) = s
+'''    End If
+'''End Sub
