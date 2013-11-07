@@ -65,9 +65,7 @@ Public Function vtkCreateProject(path As String, name As String, Optional displa
     Dim internalError As Long
     internalError = vtkCreateTreeFolder(rootPath)
     If internalError <> VTK_OK Then GoTo vtkCreateProject_ErrorTreeFolder
-    
-    ' This can be done with importing a template, which is ugly
-    '--------------------------------------------
+
     ' Create DEV workbook with xlsm extension
     Workbooks.Add.SaveAs (rootPath & "\" & project.projectDEVStandardRelativePath), FileFormat:=xlOpenXMLWorkbookMacroEnabled
     ' Rename the VBProject of the DEV workbook
@@ -78,7 +76,6 @@ Public Function vtkCreateProject(path As String, name As String, Optional displa
     vtkInitializeVbaUnitNamesAndPathes project:=project.projectName
     ' Save DEV Workbook
     Workbooks(project.workbookDEVName).Save
-    '--------------------------------------------
     
     ' Create Delivery workbook with xlsm extension
     Workbooks.Add.SaveAs (rootPath & "\" & project.projectStandardRelativePath), FileFormat:=(52) '52 is xlsm format
@@ -126,45 +123,123 @@ vtkCreateProject_ErrorGit:
 End Function
 
 
-'---------------------------------------------------------------------------------------
-' Procedure : renameDEVTemplateWorkbook
-' Author    : Lucas Vitorino
-' Purpose   : Ugly hack to allow us to remove the addModule function. Instead of adding modules
-'             in a workbook, we import a template and modify it.
-'---------------------------------------------------------------------------------------
+'Public Function vtkCreateProject(path As String, name As String, Optional displayError As Boolean = True) As Long
 '
-Public Sub renameDEVTemplateWorkbook(wbPath As String, projectName As String)
-    
-    Dim Wb As New Workbook
-    Set Wb = Workbooks.Open(wbPath)
-    
-    Dim ws As Worksheet
-    On Error GoTo renameDEVTemplateWorkbook_Error
-
-    Set ws = Wb.Worksheets("vtkConfigurations")
-    ws.Range("B1") = vtkProjectForName(projectName).projectName
-    ws.Range("B2") = vtkProjectForName(projectName).projectStandardRelativePath
-    ws.Range("C1") = vtkProjectForName(projectName).projectDEVName
-    ws.Range("C2") = vtkProjectForName(projectName).projectDEVStandardRelativePath
-    
-    Wb.VBProject.name = vtkProjectForName(projectName).projectDEVName
-    Wb.Close saveChanges:=True
-    
-    Dim fso As New FileSystemObject
-    fso.GetFile(wbPath).name = fso.GetFileName(vtkProjectForName(projectName).projectDEVStandardRelativePath)
-    
-    Set Wb = Workbooks.Open(fso.BuildPath(fso.GetParentFolderName(wbPath), vtkProjectForName(projectName).projectDEVName))
-    vtkAddBeforeSaveHandlerInDEVWorkbook Wb:=wb, projectName:=vtkProjectForName(projectName).projectName, confName:=vtkProjectForName(projectName).projectDEVName
-    Wb.Close saveChanges:=True
-
-
-    On Error GoTo 0
-    Exit Sub
-
-renameDEVTemplateWorkbook_Error:
-    Err.Source = "Sub renameDEVTemplateWorkbook in module vtkMainFunctions"
-    Debug.Print "Error " & Err.Number & " : " & Err.Description & " in " & Err.Source
-    Exit Sub
-    
-End Sub
+'  On Error GoTo vtkCreateProject_Error
+'
+'    Dim fso As New FileSystemObject
+'
+'    ' Create the vtkProject object attached to the new project
+'    Dim project As vtkProject
+'    Set project = vtkProjectForName(projectName:=name)
+'    Dim rootPath As String
+'    rootPath = path & "\" & project.projectName
+'
+'    ' Create tree folder
+'    'If fso.folderExists(rootPath) Then vtkDeleteFolder rootPath
+'    Dim internalError As Long
+'    internalError = vtkCreateTreeFolder(rootPath)
+'    If internalError <> VTK_OK Then GoTo vtkCreateProject_ErrorTreeFolder
+'
+'    ' Copy the template workbook, that contains a vtkConfigurations sheet, the VBAUnit modules and references activated
+'    Dim projectTemplateName As String
+'    projectTemplateName = "BaseProject_DEV.xlsm" ' hardcoded ugly stuff for now
+'    'Debug.Print VBAToolKit.vtkPathToTemplateFolder(ThisWorkbook)
+'    Dim src As String: src = fso.BuildPath(VBAToolKit.vtkPathToTemplateFolder(ThisWorkbook), projectTemplateName)
+'    Dim dst As String: dst = fso.BuildPath(fso.GetParentFolderName(fso.BuildPath(rootPath, project.projectDEVStandardRelativePath)), projectTemplateName)
+'    FileCopy src, dst
+'
+'    ' Reformat (configuration names, project name) the template workbook and add tthe before save handler
+'    renameDEVTemplateWorkbook dst, project.projectName
+'
+'    ' Create Delivery workbook with xlsm extension
+'    Workbooks.Add.SaveAs (rootPath & "\" & project.projectStandardRelativePath), FileFormat:=(52) '52 is xlsm format
+'    ' Rename the VBProject of the Delivery workbook
+'    Workbooks(project.workbookName).VBProject.name = project.projectName
+'    ' Activate references
+'    VtkActivateReferences wb:=Workbooks(project.workbookName), toSelf:=False
+'    ' A module must be added in the Excel File for the project parameters to be saved
+'    Workbooks(project.workbookName).VBProject.VBComponents.Add ComponentType:=vbext_ct_StdModule
+'    ' Save and Close Delivery Workbook
+'    Workbooks(project.workbookName).Close SaveChanges:=True
+'
+'    Dim wb As Workbook
+'    'Debug.Print fso.BuildPath(rootPath, project.projectDEVStandardRelativePath)
+'    Set wb = Workbooks.Open(fso.BuildPath(rootPath, project.projectDEVStandardRelativePath))
+'    wb.Activate
+'
+'    ' Get VBAUnit modules from VBAToolkit (This workbook = current running code)
+'    ' vtkExportModulesFromAnotherProject projectWithModules:=ThisWorkbook.VBProject, projectName:=project.projectName, confName:=project.projectDEVName
+'
+'    ' The above doesn't work anymore with the hack, so we do something ugly
+'    ' Copy every file from the source of VBAToolKit_DEV to the source folder of the new project
+'    Dim tmpFile As File
+'    For Each tmpFile In fso.GetFolder(VBAToolKit.vtkPathToSourceFolder(ThisWorkbook) & "\VBAUnit").Files
+'        FileCopy tmpFile.path, rootPath & "\Source\VBAUnit\" & tmpFile.name
+'    Next
+'
+'    ' Initialize git
+'    On Error GoTo vtkCreateProject_ErrorGit
+'    vtkInitializeGit rootPath
+'
+'    On Error GoTo 0
+'    vtkCreateProject = VTK_OK
+'    Exit Function
+'
+'vtkCreateProject_ErrorTreeFolder:
+'    vtkCreateProject = internalError
+'    If displayError Then MsgBox "Error " & Err.Number & " (" & Err.Description & ") in procedure vtkCreateProject of Module MainFunctions"
+'    Exit Function
+'vtkCreateProject_Error:
+'    vtkCreateProject = Err.Number
+'    If displayError Then MsgBox "Error " & Err.Number & " (" & Err.Description & ") in procedure vtkCreateProject of Module MainFunctions"
+'vtkCreateProject_ErrorGit:
+'    vtkCreateProject = Err.Number
+'    If displayError Then MsgBox "Error " & Err.Number & " (" & Err.Description & ") in procedure vtkCreateProject of Module MainFunctions"
+'
+'End Function
+'
+'
+'
+''---------------------------------------------------------------------------------------
+'' Procedure : renameDEVTemplateWorkbook
+'' Author    : Lucas Vitorino
+'' Purpose   : Ugly hack to allow us to remove the addModule function. Instead of adding modules
+''             in a workbook, we import a template and modify it.
+''---------------------------------------------------------------------------------------
+''
+'Public Sub renameDEVTemplateWorkbook(wbPath As String, projectName As String)
+'
+'    Dim wb As New Workbook
+'    Set wb = Workbooks.Open(wbPath)
+'
+'    Dim ws As Worksheet
+'    On Error GoTo renameDEVTemplateWorkbook_Error
+'
+'    Set ws = wb.Worksheets("vtkConfigurations")
+'    ws.Range("B1") = vtkProjectForName(projectName).projectName
+'    ws.Range("B2") = vtkProjectForName(projectName).projectStandardRelativePath
+'    ws.Range("C1") = vtkProjectForName(projectName).projectDEVName
+'    ws.Range("C2") = vtkProjectForName(projectName).projectDEVStandardRelativePath
+'
+'    wb.VBProject.name = vtkProjectForName(projectName).projectDEVName
+'    wb.Close SaveChanges:=True
+'
+'    Dim fso As New FileSystemObject
+'    fso.GetFile(wbPath).name = fso.GetFileName(vtkProjectForName(projectName).projectDEVStandardRelativePath)
+'
+'    Set wb = Workbooks.Open(fso.BuildPath(fso.GetParentFolderName(wbPath), vtkProjectForName(projectName).projectDEVName))
+'    vtkAddBeforeSaveHandlerInDEVWorkbook wb:=wb, projectName:=vtkProjectForName(projectName).projectName, confName:=vtkProjectForName(projectName).projectDEVName
+'    wb.Close SaveChanges:=True
+'
+'
+'    On Error GoTo 0
+'    Exit Sub
+'
+'renameDEVTemplateWorkbook_Error:
+'    Err.Source = "Sub renameDEVTemplateWorkbook in module vtkMainFunctions"
+'    Debug.Print "Error " & Err.Number & " : " & Err.Description & " in " & Err.Source
+'    Exit Sub
+'
+'End Sub
 
