@@ -240,6 +240,21 @@ Public Sub vtkExportConfigurationsAsXML(projectName As String, filePath As Strin
     Dim xmlFile As TextStream
     Set xmlFile = fso.CreateTextFile(fileName:=filePath, Overwrite:=True)
 
+    ' Create the XML preambul
+    xmlFile.WriteLine Text:="<?xml version=""1.0"" encoding=""ISO-8859-1"" standalone=""no""?>"
+    xmlFile.WriteLine Text:="<!DOCTYPE vtkConf SYSTEM ""vtkConfigurationsDTD.dtd"">"
+    xmlFile.WriteLine Text:="<vtkConf>"
+    xmlFile.WriteBlankLines Lines:=1
+    xmlFile.WriteLine Text:="    <info>"
+    xmlFile.WriteLine Text:="        <vtkConfigurationsVersion>1.0</vtkConfigurationsVersion>"
+    xmlFile.WriteLine Text:="        <projectName>" & projectName & "</projectName>"
+    xmlFile.WriteLine Text:="    </info>"
+    xmlFile.WriteBlankLines Lines:=1
+    
+    ' Close the file
+    xmlFile.WriteLine Text:="</vtkConf>"
+    xmlFile.Close
+    
    On Error GoTo 0
    Exit Sub
 

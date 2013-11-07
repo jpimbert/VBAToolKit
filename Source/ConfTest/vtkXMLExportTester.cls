@@ -560,12 +560,37 @@ Public Sub Test_vtkExportConfigurationsAsXML_InexistantFile()
    Exit Sub
 
 Test_vtkExportConfigurationsAsXML_InexistantFile_Error:
-    mAssert.Should False, "No error should occur when exporting in a new file with a good path"
+    mAssert.Should False, "Unexpected error " & Err.Number & " (" & Err.Description & ")"
+End Sub
+
+Public Sub Test_vtkExportConfigurationsAsXML_ExistantFile()
+'   Verifies that an old configuration file is erased and rewritten
+
+   On Error GoTo Test_vtkExportConfigurationsAsXML_ExistantFile_Error
+
+    ' Create an empty file
+    Dim f As TextStream
+    Set f = fso.CreateTextFile(testFilePath)
+    f.WriteLine ("Unexpected line in a XML file")
+    f.Close
+    
+    vtkExportConfigurationsAsXML projectName:=testProjectName, filePath:=testFilePath
+    ' Verifies the first line
+    Set f = fso.OpenTextFile(testFilePath)
+    Dim line As String
+    line = f.ReadLine
+    f.Close
+    mAssert.Equals line, "<?xml version=""1.0"" encoding=""ISO-8859-1"" standalone=""no""?>", "First line of the configuration file"
+
+   On Error GoTo 0
+   Exit Sub
+
+Test_vtkExportConfigurationsAsXML_ExistantFile_Error:
+    mAssert.Should False, "Unexpected error " & Err.Number & " (" & Err.Description & ")"
 End Sub
 
 '   Other tests to write
 '
-'   Verifies that an old configuration file is erased and rewritten
 '   Verifies the content of the generated configuration file (with the previous tests)
 
 Private Function ITest_Suite() As TestSuite
@@ -585,6 +610,7 @@ Private Function ITest_Suite() As TestSuite
     ITest_Suite.AddTest ITest_Manager.ClassName, "Test_vtkExportConfigurationsAsXML_NoProject"
     ITest_Suite.AddTest ITest_Manager.ClassName, "Test_vtkExportConfigurationsAsXML_WrongPath"
     ITest_Suite.AddTest ITest_Manager.ClassName, "Test_vtkExportConfigurationsAsXML_InexistantFile"
+    ITest_Suite.AddTest ITest_Manager.ClassName, "Test_vtkExportConfigurationsAsXML_ExistantFile"
 End Function
 
 Private Sub ITestCase_RunTest()
@@ -604,6 +630,7 @@ Private Sub ITestCase_RunTest()
         Case "Test_vtkExportConfigurationsAsXML_NoProject": Test_vtkExportConfigurationsAsXML_NoProject
         Case "Test_vtkExportConfigurationsAsXML_WrongPath": Test_vtkExportConfigurationsAsXML_WrongPath
         Case "Test_vtkExportConfigurationsAsXML_InexistantFile": Test_vtkExportConfigurationsAsXML_InexistantFile
+        Case "Test_vtkExportConfigurationsAsXML_ExistantFile": Test_vtkExportConfigurationsAsXML_ExistantFile
         Case Else: mAssert.Should False, "Invalid test name: " & mManager.methodName
     End Select
 End Sub
