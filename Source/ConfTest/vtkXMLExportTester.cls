@@ -516,6 +516,27 @@ Test_vtkWriteXMLDomToFile_fileContentIsValidDom_Error:
     Exit Sub
 End Sub
 
+Public Sub Test_vtkExportConfigurationsAsXML_NoProject()
+'   Verifies that an attempt to export a nonexistant project configuration raises the proper error
+
+   On Error GoTo Test_vtkExportConfigurationsAsXML_NoProject_Error
+
+    vtkExportConfigurationsAsXML projectName:="InexistantProject", filePath:=""
+    mAssert.Should False, "An error should occur when exporting an inexistant project"
+
+   On Error GoTo 0
+   Exit Sub
+
+Test_vtkExportConfigurationsAsXML_NoProject_Error:
+    mAssert.Equals Err.Number, VTK_WORKBOOK_NOT_OPEN, "Bad error raised when exporting an inexistant project"
+End Sub
+
+'   Other tests to write
+'
+'   Verifies that an attempt to export a project configuration in a bad path raises the proper error
+'   Verifies that a new configuration file is created if not yet existing
+'   Verifies that an old configuration file is erased and rewritten
+'   Verifies the content of the generated configuration file (with the previous tests)
 
 Private Function ITest_Suite() As TestSuite
     Set ITest_Suite = New TestSuite
@@ -531,6 +552,7 @@ Private Function ITest_Suite() As TestSuite
     ITest_Suite.AddTest ITest_Manager.ClassName, "Test_vtkWriteXMLDomToFile_fileIsOverWritten"
     ITest_Suite.AddTest ITest_Manager.ClassName, "Test_vtkWriteXMLDomToFile_filepathIsCreated"
     ITest_Suite.AddTest ITest_Manager.ClassName, "Test_vtkWriteXMLDomToFile_fileContentIsValidDom"
+    ITest_Suite.AddTest ITest_Manager.ClassName, "Test_vtkExportConfigurationsAsXML_NoProject"
 End Function
 
 Private Sub ITestCase_RunTest()
@@ -547,6 +569,7 @@ Private Sub ITestCase_RunTest()
         Case "Test_vtkWriteXMLDomToFile_fileIsOverWritten": Test_vtkWriteXMLDomToFile_fileIsOverWritten
         Case "Test_vtkWriteXMLDomToFile_filepathIsCreated": Test_vtkWriteXMLDomToFile_filepathIsCreated
         Case "Test_vtkWriteXMLDomToFile_fileContentIsValidDom": Test_vtkWriteXMLDomToFile_fileContentIsValidDom
+        Case "Test_vtkExportConfigurationsAsXML_NoProject": Test_vtkExportConfigurationsAsXML_NoProject
         Case Else: mAssert.Should False, "Invalid test name: " & mManager.methodName
     End Select
 End Sub

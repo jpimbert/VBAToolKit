@@ -212,3 +212,41 @@ vtkWriteXMLDOMToFile_Error:
 
 End Sub
 
+'---------------------------------------------------------------------------------------
+' Procedure : exportConfigurationsAsXML
+' Author    : Jean-Pierre IMBERT
+' Date      : 07/11/2013
+' Purpose   : Export the configurations of a project as a new XML file
+'             - the "new" XML file format is the one designed for configuration management as XML
+'             - this subroutine is temporary, dedicated to prepare the migration from
+'               Excel sheet management of configurations to XML file management
+' Raises    : - VTK_WORKBOOK_NOT_OPEN if the _DEV workbook containing the configuration sheet is not opened
+'---------------------------------------------------------------------------------------
+'
+Public Sub exportConfigurationsAsXML(projectName As String, filePath As String)
+
+   On Error GoTo exportConfigurationsAsXML_Error
+
+    ' If the project is not initialized
+    Dim cm As vtkConfigurationManager
+    Dim conf As vtkConfiguration
+    Set cm = vtkConfigurationManagerForProject(projectName)
+    If cm Is Nothing Then
+        Err.Raise VTK_WORKBOOK_NOT_OPEN
+    End If
+    
+
+   On Error GoTo 0
+   Exit Sub
+
+exportConfigurationsAsXML_Error:
+    
+    Select Case Err.Number
+        Case VTK_WORKBOOK_NOT_OPEN
+            Err.Description = "The " & projectName & "_DEV workbook is not opened"
+        Case Else
+            Err.Number = VTK_UNEXPECTED_ERROR
+    End Select
+
+    Err.Raise Err.Number, "vtkXMLutilities::exportConfigurationsAsXML -> " & Err.Source, Err.Description
+End Sub
