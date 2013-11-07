@@ -51,6 +51,9 @@ Private Const existingXMLSheetNameForTests As String = "XMLSheetForConfiguration
 Private Const newProjectXMLSheetName As String = "NewProject.xml"
 Private Const rememberedProjectsSheetName As String = "BlankRememberedProjectsSheet.xml"
 
+Private Const rememberedProjectsDTDName As String = "rememberedProjectsDTD.dtd"
+Private Const vtkConfigurationsDTDName As String = "vtkConfigurationsDTD.dtd"
+
 Private Sub SaveThenReOpenNewWorkbook()
 ' Utility Function for saving then re-open the new workbook and re-initialize the configuration managers
     Dim savedNewWorkbookPath As String
@@ -99,6 +102,8 @@ Private Sub ITestCase_SetUp(Assert As IAssert)
     ' --------------------------------------------------------
     
     ' Create an XML sheet that references the projects "ExistingProject" and "NewProject"
+    
+    ' Copy a blank sheet
     FileCopy Source:=fso.BuildPath(vtkPathToTemplateFolder, rememberedProjectsSheetName), _
              destination:=fso.BuildPath(VBAToolKit.vtkTestPath, rememberedProjectsSheetName)
     
@@ -121,6 +126,14 @@ Private Sub ITestCase_SetUp(Assert As IAssert)
     FileCopy Source:=fso.BuildPath(vtkPathToTemplateFolder, newProjectXMLSheetName), _
              destination:=fso.BuildPath(VBAToolKit.vtkTestPath, newProjectXMLSheetName)
     
+    
+    ' Copy the DTDs
+    FileCopy Source:=fso.BuildPath(vtkPathToTemplateFolder, rememberedProjectsDTDName), _
+             destination:=fso.BuildPath(VBAToolKit.vtkTestPath, rememberedProjectsDTDName)
+    
+    FileCopy Source:=fso.BuildPath(vtkPathToTemplateFolder, vtkConfigurationsDTDName), _
+             destination:=fso.BuildPath(VBAToolKit.vtkTestPath, vtkConfigurationsDTDName)
+    
     ' --------------------------------------------------------
 
     Set newConfManager = vtkConfigurationManagerForProject(newProjectName)
@@ -138,105 +151,142 @@ Private Sub ITestCase_TearDown()
     resetTestFolder
 End Sub
 
-'Public Sub Test_PropertyName_DefaultGet()
-'    '   Verify that the Property Name is the Default property for vtkConfigurationManager
-'    '   - In fact there is no need to run the test, just to compile it
-'    mAssert.Equals newConfManager, "NewProject", "The name property must be the default one for vtkConfigurationManager"
-'End Sub
-'
-'Public Sub Test_PropertyName_DefaultLet()
-'    '   Verify that the Property Name is the Default property for vtkConfigurationManager
-'    '   - In fact there is no need to run the test, just to compile it
-'    mAssert.Equals existingConfManager, "ExistingProject", "The name property of existingConf before modification"
-'    existingConfManager = "NewProject"
-'    mAssert.Equals existingConfManager, "NewProject", "The name property of existingConf after modification"
-'End Sub
+Public Sub Test_PropertyName_DefaultGet()
+    '   Verify that the Property Name is the Default property for vtkConfigurationManager
+    '   - In fact there is no need to run the test, just to compile it
+    On Error GoTo Test_PropertyName_DefaultGet_Error
 
-'Public Sub TestConfigurationSheetExistsInExistingWorkbook()
-'    '   Verify that the configuration sheet presence is detected in existing workbook
-'    '   using a fresh configuration Manager (with no default sheet initialized)
-'    Dim cm As New vtkConfigurationManager
-'    mAssert.Should cm.isConfigurationInitializedForWorkbook(ExcelName:=existingWorkbookName), "The Configuration sheet must exist in existing workbook"
-'End Sub
-'
-'Public Sub TestConfigurationSheetDoesntExistInNewWorkbook()
-'    '   Verify that the configuration sheet missing is detected in new workbook
-'    '   using a fresh configuration Manager (with no default sheet initialized)
-'    Dim cm As New vtkConfigurationManager, wb As Workbook, wbFullName As String
-'    Set wb = vtkCreateExcelWorkbookForTestWithProjectName("NewWorkbook")    ' create a fresh new Excel workbook
-'    wbFullName = wb.FullName
-'    mAssert.Should Not cm.isConfigurationInitializedForWorkbook(ExcelName:=wb.name), "The Configuration sheet must not exist in new workbook"
-'    wb.Close SaveChanges:=False
-'    Kill PathName:=wbFullName
-'End Sub
-'
-'Public Sub TestConfigurationSheetCreationForNewProject()
-''       Verify that a Configuration Sheet is created in a new project
-'    Dim ws As Worksheet
-'    On Error Resume Next
-'    Set ws = newWorkBook.Sheets("vtkConfigurations")
-'    mAssert.Equals Err, 0, "A configuration manager must create a Configuration sheet"
-'    On Error GoTo 0
-'    mAssert.Should newWorkBook.Sheets("vtkConfigurations") Is newConfManager.configurationSheet, "The configurationSheet property of the conf manager must be equal to the configuration sheet of the workbook"
-'End Sub
-'
-'Public Sub TestConfigurationSheetRetrievalForExistingProject()
-''       Verify that a Configuration Sheet is retreived in an existing project
-'    Dim ws As Worksheet
-'    On Error Resume Next
-'    Set ws = existingWorkbook.Sheets("vtkConfigurations")
-'    mAssert.Equals Err, 0, "A configuration manager must be accessible in an existing project"
-'    On Error GoTo 0
-'    mAssert.Should existingWorkbook.Sheets("vtkConfigurations") Is existingConfManager.configurationSheet, "The configurationSheet property of the conf manager must be equal to the configuration sheet of the workbook"
-'End Sub
-'
-'Public Sub TestConfigurationSheetFormatForNewProjet()
-''       Verify the newly created configuration sheet of a new project
-'    Dim ws As Worksheet
-'    Set ws = newConfManager.configurationSheet
-'    mAssert.Equals ws.Range("A1"), "vtkConfigurations v1.0", "Expected identification of the configuration sheet"
-'    mAssert.Equals ws.Range("A2"), "Module Name", "Expected Title for Modules column"
-'    mAssert.Equals ws.Range("B1"), newProjectName, "Expected Title for main project column"
-'    mAssert.Equals ws.Range("B2"), "Delivery\" & newProjectName & ".xlsm", "Expected related Path for new main workbook"
-'    mAssert.Equals ws.Range("C1"), newProjectName & "_DEV", "Expected Title for development project column"
-'    mAssert.Equals ws.Range("C2"), "Project\" & newWorkbookName, "Expected related Path for new development workbook"
-'End Sub
-'
-'Public Sub TestConfigurationSheetFormatForExistingProjet()
-''       Verify the retrieved configuration sheet from an existing project
-'    Dim ws As Worksheet
-'    Set ws = existingConfManager.configurationSheet
-'    mAssert.Equals ws.Range("A1"), "vtkConfigurations v1.0", "Expected identification of the configuration sheet"
-'    mAssert.Equals ws.Range("A2"), "Module Name", "Expected Title for Modules column"
-'    mAssert.Equals ws.Range("B1"), existingProjectName, "Expected Title for main project column"
-'    mAssert.Equals ws.Range("B2"), "Delivery\ExistingProject.xlsm", "Expected related Path for new main workbook"
-'    mAssert.Equals ws.Range("C1"), existingProjectName & "_DEV", "Expected Title for development project column"
-'    mAssert.Equals ws.Range("C2"), "Project\ExistingProject_DEV.xlsm", "Expected related Path for new development workbook"
-'End Sub
-'
-'Public Sub TestGetConfigurationsFromNewProject()
-''       Verify the list of the configurations of a new project
-'    mAssert.Equals newConfManager.configurationCount, 2, "There must be two configurations in a new project"
-'    mAssert.Equals newConfManager.configuration(0), "", "Inexistant configuration number 0"
-'    mAssert.Equals newConfManager.configuration(1), newProjectName, "Name of the first configuration"
-'    mAssert.Equals newConfManager.configuration(2), newProjectName & "_DEV", "Name of the second configuration"
-'    mAssert.Equals newConfManager.configuration(3), "", "Inexistant configuration number 3"
-'    mAssert.Equals newConfManager.configuration(-23), "", "Inexistant configuration number -23"
-'    mAssert.Equals newConfManager.configuration(150), "", "Inexistant configuration number 150"
-'End Sub
-'
-'Public Sub TestGetConfigurationsFromExistingProject()
-''       Verify the list of the configurations of an existing project
-'    mAssert.Equals existingConfManager.configurationCount, 2, "There must be two configurations in the existing template project"
-'    mAssert.Equals existingConfManager.configuration(0), "", "Inexistant configuration number 0"
-'    mAssert.Equals existingConfManager.configuration(1), existingProjectName, "Name of the first configuration"
-'    mAssert.Equals existingConfManager.configuration(2), existingProjectName & "_DEV", "Name of the second configuration"
-'    mAssert.Equals existingConfManager.configuration(3), "", "Inexistant configuration number 3"
-'    mAssert.Equals existingConfManager.configuration(-23), "", "Inexistant configuration number -23"
-'    mAssert.Equals existingConfManager.configuration(150), "", "Inexistant configuration number 150"
-'End Sub
-'
-'
+    mAssert.Equals newConfManager, "NewProject", "The name property must be the default one for vtkConfigurationManager"
+
+    On Error GoTo 0
+    Exit Sub
+
+Test_PropertyName_DefaultGet_Error:
+    Err.Source = "Sub Test_PropertyName_DefaultGet in module vtkConfigurationManagerTester"
+    mAssert.Should False, "Unexpected Error " & Err.Number & " (" & Err.Description & ") in " & Err.Source
+    Exit Sub
+
+End Sub
+
+Public Sub Test_PropertyName_DefaultLet()
+    '   Verify that the Property Name is the Default property for vtkConfigurationManager
+    '   - In fact there is no need to run the test, just to compile it
+    On Error GoTo Test_PropertyName_DefaultLet_Error
+
+    mAssert.Equals existingConfManager, "ExistingProject", "The name property of existingConf before modification"
+    existingConfManager = "NewProject"
+    mAssert.Equals existingConfManager, "NewProject", "The name property of existingConf after modification"
+
+    On Error GoTo 0
+    Exit Sub
+
+Test_PropertyName_DefaultLet_Error:
+    Err.Source = "Sub Test_PropertyName_DefaultLet in module vtkConfigurationManagerTester"
+    Debug.Print "Error " & Err.Number & " : " & Err.Description & " in " & Err.Source
+    mAssert.Should False, "Unexpected Error " & Err.Number & " (" & Err.Description & ") in " & Err.Source
+    Exit Sub
+
+End Sub
+
+'''Public Sub TestConfigurationSheetExistsInExistingWorkbook()
+'''    '   Verify that the configuration sheet presence is detected in existing workbook
+'''    '   using a fresh configuration Manager (with no default sheet initialized)
+'''    Dim cm As New vtkConfigurationManager
+'''    mAssert.Should cm.isConfigurationInitializedForWorkbook(ExcelName:=existingWorkbookName), "The Configuration sheet must exist in existing workbook"
+'''End Sub
+'''
+'''Public Sub TestConfigurationSheetDoesntExistInNewWorkbook()
+'''    '   Verify that the configuration sheet missing is detected in new workbook
+'''    '   using a fresh configuration Manager (with no default sheet initialized)
+'''    Dim cm As New vtkConfigurationManager, wb As Workbook, wbFullName As String
+'''    Set wb = vtkCreateExcelWorkbookForTestWithProjectName("NewWorkbook")    ' create a fresh new Excel workbook
+'''    wbFullName = wb.FullName
+'''    mAssert.Should Not cm.isConfigurationInitializedForWorkbook(ExcelName:=wb.name), "The Configuration sheet must not exist in new workbook"
+'''    wb.Close SaveChanges:=False
+'''    Kill PathName:=wbFullName
+'''End Sub
+'''
+'''Public Sub TestConfigurationSheetCreationForNewProject()
+''''       Verify that a Configuration Sheet is created in a new project
+'''    Dim ws As Worksheet
+'''    On Error Resume Next
+'''    Set ws = newWorkBook.Sheets("vtkConfigurations")
+'''    mAssert.Equals Err, 0, "A configuration manager must create a Configuration sheet"
+'''    On Error GoTo 0
+'''    mAssert.Should newWorkBook.Sheets("vtkConfigurations") Is newConfManager.configurationSheet, "The configurationSheet property of the conf manager must be equal to the configuration sheet of the workbook"
+'''End Sub
+'''
+'''Public Sub TestConfigurationSheetRetrievalForExistingProject()
+''''       Verify that a Configuration Sheet is retreived in an existing project
+'''    Dim ws As Worksheet
+'''    On Error Resume Next
+'''    Set ws = existingWorkbook.Sheets("vtkConfigurations")
+'''    mAssert.Equals Err, 0, "A configuration manager must be accessible in an existing project"
+'''    On Error GoTo 0
+'''    mAssert.Should existingWorkbook.Sheets("vtkConfigurations") Is existingConfManager.configurationSheet, "The configurationSheet property of the conf manager must be equal to the configuration sheet of the workbook"
+'''End Sub
+'''
+'''Public Sub TestConfigurationSheetFormatForNewProjet()
+''''       Verify the newly created configuration sheet of a new project
+'''    Dim ws As Worksheet
+'''    Set ws = newConfManager.configurationSheet
+'''    mAssert.Equals ws.Range("A1"), "vtkConfigurations v1.0", "Expected identification of the configuration sheet"
+'''    mAssert.Equals ws.Range("A2"), "Module Name", "Expected Title for Modules column"
+'''    mAssert.Equals ws.Range("B1"), newProjectName, "Expected Title for main project column"
+'''    mAssert.Equals ws.Range("B2"), "Delivery\" & newProjectName & ".xlsm", "Expected related Path for new main workbook"
+'''    mAssert.Equals ws.Range("C1"), newProjectName & "_DEV", "Expected Title for development project column"
+'''    mAssert.Equals ws.Range("C2"), "Project\" & newWorkbookName, "Expected related Path for new development workbook"
+'''End Sub
+'''
+'''Public Sub TestConfigurationSheetFormatForExistingProjet()
+''''       Verify the retrieved configuration sheet from an existing project
+'''    Dim ws As Worksheet
+'''    Set ws = existingConfManager.configurationSheet
+'''    mAssert.Equals ws.Range("A1"), "vtkConfigurations v1.0", "Expected identification of the configuration sheet"
+'''    mAssert.Equals ws.Range("A2"), "Module Name", "Expected Title for Modules column"
+'''    mAssert.Equals ws.Range("B1"), existingProjectName, "Expected Title for main project column"
+'''    mAssert.Equals ws.Range("B2"), "Delivery\ExistingProject.xlsm", "Expected related Path for new main workbook"
+'''    mAssert.Equals ws.Range("C1"), existingProjectName & "_DEV", "Expected Title for development project column"
+'''    mAssert.Equals ws.Range("C2"), "Project\ExistingProject_DEV.xlsm", "Expected related Path for new development workbook"
+'''End Sub
+'''
+'''Public Sub TestGetConfigurationsFromNewProject()
+''''       Verify the list of the configurations of a new project
+'''    mAssert.Equals newConfManager.configurationCount, 2, "There must be two configurations in a new project"
+'''    mAssert.Equals newConfManager.configuration(0), "", "Inexistant configuration number 0"
+'''    mAssert.Equals newConfManager.configuration(1), newProjectName, "Name of the first configuration"
+'''    mAssert.Equals newConfManager.configuration(2), newProjectName & "_DEV", "Name of the second configuration"
+'''    mAssert.Equals newConfManager.configuration(3), "", "Inexistant configuration number 3"
+'''    mAssert.Equals newConfManager.configuration(-23), "", "Inexistant configuration number -23"
+'''    mAssert.Equals newConfManager.configuration(150), "", "Inexistant configuration number 150"
+'''End Sub
+'''
+
+Public Sub TestGetConfigurationsFromExistingProject()
+'       Verify the list of the configurations of an existing project
+    
+    On Error GoTo TestGetConfigurationsFromExistingProject_Error
+
+    mAssert.Equals existingConfManager.configurationCount, 2, "There must be two configurations in the existing template project"
+    mAssert.Equals existingConfManager.configuration(0), "", "Inexistant configuration number 0"
+    mAssert.Equals existingConfManager.configuration(1), existingProjectName, "Name of the first configuration"
+    mAssert.Equals existingConfManager.configuration(2), existingProjectName & "_DEV", "Name of the second configuration"
+    mAssert.Equals existingConfManager.configuration(3), "", "Inexistant configuration number 3"
+    mAssert.Equals existingConfManager.configuration(-23), "", "Inexistant configuration number -23"
+    mAssert.Equals existingConfManager.configuration(150), "", "Inexistant configuration number 150"
+
+    On Error GoTo 0
+    Exit Sub
+
+TestGetConfigurationsFromExistingProject_Error:
+    Err.Source = "Sub TestGetConfigurationsFromExistingProject in module vtkConfigurationManagerTester"
+    Debug.Print "Error " & Err.Number & " : " & Err.Description & " in " & Err.Source
+    mAssert.Should False, "Unexpected Error " & Err.Number & " (" & Err.Description & ") in " & Err.Source
+    Exit Sub
+
+End Sub
+
+
 'Public Sub TestGetConfigurationPathWithNumberFromExistingProject()
 ''       Verify the capability to get the configuration path by number
 '    mAssert.Equals existingConfManager.getConfigurationPathWithNumber(0), "", "Inexistant configuration number 0"
@@ -493,10 +543,16 @@ End Sub
 
 Private Function ITest_Suite() As TestSuite
     Set ITest_Suite = New TestSuite
+    ITest_Suite.AddTest ITest_Manager.ClassName, "Test_PropertyName_DefaultGet"
+    ITest_Suite.AddTest ITest_Manager.ClassName, "Test_PropertyName_DefaultLet"
+    ITest_Suite.AddTest ITest_Manager.ClassName, "TestGetConfigurationsFromExistingProject"
 End Function
 
 Private Sub ITestCase_RunTest()
     Select Case mManager.methodName
+        Case "Test_PropertyName_DefaultGet": Test_PropertyName_DefaultGet
+        Case "Test_PropertyName_DefaultLet": Test_PropertyName_DefaultLet
+        Case "TestGetConfigurationsFromExistingProject": TestGetConfigurationsFromExistingProject
         Case Else: mAssert.Should False, "Invalid test name: " & mManager.methodName
     End Select
 End Sub

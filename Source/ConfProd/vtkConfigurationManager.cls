@@ -53,6 +53,10 @@ Private Const currentVersion As String = "vtkConfigurations v1.0"
 Private Const nbTitleColumns As Integer = 1
 Private Const nbTitleRows As Integer = 2
 
+Private fso As New FileSystemObject
+Private m_xmlSheetPath As String
+Private m_configurationDom As MSXML2.DOMDocument
+
 Private Sub Class_Terminate()
     Set m_configurationSheet = Nothing
     Set m_workbook = Nothing
@@ -75,14 +79,26 @@ Attribute projectName.VB_UserMemId = 0
 End Property
 
 Public Property Let projectName(ByVal sprojectName As String)
-    Dim wbName As String
-    wbName = vtkProjectForName(sprojectName).workbookDEVName
-    If m_projectName <> sprojectName And VtkWorkbookIsOpen(wbName) Then
+' OLD
+'    Dim wbName As String
+'    wbName = vtkProjectForName(sprojectName).workbookDEVName
+'    If m_projectName <> sprojectName And VtkWorkbookIsOpen(wbName) Then
+'        m_projectName = sprojectName
+'        Set m_workbook = Workbooks(wbName)
+'        m_rootPath = ""
+'        setConfigurationSheet      ' Reset the configuration sheet when the attached project is changed
+'    End If
+    
+' NEW
+    Dim sheetPath As String
+    sheetPath = fso.BuildPath(vtkRootPathForProject(sprojectName), vtkXmlRelPathForProject(sprojectName))
+    If m_projectName <> sprojectName And fso.FileExists(sheetPath) Then
         m_projectName = sprojectName
-        Set m_workbook = Workbooks(wbName)
+        m_xmlSheetPath = sheetPath
         m_rootPath = ""
-        setConfigurationSheet      ' Reset the configuration sheet when the attached project is changed
+        'setConfigurationSheet      ' Reset the configuration sheet when the attached project is changed
     End If
+    
 End Property
 
 '---------------------------------------------------------------------------------------
@@ -203,6 +219,21 @@ Public Property Get configurationSheet() As Worksheet
     Set configurationSheet = m_configurationSheet
 End Property
 
+
+'---------------------------------------------------------------------------------------
+' Procedure : configurationDOM
+' Author    : Lucas Vitorino
+' Purpose   : Return the XML DOM with all the information - used during tests
+'---------------------------------------------------------------------------------------
+'
+Public Property Get configurationDOM() As MSXML2.DOMDocument
+    Dim dom As New MSXML2.DOMDocument
+    dom.async = False
+    dom.validateOnParse = True
+    If dom.Load(m_xmlSheetPath) <> True Then Debug.Print "error"
+    Set configurationDOM = dom
+End Property
+
 '---------------------------------------------------------------------------------------
 ' Property  : configurationCount as Integer - Read Only - Public
 ' Author    : Jean-Pierre Imbert
@@ -212,7 +243,13 @@ End Property
 '
 Public Property Get configurationCount() As Integer
     ' The number of configurations is the number of used columns minus one
-    configurationCount = configurationSheet.UsedRange.Columns.Count - 1
+    
+    ' OLD
+    'configurationCount = configurationSheet.UsedRange.Columns.Count - 1
+    
+    ' NEW
+    configurationCount = configurationDOM.SelectNodes("/vtkConf/configuration").Length
+    
 End Property
 
 '---------------------------------------------------------------------------------------
@@ -226,11 +263,21 @@ End Property
 Public Function configuration(n As Integer) As String
     Dim sResult As String
     sResult = ""
+
+' OLD
+'    If n >= 1 And n <= configurationCount Then
+'        sResult = configurationSheet.Cells(1, n + nbTitleColumns)
+'       Else
+'        sResult = ""
+'    End If
+
+' NEW
     If n >= 1 And n <= configurationCount Then
-        sResult = configurationSheet.Cells(1, n + nbTitleColumns)
-       Else
+        sResult = configurationDOM.SelectSingleNode("/vtkConf/configuration[" & n - 1 & "]/name[0]").Text
+    Else
         sResult = ""
     End If
+    
     configuration = sResult
 End Function
 
@@ -490,8 +537,4 @@ Public Sub setModulePathWithNumber(path As String, numModule As Integer, numConf
         End If
         configurationSheet.Cells(numModule + nbTitleRows, numConfiguration + nbTitleColumns) = s
     End If
-End Sub
-
-Public Sub dbg()
-    Debug.Print m_workbook.FullName
 End Sub
