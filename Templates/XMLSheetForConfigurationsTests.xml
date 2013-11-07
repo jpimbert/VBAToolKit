@@ -1,0 +1,52 @@
+<?xml version="1.0" encoding="ISO-8859-1" standalone="no"?>
+<!DOCTYPE vtkConf SYSTEM "vtkConfigurationsDTD.dtd">
+<vtkConf>
+
+	<info>
+		<vtkConfigurationsVersion>2.0</vtkConfigurationsVersion>
+		<projectName>TestProject1</projectName>
+	</info>
+
+
+	<configuration cID="c01">
+		<name>ExistingProject</name>
+		<path>Delivery\ExistingProject.xlsm</path>
+		<title>Existing Project Delivery version</title>
+		<comment>This is the Delivery configuration of ExistingProject</comment>
+	</configuration>
+
+	<configuration cID="c02">
+		<name>ExistingProject_DEV</name>
+		<path>Project\ExistingProject_DEV.xlsm</path>
+		<templatePath>Templates/TestTemplate.xlsm</templatePath>
+		<title>Existing Project DEV version</title>
+		<comment>This is the DEV configuration of ExistingProject</comment>
+	</configuration>
+
+	<module mID="m01">
+		<name>Module1</name>
+		<modulePath confId="c01">Path1Module1</modulePath>
+	</module>
+
+	<module mID="m02">
+		<name>Module2</name>
+		<modulePath confId="c02">Path2Module2</modulePath>
+	</module>
+
+	<module mID="m03">
+		<name>Module3</name>
+	</module>
+
+	<module mID="m04">
+		<name>Module4</name>
+		<modulePath confId="c01">Path1Module4</modulePath>
+		<modulePath confId="c02">Path2Module4</modulePath>
+	</module>
+
+	<module mID="m05">
+		<name>Module5</name>
+		<modulePath confId="c01"/>
+		<modulePath confId="c02">Path2Module5</modulePath>
+	</module>
+
+</vtkConf>

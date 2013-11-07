@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="ISO-8859-1" standalone="no"?>
+<!DOCTYPE vtkConf SYSTEM "vtkConfigurationsDTD.dtd">
+<vtkConf>
+
+	<info>
+		<vtkConfigurationsVersion>2.0</vtkConfigurationsVersion>
+		<projectName>NewProject</projectName>
+	</info>
+
+</vtkConf>
