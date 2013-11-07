@@ -127,16 +127,22 @@ Public Property Get rootPath() As String
         ret = m_rootPath
        Else
         ret = ""
-        If Not Workbook Is Nothing Then
-            ret = Workbook.path
-            If Not ret Like "" Then
-                Dim fso As New FileSystemObject
-                ret = fso.GetParentFolderName(ret)
-                m_rootPath = ret
-            End If
+'        If Not Workbook Is Nothing Then
+'            ret = Workbook.path
+'            If Not ret Like "" Then
+'                Dim fso As New FileSystemObject
+'                ret = fso.GetParentFolderName(ret)
+'                m_rootPath = ret
+'            End If
+'        End If
+        ret = vtkRootPathForProject(m_projectName)
+        If Not ret Like "" Then
+            m_rootPath = ret
         End If
     End If
+    
     rootPath = ret
+
 End Property
 
 '---------------------------------------------------------------------------------------
@@ -264,15 +270,8 @@ Public Function configuration(n As Integer) As String
     Dim sResult As String
     sResult = ""
 
-' OLD
-'    If n >= 1 And n <= configurationCount Then
-'        sResult = configurationSheet.Cells(1, n + nbTitleColumns)
-'       Else
-'        sResult = ""
-'    End If
-
-' NEW
     If n >= 1 And n <= configurationCount Then
+'        sResult = configurationSheet.Cells(1, n + nbTitleColumns)
         sResult = configurationDOM.SelectSingleNode("/vtkConf/configuration[" & n - 1 & "]/name[0]").Text
     Else
         sResult = ""
@@ -336,17 +335,27 @@ End Function
 '---------------------------------------------------------------------------------------
 '
 Public Function getConfigurationNumber(configuration As String) As Integer
-    Dim r As Range
-    On Error Resume Next
-    Set r = configurationSheet.Rows(1)      ' Select first column of the sheet
-    Set r = r.Offset(0, nbTitleColumns)     ' Forget the first column
-    Set r = r.Find(what:=configuration, SearchOrder:=xlByRows, LookAt:=xlWhole)
-    On Error GoTo 0
-    If r Is Nothing Then
-        getConfigurationNumber = 0
-       Else
-        getConfigurationNumber = r.Column - nbTitleColumns
-    End If
+'    Dim r As Range
+'    On Error Resume Next
+'    Set r = configurationSheet.Rows(1)      ' Select first column of the sheet
+'    Set r = r.Offset(0, nbTitleColumns)     ' Forget the first column
+'    Set r = r.Find(what:=configuration, SearchOrder:=xlByRows, LookAt:=xlWhole)
+'    On Error GoTo 0
+'    If r Is Nothing Then
+'        getConfigurationNumber = 0
+'       Else
+'        getConfigurationNumber = r.Column - nbTitleColumns
+'    End If
+
+    Dim i As Integer
+    For i = 1 To configurationCount
+        If configurationDOM.SelectSingleNode("/vtkConf/configuration[" & i - 1 & "]/name[0]").Text = configuration Then
+            getConfigurationNumber = i
+            Exit Function
+        End If
+    Next
+    getConfigurationNumber = 0
+    
 End Function
 
 '---------------------------------------------------------------------------------------
@@ -360,11 +369,14 @@ End Function
 Public Function getConfigurationPathWithNumber(n As Integer) As String
     Dim sResult As String
     sResult = ""
+    
     If n >= 1 And n <= configurationCount Then
-        sResult = configurationSheet.Cells(2, n + nbTitleColumns)
+'        sResult = configurationSheet.Cells(2, n + nbTitleColumns)
+        sResult = configurationDOM.SelectSingleNode("/vtkConf/configuration[" & n - 1 & "]/path[0]").Text
        Else
         sResult = ""
     End If
+    
     getConfigurationPathWithNumber = sResult
 End Function
 
@@ -414,7 +426,8 @@ End Sub
 '
 Public Property Get moduleCount() As Integer
     ' The number of modules is the number of used rows minus two
-    moduleCount = configurationSheet.UsedRange.Rows.Count - nbTitleRows
+    'moduleCount = configurationSheet.UsedRange.Rows.Count - nbTitleRows
+    moduleCount = configurationDOM.SelectNodes("/vtkConf/module").Length
 End Property
 
 '---------------------------------------------------------------------------------------
@@ -445,7 +458,8 @@ Public Function module(n As Integer) As String
     Dim sResult As String
     sResult = ""
     If n >= 1 And n <= moduleCount Then
-        sResult = configurationSheet.Cells(n + nbTitleRows, 1)
+        'sResult = configurationSheet.Cells(n + nbTitleRows, 1)
+        sResult = configurationDOM.SelectSingleNode("/vtkConf/module[" & n - 1 & "]/name[0]").Text
        Else
         sResult = ""
     End If
@@ -461,17 +475,27 @@ End Function
 '---------------------------------------------------------------------------------------
 '
 Public Function getModuleNumber(module As String) As Integer
-    Dim r As Range
-    On Error Resume Next
-    Set r = configurationSheet.Columns(1)   ' Select first column of the sheet
-    Set r = r.Offset(nbTitleRows, 0)                  ' Forget the two first rows
-    Set r = r.Find(what:=module, SearchOrder:=xlByColumns, LookAt:=xlWhole)
-    On Error GoTo 0
-    If r Is Nothing Then
-        getModuleNumber = 0
-       Else
-        getModuleNumber = r.Row - nbTitleRows
-    End If
+'    Dim r As Range
+'    On Error Resume Next
+'    Set r = configurationSheet.Columns(1)   ' Select first column of the sheet
+'    Set r = r.Offset(nbTitleRows, 0)                  ' Forget the two first rows
+'    Set r = r.Find(what:=module, SearchOrder:=xlByColumns, LookAt:=xlWhole)
+'    On Error GoTo 0
+'    If r Is Nothing Then
+'        getModuleNumber = 0
+'       Else
+'        getModuleNumber = r.Row - nbTitleRows
+'    End If
+    
+    Dim i As Integer
+    For i = 1 To moduleCount
+        If configurationDOM.SelectSingleNode("/vtkConf/module[" & i - 1 & "]/name[0]").Text = module Then
+            getModuleNumber = i
+            Exit Function
+        End If
+    Next
+    getModuleNumber = 0
+    
 End Function
 
 '---------------------------------------------------------------------------------------
@@ -510,13 +534,21 @@ End Function
 '
 Public Function getModulePathWithNumber(numModule As Integer, numConfiguration As Integer) As String
     Dim sResult As String
+    sResult = ""
     If numModule >= 1 And numModule <= moduleCount And numConfiguration >= 1 And numConfiguration <= configurationCount Then
-        sResult = configurationSheet.Cells(numModule + nbTitleRows, numConfiguration + nbTitleColumns)
-        If sResult = "-" Then sResult = ""
+        'sResult = configurationSheet.Cells(numModule + nbTitleRows, numConfiguration + nbTitleColumns)
+        'If sResult = "-" Then sResult = ""
+        On Error Resume Next
+        sResult = configurationDOM.SelectSingleNode("/vtkConf/module[" & numModule - 1 & "]/modulePath[@confId=""" & _
+                    configurationDOM.SelectSingleNode("/vtkConf/configuration[" & numConfiguration - 1 & "]/@cID").Text & _
+                    """]").Text
+        On Error GoTo 0
        Else
         sResult = ""
     End If
     getModulePathWithNumber = sResult
+
+
 End Function
 
 '---------------------------------------------------------------------------------------
