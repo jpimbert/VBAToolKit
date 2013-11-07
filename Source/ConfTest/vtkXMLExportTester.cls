@@ -40,6 +40,8 @@ Private Const testProjectName As String = "TestProject"
 Private Const testProjectFileName As String = testProjectName & "_DEV.xlsm"
 Private Const testFileName As String = "testFile.xml"
 
+Private fso As New FileSystemObject
+
 Private testWorkbook As Workbook
 Private cm As vtkConfigurationManager
 Private conf As vtkConfiguration
@@ -79,7 +81,7 @@ Private Sub ITestCase_TearDown()
     
     vtkResetConfigurationManagers
     vtkCloseAndKillWorkbook Wb:=testWorkbook
-    vtkCleanFolder VBAToolKit.vtkTestPath
+    VBAToolKit.resetTestFolder
     
 End Sub
 
@@ -531,10 +533,38 @@ Test_vtkExportConfigurationsAsXML_NoProject_Error:
     mAssert.Equals Err.Number, VTK_WORKBOOK_NOT_OPEN, "Bad error raised when exporting an inexistant project"
 End Sub
 
+Public Sub Test_vtkExportConfigurationsAsXML_WrongPath()
+'   Verifies that an attempt to export a project configuration in a bad path raises the proper error
+
+   On Error GoTo Test_vtkExportConfigurationsAsXML_WrongPath_Error
+
+    vtkExportConfigurationsAsXML projectName:=testProjectName, filePath:="c:\InexistantFolder\file.xml"
+    mAssert.Should False, "An error should occur when exporting in a wrong path"
+
+   On Error GoTo 0
+   Exit Sub
+
+Test_vtkExportConfigurationsAsXML_WrongPath_Error:
+    mAssert.Equals Err.Number, VTK_WRONG_FILE_PATH, "Bad error raised when exporting in a wrong path"
+End Sub
+
+Public Sub Test_vtkExportConfigurationsAsXML_InexistantFile()
+'   Verifies that a new configuration file is created if not yet existing
+
+   On Error GoTo Test_vtkExportConfigurationsAsXML_InexistantFile_Error
+
+    vtkExportConfigurationsAsXML projectName:=testProjectName, filePath:=testFilePath
+    mAssert.Should fso.FileExists(testFilePath), "The configuration file must be created when exporting a project"
+
+   On Error GoTo 0
+   Exit Sub
+
+Test_vtkExportConfigurationsAsXML_InexistantFile_Error:
+    mAssert.Should False, "No error should occur when exporting in a new file with a good path"
+End Sub
+
 '   Other tests to write
 '
-'   Verifies that an attempt to export a project configuration in a bad path raises the proper error
-'   Verifies that a new configuration file is created if not yet existing
 '   Verifies that an old configuration file is erased and rewritten
 '   Verifies the content of the generated configuration file (with the previous tests)
 
@@ -553,6 +583,8 @@ Private Function ITest_Suite() As TestSuite
     ITest_Suite.AddTest ITest_Manager.ClassName, "Test_vtkWriteXMLDomToFile_filepathIsCreated"
     ITest_Suite.AddTest ITest_Manager.ClassName, "Test_vtkWriteXMLDomToFile_fileContentIsValidDom"
     ITest_Suite.AddTest ITest_Manager.ClassName, "Test_vtkExportConfigurationsAsXML_NoProject"
+    ITest_Suite.AddTest ITest_Manager.ClassName, "Test_vtkExportConfigurationsAsXML_WrongPath"
+    ITest_Suite.AddTest ITest_Manager.ClassName, "Test_vtkExportConfigurationsAsXML_InexistantFile"
 End Function
 
 Private Sub ITestCase_RunTest()
@@ -570,6 +602,8 @@ Private Sub ITestCase_RunTest()
         Case "Test_vtkWriteXMLDomToFile_filepathIsCreated": Test_vtkWriteXMLDomToFile_filepathIsCreated
         Case "Test_vtkWriteXMLDomToFile_fileContentIsValidDom": Test_vtkWriteXMLDomToFile_fileContentIsValidDom
         Case "Test_vtkExportConfigurationsAsXML_NoProject": Test_vtkExportConfigurationsAsXML_NoProject
+        Case "Test_vtkExportConfigurationsAsXML_WrongPath": Test_vtkExportConfigurationsAsXML_WrongPath
+        Case "Test_vtkExportConfigurationsAsXML_InexistantFile": Test_vtkExportConfigurationsAsXML_InexistantFile
         Case Else: mAssert.Should False, "Invalid test name: " & mManager.methodName
     End Select
 End Sub

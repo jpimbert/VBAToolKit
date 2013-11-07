@@ -213,7 +213,7 @@ vtkWriteXMLDOMToFile_Error:
 End Sub
 
 '---------------------------------------------------------------------------------------
-' Procedure : exportConfigurationsAsXML
+' Procedure : vtkExportConfigurationsAsXML
 ' Author    : Jean-Pierre IMBERT
 ' Date      : 07/11/2013
 ' Purpose   : Export the configurations of a project as a new XML file
@@ -221,32 +221,42 @@ End Sub
 '             - this subroutine is temporary, dedicated to prepare the migration from
 '               Excel sheet management of configurations to XML file management
 ' Raises    : - VTK_WORKBOOK_NOT_OPEN if the _DEV workbook containing the configuration sheet is not opened
+'             - VTK_WRONG_FILE_PATH if the file path couldn't be created
 '---------------------------------------------------------------------------------------
 '
-Public Sub exportConfigurationsAsXML(projectName As String, filePath As String)
+Public Sub vtkExportConfigurationsAsXML(projectName As String, filePath As String)
 
-   On Error GoTo exportConfigurationsAsXML_Error
+   On Error GoTo vtkExportConfigurationsAsXML_Error
 
-    ' If the project is not initialized
+    ' Get the configurationManager of the project to export
     Dim cm As vtkConfigurationManager
-    Dim conf As vtkConfiguration
     Set cm = vtkConfigurationManagerForProject(projectName)
     If cm Is Nothing Then
-        Err.Raise VTK_WORKBOOK_NOT_OPEN
+        Err.Raise Number:=VTK_WORKBOOK_NOT_OPEN
     End If
     
+    ' Create a new XML configuration file
+    Dim fso As New FileSystemObject
+    Dim xmlFile As TextStream
+    Set xmlFile = fso.CreateTextFile(fileName:=filePath, Overwrite:=True)
 
    On Error GoTo 0
    Exit Sub
 
-exportConfigurationsAsXML_Error:
+vtkExportConfigurationsAsXML_Error:
+    Dim s As String
+    s = "vtkXMLutilities::exportConfigurationsAsXML"
     
     Select Case Err.Number
         Case VTK_WORKBOOK_NOT_OPEN
             Err.Description = "The " & projectName & "_DEV workbook is not opened"
+        Case 76
+            Err.Number = VTK_WRONG_FILE_PATH
+            Err.Description = "The " & filePath & " path is unreachable"
         Case Else
             Err.Number = VTK_UNEXPECTED_ERROR
+            s = s & " -> " & Err.Source
     End Select
 
-    Err.Raise Err.Number, "vtkXMLutilities::exportConfigurationsAsXML -> " & Err.Source, Err.Description
+    Err.Raise Err.Number, s, Err.Description
 End Sub
