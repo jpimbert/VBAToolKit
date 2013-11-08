@@ -1,0 +1,37 @@
+<?xml version="1.0" encoding="ISO-8859-1" standalone="no"?>
+<!DOCTYPE vtkConf SYSTEM "vtkConfigurationsDTD.dtd">
+<vtkConf>
+
+	<info>
+		<vtkConfigurationsVersion>2.0</vtkConfigurationsVersion>
+		<projectName>InitializedProjet</projectName>
+	</info>
+
+
+	<configuration cID="c01">
+		<name>InitializedProjet_DEV</name>
+		<path>Tests\InitializedProjet_DEV.xlsm</path>
+	</configuration>
+
+
+	<module mID="m01">
+		<name>TestModule</name>
+		<modulePath confId="c01">Tests\TestModule.bas</modulePath>
+	</module>
+
+	<module mID="m02">
+		<name>TestClass</name>
+		<modulePath confId="c01">Tests\TestModule.cls</modulePath>
+	</module>
+
+	<module mID="m03">
+		<name>TestForm</name>
+		<modulePath confId="c01">Tests\TestForm.frm</modulePath>
+	</module>
+
+	<module mID="m04">
+		<name>ThisWorkbook</name>
+		<modulePath confId="c01">Tests\ThisWorkbook.cls</modulePath>
+	</module>
+
+</vtkConf>

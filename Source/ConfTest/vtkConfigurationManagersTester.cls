@@ -73,7 +73,7 @@ Private Sub ITestCase_SetUp(Assert As IAssert)
 '    FileCopy Source:=vtkPathToTemplateFolder & "\" & existingWorkbookName, destination:=vtkPathToTestFolder & "\" & existingWorkbookName
     ' --------------------------------------------------------
 
-    ' Create an XML sheet that references the projects "ExistingProject" and "NewProject"
+    ' Create an XML sheet that references the projects "Test Project" and "Second Test"
     
     ' Copy a blank sheet
     FileCopy Source:=fso.BuildPath(vtkPathToTemplateFolder, rememberedProjectsSheetName), _
@@ -90,7 +90,7 @@ Private Sub ITestCase_SetUp(Assert As IAssert)
                             xmlRelativePath:=secondProjectName & ".xml"
 
 
-    ' Copy the XML sheet that describes the project "ExistingProject"
+    ' Copy the XML sheet that describes the project "Test Project"
     ' NB : the content of this file is wrong (projectName is wrong)
     FileCopy Source:=fso.BuildPath(vtkPathToTemplateFolder, existingXMLSheetNameForTests), _
              destination:=fso.BuildPath(VBAToolKit.vtkTestPath, projectName & ".xml")
@@ -168,6 +168,7 @@ Public Sub TestConfigurationManagerIsInvariant()
     Set cm = vtkConfigurationManagerForProject(projectName)
     mAssert.Should vtkConfigurationManagerForProject(projectName) Is cm, "The configuration manager for a project must be always the same"
 End Sub
+
 
 'Public Sub TestInoperantProjectConfigurationSheetInitializationForExistingProject()
 '    '   Verifies that the configuration sheet initialization does nothing on existing project
@@ -259,6 +260,8 @@ Private Function ITest_Suite() As TestSuite
     ITest_Suite.AddTest ITest_Manager.ClassName, "TestConfigurationManagerForNotRememberedAndSheetedProjectIsNull"
     ITest_Suite.AddTest ITest_Manager.ClassName, "TestConfigurationManagerForNotRememberedAndNotSheetedProjectIsNull"
     ITest_Suite.AddTest ITest_Manager.ClassName, "TestCOnfigurationManagerForRememberedAndNotSheetedProjectIsNull"
+    ITest_Suite.AddTest ITest_Manager.ClassName, "TestConfigurationManagersAreDifferentForTwoProjects"
+    ITest_Suite.AddTest ITest_Manager.ClassName, "TestConfigurationManagerIsInvariant"
 End Function
 
 Private Sub ITestCase_RunTest()
@@ -267,6 +270,8 @@ Private Sub ITestCase_RunTest()
         Case "TestConfigurationManagerForNotRememberedAndSheetedProjectIsNull": TestConfigurationManagerForNotRememberedAndSheetedProjectIsNull
         Case "TestConfigurationManagerForNotRememberedAndNotSheetedProjectIsNull": TestConfigurationManagerForNotRememberedAndNotSheetedProjectIsNull
         Case "TestCOnfigurationManagerForRememberedAndNotSheetedProjectIsNull": TestCOnfigurationManagerForRememberedAndNotSheetedProjectIsNull
+        Case "TestConfigurationManagersAreDifferentForTwoProjects": TestConfigurationManagersAreDifferentForTwoProjects
+        Case "TestConfigurationManagerIsInvariant": TestConfigurationManagerIsInvariant
         Case Else: mAssert.Should False, "Invalid test name: " & mManager.methodName
     End Select
 End Sub
