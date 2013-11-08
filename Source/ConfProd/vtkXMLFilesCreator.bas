@@ -41,7 +41,8 @@ Attribute VB_Name = "vtkXMLFilesCreator"
 '
 Public Sub createInitializedXMLSheetForProject(sheetPath As String, _
                                     projectName As String, _
-                                    Optional dtdPath As String = "../Templates/vtkConfigurationsDTD.dtd")
+                                    Optional dtdPath As String = "../Templates/vtkConfigurationsDTD.dtd", _
+                                    Optional addReferenceToSelf As Boolean = True)
 
     Dim fso As New FileSystemObject
     Dim xmlFile As TextStream
@@ -85,6 +86,24 @@ Public Sub createInitializedXMLSheetForProject(sheetPath As String, _
         xmlFile.WriteLine Text:="    </module>"
         xmlFile.WriteBlankLines Lines:=1
     Next i
+
+    ' Create the references for the DEV configuration
+    Dim tmpRef As VBIDE.Reference
+    For Each tmpRef In listOfDefaultReferences
+        xmlFile.WriteLine Text:="    <reference confIDs=""c01"">"
+        xmlFile.WriteLine Text:="        <name>" & tmpRef.name & "</name>"
+        xmlFile.WriteLine Text:="        <guid>" & tmpRef.GUID & "</guid>"
+        xmlFile.WriteLine Text:="    </reference>"
+        xmlFile.WriteBlankLines Lines:=1
+    Next
+    
+    If addReferenceToSelf Then
+        xmlFile.WriteLine Text:="    <reference confIDs=""c01"">"
+        xmlFile.WriteLine Text:="        <name>" & ThisWorkbook.VBProject.name & "</name>"
+        xmlFile.WriteLine Text:="        <guid>" & ThisWorkbook.name & "</guid>"
+        xmlFile.WriteLine Text:="    </reference>"
+        xmlFile.WriteBlankLines Lines:=1
+    Next
 
     ' Close the file
     xmlFile.WriteLine Text:="</vtkConf>"
