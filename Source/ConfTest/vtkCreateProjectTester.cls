@@ -166,29 +166,72 @@ TestProjectIsNamedcorrectly_Error:
     Exit Sub
 
 End Sub
-'''
-'''Public Sub TestDelivXlsmFileCreated()
-''''test that xlsm file is created in the right path
-'''    Dim returnValue As Long
-'''    returnValue = vtkCreateProject(path:=VBAToolKit.vtkTestPath, name:=vtkTestProjectName, displayError:=False)
-'''    mAssert.Should Dir(VBAToolKit.vtkTestPath & "\" & vtkTestProjectName & "\" & "Delivery" & "\" & vtkTestProjectName & ".xlsm", vbDirectory) <> "", "the workbook must be created"
-'''End Sub
-'''
-'''Public Sub TestDevProjectIsNamedcorrectly()
-''''test that xlsm is correctly renamed
-'''    Dim returnValue As Long
-'''    returnValue = vtkCreateProject(path:=VBAToolKit.vtkTestPath, name:=vtkTestProjectName, displayError:=False)
-'''    mAssert.Should Workbooks(vtkTestProjectName & "_DEV.xlsm").VBProject.name = vtkTestProjectName & "_DEV", "the workbook name must be like " & vtkTestProjectName & "_DEV"
-'''End Sub
-'''
-'''Public Sub TestDelivProjectIsNamedcorrectly()
-''''test that xlsm is correctly renamed
-'''    Dim returnValue As Long
-'''    returnValue = vtkCreateProject(path:=VBAToolKit.vtkTestPath, name:=vtkTestProjectName, displayError:=False)
-'''    OpenDeliveryProject
-'''    mAssert.Equals Workbooks(vtkTestProjectName & ".xlsm").VBProject.name, vtkTestProjectName, "the workbook name must be like " & vtkTestProjectName & "_DEV"
-'''End Sub
-'''
+
+
+Public Sub TestDevProjectIsNamedcorrectly()
+'test that xlsm is correctly renamed
+    On Error GoTo TestDevProjectIsNamedcorrectly_Error
+    
+    Dim returnValue As Long
+    returnValue = vtkCreateProject(path:=VBAToolKit.vtkTestPath, name:=vtkTestProjectName, displayError:=False)
+    
+    Dim dom As New MSXML2.DOMDocument
+    dom.Load VBAToolKit.vtkTestPath & "\" & vtkTestProjectName & "\" & "Project" & "\" & vtkTestProjectName & ".xml"
+    
+    mAssert.Equals dom.SelectSingleNode("/vtkConf/configuration[@cID=""c01""]/name[0]").Text, vtkTestProjectName & "_DEV", "the dev configuration must be called " & vtkTestProjectName & "_DEV"
+
+    On Error GoTo 0
+    Exit Sub
+
+TestDevProjectIsNamedcorrectly_Error:
+    Err.Source = "Sub TestDevProjectIsNamedcorrectly in module vtkCreateProjectTester"
+    mAssert.Should False, "Unexpected Error " & Err.Number & " (" & Err.Description & ") in " & Err.Source
+    Exit Sub
+
+End Sub
+
+
+Public Sub TestDelivProjectIsNamedcorrectly()
+'test that xlsm is correctly renamed
+    On Error GoTo TestDelivProjectIsNamedcorrectly_Error
+
+    Dim returnValue As Long
+    returnValue = vtkCreateProject(path:=VBAToolKit.vtkTestPath, name:=vtkTestProjectName, displayError:=False)
+    
+    Dim dom As New MSXML2.DOMDocument
+    dom.Load VBAToolKit.vtkTestPath & "\" & vtkTestProjectName & "\" & "Project" & "\" & vtkTestProjectName & ".xml"
+    
+    mAssert.Equals dom.SelectSingleNode("/vtkConf/configuration[@cID=""c02""]/name[0]").Text, vtkTestProjectName, "the delivery configuration must be called " & vtkTestProjectName
+ 
+    On Error GoTo 0
+    Exit Sub
+
+TestDelivProjectIsNamedcorrectly_Error:
+    Err.Source = "Sub TestDelivProjectIsNamedcorrectly in module vtkCreateProjectTester"
+    mAssert.Should False, "Unexpected Error " & Err.Number & " (" & Err.Description & ") in " & Err.Source
+    Exit Sub
+
+End Sub
+
+
+Public Sub Test_vtkCreateProject_correctPathGitFolderIsCreated()
+    Dim fso As New FileSystemObject
+
+    On Error GoTo Test_vtkCreateProject_correctPathGitFolderIsCreated_Error
+
+    vtkCreateProject VBAToolKit.vtkTestPath, vtkTestProjectName, displayError:=False
+
+    mAssert.Should fso.folderExists(VBAToolKit.vtkTestPath & "\" & vtkTestProjectName & "\.git"), ".git folder should be created."
+
+    On Error GoTo 0
+    Exit Sub
+
+Test_vtkCreateProject_correctPathGitFolderIsCreated_Error:
+    mAssert.Should False, "Error " & Err.Number & " (" & Err.Description & ") in procedure Test_vtkCreateProject_gitFolderIsCreated of Class Module vtkCreateProjectTester"
+    Resume Next
+End Sub
+
+
 '''Public Sub TestReferencesOfDevWorkbookWasActivated()
 ''' Dim returnValue As Long
 ''' Dim i As Integer
@@ -256,22 +299,6 @@ End Sub
 '''    mAssert.Should False, "No error have to be raised during project creation (Err=" & Err.Number & ": " & Err.Description & ")"
 '''End Sub
 '''
-'''Public Sub Test_vtkCreateProject_correctPathGitFolderIsCreated()
-'''    Dim fso As New FileSystemObject
-'''
-'''    On Error GoTo Test_vtkCreateProject_correctPathGitFolderIsCreated_Error
-'''
-'''    vtkCreateProject VBAToolKit.vtkTestPath, vtkTestProjectName, displayError:=False
-'''
-'''    mAssert.Should fso.folderExists(VBAToolKit.vtkTestPath & "\" & vtkTestProjectName & "\.git"), ".git folder should be created."
-'''
-'''    On Error GoTo 0
-'''    Exit Sub
-'''
-'''Test_vtkCreateProject_correctPathGitFolderIsCreated_Error:
-'''    mAssert.Should False, "Error " & Err.Number & " (" & Err.Description & ") in procedure Test_vtkCreateProject_gitFolderIsCreated of Class Module vtkCreateProjectTester"
-'''    Resume Next
-'''End Sub
 '''
 '''Public Sub Test_vtkCreateProject_handlerAddedInDEVWorkbook_modulesAreExported()
 '''' creating a project, modifying an existing module in the DEV workbook, save => module must be exported
@@ -341,14 +368,6 @@ End Sub
 '''End Sub
 
 
-
-'''Private Sub OpenDeliveryProject()
-'''    Dim path As String
-'''    Dim fso As New FileSystemObject
-'''    path = fso.GetParentFolderName(ActiveWorkbook.path) & "\" & vtkConfigurationManagerForProject(vtkTestProjectName).getConfigurationPath(vtkTestProjectName)
-'''    Workbooks.Open fileName:=path
-'''End Sub
-
 Private Function ITest_Suite() As TestSuite
     Set ITest_Suite = New TestSuite
     ITest_Suite.AddTest ITest_Manager.ClassName, "TestCreateProjectDoesNothingWhenPathDoesntExist"
@@ -356,6 +375,9 @@ Private Function ITest_Suite() As TestSuite
     ITest_Suite.AddTest ITest_Manager.ClassName, "TestMainFolderIsCreated"
     ITest_Suite.AddTest ITest_Manager.ClassName, "TestDevXlsmFileCreated"
     ITest_Suite.AddTest ITest_Manager.ClassName, "TestProjectIsNamedcorrectly"
+    ITest_Suite.AddTest ITest_Manager.ClassName, "TestDevProjectIsNamedcorrectly"
+    ITest_Suite.AddTest ITest_Manager.ClassName, "TestDelivProjectIsNamedcorrectly"
+    ITest_Suite.AddTest ITest_Manager.ClassName, "Test_vtkCreateProject_correctPathGitFolderIsCreated"
 End Function
 
 Private Sub ITestCase_RunTest()
@@ -365,6 +387,9 @@ Private Sub ITestCase_RunTest()
         Case "TestMainFolderIsCreated": TestMainFolderIsCreated
         Case "TestDevXlsmFileCreated": TestDevXlsmFileCreated
         Case "TestProjectIsNamedcorrectly": TestProjectIsNamedcorrectly
+        Case "TestDevProjectIsNamedcorrectly": TestDevProjectIsNamedcorrectly
+        Case "TestDelivProjectIsNamedcorrectly": TestDelivProjectIsNamedcorrectly
+        Case "Test_vtkCreateProject_correctPathGitFolderIsCreated": Test_vtkCreateProject_correctPathGitFolderIsCreated
         Case Else: mAssert.Should False, "Invalid test name: " & mManager.methodName
     End Select
 End Sub
