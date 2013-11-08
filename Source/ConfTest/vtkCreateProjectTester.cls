@@ -70,9 +70,6 @@ Private Sub ITestCase_SetUp(Assert As IAssert)
     ' Add the TestProject to the list of remembered projects
     xmlRememberedProjectsFullPath = fso.BuildPath(VBAToolKit.vtkTestPath, rememberedProjectsSheetName)
     
-    vtkAddRememberedProject projectName:=vtkTestProjectName, _
-                            rootFolder:=fso.BuildPath(VBAToolKit.vtkTestPath, vtkTestProjectName), _
-                            xmlRelativePath:="Project\" & vtkTestProjectName & ".xml"
     
 End Sub
 
@@ -361,7 +358,10 @@ Public Sub TestNewProjectIsRemembered()
 ' test that new project is added to the list of remembered projects
     On Error GoTo TestNewProjectIsRemembered_Error
 
+    vtkCreateProject path:=VBAToolKit.vtkTestPath, name:=vtkTestProjectName, displayError:=False
     
+    mAssert.Should vtkRootPathForProject(vtkTestProjectName) <> "", "The root path of the newly created project should be detected."
+    mAssert.Should vtkXmlRelPathForProject(vtkTestProjectName) <> "", "The xml relative path of the newly created project should be detected."
 
     On Error GoTo 0
     Exit Sub
@@ -372,6 +372,8 @@ TestNewProjectIsRemembered_Error:
     Exit Sub
 
 End Sub
+
+
 '''Public Sub Test_VBAUnitModulesExportation()
 '''    '   Verify that VBA modules are exported from VBAToolkit to the new project
 '''    Dim returnValue As Long, fso As New FileSystemObject

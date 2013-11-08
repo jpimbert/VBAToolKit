@@ -84,6 +84,11 @@ Public Function vtkCreateProject(path As String, name As String, Optional displa
     ' /!\ For that we need to manage the "ThisWorkbook" object, we will do it later
     ' vtkAddBeforeSaveHandlerInDEVWorkbook Wb:=Wb, projectName:=project.projectName, confName:=project.projectDEVName
         
+    ' Add the newly created project to the list of projects remembered by VBAToolKit
+    vtkAddRememberedProject projectName:=projectName, _
+                            rootFolder:=rootPath, _
+                            xmlRelativePath:=project.XMLConfigurationStandardRelativePath
+    
     ' Initialize git
     On Error GoTo vtkCreateProject_ErrorGit
     vtkInitializeGit rootPath
