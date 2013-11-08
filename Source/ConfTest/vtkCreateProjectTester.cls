@@ -233,24 +233,58 @@ Test_vtkCreateProject_correctPathGitFolderIsCreated_Error:
 End Sub
 
 
-'''Public Sub TestReferencesOfDevWorkbookWasActivated()
-''' Dim returnValue As Long
-''' Dim i As Integer
-''' Dim j As Integer
-''' j = 0
-''''this function will count extention number before executing function ,
-''''and extentions number must be equal to(initial extention number + added extention number )
-'''returnValue = vtkCreateProject(path:=VBAToolKit.vtkTestPath, name:=vtkTestProjectName, displayError:=False)
-'''    OpenDeliveryProject
-'''
-'''    For i = 1 To Workbooks(vtkTestProjectName & "_DEV.xlsm").VBProject.References.count
-'''        If ((Workbooks(vtkTestProjectName & "_DEV.xlsm").VBProject.References(i).GUID) = "{420B2830-E718-11CF-893D-00A0C9054228}") Or (Workbooks(vtkTestProjectName & "_DEV.xlsm").VBProject.References(i).GUID = "{0002E157-0000-0000-C000-000000000046}") Then
-'''        j = j + 1
-'''        End If
-'''    Next
-'''mAssert.Equals j, 2, "the searched reference number must be equal to " & 2
-'''mAssert.Equals Workbooks(vtkTestProjectName & "_DEV.xlsm").VBProject.References.count, expectedReferenceCount + 1, "the total references number must be equal to " & expectedReferenceCount + 1
-'''End Sub
+Public Sub TestDefaultReferencesArePresent()
+' test that the default VBAToolKit references are present in the sheet
+    On Error GoTo TestDefaultReferencesArePresent_Error
+
+    vtkCreateProject path:=VBAToolKit.vtkTestPath, name:=vtkTestProjectName, displayError:=False
+    
+    Dim dom As New MSXML2.DOMDocument
+    dom.Load VBAToolKit.vtkTestPath & "\" & vtkTestProjectName & "\" & "Project" & "\" & vtkTestProjectName & ".xml"
+    
+    Dim tmpRef As VBIDE.Reference
+    For Each tmpRef In listOfDefaultReferences
+        mAssert.Equals dom.SelectNodes("/vtkConf/reference[name=""" & tmpRef.name & """]").Length, 1, "The reference " & tmpRef.name & " should be present in the sheet."
+    Next
+
+    On Error GoTo 0
+    Exit Sub
+
+TestDefaultReferencesArePresent_Error:
+    Err.Source = "Sub TestDefaultReferencesArePresent in module vtkCreateProjectTester"
+    mAssert.Should False, "Unexpected Error " & Err.Number & " (" & Err.Description & ") in " & Err.Source
+    Exit Sub
+
+End Sub
+
+
+'Public Sub TestReferencesOfDevConfigurationWasActivated()
+'' test that the references of the DEV configuration are activated
+'    On Error GoTo TestReferencesOfDevConfigurationWasActivated_Error
+'
+'    vtkCreateProject path:=VBAToolKit.vtkTestPath, name:=vtkTestProjectName, displayError:=False
+'
+'    Dim dom As New MSXML2.DOMDocument
+'    dom.Load VBAToolKit.vtkTestPath & "\" & vtkTestProjectName & "\" & "Project" & "\" & vtkTestProjectName & ".xml"
+'
+'    Dim confId As String
+'    confId = dom.SelectSingleNode("/vtkConf/configuration[name=""" & vtkTestProjectName & "_DEV""]/@cID").Text
+'
+'    Dim tmpRef As VBIDE.Reference
+'    For Each tmpRef In listOfDefaultReferences
+'        mAssert.Equals dom.SelectNodes("/vtkConf/reference[name=""" & tmpRef.name & """]/@confId='" & confId & "'").Length, 1, "The reference " & tmpRef.name & " should be present in the sheet."
+'    Next
+'
+'    On Error GoTo 0
+'    Exit Sub
+'
+'TestReferencesOfDevConfigurationWasActivated_Error:
+'    Err.Source = "Sub TestReferencesOfDevConfigurationWasActivated in module vtkCreateProjectTester"
+'    mAssert.Should False, "Unexpected Error " & Err.Number & " (" & Err.Description & ") in " & Err.Source
+'    Exit Sub
+'
+'
+'End Sub
 '''
 '''
 '''Public Sub TestReferencesOfDeliveryWorkbookWasActivated()
@@ -375,11 +409,12 @@ Private Function ITest_Suite() As TestSuite
     ITest_Suite.AddTest ITest_Manager.ClassName, "TestCreateProjectDoesNothingWhenPathDoesntExist"
     ITest_Suite.AddTest ITest_Manager.ClassName, "TestCreateProjectAlreadyExisting"
     ITest_Suite.AddTest ITest_Manager.ClassName, "TestMainFolderIsCreated"
-    ITest_Suite.AddTest ITest_Manager.ClassName, "TestDevXlsmFileCreated"
+    ITest_Suite.AddTest ITest_Manager.ClassName, "TestDevXmlFileCreated"
     ITest_Suite.AddTest ITest_Manager.ClassName, "TestProjectIsNamedcorrectly"
     ITest_Suite.AddTest ITest_Manager.ClassName, "TestDevProjectIsNamedcorrectly"
     ITest_Suite.AddTest ITest_Manager.ClassName, "TestDelivProjectIsNamedcorrectly"
     ITest_Suite.AddTest ITest_Manager.ClassName, "Test_vtkCreateProject_correctPathGitFolderIsCreated"
+    ITest_Suite.AddTest ITest_Manager.ClassName, "TestDefaultReferencesArePresent"
 End Function
 
 Private Sub ITestCase_RunTest()
@@ -387,11 +422,12 @@ Private Sub ITestCase_RunTest()
         Case "TestCreateProjectDoesNothingWhenPathDoesntExist": TestCreateProjectDoesNothingWhenPathDoesntExist
         Case "TestCreateProjectAlreadyExisting": TestCreateProjectAlreadyExisting
         Case "TestMainFolderIsCreated": TestMainFolderIsCreated
-        Case "TestDevXlsmFileCreated": TestDevXlsmFileCreated
+        Case "TestDevXmlFileCreated": TestDevXmlFileCreated
         Case "TestProjectIsNamedcorrectly": TestProjectIsNamedcorrectly
         Case "TestDevProjectIsNamedcorrectly": TestDevProjectIsNamedcorrectly
         Case "TestDelivProjectIsNamedcorrectly": TestDelivProjectIsNamedcorrectly
         Case "Test_vtkCreateProject_correctPathGitFolderIsCreated": Test_vtkCreateProject_correctPathGitFolderIsCreated
+        Case "TestDefaultReferencesArePresent": TestDefaultReferencesArePresent
         Case Else: mAssert.Should False, "Invalid test name: " & mManager.methodName
     End Select
 End Sub
