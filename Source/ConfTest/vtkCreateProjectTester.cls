@@ -54,6 +54,9 @@ End Property
 
 Private Sub ITestCase_SetUp(Assert As IAssert)
     Set mAssert = Assert
+    vtkCleanFolder VBAToolKit.vtkTestPath
+    vtkResetConfigurationManagers             ' reset all configuration managers
+    vtkResetProjects
 End Sub
 
 Private Sub ITestCase_TearDown()
@@ -64,14 +67,14 @@ Private Sub ITestCase_TearDown()
 End Sub
 
 Public Sub TestCreateProjectDoesNothingWhenPathDoesntExist()
-    ' The createProject must does nothing when path doesn't exist
+    ' The createProject must do nothing when path doesn't exist
     Dim InexistentPath As String
     Dim returnValue As Long
     On Error GoTo TestCreateProjectDoesNothingWhenPathDoesntExist_Error
 
     InexistentPath = VBAToolKit.vtkTestPath & "\InexistentFolder"
     returnValue = vtkCreateProject(path:=InexistentPath, name:=vtkTestProjectName, displayError:=False)
-    mAssert.Should Dir(InexistentPath & "\" & vtkTestProjectName, vbDirectory) = "", "The project main folder must exist"
+    mAssert.Should Dir(InexistentPath & "\" & vtkTestProjectName, vbDirectory) = "", "The createProject must do nothing when path doesn't exist"
     mAssert.Equals returnValue, 76, "The project creation must fail"
 
     On Error GoTo 0
@@ -92,7 +95,7 @@ Public Sub TestCreateProjectAlreadyExisting()
 
     MkDir VBAToolKit.vtkTestPath & "\" & vtkTestProjectName 'must respect order mkdir before call vtkcreateproject
     returnValue = vtkCreateProject(path:=VBAToolKit.vtkTestPath, name:=vtkTestProjectName, displayError:=False)
-    mAssert.Should Dir(VBAToolKit.vtkTestPath & "\" & vtkTestProjectName, vbDirectory) <> "", "The existing project main folder must exist"
+    mAssert.Should fso.folderExists(VBAToolKit.vtkTestPath & "\" & vtkTestProjectName), "The existing project main folder must exist"
     mAssert.Equals returnValue, 75, "The project creation must fail"
 
     On Error GoTo 0
@@ -124,20 +127,45 @@ TestMainFolderIsCreated_Error:
 
 End Sub
 
-'''Public Sub TestDevXlsmFileCreated()
-''''test that xlsm file is created in the right path
-'''    Dim returnValue As Long
-'''    returnValue = vtkCreateProject(path:=VBAToolKit.vtkTestPath, name:=vtkTestProjectName, displayError:=False)
-'''    mAssert.Should Dir(VBAToolKit.vtkTestPath & "\" & vtkTestProjectName & "\" & "Project" & "\" & vtkTestProjectName & "_DEV.xlsm", vbDirectory) <> "", "the workbook must be created"
-'''End Sub
-'''
-'''Public Sub TestDevXlsmFileIsNamedcorrectly()
-''''test that xlsm is correctly renamed
-'''    Dim returnValue As Long
-'''    returnValue = vtkCreateProject(path:=VBAToolKit.vtkTestPath, name:=vtkTestProjectName, displayError:=False)
-'''
-'''    mAssert.Equals Workbooks(vtkTestProjectName & "_DEV.xlsm").VBProject.name, vtkTestProjectName & "_DEV", "the workbook name must be like " & vtkTestProjectName & "_DEV"
-'''End Sub
+Public Sub TestDevXlsmFileCreated()
+'test that xml file is created in the right path
+    Dim returnValue As Long
+    On Error GoTo TestDevXlsmFileCreated_Error
+
+    returnValue = vtkCreateProject(path:=VBAToolKit.vtkTestPath, name:=vtkTestProjectName, displayError:=False)
+    mAssert.Should fso.FileExists(VBAToolKit.vtkTestPath & "\" & vtkTestProjectName & "\" & "Project" & "\" & vtkTestProjectName & ".xml"), "the xml sheet must be created"
+
+    On Error GoTo 0
+    Exit Sub
+
+TestDevXlsmFileCreated_Error:
+    Err.Source = "Sub TestDevXlsmFileCreated in module vtkCreateProjectTester"
+    mAssert.Should False, "Unexpected Error " & Err.Number & " (" & Err.Description & ") in " & Err.Source
+    Exit Sub
+
+End Sub
+
+Public Sub TestProjectIsNamedcorrectly()
+'test that xlsm is correctly renamed
+    On Error GoTo TestProjectIsNamedcorrectly_Error
+
+    Dim returnValue As Long
+    returnValue = vtkCreateProject(path:=VBAToolKit.vtkTestPath, name:=vtkTestProjectName, displayError:=False)
+    
+    Dim dom As New MSXML2.DOMDocument
+    dom.Load VBAToolKit.vtkTestPath & "\" & vtkTestProjectName & "\" & "Project" & "\" & vtkTestProjectName & ".xml"
+    
+    mAssert.Equals dom.SelectSingleNode("/vtkConf/info/projectName[0]").Text, vtkTestProjectName, "the project name in the sheet must be like " & vtkTestProjectName
+
+    On Error GoTo 0
+    Exit Sub
+
+TestProjectIsNamedcorrectly_Error:
+    Err.Source = "Sub TestProjectIsNamedcorrectly in module vtkCreateProjectTester"
+    mAssert.Should False, "Unexpected Error " & Err.Number & " (" & Err.Description & ") in " & Err.Source
+    Exit Sub
+
+End Sub
 '''
 '''Public Sub TestDelivXlsmFileCreated()
 ''''test that xlsm file is created in the right path
@@ -326,6 +354,8 @@ Private Function ITest_Suite() As TestSuite
     ITest_Suite.AddTest ITest_Manager.ClassName, "TestCreateProjectDoesNothingWhenPathDoesntExist"
     ITest_Suite.AddTest ITest_Manager.ClassName, "TestCreateProjectAlreadyExisting"
     ITest_Suite.AddTest ITest_Manager.ClassName, "TestMainFolderIsCreated"
+    ITest_Suite.AddTest ITest_Manager.ClassName, "TestDevXlsmFileCreated"
+    ITest_Suite.AddTest ITest_Manager.ClassName, "TestProjectIsNamedcorrectly"
 End Function
 
 Private Sub ITestCase_RunTest()
@@ -333,6 +363,8 @@ Private Sub ITestCase_RunTest()
         Case "TestCreateProjectDoesNothingWhenPathDoesntExist": TestCreateProjectDoesNothingWhenPathDoesntExist
         Case "TestCreateProjectAlreadyExisting": TestCreateProjectAlreadyExisting
         Case "TestMainFolderIsCreated": TestMainFolderIsCreated
+        Case "TestDevXlsmFileCreated": TestDevXlsmFileCreated
+        Case "TestProjectIsNamedcorrectly": TestProjectIsNamedcorrectly
         Case Else: mAssert.Should False, "Invalid test name: " & mManager.methodName
     End Select
 End Sub

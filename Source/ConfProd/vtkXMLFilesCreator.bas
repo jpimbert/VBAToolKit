@@ -81,7 +81,7 @@ Public Sub createInitializedXMLSheetForProject(sheetPath As String, _
         Set module = ThisWorkbook.VBProject.VBComponents(moduleName)
         xmlFile.WriteLine Text:="    <module mID=""m" & i & """>"
         xmlFile.WriteLine Text:="        <name>" & moduleName & "</name>"
-        xmlFile.WriteLine Text:="        <modulePath confID=""c01"">" & vtkStandardPathForModule(module) & "</modulePath>"
+        xmlFile.WriteLine Text:="        <modulePath confId=""c01"">" & vtkStandardPathForModule(module) & "</modulePath>"
         xmlFile.WriteLine Text:="    </module>"
         xmlFile.WriteBlankLines Lines:=1
     Next i
@@ -105,28 +105,30 @@ Public Sub createDTDForVtkConfigurations(sheetPath As String)
     Dim xmlFile As TextStream
     Set xmlFile = fso.CreateTextFile(fileName:=sheetPath, Overwrite:=True)
     
-    xmlFile.WriteLine Text:="<!ELEMENT info (vtkConfigurationsVersion,projectName)>"
-    xmlFile.WriteLine Text:="    <!ELEMENT vtkConfigurationsVersion (#PCDATA)>"
-    xmlFile.WriteLine Text:="    <!ELEMENT projectName (#PCDATA)>"
+    xmlFile.WriteLine Text:="<!ELEMENT vtkConf (info,configuration*, module*, reference*)>"
     xmlFile.WriteBlankLines Lines:=1
-    xmlFile.WriteLine Text:="<!ELEMENT configuration (name,path,templatePath?,title?,comment?)>"
-    xmlFile.WriteLine Text:=" <!ATTLIST configuration cID ID #REQUIRED>"
-    xmlFile.WriteLine Text:="    <!ELEMENT name (#PCDATA)>"
-    xmlFile.WriteLine Text:="    <!ELEMENT path (#PCDATA)>"
-    xmlFile.WriteLine Text:="    <!ELEMENT templatePath (#PCDATA)>"
-    xmlFile.WriteLine Text:="    <!ELEMENT title (#PCDATA)>"
-    xmlFile.WriteLine Text:="    <!ELEMENT comment (#PCDATA)>"
+    xmlFile.WriteLine Text:="   <!ELEMENT info (vtkConfigurationsVersion,projectName)>"
+    xmlFile.WriteLine Text:="       <!ELEMENT vtkConfigurationsVersion (#PCDATA)>"
+    xmlFile.WriteLine Text:="       <!ELEMENT projectName (#PCDATA)>"
     xmlFile.WriteBlankLines Lines:=1
-    xmlFile.WriteLine Text:="<!ELEMENT module (name, modulePath*)>"
-    xmlFile.WriteLine Text:=" <!ATTLIST module mID ID #REQUIRED>"
-    xmlFile.WriteLine Text:="    <!ELEMENT modulePath (#PCDATA)>"
-    xmlFile.WriteLine Text:="     <!ATTLIST modulePath"
-    xmlFile.WriteLine Text:="        confId IDREF #REQUIRED"
-    xmlFile.WriteLine Text:="     >"
+    xmlFile.WriteLine Text:="   <!ELEMENT configuration (name,path,templatePath?,title?,comment?)>"
+    xmlFile.WriteLine Text:="    <!ATTLIST configuration cID ID #REQUIRED>"
+    xmlFile.WriteLine Text:="       <!ELEMENT name (#PCDATA)>"
+    xmlFile.WriteLine Text:="       <!ELEMENT path (#PCDATA)>"
+    xmlFile.WriteLine Text:="       <!ELEMENT templatePath (#PCDATA)>"
+    xmlFile.WriteLine Text:="       <!ELEMENT title (#PCDATA)>"
+    xmlFile.WriteLine Text:="       <!ELEMENT comment (#PCDATA)>"
     xmlFile.WriteBlankLines Lines:=1
-    xmlFile.WriteLine Text:="<!ELEMENT reference (name, (guid|path))>"
-    xmlFile.WriteLine Text:=" <!ATTLIST reference confIDs IDREFS #REQUIRED>"
-    xmlFile.WriteLine Text:="    <!ELEMENT guid (#PCDATA)>"
+    xmlFile.WriteLine Text:="   <!ELEMENT module (name, modulePath*)>"
+    xmlFile.WriteLine Text:="    <!ATTLIST module mID ID #REQUIRED>"
+    xmlFile.WriteLine Text:="       <!ELEMENT modulePath (#PCDATA)>"
+    xmlFile.WriteLine Text:="       <!ATTLIST modulePath"
+    xmlFile.WriteLine Text:="           confId IDREF #REQUIRED"
+    xmlFile.WriteLine Text:="       >"
+    xmlFile.WriteBlankLines Lines:=1
+    xmlFile.WriteLine Text:="   <!ELEMENT reference (name, (guid|path))>"
+    xmlFile.WriteLine Text:="    <!ATTLIST reference confIDs IDREFS #REQUIRED>"
+    xmlFile.WriteLine Text:="       <!ELEMENT guid (#PCDATA)>"
   
     xmlFile.Close
 
