@@ -258,6 +258,27 @@ TestDefaultReferencesArePresent_Error:
 End Sub
 
 
+Public Sub TestToSelfReferenceIsPresentAndActivatedByDefaultForDEV()
+' test that the DEV configuration has a reference to the workbook that created the project
+    On Error GoTo TestToSelfReferenceIsPresentAndActivatedByDefaultForDEV_Error
+    
+    vtkCreateProject path:=VBAToolKit.vtkTestPath, name:=vtkTestProjectName, displayError:=False
+    
+    Dim dom As New MSXML2.DOMDocument
+    dom.Load VBAToolKit.vtkTestPath & "\" & vtkTestProjectName & "\" & "Project" & "\" & vtkTestProjectName & ".xml"
+    
+    mAssert.Equals dom.SelectNodes("/vtkConf/reference[@confIDs=""c01""][name=""" & ThisWorkbook.VBProject.name & """]").Length, 1, "The reference to the current workbook must be present."
+
+    On Error GoTo 0
+    Exit Sub
+
+TestToSelfReferenceIsPresentAndActivatedByDefaultForDEV_Error:
+    Err.Source = "Sub TestToSelfReferenceIsPresentAndActivatedByDefaultForDEV in module vtkCreateProjectTester"
+    mAssert.Should False, "Unexpected Error " & Err.Number & " (" & Err.Description & ") in " & Err.Source
+    Exit Sub
+
+End Sub
+
 'Public Sub TestReferencesOfDevConfigurationWasActivated()
 '' test that the references of the DEV configuration are activated
 '    On Error GoTo TestReferencesOfDevConfigurationWasActivated_Error
@@ -415,6 +436,7 @@ Private Function ITest_Suite() As TestSuite
     ITest_Suite.AddTest ITest_Manager.ClassName, "TestDelivProjectIsNamedcorrectly"
     ITest_Suite.AddTest ITest_Manager.ClassName, "Test_vtkCreateProject_correctPathGitFolderIsCreated"
     ITest_Suite.AddTest ITest_Manager.ClassName, "TestDefaultReferencesArePresent"
+    ITest_Suite.AddTest ITest_Manager.ClassName, "TestToSelfReferenceIsPresentAndActivatedByDefaultForDEV"
 End Function
 
 Private Sub ITestCase_RunTest()
@@ -428,6 +450,7 @@ Private Sub ITestCase_RunTest()
         Case "TestDelivProjectIsNamedcorrectly": TestDelivProjectIsNamedcorrectly
         Case "Test_vtkCreateProject_correctPathGitFolderIsCreated": Test_vtkCreateProject_correctPathGitFolderIsCreated
         Case "TestDefaultReferencesArePresent": TestDefaultReferencesArePresent
+        Case "TestToSelfReferenceIsPresentAndActivatedByDefaultForDEV": TestToSelfReferenceIsPresentAndActivatedByDefaultForDEV
         Case Else: mAssert.Should False, "Invalid test name: " & mManager.methodName
     End Select
 End Sub
