@@ -185,3 +185,29 @@ Public Sub createRememberedProjectsXMLSheet(sheetPath As String, _
     xmlFile.Close
     
 End Sub
+
+
+'---------------------------------------------------------------------------------------
+' Procedure : createDTDforRememberedProjects
+' Author    : Lucas Vitorino
+' Purpose   : Create a DTD sheet for rememberedProjects, that is to say the XML sheet describing
+'             the projects rememberd by VBAToolKit (name, rootFolder, xmlRelativePath)
+'---------------------------------------------------------------------------------------
+'
+Public Sub createDTDforRememberedProjects(sheetPath As String)
+    
+    Dim fso As New FileSystemObject
+    Dim xmlFile As TextStream
+    Set xmlFile = fso.CreateTextFile(fileName:=sheetPath, Overwrite:=True)
+    
+    xmlFile.WriteLine Text:="<!ELEMENT rememberedProjects (info,project*)>"
+    xmlFile.WriteLine Text:="    <!ELEMENT info (version)>"
+    xmlFile.WriteLine Text:="        <!ELEMENT version (#PCDATA)>"
+    xmlFile.WriteLine Text:="    <!ELEMENT project (name,rootFolder,xmlRelativePath)>"
+    xmlFile.WriteLine Text:="        <!ELEMENT name (#PCDATA)>"
+    xmlFile.WriteLine Text:="        <!ELEMENT rootFolder (#PCDATA)>"
+    xmlFile.WriteLine Text:="        <!ELEMENT xmlRelativePath (#PCDATA)>"
+    
+    xmlFile.Close
+    
+End Sub
