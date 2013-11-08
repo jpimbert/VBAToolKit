@@ -153,3 +153,35 @@ Public Sub createDTDForVtkConfigurations(sheetPath As String)
     xmlFile.Close
 
 End Sub
+
+
+'---------------------------------------------------------------------------------------
+' Procedure : createRememberedProjectsXMLSheet
+' Author    : Lucas Vitorino
+' Purpose   : Create a blank "remembered projects" xml sheet at the given path.
+' Notes     : - By default he XML file will look for the DTD "vtkRememberedProjects.dtd" located in the Template folder
+'               of the project.
+'             - The folder structure is supposed to be a standard VBAToolKit project structure.
+'---------------------------------------------------------------------------------------
+'
+Public Sub createRememberedProjectsXMLSheet(sheetPath As String, _
+                                            Optional dtdPath As String = "../Templates/vtkRememberedProjectsDTD.dtd")
+
+    Dim fso As New FileSystemObject
+    Dim xmlFile As TextStream
+    Set xmlFile = fso.CreateTextFile(fileName:=sheetPath, Overwrite:=True)
+
+    xmlFile.WriteLine Text:="<?xml version=""1.0"" encoding=""ISO-8859-1"" standalone=""no""?>"
+    xmlFile.WriteLine Text:="<!DOCTYPE vtkConf SYSTEM """ & dtdPath & """>"
+    xmlFile.WriteBlankLines Lines:=1
+    xmlFile.WriteLine Text:="<rememberedProjects>"
+    xmlFile.WriteBlankLines Lines:=1
+    xmlFile.WriteLine Text:="    <info>"
+    xmlFile.WriteLine Text:="        <version>1.0</version>"
+    xmlFile.WriteLine Text:="    </info>"
+    xmlFile.WriteBlankLines Lines:=1
+    xmlFile.WriteLine Text:="</rememberedProjects>"
+    
+    xmlFile.Close
+    
+End Sub

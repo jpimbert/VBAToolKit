@@ -309,6 +309,7 @@ TestReferencesOfDevConfigurationAreActivated_Error:
 
 End Sub
 
+
 Public Sub TestReferencesOfDeliveryConfigurationAreActivated()
 ' test that the references of the Delvivery configuration are activated
     On Error GoTo TestReferencesOfDeliveryConfigurationAreActivated_Error
@@ -338,7 +339,21 @@ TestReferencesOfDeliveryConfigurationAreActivated_Error:
 End Sub
 
 
-'''
+Public Sub TestNewProjectIsRemembered()
+' test that new project is added to the list of remembered projects
+    On Error GoTo TestNewProjectIsRemembered_Error
+
+    
+
+    On Error GoTo 0
+    Exit Sub
+
+TestNewProjectIsRemembered_Error:
+    Err.Source = "Sub TestNewProjectIsRemembered in module vtkCreateProjectTester"
+    mAssert.Should False, "Unexpected Error " & Err.Number & " (" & Err.Description & ") in " & Err.Source
+    Exit Sub
+
+End Sub
 '''Public Sub Test_VBAUnitModulesExportation()
 '''    '   Verify that VBA modules are exported from VBAToolkit to the new project
 '''    Dim returnValue As Long, fso As New FileSystemObject
