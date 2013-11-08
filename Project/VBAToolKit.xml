@@ -388,9 +388,4 @@
 		<path confName="VBAToolKit_DEV">Source\ConfProd\vtkRecreateConfigurationForm.frm</path>
 		<path confName="VBAToolKit_2003">Source\ConfProd\vtkRecreateConfigurationForm.frm</path>
 	</module>
-	<module>
-		<name>vtkXMLUtilitiesTester</name>
-		<path confName="VBAToolKit"/>
-		<path confName="VBAToolKit_DEV">Source\ConfTest\vtkXMLUtilitiesTester.cls</path>
-	</module>
 </vtkConf>
