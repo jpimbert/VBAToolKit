@@ -48,6 +48,7 @@ Private conf As vtkConfiguration
 Private testFilePath As String
 
 Private retDom As MSXML2.DOMDocument
+Private reloadDom As MSXML2.DOMDocument
 
 Private Sub Class_Initialize()
     Set mManager = New TestCaseManager
@@ -66,12 +67,20 @@ Private Sub ITestCase_SetUp(Assert As IAssert)
 
     Set mAssert = Assert
     
+    ' Copy the DTD in the Test Folder
     getTestFileFromTemplate fileName:="vtkConfigurationsDTD.dtd", openExcel:=False
     
+    ' Open the test Project and get the configuration manager for this project
     Set testWorkbook = getTestFileFromTemplate(fileName:=testProjectFileName, openExcel:=True)
     Set cm = vtkConfigurationManagerForProject(testProjectName)
 
+    ' Export the test project configuration in XML format
     testFilePath = VBAToolKit.vtkTestPath & "\" & testFileName
+    vtkExportConfigurationsAsXML projectName:=testProjectName, filePath:=testFilePath
+    
+    ' Load the configuration as a DOM structure for content testing
+    Set reloadDom = New MSXML2.DOMDocument
+    reloadDom.Load testFilePath
 
     Set retDom = vtkExportAsXMLDOM(testProjectName)
     
@@ -199,21 +208,18 @@ Test_vtkExportAsXMLDom_correctNumberOfInfoObject_Error:
 End Sub
 
 
-Public Sub Test_vtkExportAsXMLDom_correctInfoContent()
+Public Sub Test_vtkExportConfigurationsAsXML_correctInfoContent()
 '   info -> correct content
 
-    On Error GoTo Test_vtkExportAsXMLDom_correctDomContent_Error
+    On Error GoTo Test_vtkExportConfigurationsAsXML_correctDomContent_Error
     
-    mAssert.Equals retDom.getElementsByTagName("info").Item(0).ChildNodes.Item(0).BaseName, "projectName"
-    mAssert.Equals retDom.getElementsByTagName("info").Item(0).ChildNodes.Item(0).Text, testProjectName
-    
-    mAssert.Equals retDom.getElementsByTagName("info").Item(0).ChildNodes.Item(1).BaseName, "vtkConfigurationsVersion"
-    mAssert.Equals retDom.getElementsByTagName("info").Item(0).ChildNodes.Item(1).Text, "1.0"
+    mAssert.Equals reloadDom.SelectSingleNode("/vtkConf/info/projectName").Text, testProjectName, "Expected name of project in info element"
+    mAssert.Equals reloadDom.SelectSingleNode("/vtkConf/info/vtkConfigurationsVersion").Text, "1.0", "Expected configuration version in info element"
 
     On Error GoTo 0
     Exit Sub
 
-Test_vtkExportAsXMLDom_correctDomContent_Error:
+Test_vtkExportConfigurationsAsXML_correctDomContent_Error:
     mAssert.Should False, "Unexpected error " & Err.Number & " (" & Err.Description & ") in procedure Test_vtkExportAsXMLDom_correctDomContent of Class Module vtkXMLExportTester"
     Resume Next
 End Sub
@@ -402,8 +408,8 @@ Public Sub Test_vtkWriteXMLDomToFile_dummyDom()
 
     Dim error As Integer
     Dim dummyDom As MSXML2.DOMDocument
-    Dim fso As New FileSystemObject
 
+    fso.DeleteFile testFilePath
     vtkWriteXMLDOMToFile dummyDom, testFilePath
     
     mAssert.Equals error, VTK_DOM_NOT_INITIALIZED, "Dom is not initialized : VTK_DOM_NOT_INITIALIZED should be raised."
@@ -596,12 +602,7 @@ Public Sub Test_vtkExportConfigurationsAsXML_fileContentIsValidDom()
 
     On Error GoTo Test_vtkExportConfigurationsAsXML_fileContentIsValidDom_Error
     
-    vtkExportConfigurationsAsXML projectName:=testProjectName, filePath:=testFilePath
-    
-    Dim newDom As New MSXML2.DOMDocument
-    newDom.Load testFilePath
-
-    mAssert.Equals newDom.parseError.ErrorCode, 0, "Dom should be readable without parse error"
+    mAssert.Equals reloadDom.parseError.ErrorCode, 0, "Dom should be readable without parse error"
 
     On Error GoTo 0
     Exit Sub
@@ -620,7 +621,7 @@ Private Function ITest_Suite() As TestSuite
     Set ITest_Suite = New TestSuite
     ITest_Suite.AddTest ITest_Manager.ClassName, "Test_vtkExportAsXMLDom_correctNameForRoot"
     ITest_Suite.AddTest ITest_Manager.ClassName, "Test_vtkExportAsXMLDom_correctNumberOfInfoObject"
-    ITest_Suite.AddTest ITest_Manager.ClassName, "Test_vtkExportAsXMLDom_correctInfoContent"
+    ITest_Suite.AddTest ITest_Manager.ClassName, "Test_vtkExportConfigurationsAsXML_correctInfoContent"
     ITest_Suite.AddTest ITest_Manager.ClassName, "Test_vtkExportAsXMLDom_correctConfigurationNumber"
     ITest_Suite.AddTest ITest_Manager.ClassName, "Test_vtkExportAsXMLDom_correctModuleNumber"
     ITest_Suite.AddTest ITest_Manager.ClassName, "Test_vtkExportAsDom_correctModuleContent"
@@ -641,7 +642,7 @@ Private Sub ITestCase_RunTest()
     Select Case mManager.methodName
         Case "Test_vtkExportAsXMLDom_correctNameForRoot": Test_vtkExportAsXMLDom_correctNameForRoot
         Case "Test_vtkExportAsXMLDom_correctNumberOfInfoObject": Test_vtkExportAsXMLDom_correctNumberOfInfoObject
-        Case "Test_vtkExportAsXMLDom_correctInfoContent": Test_vtkExportAsXMLDom_correctInfoContent
+        Case "Test_vtkExportConfigurationsAsXML_correctInfoContent": Test_vtkExportConfigurationsAsXML_correctInfoContent
         Case "Test_vtkExportAsXMLDom_correctConfigurationNumber": Test_vtkExportAsXMLDom_correctConfigurationNumber
         Case "Test_vtkExportAsXMLDom_correctModuleNumber": Test_vtkExportAsXMLDom_correctModuleNumber
         Case "Test_vtkExportAsDom_correctModuleContent": Test_vtkExportAsDom_correctModuleContent
