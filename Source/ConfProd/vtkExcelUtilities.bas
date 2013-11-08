@@ -113,6 +113,8 @@ Public Function vtkDefaultFileFormat(filePath As String) As XlFileFormat
             vtkDefaultFileFormat = xlOpenXMLAddIn
         Case "xla"
             vtkDefaultFileFormat = xlAddIn
+        Case "xls"
+            vtkDefaultFileFormat = xlExcel8
         Case Else
             vtkDefaultFileFormat = 0
         End Select

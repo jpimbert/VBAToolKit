@@ -347,73 +347,127 @@ End Sub
 
 '---------------------------------------------------------------------------------------
 ' Procedure : vtkRecreateConfiguration
-' Author    : Jean-Pierre Imbert
-' Date      : 09/08/2013
-' Purpose   : recreate a complete configuration based on
+' Author    : JPI-Conseil
+' Purpose   : Recreate a complete configuration based on
 '             - the vtkConfiguration sheet of the project
 '             - the exported modules located in the Source folder
-' Params    - projectName
-'           - configurationName
+'
+' Params    : - projectName
+'             - configurationName
+'
+' Raises    : - VTK_UNEXPECTED_ERROR
+'             - VTK_WORKBOOK_ALREADY_OPEN
+'             - VTK_NO_SOURCE_FILES
+'             - VTK_WRONG_FILE_PATH
+'
 ' WARNING : We use vtkImportOneModule because the document module importation is
 '           not efficient with VBComponents.Import (creation of a double class module
 '           instead of import the Document code)
-' TEST :
-'   execute 'vtkRecreateConfiguration projectName :="VBAToolKit",configurationName:="VBAToolKit"'
-'   if the Project to reconfigure is installed as AddIn, it must be uninstalled then reinstalled.
 '
-' IMPORTANT TO DO :
-'   il faut récupérer la feuille vtkConfigurations existante pour le projet de DEV
-'   il faudrait aussi récupérer les modules non exportés du projet DEV (tmptest)
-'   il faut tester avec un miniprojet où les deux fichiers Excel sont dans Tests
-'
-' WARNING : Cette fonction devra être reprise en profondeur pour être généralisée
-'           Elle sera testée formellement à ce moment là
 '---------------------------------------------------------------------------------------
 '
 Public Sub vtkRecreateConfiguration(projectName As String, configurationName As String)
-    Dim cm As vtkConfigurationManager, rootPath As String, wbPath As String, Wb As Workbook
+    Dim cm As vtkConfigurationManager
+    Dim rootPath As String
+    Dim wbPath As String
+    Dim Wb As Workbook
+    Dim tmpWb As Workbook
+    Dim fso As New FileSystemObject
+
+    On Error GoTo vtkRecreateConfiguration_Error
+    
     ' Get the project and the rootPath of the project
     Set cm = vtkConfigurationManagerForProject(projectName)
     rootPath = cm.rootPath
-    ' Create Delivery folder if it doesn't exist
-    Dim path As String
-    path = rootPath & "\Delivery"
-    If Dir(path, vbDirectory) = vbNullString Then MkDir (path)
+    
     ' Get the configuration number in the project and the path of the file
     wbPath = cm.getConfigurationPath(configuration:=configurationName)
+    
+    ' Make sure the workbook we want to create is not open
+    ' NB : open add-ins don't count and are managed further down
+    For Each tmpWb In Workbooks
+        If tmpWb.name Like fso.GetFileName(wbPath) Then Err.Raise VTK_WORKBOOK_ALREADY_OPEN
+    Next
+    
+    'Make sure the source files exist
+    Dim mo As vtkModule
+    Dim conf As vtkConfiguration
+    Set conf = cm.configurations(configurationName)
+    For Each mo In conf.modules
+        If fso.FileExists(rootPath & "\" & mo.getPathForConfiguration(configurationName)) = False Then
+            Err.Raise VTK_NO_SOURCE_FILES
+        End If
+    Next
+    
     ' Create a new Excel file
     Set Wb = vtkCreateExcelWorkbook()
+    
     ' Set the projectName
     Wb.VBProject.name = configurationName
+    
     ' Import all modules for this configuration from the source directory
     vtkImportModulesInAnotherProject projectForModules:=Wb.VBProject, projectName:=projectName, confName:=configurationName
+    
     ' Recreate references in the new Excel File
-    VtkActivateReferences Wb:=Wb
-    ' Set attribute properties WARNING - only for Delivery VBAToolKit
-    Wb.BuiltinDocumentProperties("Title").Value = "VBAToolKit"
-    Wb.BuiltinDocumentProperties("Comments").Value = "Toolkit improving IDE for VBA projects"
-    ' Deactivate AddIn if the current Excel file is AddIn and installed
-    Dim fso As New FileSystemObject, fileName As String, addInWasActivated As Boolean, wbIsAddin As Boolean
-    fileName = fso.GetFileName(wbPath)
-   On Error Resume Next
-    wbIsAddin = Workbooks(fileName).IsAddin
-    If Err.Number = 0 And wbIsAddin Then
-        addInWasActivated = AddIns(configurationName).Installed
-        AddIns(configurationName).Installed = False
-       Else
-        addInWasActivated = False
-    End If
-   On Error GoTo 0
-    ' Save the Excel file with the good type and erase the previous one (a message is displayed to the user)
-    Wb.SaveAs fileName:=rootPath & "\" & wbPath, FileFormat:=vtkDefaultFileFormat(wbPath)
+    Dim toSelf As Boolean
+    toSelf = Right(Wb.VBProject.name, 4) Like "_DEV"
+    VtkActivateReferences Wb:=Wb, toSelf:=toSelf
+    
+    ' VB will not let the workbook be saved under the name of an already opened workbook, which
+    ' is annoying when recreating an add-in (always opened). The following code works around this.
+    Dim tmpPath As String
+    ' Add a random string to the file name of the workbook that will be saved
+    tmpPath = fso.BuildPath(rootPath & "\" & fso.GetParentFolderName(wbPath), _
+              vtkStripFilePathOrNameOfExtension(fso.GetFileName(wbPath)) & _
+              CStr(Round((99999 - 10000 + 1) * Rnd(), 0)) + 10000 & _
+              "." & fso.GetExtensionName(wbPath))
+    
+    ' Create the the folder containing the workbook if a 1-level or less deep folder structure
+    ' is specified in the configuration path.
+    vtkCreateFolderPath tmpPath
+    
+    ' Save the new workbook with the correct extension
+    Wb.SaveAs fileName:=tmpPath, FileFormat:=vtkDefaultFileFormat(wbPath)
     Wb.Close saveChanges:=False
-    ' Copy the AddIn in App Data folder (Only Excel 2007 at the moment)
-    Dim appPath As String
-    appPath = ""
-    If Application.Version = "12.0" Then appPath = Environ("appdata") & "\Microsoft\AddIns\" & fileName ' Path for Excel 2007
-    If Not appPath Like "" Then fso.CopyFile Source:=rootPath & "\" & wbPath, destination:=appPath, OverWriteFiles:=True
-    ' Reactivate The AddIn if it was activated
-    If addInWasActivated Then AddIns(configurationName).Installed = True
+    
+    ' Delete the old workbook if it exists
+    Dim fullWbpath As String
+    fullWbpath = rootPath & "\" & wbPath
+    If fso.FileExists(fullWbpath) Then fso.DeleteFile (fullWbpath)
+    
+    ' Rename the new workbook without the random string
+    fso.GetFile(tmpPath).name = fso.GetFileName(rootPath & "\" & wbPath)
+    
+    On Error GoTo 0
+    Exit Sub
+
+vtkRecreateConfiguration_Error:
+
+    If Not Wb Is Nothing Then Wb.Close saveChanges:=False
+
+    Err.Source = "vtkRecreateConfiguration of module vtkImportExportUtilities"
+    
+    Select Case Err.Number
+        Case VTK_WORKBOOK_ALREADY_OPEN
+            Err.Number = VTK_WORKBOOK_ALREADY_OPEN
+            Err.Description = "The configuration you're trying to create (" & configurationName & ") corresponds to an open workbook. " & _
+                              "Please close it before recreating the configuration."
+        Case VTK_NO_SOURCE_FILES
+            Err.Number = VTK_NO_SOURCE_FILES
+            Err.Description = "The configuration you're trying to create (" & configurationName & ") is missing one or several source files." & _
+                              "Please export the modules in their relevant path before recreating the configuration."
+        Case VTK_WRONG_FILE_PATH
+            Err.Number = VTK_WRONG_FILE_PATH
+            Err.Description = "The configuration you're trying to create (" & configurationName & ") has a invalid path." & _
+                              "Please check if the folder structure it needs is not more than one-level deep."
+        Case Else
+            Err.Number = VTK_UNEXPECTED_ERROR
+    End Select
+
+    Err.Raise Err.Number, Err.Source, Err.Description
+    
+    Exit Sub
+    
 End Sub
 
 '---------------------------------------------------------------------------------------
@@ -465,7 +519,7 @@ Public Function vtkExportConfiguration(projectWithModules As VBProject, projectN
     Exit Function
 
 vtkExportConfiguration_Error:
-    Err.Raise Err.Number, "procedure vtkExportConfiguration of Module vtkImportExportUtilities", Err.Source
+    Err.Raise Err.Number, "procedure vtkExportConfiguration of Module vtkImportExportUtilities", Err.Description
     Resume Next
 
 End Function

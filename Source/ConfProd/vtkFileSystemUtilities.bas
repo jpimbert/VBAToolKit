@@ -167,3 +167,76 @@ vtkDoesFolderExist_Error:
 
 End Function
 
+
+'---------------------------------------------------------------------------------------
+' Procedure : vtkCreateFolderPath
+' Author    : Lucas Vitorino
+' Purpose   : Will create every folder of the given path if they don't exist.
+' Notes     : Works only with an absolute path.
+' Raises    :
+'---------------------------------------------------------------------------------------
+'
+Public Sub vtkCreateFolderPath(fileOrFolderPath As String)
+
+    Dim fso As New FileSystemObject
+
+    On Error GoTo vtkCreateFolderPath_Error
+
+    ' Filter relative paths
+    If fso.GetDriveName(fileOrFolderPath) Like "" Then
+        Err.Raise VTK_FORBIDDEN_PARAMETER
+    End If
+    
+    ' Filter unmounted drives
+    If fso.DriveExists(fso.GetDriveName(fileOrFolderPath)) = False Then
+        Err.Raise VTK_WRONG_FOLDER_PATH
+    End If
+    
+    ' Filter dots
+    If InStr(fileOrFolderPath, ".\") <> 0 Then
+        Err.Raise VTK_FORBIDDEN_PARAMETER
+    End If
+    
+    ' Finding the path of the folder to be created, whether a file or folder path
+    '   has been given
+    Dim folderPath As String
+    If Not fso.GetExtensionName(fileOrFolderPath) Like "" Then
+        folderPath = fso.GetParentFolderName(fileOrFolderPath)
+    Else
+        folderPath = fileOrFolderPath
+    End If
+    
+    ' Main loop
+    Dim currentFolder As String
+    Dim folderArray() As String
+    folderArray = Split(folderPath, "\")
+    Dim i As Integer: i = 0
+    
+    currentFolder = folderArray(i)
+    i = i + 1
+    While i <= UBound(folderArray)
+        currentFolder = currentFolder & "\" & folderArray(i)
+        If Not fso.folderExists(currentFolder) Then MkDir currentFolder
+        i = i + 1
+    Wend
+
+    On Error GoTo 0
+    Exit Sub
+
+vtkCreateFolderPath_Error:
+    Err.Source = "vtkCreateFolderPath of module vtkFileSystemUtilities"
+    
+    Select Case Err.Number
+        Case VTK_WRONG_FOLDER_PATH
+            Err.Description = "The path given as a parameter corresponds to a drive that is not mounted."
+        Case VTK_FORBIDDEN_PARAMETER
+            Err.Description = "The path given as a parameter has illegal features. " & vbCrLf & _
+                              "Make sure it is an absolute path that does not use dots or double dots to designate a folder."
+        Case Else
+            Err.Number = VTK_UNEXPECTED_ERROR
+    End Select
+    
+    Err.Raise Err.Number, Err.Source, Err.Description
+    
+    Exit Sub
+End Sub

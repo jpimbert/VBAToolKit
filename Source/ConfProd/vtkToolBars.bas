@@ -105,11 +105,32 @@ End Function
 Public Sub vtkCreateToolbars(Optional vbeToolbar As Boolean = True, Optional excToolbar As Boolean = True)
     vtkCreateEmptyToolbars vbeToolbar:=vbeToolbar, excToolbar:=excToolbar
     ' Create the button for VBE Toolbar reactivation
-    If excToolbar Then vtkCreateToolbarButton caption:="Reset VBE Toolbar", helpText:="Click here to reset the VBA IDE Toolbar", faceId:=688, action:=projectName & ".vtkReactivateVBEToolBar", vbeToolbar:=False, excToolbar:=True
+    If excToolbar Then
+        vtkCreateToolbarButton caption:="Reset VBE Toolbar", _
+                               helpText:="Click here to reset the VBA IDE Toolbar", _
+                               faceId:=688, _
+                               action:=projectName & ".vtkReactivateVBEToolBar", _
+                               vbeToolbar:=False, _
+                               excToolbar:=True
+    End If
+                               
     ' Create other buttons
-    vtkCreateToolbarButton caption:="Create Project", helpText:="Click here to create a new project", faceId:=2031, action:=projectName & ".vtkShowCreateProjectForm", vbeToolbar:=vbeToolbar, excToolbar:=excToolbar
-'    doesn't work because it's a Hara-Kiri for VBAToolKit itself
-'    vtkCreateToolbarButton caption:="Recreate Delivery", helpText:="Click here to recreate the configuration for delivery", faceId:=680, action:=projectName & ".vtkRecreateDeliveryClicked", vbeToolbar:=vbeToolbar, excToolbar:=excToolbar
+    vtkCreateToolbarButton caption:="Create Project", _
+                           helpText:="Click here to create a new project", _
+                           faceId:=2031, _
+                           action:=projectName & ".vtkShowCreateProjectForm", _
+                           vbeToolbar:=vbeToolbar, _
+                           excToolbar:=excToolbar
+
+    ' Create the button for recreate configuration
+    vtkCreateToolbarButton caption:="Recreate Configuration", _
+                           helpText:="Click here to recreate a configuration", _
+                           faceId:=680, _
+                           action:=projectName & ".vtkShowRecreateConfigurationForm", _
+                           vbeToolbar:=vbeToolbar, _
+                           excToolbar:=excToolbar
+                           
+                           
 End Sub
 
 '---------------------------------------------------------------------------------------
@@ -175,10 +196,10 @@ End Sub
 '---------------------------------------------------------------------------------------
 '
 Public Sub vtkReactivateVBEToolBar()
-    Dim c As CommandBarControl
+    Dim C As CommandBarControl
     vtkClearEventHandlers
-    For Each c In Application.VBE.CommandBars(toolBarName).Controls
-        vtkAddEventHandler action:=c.onAction, cmdBarCtl:=c
+    For Each C In Application.VBE.CommandBars(toolBarName).Controls
+        vtkAddEventHandler action:=C.onAction, cmdBarCtl:=C
     Next
 End Sub
 
@@ -245,6 +266,10 @@ End Function
 '
 Private Sub vtkShowCreateProjectForm()
     vtkCreateProjectForm.Show
+End Sub
+
+Public Sub vtkShowRecreateConfigurationForm()
+    vtkRecreateConfigurationForm.Show
 End Sub
 
 ' Special CallBack, manually configured in Excel to recreate AddIn
