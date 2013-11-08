@@ -388,4 +388,10 @@
 		<path confName="VBAToolKit_DEV">Source\ConfProd\vtkRecreateConfigurationForm.frm</path>
 		<path confName="VBAToolKit_2003">Source\ConfProd\vtkRecreateConfigurationForm.frm</path>
 	</module>
+	<module>
+		<name>vtkXMLFilesCreator</name>
+		<path confName="VBAToolKit">Source\ConfProd\vtkXMLFilesCreator.bas</path>
+		<path confName="VBAToolKit_DEV">Source\ConfProd\vtkXMLFilesCreator.bas</path>
+		<path confName="VBAToolKit_2003">Source\ConfProd\vtkXMLFilesCreator.bas</path>
+	</module>
 </vtkConf>
