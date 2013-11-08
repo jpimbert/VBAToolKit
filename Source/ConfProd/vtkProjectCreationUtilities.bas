@@ -134,3 +134,41 @@ vtkAddBeforeSaveHandlerInDEVWorkbook_Error:
     Resume Next
 End Sub
 
+
+'---------------------------------------------------------------------------------------
+' Procedure : listOfDefaultReferences
+' Author    : Lucas Vitorino
+' Purpose   : Returns a collection of VBIDE.Reference objects corresponding to the default
+'             references activated by default in a new VBAToolKit project.
+'---------------------------------------------------------------------------------------
+'
+Public Function listOfDefaultReferences() As Collection
+    Dim retList As Collection
+    Set retList = New Collection
+    
+    Dim refName As Variant ' necessary evil : can't loop through a collection of String without Variant
+    For Each refName In listOfDefaultReferencesNames
+        retList.Add Item:=ThisWorkbook.VBProject.References(refName)
+    Next
+    
+    Set listOfDefaultReferences = retList
+End Function
+
+'---------------------------------------------------------------------------------------
+' Procedure : listOfDefaultReferencesNames
+' Author    : Lucas Vitorino
+' Purpose   : Returns a collection of Strings corresponding to the default
+'             references activated by default in a new VBAToolKit project.
+'---------------------------------------------------------------------------------------
+'
+Public Function listOfDefaultReferencesNames() As Collection
+    Set listOfDefaultReferencesNames = New Collection
+    With listOfDefaultReferencesNames
+            .Add Item:="Scripting", Key:="Scripting" ' Microsoft scripting runtime
+            .Add Item:="VBIDE", Key:="VBIDE" ' Microsoft visual basic for applications extensibility 5.3
+            .Add Item:="Shell32", Key:="Shell32" ' Microsoft Shell Controls and Automation
+            .Add Item:="MSXML2", Key:="MSXML2" ' Microsoft XML V5.0
+            .Add Item:="ADODB", Key:="ADODB" ' Microsoft ActiveX Data Objects V2.6 Library
+    End With
+End Function
+

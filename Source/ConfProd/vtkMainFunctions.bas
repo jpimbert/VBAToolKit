@@ -71,7 +71,7 @@ Public Function vtkCreateProject(path As String, name As String, Optional displa
     ' Create the XML vtkConfigurations sheet in the standard folder, the dtd is supposed to be in the same folder
     createInitializedXMLSheetForProject sheetPath:=fso.BuildPath(rootPath, project.XMLConfigurationStandardRelativePath), _
                                         projectName:=project.projectName, _
-                                        dtdPath:=fso.BuildPath(fso.GetParentFolderName(project.XMLConfigurationStandardRelativePath), "vtkConfigurationsDTD.dtd")
+                                        dtdPath:="vtkConfigurationsDTD.dtd"
                                         
     ' Create the DTD sheet for the XML vtkConfigurations sheet in the same folder
     createDTDForVtkConfigurations sheetPath:=fso.BuildPath(rootPath, fso.BuildPath(fso.GetParentFolderName(project.XMLConfigurationStandardRelativePath), "vtkConfigurationsDTD.dtd"))

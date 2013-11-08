@@ -127,10 +127,10 @@ TestMainFolderIsCreated_Error:
 
 End Sub
 
-Public Sub TestDevXlsmFileCreated()
+Public Sub TestDevXmlFileCreated()
 'test that xml file is created in the right path
     Dim returnValue As Long
-    On Error GoTo TestDevXlsmFileCreated_Error
+    On Error GoTo TestDevXmlFileCreated_Error
 
     returnValue = vtkCreateProject(path:=VBAToolKit.vtkTestPath, name:=vtkTestProjectName, displayError:=False)
     mAssert.Should fso.FileExists(VBAToolKit.vtkTestPath & "\" & vtkTestProjectName & "\" & "Project" & "\" & vtkTestProjectName & ".xml"), "the xml sheet must be created"
@@ -138,15 +138,15 @@ Public Sub TestDevXlsmFileCreated()
     On Error GoTo 0
     Exit Sub
 
-TestDevXlsmFileCreated_Error:
-    Err.Source = "Sub TestDevXlsmFileCreated in module vtkCreateProjectTester"
+TestDevXmlFileCreated_Error:
+    Err.Source = "Sub TestDevXmlFileCreated in module vtkCreateProjectTester"
     mAssert.Should False, "Unexpected Error " & Err.Number & " (" & Err.Description & ") in " & Err.Source
     Exit Sub
 
 End Sub
 
 Public Sub TestProjectIsNamedcorrectly()
-'test that xlsm is correctly renamed
+'test that the project is named correctly in the configuration sheet
     On Error GoTo TestProjectIsNamedcorrectly_Error
 
     Dim returnValue As Long
@@ -169,7 +169,7 @@ End Sub
 
 
 Public Sub TestDevProjectIsNamedcorrectly()
-'test that xlsm is correctly renamed
+'test that the dev configuration is named correctly in the configuration sheet
     On Error GoTo TestDevProjectIsNamedcorrectly_Error
     
     Dim returnValue As Long
@@ -192,7 +192,7 @@ End Sub
 
 
 Public Sub TestDelivProjectIsNamedcorrectly()
-'test that xlsm is correctly renamed
+'test that the delivery configuration is named correctly in the configuration sheet
     On Error GoTo TestDelivProjectIsNamedcorrectly_Error
 
     Dim returnValue As Long
@@ -215,6 +215,7 @@ End Sub
 
 
 Public Sub Test_vtkCreateProject_correctPathGitFolderIsCreated()
+' test that the .git folder is created
     Dim fso As New FileSystemObject
 
     On Error GoTo Test_vtkCreateProject_correctPathGitFolderIsCreated_Error
@@ -250,6 +251,7 @@ End Sub
 '''mAssert.Equals j, 2, "the searched reference number must be equal to " & 2
 '''mAssert.Equals Workbooks(vtkTestProjectName & "_DEV.xlsm").VBProject.References.count, expectedReferenceCount + 1, "the total references number must be equal to " & expectedReferenceCount + 1
 '''End Sub
+'''
 '''
 '''Public Sub TestReferencesOfDeliveryWorkbookWasActivated()
 ''' Dim returnValue As Long
