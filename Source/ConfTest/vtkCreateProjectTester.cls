@@ -280,6 +280,7 @@ TestToSelfReferenceIsPresentAndActivatedByDefaultForDEV_Error:
 
 End Sub
 
+
 Public Sub TestReferencesOfDevConfigurationAreActivated()
 ' test that the references of the DEV configuration are activated
     On Error GoTo TestReferencesOfDevConfigurationAreActivated_Error
@@ -288,13 +289,14 @@ Public Sub TestReferencesOfDevConfigurationAreActivated()
 
     Dim dom As New MSXML2.DOMDocument
     dom.Load VBAToolKit.vtkTestPath & "\" & vtkTestProjectName & "\" & "Project" & "\" & vtkTestProjectName & ".xml"
+    dom.setProperty "SelectionLanguage", "XPath"
 
     Dim confId As String
     confId = dom.SelectSingleNode("/vtkConf/configuration[name=""" & vtkTestProjectName & "_DEV""]/@cID").Text
 
     Dim tmpRef As VBIDE.Reference
     For Each tmpRef In listOfDefaultReferences
-        mAssert.Equals dom.SelectNodes("/vtkConf/reference[name=""" & tmpRef.name & """][@confIds=""" & confId & """]").Length, 1, "The reference " & tmpRef.name & " should be present in the sheet."
+        mAssert.Equals dom.SelectNodes("/vtkConf/reference[name=""" & tmpRef.name & """ and @confIDs[contains(., """ & confId & """)]]").Length, 1, "The reference " & tmpRef.name & " should be activated for conf DEV."
     Next
 
     On Error GoTo 0
@@ -307,25 +309,35 @@ TestReferencesOfDevConfigurationAreActivated_Error:
 
 End Sub
 
+Public Sub TestReferencesOfDeliveryConfigurationAreActivated()
+' test that the references of the Delvivery configuration are activated
+    On Error GoTo TestReferencesOfDeliveryConfigurationAreActivated_Error
 
-'''Public Sub TestReferencesOfDeliveryWorkbookWasActivated()
-''' Dim returnValue As Long
-''' Dim i As Integer
-''' Dim j As Integer
-''' j = 0
-''''this function will count extention number before executing function ,
-''''and extentions number must be equal to(initial extention number + added extention number )
-'''returnValue = vtkCreateProject(path:=VBAToolKit.vtkTestPath, name:=vtkTestProjectName, displayError:=False)
-'''    OpenDeliveryProject
-'''
-'''    For i = 1 To Workbooks(vtkTestProjectName & ".xlsm").VBProject.References.count
-'''        If ((Workbooks(vtkTestProjectName & ".xlsm").VBProject.References(i).GUID) = "{420B2830-E718-11CF-893D-00A0C9054228}") Or (Workbooks(vtkTestProjectName & ".xlsm").VBProject.References(i).GUID = "{0002E157-0000-0000-C000-000000000046}") Then
-'''        j = j + 1
-'''        End If
-'''    Next
-'''mAssert.Equals j, 2, "the searched reference number must be equal to " & 2
-'''mAssert.Equals Workbooks(vtkTestProjectName & ".xlsm").VBProject.References.count, expectedReferenceCount, "the total references number must be equal to " & expectedReferenceCount
-'''End Sub
+    vtkCreateProject path:=VBAToolKit.vtkTestPath, name:=vtkTestProjectName, displayError:=False
+
+    Dim dom As New MSXML2.DOMDocument
+    dom.Load VBAToolKit.vtkTestPath & "\" & vtkTestProjectName & "\" & "Project" & "\" & vtkTestProjectName & ".xml"
+    dom.setProperty "SelectionLanguage", "XPath"
+    
+    Dim confId As String
+    confId = dom.SelectSingleNode("/vtkConf/configuration[name=""" & vtkTestProjectName & """]/@cID").Text
+
+    Dim tmpRef As VBIDE.Reference
+    For Each tmpRef In listOfDefaultReferences
+        mAssert.Equals dom.SelectNodes("/vtkConf/reference[name=""" & tmpRef.name & """ and @confIDs[contains(., """ & confId & """)]]").Length, 1, "The reference " & tmpRef.name & " should be activated for conf DEV."
+    Next
+
+    On Error GoTo 0
+    Exit Sub
+
+TestReferencesOfDeliveryConfigurationAreActivated_Error:
+    Err.Source = "Sub TestReferencesOfDeliveryConfigurationAreActivated in module vtkCreateProjectTester"
+    mAssert.Should False, "Unexpected Error " & Err.Number & " (" & Err.Description & ") in " & Err.Source
+    Exit Sub
+
+End Sub
+
+
 '''
 '''Public Sub Test_VBAUnitModulesExportation()
 '''    '   Verify that VBA modules are exported from VBAToolkit to the new project
@@ -438,6 +450,7 @@ Private Function ITest_Suite() As TestSuite
     ITest_Suite.AddTest ITest_Manager.ClassName, "TestDefaultReferencesArePresent"
     ITest_Suite.AddTest ITest_Manager.ClassName, "TestToSelfReferenceIsPresentAndActivatedByDefaultForDEV"
     ITest_Suite.AddTest ITest_Manager.ClassName, "TestReferencesOfDevConfigurationAreActivated"
+    ITest_Suite.AddTest ITest_Manager.ClassName, "TestReferencesOfDeliveryConfigurationAreActivated"
 End Function
 
 Private Sub ITestCase_RunTest()
@@ -453,6 +466,7 @@ Private Sub ITestCase_RunTest()
         Case "TestDefaultReferencesArePresent": TestDefaultReferencesArePresent
         Case "TestToSelfReferenceIsPresentAndActivatedByDefaultForDEV": TestToSelfReferenceIsPresentAndActivatedByDefaultForDEV
         Case "TestReferencesOfDevConfigurationAreActivated": TestReferencesOfDevConfigurationAreActivated
+        Case "TestReferencesOfDeliveryConfigurationAreActivated": TestReferencesOfDeliveryConfigurationAreActivated
         Case Else: mAssert.Should False, "Invalid test name: " & mManager.methodName
     End Select
 End Sub

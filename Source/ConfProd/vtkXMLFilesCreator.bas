@@ -87,23 +87,24 @@ Public Sub createInitializedXMLSheetForProject(sheetPath As String, _
         xmlFile.WriteBlankLines Lines:=1
     Next i
 
-    ' Create the references for the DEV configuration
+    ' Create the references for the DEV and the delivery configurations
     Dim tmpRef As VBIDE.Reference
     For Each tmpRef In listOfDefaultReferences
-        xmlFile.WriteLine Text:="    <reference confIDs=""c01"">"
+        xmlFile.WriteLine Text:="    <reference confIDs=""c01 c02"">"
         xmlFile.WriteLine Text:="        <name>" & tmpRef.name & "</name>"
         xmlFile.WriteLine Text:="        <guid>" & tmpRef.GUID & "</guid>"
         xmlFile.WriteLine Text:="    </reference>"
         xmlFile.WriteBlankLines Lines:=1
     Next
     
+    ' Create the reference "to self" only for the DEV configuration
     If addReferenceToSelf Then
         xmlFile.WriteLine Text:="    <reference confIDs=""c01"">"
         xmlFile.WriteLine Text:="        <name>" & ThisWorkbook.VBProject.name & "</name>"
         xmlFile.WriteLine Text:="        <guid>" & ThisWorkbook.name & "</guid>"
         xmlFile.WriteLine Text:="    </reference>"
         xmlFile.WriteBlankLines Lines:=1
-    Next
+    End If
 
     ' Close the file
     xmlFile.WriteLine Text:="</vtkConf>"
