@@ -38,6 +38,8 @@ Private Const expectedReferenceCount = 9
 Private mManager As TestCaseManager
 Private mAssert As IAssert
 
+Private fso As New FileSystemObject
+
 Private Sub Class_Initialize()
     Set mManager = New TestCaseManager
 End Sub
@@ -55,40 +57,73 @@ Private Sub ITestCase_SetUp(Assert As IAssert)
 End Sub
 
 Private Sub ITestCase_TearDown()
+    vtkCleanFolder VBAToolKit.vtkTestPath
+    'VBAToolKit.resetTestFolder 'Throws me a "Error 5006 : permission denied" at third test
     vtkResetConfigurationManagers             ' reset all configuration managers
     vtkResetProjects
-    VBAToolKit.resetTestFolder
+End Sub
+
+Public Sub TestCreateProjectDoesNothingWhenPathDoesntExist()
+    ' The createProject must does nothing when path doesn't exist
+    Dim InexistentPath As String
+    Dim returnValue As Long
+    On Error GoTo TestCreateProjectDoesNothingWhenPathDoesntExist_Error
+
+    InexistentPath = VBAToolKit.vtkTestPath & "\InexistentFolder"
+    returnValue = vtkCreateProject(path:=InexistentPath, name:=vtkTestProjectName, displayError:=False)
+    mAssert.Should Dir(InexistentPath & "\" & vtkTestProjectName, vbDirectory) = "", "The project main folder must exist"
+    mAssert.Equals returnValue, 76, "The project creation must fail"
+
+    On Error GoTo 0
+    Exit Sub
+
+TestCreateProjectDoesNothingWhenPathDoesntExist_Error:
+    Err.Source = "Sub TestCreateProjectDoesNothingWhenPathDoesntExist in module vtkCreateProjectTester"
+    mAssert.Should False, "Unexpected Error " & Err.Number & " (" & Err.Description & ") in " & Err.Source
+    Exit Sub
+
 End Sub
 
 
+Public Sub TestCreateProjectAlreadyExisting()
+    ' The createProject must does nothing when project already exists
+    Dim returnValue As Long
+    On Error GoTo TestCreateProjectAlreadyExisting_Error
 
-'''Public Sub TestCreateProjectDoesNothingWhenPathDoesntExist()
-'''    ' The createProject must does nothing when path doesn't exist
-'''    Dim InexistentPath As String
-'''    Dim returnValue As Long
-'''    InexistentPath = VBAToolKit.vtkTestPath & "\InexistentFolder"
-'''    returnValue = vtkCreateProject(path:=InexistentPath, name:=vtkTestProjectName, displayError:=False)
-'''    mAssert.Should Dir(InexistentPath & "\" & vtkTestProjectName, vbDirectory) = "", "The project main folder must exist"
-'''    mAssert.Equals returnValue, 76, "The project creation must fail"
-'''End Sub
-'''
-'''Public Sub TestCreateProjectAlreadyExisting()
-'''    ' The createProject must does nothing when project already exists
-'''    Dim returnValue As Long
-'''    MkDir VBAToolKit.vtkTestPath & "\" & vtkTestProjectName 'must respect order mkdir before call vtkcreateproject
-'''    returnValue = vtkCreateProject(path:=VBAToolKit.vtkTestPath, name:=vtkTestProjectName, displayError:=False)
-'''    mAssert.Should Dir(VBAToolKit.vtkTestPath & "\" & vtkTestProjectName, vbDirectory) <> "", "The existing project main folder must exist"
-'''    mAssert.Equals returnValue, 75, "The project creation must fail"
-'''End Sub
-'''
-'''Public Sub TestMainFolderIsCreated()
-'''    ' The createProject subroutine must create a new folder named like the project in the path
-'''    Dim returnValue As Long
-'''    returnValue = vtkCreateProject(path:=VBAToolKit.vtkTestPath, name:=vtkTestProjectName, displayError:=False)
-'''    mAssert.Should Dir(VBAToolKit.vtkTestPath & "\" & vtkTestProjectName, vbDirectory) <> "", "The project main folder must exist"
-'''    mAssert.Equals returnValue, VTK_OK, "The project creation must succeed"
-'''End Sub
-'''
+    MkDir VBAToolKit.vtkTestPath & "\" & vtkTestProjectName 'must respect order mkdir before call vtkcreateproject
+    returnValue = vtkCreateProject(path:=VBAToolKit.vtkTestPath, name:=vtkTestProjectName, displayError:=False)
+    mAssert.Should Dir(VBAToolKit.vtkTestPath & "\" & vtkTestProjectName, vbDirectory) <> "", "The existing project main folder must exist"
+    mAssert.Equals returnValue, 75, "The project creation must fail"
+
+    On Error GoTo 0
+    Exit Sub
+
+TestCreateProjectAlreadyExisting_Error:
+    Err.Source = "Sub TestCreateProjectAlreadyExisting in module vtkCreateProjectTester"
+    mAssert.Should False, "Unexpected Error " & Err.Number & " (" & Err.Description & ") in " & Err.Source
+    Exit Sub
+
+End Sub
+
+Public Sub TestMainFolderIsCreated()
+    ' The createProject subroutine must create a new folder named like the project in the path
+    Dim returnValue As Long
+    On Error GoTo TestMainFolderIsCreated_Error
+
+    returnValue = vtkCreateProject(path:=VBAToolKit.vtkTestPath, name:=vtkTestProjectName, displayError:=False)
+    mAssert.Should fso.folderExists(VBAToolKit.vtkTestPath & "\" & vtkTestProjectName), "The project main folder must exist"
+    mAssert.Equals returnValue, VTK_OK, "The project creation must succeed"
+
+    On Error GoTo 0
+    Exit Sub
+
+TestMainFolderIsCreated_Error:
+    Err.Source = "Sub TestMainFolderIsCreated in module vtkCreateProjectTester"
+    mAssert.Should False, "Unexpected Error " & Err.Number & " (" & Err.Description & ") in " & Err.Source
+    Exit Sub
+
+End Sub
+
 '''Public Sub TestDevXlsmFileCreated()
 ''''test that xlsm file is created in the right path
 '''    Dim returnValue As Long
@@ -291,18 +326,6 @@ Private Function ITest_Suite() As TestSuite
     ITest_Suite.AddTest ITest_Manager.ClassName, "TestCreateProjectDoesNothingWhenPathDoesntExist"
     ITest_Suite.AddTest ITest_Manager.ClassName, "TestCreateProjectAlreadyExisting"
     ITest_Suite.AddTest ITest_Manager.ClassName, "TestMainFolderIsCreated"
-    ITest_Suite.AddTest ITest_Manager.ClassName, "TestDevXlsmFileCreated"
-    ITest_Suite.AddTest ITest_Manager.ClassName, "TestDevXlsmFileIsNamedcorrectly"
-    ITest_Suite.AddTest ITest_Manager.ClassName, "TestDelivXlsmFileCreated"
-    ITest_Suite.AddTest ITest_Manager.ClassName, "TestDevProjectIsNamedcorrectly"
-    ITest_Suite.AddTest ITest_Manager.ClassName, "TestDelivProjectIsNamedcorrectly"
-    ITest_Suite.AddTest ITest_Manager.ClassName, "TestReferencesOfDevWorkbookWasActivated"
-    ITest_Suite.AddTest ITest_Manager.ClassName, "TestReferencesOfDeliveryWorkbookWasActivated"
-    ITest_Suite.AddTest ITest_Manager.ClassName, "Test_VBAUnitModulesExportation"
-    ITest_Suite.AddTest ITest_Manager.ClassName, "Test_VBAUnitModulesImportation"
-    ITest_Suite.AddTest ITest_Manager.ClassName, "Test_vtkCreateProject_correctPathGitFolderIsCreated"
-    ITest_Suite.AddTest ITest_Manager.ClassName, "Test_vtkCreateProject_handlerAddedInDEVWorkbook_modulesAreExported"
-    ITest_Suite.AddTest ITest_Manager.ClassName, "Test_vtkCreateProject_handlerAddedInDEVWorkbook_xmlIsCreated"
 End Function
 
 Private Sub ITestCase_RunTest()
@@ -310,18 +333,6 @@ Private Sub ITestCase_RunTest()
         Case "TestCreateProjectDoesNothingWhenPathDoesntExist": TestCreateProjectDoesNothingWhenPathDoesntExist
         Case "TestCreateProjectAlreadyExisting": TestCreateProjectAlreadyExisting
         Case "TestMainFolderIsCreated": TestMainFolderIsCreated
-        Case "TestDevXlsmFileCreated": TestDevXlsmFileCreated
-        Case "TestDevXlsmFileIsNamedcorrectly": TestDevXlsmFileIsNamedcorrectly
-        Case "TestDelivXlsmFileCreated": TestDelivXlsmFileCreated
-        Case "TestDevProjectIsNamedcorrectly": TestDevProjectIsNamedcorrectly
-        Case "TestDelivProjectIsNamedcorrectly": TestDelivProjectIsNamedcorrectly
-        Case "TestReferencesOfDevWorkbookWasActivated": TestReferencesOfDevWorkbookWasActivated
-        Case "TestReferencesOfDeliveryWorkbookWasActivated": TestReferencesOfDeliveryWorkbookWasActivated
-        Case "Test_VBAUnitModulesExportation": Test_VBAUnitModulesExportation
-        Case "Test_VBAUnitModulesImportation": Test_VBAUnitModulesImportation
-        Case "Test_vtkCreateProject_correctPathGitFolderIsCreated": Test_vtkCreateProject_correctPathGitFolderIsCreated
-        Case "Test_vtkCreateProject_handlerAddedInDEVWorkbook_modulesAreExported": Test_vtkCreateProject_handlerAddedInDEVWorkbook_modulesAreExported
-        Case "Test_vtkCreateProject_handlerAddedInDEVWorkbook_xmlIsCreated": Test_vtkCreateProject_handlerAddedInDEVWorkbook_xmlIsCreated
         Case Else: mAssert.Should False, "Invalid test name: " & mManager.methodName
     End Select
 End Sub
