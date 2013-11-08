@@ -479,9 +479,6 @@ Public Function listOfRememberedProjects() As Collection
     On Error GoTo 0
     Exit Function
 
-    On Error GoTo 0
-    Exit Function
-
 listOfRememberedProjects_Error:
     Err.Source = "Function listOfRememberedProjects in module vtkProjects"
     Debug.Print "Error " & Err.Number & " : " & Err.Description & " in " & Err.Source

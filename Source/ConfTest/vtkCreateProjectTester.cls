@@ -40,6 +40,9 @@ Private mAssert As IAssert
 
 Private fso As New FileSystemObject
 
+Private Const standardRememberedProjectsDTDName As String = "vtkRememberedProjectsDTD.dtd"
+Private Const rememberedProjectsSheetName As String = "VBAToolKitRememberdProjects.xml"
+
 Private Sub Class_Initialize()
     Set mManager = New TestCaseManager
 End Sub
@@ -57,6 +60,20 @@ Private Sub ITestCase_SetUp(Assert As IAssert)
     vtkCleanFolder VBAToolKit.vtkTestPath
     vtkResetConfigurationManagers             ' reset all configuration managers
     vtkResetProjects
+    
+    ' Create the files we'll need for remembering projects
+    createDTDforRememberedProjects sheetPath:=fso.BuildPath(VBAToolKit.vtkTestPath, standardRememberedProjectsDTDName)
+    
+    createRememberedProjectsXMLSheet sheetPath:=fso.BuildPath(VBAToolKit.vtkTestPath, rememberedProjectsSheetName), _
+                                     dtdPath:=fso.BuildPath(VBAToolKit.vtkTestPath, standardRememberedProjectsDTDName)
+    
+    ' Add the TestProject to the list of remembered projects
+    xmlRememberedProjectsFullPath = fso.BuildPath(VBAToolKit.vtkTestPath, rememberedProjectsSheetName)
+    
+    vtkAddRememberedProject projectName:=vtkTestProjectName, _
+                            rootFolder:=fso.BuildPath(VBAToolKit.vtkTestPath, vtkTestProjectName), _
+                            xmlRelativePath:="Project\" & vtkTestProjectName & ".xml"
+    
 End Sub
 
 Private Sub ITestCase_TearDown()
@@ -64,6 +81,7 @@ Private Sub ITestCase_TearDown()
     'VBAToolKit.resetTestFolder 'Throws me a "Error 5006 : permission denied" at third test
     vtkResetConfigurationManagers             ' reset all configuration managers
     vtkResetProjects
+
 End Sub
 
 Public Sub TestCreateProjectDoesNothingWhenPathDoesntExist()
@@ -466,6 +484,7 @@ Private Function ITest_Suite() As TestSuite
     ITest_Suite.AddTest ITest_Manager.ClassName, "TestToSelfReferenceIsPresentAndActivatedByDefaultForDEV"
     ITest_Suite.AddTest ITest_Manager.ClassName, "TestReferencesOfDevConfigurationAreActivated"
     ITest_Suite.AddTest ITest_Manager.ClassName, "TestReferencesOfDeliveryConfigurationAreActivated"
+    ITest_Suite.AddTest ITest_Manager.ClassName, "TestNewProjectIsRemembered"
 End Function
 
 Private Sub ITestCase_RunTest()
@@ -482,6 +501,7 @@ Private Sub ITestCase_RunTest()
         Case "TestToSelfReferenceIsPresentAndActivatedByDefaultForDEV": TestToSelfReferenceIsPresentAndActivatedByDefaultForDEV
         Case "TestReferencesOfDevConfigurationAreActivated": TestReferencesOfDevConfigurationAreActivated
         Case "TestReferencesOfDeliveryConfigurationAreActivated": TestReferencesOfDeliveryConfigurationAreActivated
+        Case "TestNewProjectIsRemembered": TestNewProjectIsRemembered
         Case Else: mAssert.Should False, "Invalid test name: " & mManager.methodName
     End Select
 End Sub
