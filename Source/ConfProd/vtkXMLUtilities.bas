@@ -252,6 +252,16 @@ Public Sub vtkExportConfigurationsAsXML(projectName As String, filePath As Strin
     xmlFile.WriteBlankLines Lines:=1
     
     ' Create Configuration elements
+    Dim cf As vtkConfiguration, cfNum As Integer
+    cfNum = 1
+    For Each cf In cm.configurations
+        xmlFile.WriteLine Text:="    <configuration cID=""c" & cfNum & """>"
+        xmlFile.WriteLine Text:="        <name>" & cf.name & "</name>"
+        xmlFile.WriteLine Text:="        <path>" & cf.path & "</path>"
+        xmlFile.WriteLine Text:="    </configuration>"
+        cfNum = cfNum + 1
+    Next
+    
     ' Create Module elements
     ' Create References elements
     

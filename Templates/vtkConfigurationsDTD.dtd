@@ -17,6 +17,6 @@
                 <!ELEMENT modulePath (#PCDATA)>
                  <!ATTLIST modulePath confId IDREF #REQUIRED>
         
-        <!ELEMENT reference (name, (guid|path), usedByConf*)>
+        <!ELEMENT reference (name, (guid|path))>
          <!ATTLIST reference confIDs IDREFS #REQUIRED>
                 <!ELEMENT guid (#PCDATA)>

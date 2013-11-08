@@ -167,47 +167,6 @@ End Function
 ' Tests
 '--------------------------------------------
 
-Public Sub Test_vtkExportAsXMLDom_correctNameForRoot()
-'   rootNode -> correct name
-
-    On Error GoTo Test_vtkExportAsXMLDom_correctNameForRoot_Error
-
-    Dim expected As String
-    Dim actual As String
-    expected = "vtkConf"
-    actual = retDom.ChildNodes.Item(1).BaseName
-
-    mAssert.Equals expected, actual, "The root node has an incorrect name."
-
-
-    On Error GoTo 0
-    Exit Sub
-
-Test_vtkExportAsXMLDom_correctNameForRoot_Error:
-    mAssert.Should False, "Unexpected error " & Err.Number & " (" & Err.Description & ") in procedure" & Err.Source
-    ITestCase_TearDown
-    Exit Sub
-End Sub
-
-
-Public Sub Test_vtkExportAsXMLDom_correctNumberOfInfoObject()
-'   info -> 1 info object
-
-    On Error GoTo Test_vtkExportAsXMLDom_correctNumberOfInfoObject_Error
-
-    mAssert.Equals countElementsInDom("info", retDom), 1, "DOM should have 1 info object."
-
-    On Error GoTo 0
-    Exit Sub
-
-Test_vtkExportAsXMLDom_correctNumberOfInfoObject_Error:
-    Err.Source = "Test_vtkExportAsXMLDom_correctNumberOfInfoObject of module vtkXMLExportTester"
-    mAssert.Should False, "Unexpected error " & Err.Number & " (" & Err.Description & ") in " & Err.Source
-    ITestCase_TearDown
-    Exit Sub
-End Sub
-
-
 Public Sub Test_vtkExportConfigurationsAsXML_correctInfoContent()
 '   info -> correct content
 
@@ -225,73 +184,40 @@ Test_vtkExportConfigurationsAsXML_correctDomContent_Error:
 End Sub
 
 
-Public Sub Test_vtkExportAsXMLDom_correctConfigurationNumber()
+Public Sub Test_vtkExportConfigurationsAsXML_correctConfigurationNumber()
 '   configurations -> correct number of configurations
     
-    On Error GoTo Test_vtkExportAsXMLDom_correctConfigurationNumber_Error
+    On Error GoTo Test_vtkExportConfigurationsAsXML_correctConfigurationNumber_Error
     
-    Dim numConf As Integer
-    numConf = cm.configurationCount
-
-    mAssert.Equals countElementsInDom("configuration", retDom), numConf, "DOM should have " & numConf & " configuration objects."
+    mAssert.Equals reloadDom.SelectNodes("/vtkConf/configuration").Length, cm.configurationCount, "Expected number of configuration elements"
 
     On Error GoTo 0
     Exit Sub
 
-Test_vtkExportAsXMLDom_correctConfigurationNumber_Error:
+Test_vtkExportConfigurationsAsXML_correctConfigurationNumber_Error:
     Err.Source = "Test_vtkExportAsXMLDom_correctConfigurationNumber of module vtkXMLExportTester"
     mAssert.Should False, "Unexpected error " & Err.Number & " (" & Err.Description & ") in " & Err.Source
-    ITestCase_TearDown
-    Exit Sub
+    Resume Next
 End Sub
 
 
-Public Sub Text_vtkExportAsDom_correctConfigurationContent()
+Public Sub Text_vtkExportConfigurationsAsXML_correctConfigurationContent()
 '   configurations -> correct content
 
-    On Error GoTo Text_vtkExportAsDom_correctConfigurationContent_Error
+    On Error GoTo Text_vtkExportConfigurationsAsXML_correctConfigurationContent_Error
 
-    Dim retDom As MSXML2.DOMDocument
+    mAssert.Equals reloadDom.SelectSingleNode("/vtkConf/configuration[@cID=""c1""]/name").Text, "TestProject", "Expected name of first configuration"
+    mAssert.Equals reloadDom.SelectSingleNode("/vtkConf/configuration[@cID=""c1""]/path").Text, "Project\TestProject.xlsm", "Expected path of first configuration"
     
-    Set retDom = vtkExportAsXMLDOM(testWorkbook, testProjectName)
-    
-    Dim i As Integer
-    Dim expected As String
-    Dim actual As String
-    
-    ' For each configuration in the configuration manager
-    Dim conf As vtkConfiguration
-    For Each conf In cm.configurations
-        
-        ' Testing the name of the first child node (name)
-        expected = "name"
-        actual = retDom.getElementsByTagName("configuration").Item(conf.Number - 1).ChildNodes.Item(0).BaseName
-        mAssert.Equals expected, actual, "First child node of the configuration in the XML DOM has an incorrect name."
-
-        ' Testing the content of the first child node (name)
-        expected = conf.name
-        actual = retDom.getElementsByTagName("configuration").Item(conf.Number - 1).ChildNodes.Item(0).Text
-        mAssert.Equals expected, actual, "First child node of the configuration in the XML DOM has an incorrect value."
-        
-        ' Testing the name of the second child node (path)
-        expected = "path"
-        actual = retDom.getElementsByTagName("configuration").Item(conf.Number - 1).ChildNodes.Item(1).BaseName
-        mAssert.Equals expected, actual, "Second child node of the configuration in the XML DOM has an incorrect name."
-        
-        ' Testing the content of the second child node (path)
-        expected = conf.path
-        actual = retDom.getElementsByTagName("configuration").Item(conf.Number - 1).ChildNodes.Item(1).Text
-        mAssert.Equals expected, actual, "Second child node of the configuration in the XML DOM has an incorrect content."
-
-    Next
+    mAssert.Equals reloadDom.SelectSingleNode("/vtkConf/configuration[@cID=""c2""]/name").Text, "TestProject_DEV", "Expected name of second configuration"
+    mAssert.Equals reloadDom.SelectSingleNode("/vtkConf/configuration[@cID=""c2""]/path").Text, "Project\TestProject_DEV.xlsm", "Expected path of second configuration"
 
     On Error GoTo 0
     Exit Sub
 
-Text_vtkExportAsDom_correctConfigurationContent_Error:
+Text_vtkExportConfigurationsAsXML_correctConfigurationContent_Error:
     Err.Source = "Text_vtkExportAsDom_correctConfigurationContent of module vtkXMLExportTester"
     mAssert.Should False, "Unexpected error " & Err.Number & " (" & Err.Description & ") in " & Err.Source
-    ITestCase_TearDown
     Exit Sub
 End Sub
 
@@ -619,10 +545,8 @@ End Sub
 
 Private Function ITest_Suite() As TestSuite
     Set ITest_Suite = New TestSuite
-    ITest_Suite.AddTest ITest_Manager.ClassName, "Test_vtkExportAsXMLDom_correctNameForRoot"
-    ITest_Suite.AddTest ITest_Manager.ClassName, "Test_vtkExportAsXMLDom_correctNumberOfInfoObject"
     ITest_Suite.AddTest ITest_Manager.ClassName, "Test_vtkExportConfigurationsAsXML_correctInfoContent"
-    ITest_Suite.AddTest ITest_Manager.ClassName, "Test_vtkExportAsXMLDom_correctConfigurationNumber"
+    ITest_Suite.AddTest ITest_Manager.ClassName, "Test_vtkExportConfigurationsAsXML_correctConfigurationNumber"
     ITest_Suite.AddTest ITest_Manager.ClassName, "Test_vtkExportAsXMLDom_correctModuleNumber"
     ITest_Suite.AddTest ITest_Manager.ClassName, "Test_vtkExportAsDom_correctModuleContent"
     ITest_Suite.AddTest ITest_Manager.ClassName, "Test_vtkExportAsXMLDom_dummyProject"
@@ -640,10 +564,8 @@ End Function
 
 Private Sub ITestCase_RunTest()
     Select Case mManager.methodName
-        Case "Test_vtkExportAsXMLDom_correctNameForRoot": Test_vtkExportAsXMLDom_correctNameForRoot
-        Case "Test_vtkExportAsXMLDom_correctNumberOfInfoObject": Test_vtkExportAsXMLDom_correctNumberOfInfoObject
         Case "Test_vtkExportConfigurationsAsXML_correctInfoContent": Test_vtkExportConfigurationsAsXML_correctInfoContent
-        Case "Test_vtkExportAsXMLDom_correctConfigurationNumber": Test_vtkExportAsXMLDom_correctConfigurationNumber
+        Case "Test_vtkExportConfigurationsAsXML_correctConfigurationNumber": Test_vtkExportConfigurationsAsXML_correctConfigurationNumber
         Case "Test_vtkExportAsXMLDom_correctModuleNumber": Test_vtkExportAsXMLDom_correctModuleNumber
         Case "Test_vtkExportAsDom_correctModuleContent": Test_vtkExportAsDom_correctModuleContent
         Case "Test_vtkExportAsXMLDom_dummyProject": Test_vtkExportAsXMLDom_dummyProject
