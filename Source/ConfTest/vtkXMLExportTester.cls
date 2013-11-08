@@ -66,6 +66,8 @@ Private Sub ITestCase_SetUp(Assert As IAssert)
 
     Set mAssert = Assert
     
+    getTestFileFromTemplate fileName:="vtkConfigurationsDTD.dtd", openExcel:=False
+    
     Set testWorkbook = getTestFileFromTemplate(fileName:=testProjectFileName, openExcel:=True)
     Set cm = vtkConfigurationManagerForProject(testProjectName)
 
@@ -589,9 +591,30 @@ Test_vtkExportConfigurationsAsXML_ExistantFile_Error:
     mAssert.Should False, "Unexpected error " & Err.Number & " (" & Err.Description & ")"
 End Sub
 
+Public Sub Test_vtkExportConfigurationsAsXML_fileContentIsValidDom()
+'   load content of the file -> file content is a valid DOM
+
+    On Error GoTo Test_vtkExportConfigurationsAsXML_fileContentIsValidDom_Error
+    
+    vtkExportConfigurationsAsXML projectName:=testProjectName, filePath:=testFilePath
+    
+    Dim newDom As New MSXML2.DOMDocument
+    newDom.Load testFilePath
+
+    mAssert.Equals newDom.parseError.ErrorCode, 0, "Dom should be readable without parse error"
+
+    On Error GoTo 0
+    Exit Sub
+
+Test_vtkExportConfigurationsAsXML_fileContentIsValidDom_Error:
+    mAssert.Should False, "Unexpected error " & Err.Number & " (" & Err.Description & ")"
+End Sub
+
 '   Other tests to write
 '
-'   Verifies the content of the generated configuration file (with the previous tests)
+'   Verifies the content of the generated configuration file
+'   - for these tests the XML file is created then re-read in a DOM structure
+'   - the the old tests are recycled to work on the re-read structure rather than on an exported DOM structure
 
 Private Function ITest_Suite() As TestSuite
     Set ITest_Suite = New TestSuite
@@ -611,6 +634,7 @@ Private Function ITest_Suite() As TestSuite
     ITest_Suite.AddTest ITest_Manager.ClassName, "Test_vtkExportConfigurationsAsXML_WrongPath"
     ITest_Suite.AddTest ITest_Manager.ClassName, "Test_vtkExportConfigurationsAsXML_InexistantFile"
     ITest_Suite.AddTest ITest_Manager.ClassName, "Test_vtkExportConfigurationsAsXML_ExistantFile"
+    ITest_Suite.AddTest ITest_Manager.ClassName, "Test_vtkExportConfigurationsAsXML_fileContentIsValidDom"
 End Function
 
 Private Sub ITestCase_RunTest()
@@ -631,6 +655,7 @@ Private Sub ITestCase_RunTest()
         Case "Test_vtkExportConfigurationsAsXML_WrongPath": Test_vtkExportConfigurationsAsXML_WrongPath
         Case "Test_vtkExportConfigurationsAsXML_InexistantFile": Test_vtkExportConfigurationsAsXML_InexistantFile
         Case "Test_vtkExportConfigurationsAsXML_ExistantFile": Test_vtkExportConfigurationsAsXML_ExistantFile
+        Case "Test_vtkExportConfigurationsAsXML_fileContentIsValidDom": Test_vtkExportConfigurationsAsXML_fileContentIsValidDom
         Case Else: mAssert.Should False, "Invalid test name: " & mManager.methodName
     End Select
 End Sub
