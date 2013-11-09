@@ -252,10 +252,14 @@ Public Sub vtkExportConfigurationsAsXML(projectName As String, filePath As Strin
     xmlFile.WriteBlankLines Lines:=1
     
     ' Create Configuration elements
-    Dim cf As vtkConfiguration, cfNum As Integer
+    Dim cf As vtkConfiguration, cfNum As Integer, confArray() As vtkConfiguration
+    ReDim confArray(1 To cm.configurationCount) As vtkConfiguration
     cfNum = 1
     For Each cf In cm.configurations
-        xmlFile.WriteLine Text:="    <configuration cID=""c" & cfNum & """>"
+        ' add the configuration in a dictionary for future retrieve of its configuration
+        Set confArray(cfNum) = cf
+        ' create the configuration element
+        xmlFile.WriteLine Text:="    <configuration cID=""" & configurationID(cfNum) & """>"
         xmlFile.WriteLine Text:="        <name>" & cf.name & "</name>"
         xmlFile.WriteLine Text:="        <path>" & cf.path & "</path>"
         xmlFile.WriteLine Text:="    </configuration>"
@@ -263,7 +267,21 @@ Public Sub vtkExportConfigurationsAsXML(projectName As String, filePath As Strin
     Next
     
     ' Create Module elements
+    Dim md As vtkModule, mdNum As Integer, modulePath As String
+    mdNum = 1
+    For Each md In cm.modules
+        xmlFile.WriteLine Text:="    <module mID=""m" & mdNum & """>"
+        xmlFile.WriteLine Text:="        <name>" & md.name & "</name>"
+        For cfNum = 1 To cm.configurationCount
+            modulePath = md.getPathForConfiguration(confName:=confArray(cfNum).name)
+            If Not modulePath Like "" Then xmlFile.WriteLine Text:="        <modulePath confId=""" & configurationID(cfNum) & """>" & modulePath & "</modulePath>"
+        Next cfNum
+        xmlFile.WriteLine Text:="    </module>"
+        mdNum = mdNum + 1
+    Next
+    
     ' Create References elements
+    ' Create Title and Comments for the configuration
     
     ' Close the file
     xmlFile.WriteLine Text:="</vtkConf>"
@@ -289,3 +307,15 @@ vtkExportConfigurationsAsXML_Error:
 
     Err.Raise Err.Number, s, Err.Description
 End Sub
+
+'---------------------------------------------------------------------------------------
+' Procedure : configurationID
+' Author    : Jean-Pierre IMBERT
+' Date      : 09/11/2013
+' Purpose   : Private function for getting a configuration ID
+' Parameter : num as integer is the rank of the configuration in the temporary array
+'---------------------------------------------------------------------------------------
+'
+Private Function configurationID(num As Integer) As String
+    configurationID = "c" & num
+End Function
