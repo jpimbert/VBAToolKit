@@ -44,10 +44,8 @@ Private fso As New FileSystemObject
 
 Private testWorkbook As Workbook
 Private cm As vtkConfigurationManager
-Private conf As vtkConfiguration
 Private testFilePath As String
 
-Private retDom As MSXML2.DOMDocument
 Private reloadDom As MSXML2.DOMDocument
 
 Private Sub Class_Initialize()
@@ -84,11 +82,8 @@ Private Sub ITestCase_SetUp(Assert As IAssert)
     If reloadDom.parseError.ErrorCode <> 0 Then
         Debug.Print "Parse error of " & testFilePath & " in SetUp of vtkXMLExportTester: " & reloadDom.parseError.reason
     End If
-
-    Set retDom = vtkExportAsXMLDOM(testProjectName)
     
 End Sub
-
 
 Private Sub ITestCase_TearDown()
     On Error Resume Next
@@ -98,77 +93,6 @@ Private Sub ITestCase_TearDown()
     VBAToolKit.resetTestFolder
     
 End Sub
-
-
-
-' -------------------------------------------
-' TESTS TO DO
-'
-' exportDom
-'   rootNode -> correct name
-'   info -> 1 info object
-'   info -> correct content
-'   conf -> correct number of configurations
-'   conf -> correct content
-'   modules -> correct number of modules
-'   modules -> correct content
-'   dummy project name -> raise VTK_PROJECT_NOT_INITIALIZED
-'
-' WriteDom
-'   dummy DOM -> raise error VTK_DOM_NOT_INITIALIZED
-'   file does not yet exist -> file is created
-'   file already exists -> file is overwritten
-'   file path does not exist -> raise error VTK_WRONG_FILE_PATH
-'   load content of the file -> file content is a valid DOM
-'
-'--------------------------------------------
-
-'--------------------------------------------
-' Utility functions
-'--------------------------------------------
-Private Function countElementsInDom(elementName As String, dom As MSXML2.DOMDocument) As Integer
-
-    On Error GoTo countElementsInDom_Error
-    
-    Dim rootNode As MSXML2.IXMLDOMNode
-    Set rootNode = dom.ChildNodes.Item(1)
-    
-    countElementsInDom = countElementsInNode(elementName, rootNode)
-
-    On Error GoTo 0
-    Exit Function
-
-countElementsInDom_Error:
-    Debug.Print "Unexpected error " & Err.Number & " (" & Err.Description & ") in procedure countElementsInDom of Class Module vtkXMLExportTester"
-    Exit Function
-    
-End Function
-
-Private Function countElementsInNode(elementName As String, node As MSXML2.IXMLDOMNode) As Integer
-    
-    Dim Count As Integer: Count = 0
-    
-    On Error GoTo countElementsInNode_Error
-
-    Dim subNode As MSXML2.IXMLDOMNode
-    For Each subNode In node.ChildNodes
-        If StrComp(subNode.BaseName, elementName) = 0 Then Count = Count + 1
-    Next
-        
-    countElementsInNode = Count
-
-    On Error GoTo 0
-    Exit Function
-
-countElementsInNode_Error:
-    mAssert.Should False, "Unexpected error " & Err.Number & " (" & Err.Description & ") in procedure countElementsInNode of Class Module vtkXMLExportTester"
-    ITestCase_TearDown
-    Exit Function
-End Function
-
-'--------------------------------------------
-' Tests
-'--------------------------------------------
 
 Public Sub Test_vtkExportConfigurationsAsXML_correctInfoContent()
 '   info -> correct content
@@ -259,154 +183,6 @@ Public Sub Test_vtkExportConfigurationsAsXML_correctModuleContent()
 Test_vtkExportConfigurationsAsXML_correctModuleContent_Error:
     Err.Source = "Test_vtkExportConfigurationsAsXML_correctModuleContent of module vtkXMLExportTester"
     mAssert.Should False, "Unexpected error " & Err.Number & " (" & Err.Description & ") in " & Err.Source
-    Exit Sub
-End Sub
-
-
-Public Sub Test_vtkExportAsXMLDom_dummyProject()
-'   dummy project name -> raise VTK_PROJECT_NOT_INITIALIZED
-
-    On Error GoTo Test_vtkExportAsXMLDom_dummyProject_Error
-    
-    Dim error As Integer: error = 0
-    Dim dummyProjectName As String
-    dummyProjectName = "dummyProject"
-    
-    Set retDom = vtkExportAsXMLDOM(dummyProjectName)
-    
-    mAssert.Equals error, VTK_PROJECT_NOT_INITIALIZED, "Project is empty : VTK_PROJECT_NOT_INITIALIZED should be raised."
-
-    On Error GoTo 0
-    Exit Sub
-
-Test_vtkExportAsXMLDom_dummyProject_Error:
-    error = Err.Number
-    Resume Next
-End Sub
-
-
-Public Sub Test_vtkWriteXMLDomToFile_dummyDom()
-'   dummy DOM -> raise error VTK_DOM_NOT_INITIALIZED, no file should be created
-
-    On Error GoTo Test_vtkWriteXMLDomToFile_dummyDom_Error
-
-    Dim error As Integer
-    Dim dummyDom As MSXML2.DOMDocument
-
-    fso.DeleteFile testFilePath
-    vtkWriteXMLDOMToFile dummyDom, testFilePath
-    
-    mAssert.Equals error, VTK_DOM_NOT_INITIALIZED, "Dom is not initialized : VTK_DOM_NOT_INITIALIZED should be raised."
-    
-    mAssert.Should (fso.FileExists(testFilePath) = False), "File should not have been created as there has been an error."
-    
-    On Error GoTo 0
-    Exit Sub
-
-Test_vtkWriteXMLDomToFile_dummyDom_Error:
-    error = Err.Number
-    Resume Next
-End Sub
-
-
-Public Sub Test_vtkWriteXMLDomToFile_fileIsCreated()
-'   file does not exist -> file is created
-
-    On Error GoTo Test_vtkvtkWriteXMLDomToFile_fileIsCreated_Error
-
-    Dim fso As New FileSystemObject
-
-    vtkWriteXMLDOMToFile retDom, testFilePath
-    
-    mAssert.Should fso.FileExists(testFilePath), "File should have been created as everything is normal."
-
-    On Error GoTo 0
-    Exit Sub
-
-Test_vtkvtkWriteXMLDomToFile_fileIsCreated_Error:
-    Err.Source = "Test_vtkvtkWriteXMLDomToFile_fileIsCreated of module aavtkXMLExportTester"
-    mAssert.Should False, "Unexpected error " & Err.Number & " (" & Err.Description & ") in " & Err.Source
-    ITestCase_TearDown
-    Exit Sub
-End Sub
-
-
-Public Sub Test_vtkWriteXMLDomToFile_fileIsOverWritten()
-'   file already exists -> file is overwritten
-
-    On Error GoTo Test_vtkWriteXMLDomToFile_fileIsOverWritten_Error
-
-    Dim fso As New FileSystemObject
-    
-    Dim oldSize As Integer
-    Dim newSize As Integer
-    
-    fso.CreateTextFile testFilePath
-    oldSize = fso.GetFile(testFilePath).Size
-
-    vtkWriteXMLDOMToFile retDom, testFilePath
-    
-    newSize = fso.GetFile(testFilePath).Size
-    
-    mAssert.Should oldSize < newSize, "File should have been overwritten."
-    
-    On Error GoTo 0
-    Exit Sub
-
-Test_vtkWriteXMLDomToFile_fileIsOverWritten_Error:
-    Err.Source = "Test_vtkWriteXMLDomToFile_fileIsOverWritten of module aavtkXMLExportTester"
-    mAssert.Should False, "Unexpected error " & Err.Number & " (" & Err.Description & ") in " & Err.Source
-    ITestCase_TearDown
-    Exit Sub
-End Sub
-
-
-Public Sub Test_vtkWriteXMLDomToFile_filepathIsCreated()
-'   file path does not exist -> raise error VTK_WRONG_FILE_PATH
-    
-    On Error GoTo Test_vtkWriteXMLDomTOFile_filepathIsCreated_Error
-    
-    Dim error As Integer: error = 0
-    
-    Dim newFilePath As String
-    newFilePath = VBAToolKit.vtkTestPath & "\dummyFolder\testFile.xml"
-
-    vtkWriteXMLDOMToFile retDom, newFilePath
-    
-    Dim fso As New FileSystemObject
-    mAssert.Should Not fso.FileExists(newFilePath), "File should not have been created."
-
-    mAssert.Equals error, VTK_WRONG_FILE_PATH
-
-    On Error GoTo 0
-    Exit Sub
-
-Test_vtkWriteXMLDomTOFile_filepathIsCreated_Error:
-    error = Err.Number
-    Resume Next
-End Sub
-
-
-Public Sub Test_vtkWriteXMLDomToFile_fileContentIsValidDom()
-'   load content of the file -> file content is a valid DOM
-
-    On Error GoTo Test_vtkWriteXMLDomToFile_fileContentIsValidDom_Error
-    
-    vtkWriteXMLDOMToFile retDom, testFilePath
-    
-    Dim newDom As MSXML2.DOMDocument
-    Set newDom = New MSXML2.DOMDocument
-    newDom.Load testFilePath
-
-    mAssert.Should countElementsInDom("info", newDom) = 1, "Dom should be readable."
-
-    On Error GoTo 0
-    Exit Sub
-
-Test_vtkWriteXMLDomToFile_fileContentIsValidDom_Error:
-    Err.Source = "Test_vtkWriteXMLDomToFile_fileContentIsValidDom of module aavtkXMLExportTester"
-    mAssert.Should False, "Unexpected error " & Err.Number & " (" & Err.Description & ") in " & Err.Source
-    ITestCase_TearDown
     Exit Sub
 End Sub
 
@@ -507,12 +283,6 @@ Private Function ITest_Suite() As TestSuite
     ITest_Suite.AddTest ITest_Manager.ClassName, "Test_vtkExportConfigurationsAsXML_correctConfigurationNumber"
     ITest_Suite.AddTest ITest_Manager.ClassName, "Test_vtkExportConfigurationsAsXML_correctModuleNumber"
     ITest_Suite.AddTest ITest_Manager.ClassName, "Test_vtkExportConfigurationsAsXML_correctModuleContent"
-    ITest_Suite.AddTest ITest_Manager.ClassName, "Test_vtkExportAsXMLDom_dummyProject"
-    ITest_Suite.AddTest ITest_Manager.ClassName, "Test_vtkWriteXMLDomToFile_dummyDom"
-    ITest_Suite.AddTest ITest_Manager.ClassName, "Test_vtkWriteXMLDomToFile_fileIsCreated"
-    ITest_Suite.AddTest ITest_Manager.ClassName, "Test_vtkWriteXMLDomToFile_fileIsOverWritten"
-    ITest_Suite.AddTest ITest_Manager.ClassName, "Test_vtkWriteXMLDomToFile_filepathIsCreated"
-    ITest_Suite.AddTest ITest_Manager.ClassName, "Test_vtkWriteXMLDomToFile_fileContentIsValidDom"
     ITest_Suite.AddTest ITest_Manager.ClassName, "Test_vtkExportConfigurationsAsXML_NoProject"
     ITest_Suite.AddTest ITest_Manager.ClassName, "Test_vtkExportConfigurationsAsXML_WrongPath"
     ITest_Suite.AddTest ITest_Manager.ClassName, "Test_vtkExportConfigurationsAsXML_InexistantFile"
@@ -526,12 +296,6 @@ Private Sub ITestCase_RunTest()
         Case "Test_vtkExportConfigurationsAsXML_correctConfigurationNumber": Test_vtkExportConfigurationsAsXML_correctConfigurationNumber
         Case "Test_vtkExportConfigurationsAsXML_correctModuleNumber": Test_vtkExportConfigurationsAsXML_correctModuleNumber
         Case "Test_vtkExportConfigurationsAsXML_correctModuleContent": Test_vtkExportConfigurationsAsXML_correctModuleContent
-        Case "Test_vtkExportAsXMLDom_dummyProject": Test_vtkExportAsXMLDom_dummyProject
-        Case "Test_vtkWriteXMLDomToFile_dummyDom": Test_vtkWriteXMLDomToFile_dummyDom
-        Case "Test_vtkWriteXMLDomToFile_fileIsCreated": Test_vtkWriteXMLDomToFile_fileIsCreated
-        Case "Test_vtkWriteXMLDomToFile_fileIsOverWritten": Test_vtkWriteXMLDomToFile_fileIsOverWritten
-        Case "Test_vtkWriteXMLDomToFile_filepathIsCreated": Test_vtkWriteXMLDomToFile_filepathIsCreated
-        Case "Test_vtkWriteXMLDomToFile_fileContentIsValidDom": Test_vtkWriteXMLDomToFile_fileContentIsValidDom
         Case "Test_vtkExportConfigurationsAsXML_NoProject": Test_vtkExportConfigurationsAsXML_NoProject
         Case "Test_vtkExportConfigurationsAsXML_WrongPath": Test_vtkExportConfigurationsAsXML_WrongPath
         Case "Test_vtkExportConfigurationsAsXML_InexistantFile": Test_vtkExportConfigurationsAsXML_InexistantFile

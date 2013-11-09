@@ -1,391 +1,352 @@
 <?xml version="1.0" encoding="ISO-8859-1" standalone="no"?>
+<!DOCTYPE vtkConf SYSTEM "vtkConfigurationsDTD.dtd">
 <vtkConf>
-	<info>
-		<projectName>VBAToolKit</projectName>
-		<vtkConfigurationsVersion>1.0</vtkConfigurationsVersion>
-	</info>
-	<configuration>
-		<name>VBAToolKit</name>
-		<path>Delivery\VBAToolKit.xlam</path>
-	</configuration>
-	<configuration>
-		<name>VBAToolKit_DEV</name>
-		<path>Project\VBAToolKit_DEV.xlsm</path>
-	</configuration>
-	<configuration>
-		<name>VBAToolKit_2003</name>
-		<path>Delivery\VBAToolKit.xla</path>
-	</configuration>
-	<module>
-		<name>vtkImportExportUtilities</name>
-		<path confName="VBAToolKit">Source\ConfProd\vtkImportExportUtilities.bas</path>
-		<path confName="VBAToolKit_DEV">Source\ConfProd\vtkImportExportUtilities.bas</path>
-		<path confName="VBAToolKit_2003">Source\ConfProd\vtkImportExportUtilities.bas</path>
-	</module>
-	<module>
-		<name>vtkConstants</name>
-		<path confName="VBAToolKit">Source\ConfProd\vtkConstants.bas</path>
-		<path confName="VBAToolKit_DEV">Source\ConfProd\vtkConstants.bas</path>
-		<path confName="VBAToolKit_2003">Source\ConfProd\vtkConstants.bas</path>
-	</module>
-	<module>
-		<name>vtkCreateProjectTester</name>
-		<path confName="VBAToolKit"/>
-		<path confName="VBAToolKit_DEV">Source\ConfTest\vtkCreateProjectTester.cls</path>
-		<path confName="VBAToolKit_2003"/>
-	</module>
-	<module>
-		<name>vtkPathUtilitiesTester</name>
-		<path confName="VBAToolKit"/>
-		<path confName="VBAToolKit_DEV">Source\ConfTest\vtkPathUtilitiesTester.cls</path>
-		<path confName="VBAToolKit_2003"/>
-	</module>
-	<module>
-		<name>vtkWorkbookIsOpenTester</name>
-		<path confName="VBAToolKit"/>
-		<path confName="VBAToolKit_DEV">Source\ConfTest\vtkWorkbookIsOpenTester.cls</path>
-		<path confName="VBAToolKit_2003"/>
-	</module>
-	<module>
-		<name>RunManager</name>
-		<path confName="VBAToolKit">Source\VbaUnit\RunManager.cls</path>
-		<path confName="VBAToolKit_DEV">Source\VbaUnit\RunManager.cls</path>
-		<path confName="VBAToolKit_2003">Source\VbaUnit\RunManager.cls</path>
-	</module>
-	<module>
-		<name>TestCaseManager</name>
-		<path confName="VBAToolKit">Source\VbaUnit\TestCaseManager.cls</path>
-		<path confName="VBAToolKit_DEV">Source\VbaUnit\TestCaseManager.cls</path>
-		<path confName="VBAToolKit_2003">Source\VbaUnit\TestCaseManager.cls</path>
-	</module>
-	<module>
-		<name>TestClassLister</name>
-		<path confName="VBAToolKit">Source\VbaUnit\TestClassLister.cls</path>
-		<path confName="VBAToolKit_DEV">Source\VbaUnit\TestClassLister.cls</path>
-		<path confName="VBAToolKit_2003">Source\VbaUnit\TestClassLister.cls</path>
-	</module>
-	<module>
-		<name>TesterTemplate</name>
-		<path confName="VBAToolKit">Source\VbaUnit\TesterTemplate.cls</path>
-		<path confName="VBAToolKit_DEV">Source\VbaUnit\TesterTemplate.cls</path>
-		<path confName="VBAToolKit_2003">Source\VbaUnit\TesterTemplate.cls</path>
-	</module>
-	<module>
-		<name>TestFailure</name>
-		<path confName="VBAToolKit">Source\VbaUnit\TestFailure.cls</path>
-		<path confName="VBAToolKit_DEV">Source\VbaUnit\TestFailure.cls</path>
-		<path confName="VBAToolKit_2003">Source\VbaUnit\TestFailure.cls</path>
-	</module>
-	<module>
-		<name>TestResult</name>
-		<path confName="VBAToolKit">Source\VbaUnit\TestResult.cls</path>
-		<path confName="VBAToolKit_DEV">Source\VbaUnit\TestResult.cls</path>
-		<path confName="VBAToolKit_2003">Source\VbaUnit\TestResult.cls</path>
-	</module>
-	<module>
-		<name>TestRunner</name>
-		<path confName="VBAToolKit">Source\VbaUnit\TestRunner.cls</path>
-		<path confName="VBAToolKit_DEV">Source\VbaUnit\TestRunner.cls</path>
-		<path confName="VBAToolKit_2003">Source\VbaUnit\TestRunner.cls</path>
-	</module>
-	<module>
-		<name>TestSuite</name>
-		<path confName="VBAToolKit">Source\VbaUnit\TestSuite.cls</path>
-		<path confName="VBAToolKit_DEV">Source\VbaUnit\TestSuite.cls</path>
-		<path confName="VBAToolKit_2003">Source\VbaUnit\TestSuite.cls</path>
-	</module>
-	<module>
-		<name>TestSuiteManager</name>
-		<path confName="VBAToolKit">Source\VbaUnit\TestSuiteManager.cls</path>
-		<path confName="VBAToolKit_DEV">Source\VbaUnit\TestSuiteManager.cls</path>
-		<path confName="VBAToolKit_2003">Source\VbaUnit\TestSuiteManager.cls</path>
-	</module>
-	<module>
-		<name>VbaUnitMain</name>
-		<path confName="VBAToolKit">Source\VbaUnit\VbaUnitMain.bas</path>
-		<path confName="VBAToolKit_DEV">Source\VbaUnit\VbaUnitMain.bas</path>
-		<path confName="VBAToolKit_2003">Source\VbaUnit\VbaUnitMain.bas</path>
-	</module>
-	<module>
-		<name>Assert</name>
-		<path confName="VBAToolKit">Source\VbaUnit\Assert.cls</path>
-		<path confName="VBAToolKit_DEV">Source\VbaUnit\Assert.cls</path>
-		<path confName="VBAToolKit_2003">Source\VbaUnit\Assert.cls</path>
-	</module>
-	<module>
-		<name>AutoGen</name>
-		<path confName="VBAToolKit">Source\VbaUnit\AutoGen.cls</path>
-		<path confName="VBAToolKit_DEV">Source\VbaUnit\AutoGen.cls</path>
-		<path confName="VBAToolKit_2003">Source\VbaUnit\AutoGen.cls</path>
-	</module>
-	<module>
-		<name>IAssert</name>
-		<path confName="VBAToolKit">Source\VbaUnit\IAssert.cls</path>
-		<path confName="VBAToolKit_DEV">Source\VbaUnit\IAssert.cls</path>
-		<path confName="VBAToolKit_2003">Source\VbaUnit\IAssert.cls</path>
-	</module>
-	<module>
-		<name>IResultUser</name>
-		<path confName="VBAToolKit">Source\VbaUnit\IResultUser.cls</path>
-		<path confName="VBAToolKit_DEV">Source\VbaUnit\IResultUser.cls</path>
-		<path confName="VBAToolKit_2003">Source\VbaUnit\IResultUser.cls</path>
-	</module>
-	<module>
-		<name>IRunManager</name>
-		<path confName="VBAToolKit">Source\VbaUnit\IRunManager.cls</path>
-		<path confName="VBAToolKit_DEV">Source\VbaUnit\IRunManager.cls</path>
-		<path confName="VBAToolKit_2003">Source\VbaUnit\IRunManager.cls</path>
-	</module>
-	<module>
-		<name>ITest</name>
-		<path confName="VBAToolKit">Source\VbaUnit\ITest.cls</path>
-		<path confName="VBAToolKit_DEV">Source\VbaUnit\ITest.cls</path>
-		<path confName="VBAToolKit_2003">Source\VbaUnit\ITest.cls</path>
-	</module>
-	<module>
-		<name>ITestCase</name>
-		<path confName="VBAToolKit">Source\VbaUnit\ITestCase.cls</path>
-		<path confName="VBAToolKit_DEV">Source\VbaUnit\ITestCase.cls</path>
-		<path confName="VBAToolKit_2003">Source\VbaUnit\ITestCase.cls</path>
-	</module>
-	<module>
-		<name>ITestManager</name>
-		<path confName="VBAToolKit">Source\VbaUnit\ITestManager.cls</path>
-		<path confName="VBAToolKit_DEV">Source\VbaUnit\ITestManager.cls</path>
-		<path confName="VBAToolKit_2003">Source\VbaUnit\ITestManager.cls</path>
-	</module>
-	<module>
-		<name>vtkConfigurationManager</name>
-		<path confName="VBAToolKit">Source\ConfProd\vtkConfigurationManager.cls</path>
-		<path confName="VBAToolKit_DEV">Source\ConfProd\vtkConfigurationManager.cls</path>
-		<path confName="VBAToolKit_2003">Source\ConfProd\vtkConfigurationManager.cls</path>
-	</module>
-	<module>
-		<name>vtkConfigurationManagerTester</name>
-		<path confName="VBAToolKit"/>
-		<path confName="VBAToolKit_DEV">Source\ConfTest\vtkConfigurationManagerTester.cls</path>
-		<path confName="VBAToolKit_2003"/>
-	</module>
-	<module>
-		<name>vtkConfigurationManagers</name>
-		<path confName="VBAToolKit">Source\ConfProd\vtkConfigurationManagers.bas</path>
-		<path confName="VBAToolKit_DEV">Source\ConfProd\vtkConfigurationManagers.bas</path>
-		<path confName="VBAToolKit_2003">Source\ConfProd\vtkConfigurationManagers.bas</path>
-	</module>
-	<module>
-		<name>vtkConfigurationManagersTester</name>
-		<path confName="VBAToolKit"/>
-		<path confName="VBAToolKit_DEV">Source\ConfTest\vtkConfigurationManagersTester.cls</path>
-		<path confName="VBAToolKit_2003"/>
-	</module>
-	<module>
-		<name>vtkProjects</name>
-		<path confName="VBAToolKit">Source\ConfProd\vtkProjects.bas</path>
-		<path confName="VBAToolKit_DEV">Source\ConfProd\vtkProjects.bas</path>
-		<path confName="VBAToolKit_2003">Source\ConfProd\vtkProjects.bas</path>
-	</module>
-	<module>
-		<name>vtkProject</name>
-		<path confName="VBAToolKit">Source\ConfProd\vtkProject.cls</path>
-		<path confName="VBAToolKit_DEV">Source\ConfProd\vtkProject.cls</path>
-		<path confName="VBAToolKit_2003">Source\ConfProd\vtkProject.cls</path>
-	</module>
-	<module>
-		<name>vtkProjectsTester</name>
-		<path confName="VBAToolKit"/>
-		<path confName="VBAToolKit_DEV">Source\ConfTest\vtkProjectsTester.cls</path>
-		<path confName="VBAToolKit_2003"/>
-	</module>
-	<module>
-		<name>vtkProjectTester</name>
-		<path confName="VBAToolKit"/>
-		<path confName="VBAToolKit_DEV">Source\ConfTest\vtkProjectTester.cls</path>
-		<path confName="VBAToolKit_2003"/>
-	</module>
-	<module>
-		<name>vtkInitializeVbaUnitTester</name>
-		<path confName="VBAToolKit"/>
-		<path confName="VBAToolKit_DEV">Source\ConfTest\vtkInitializeVbaUnitTester.cls</path>
-		<path confName="VBAToolKit_2003"/>
-	</module>
-	<module>
-		<name>vtkExcelUtilities</name>
-		<path confName="VBAToolKit">Source\ConfProd\vtkExcelUtilities.bas</path>
-		<path confName="VBAToolKit_DEV">Source\ConfProd\vtkExcelUtilities.bas</path>
-		<path confName="VBAToolKit_2003">Source\ConfProd\vtkExcelUtilities.bas</path>
-	</module>
-	<module>
-		<name>vtkProjectCreationUtilities</name>
-		<path confName="VBAToolKit">Source\ConfProd\vtkProjectCreationUtilities.bas</path>
-		<path confName="VBAToolKit_DEV">Source\ConfProd\vtkProjectCreationUtilities.bas</path>
-		<path confName="VBAToolKit_2003">Source\ConfProd\vtkProjectCreationUtilities.bas</path>
-	</module>
-	<module>
-		<name>vtkMainFunctions</name>
-		<path confName="VBAToolKit">Source\ConfProd\vtkMainFunctions.bas</path>
-		<path confName="VBAToolKit_DEV">Source\ConfProd\vtkMainFunctions.bas</path>
-		<path confName="VBAToolKit_2003">Source\ConfProd\vtkMainFunctions.bas</path>
-	</module>
-	<module>
-		<name>vtkCreateTreeFolderTester</name>
-		<path confName="VBAToolKit"/>
-		<path confName="VBAToolKit_DEV">Source\ConfTest\vtkCreateTreeFolderTester.cls</path>
-		<path confName="VBAToolKit_2003"/>
-	</module>
-	<module>
-		<name>vtkImportExportUtilitiesTester</name>
-		<path confName="VBAToolKit"/>
-		<path confName="VBAToolKit_DEV">Source\ConfTest\vtkImportExportUtilitiesTester.cls</path>
-		<path confName="VBAToolKit_2003"/>
-	</module>
-	<module>
-		<name>vtKPathUtilities</name>
-		<path confName="VBAToolKit">Source\ConfProd\vtKPathUtilities.bas</path>
-		<path confName="VBAToolKit_DEV">Source\ConfProd\vtKPathUtilities.bas</path>
-		<path confName="VBAToolKit_2003">Source\ConfProd\vtKPathUtilities.bas</path>
-	</module>
-	<module>
-		<name>vtkEventHandler</name>
-		<path confName="VBAToolKit">Source\ConfProd\vtkEventHandler.cls</path>
-		<path confName="VBAToolKit_DEV">Source\ConfProd\vtkEventHandler.cls</path>
-		<path confName="VBAToolKit_2003">Source\ConfProd\vtkEventHandler.cls</path>
-	</module>
-	<module>
-		<name>vtkToolBars</name>
-		<path confName="VBAToolKit">Source\ConfProd\vtkToolBars.bas</path>
-		<path confName="VBAToolKit_DEV">Source\ConfProd\vtkToolBars.bas</path>
-		<path confName="VBAToolKit_2003">Source\ConfProd\vtkToolBars.bas</path>
-	</module>
-	<module>
-		<name>vtkToolBarsTester</name>
-		<path confName="VBAToolKit"/>
-		<path confName="VBAToolKit_DEV">Source\ConfTest\vtkToolBarsTester.cls</path>
-		<path confName="VBAToolKit_2003"/>
-	</module>
-	<module>
-		<name>ThisWorkbook</name>
-		<path confName="VBAToolKit">Source\ConfProd\ThisWorkbook.cls</path>
-		<path confName="VBAToolKit_DEV">Source\ConfTest\ThisWorkbook.cls</path>
-		<path confName="VBAToolKit_2003">Source\ConfProd\ThisWorkbook.cls</path>
-	</module>
-	<module>
-		<name>vtkCreateProjectForm</name>
-		<path confName="VBAToolKit">Source\ConfProd\vtkCreateProjectForm.frm</path>
-		<path confName="VBAToolKit_DEV">Source\ConfProd\vtkCreateProjectForm.frm</path>
-		<path confName="VBAToolKit_2003">Source\ConfProd\vtkCreateProjectForm.frm</path>
-	</module>
-	<module>
-		<name>vtkExportOneModuleTester</name>
-		<path confName="VBAToolKit"/>
-		<path confName="VBAToolKit_DEV">Source\ConfTest\vtkExportOneModuleTester.cls</path>
-		<path confName="VBAToolKit_2003"/>
-	</module>
-	<module>
-		<name>vtkGitFunctions</name>
-		<path confName="VBAToolKit">Source\ConfProd\vtkGitFunctions.bas</path>
-		<path confName="VBAToolKit_DEV">Source\ConfProd\vtkGitFunctions.bas</path>
-		<path confName="VBAToolKit_2003">Source\ConfProd\vtkGitFunctions.bas</path>
-	</module>
-	<module>
-		<name>vtkGitFunctionsTester</name>
-		<path confName="VBAToolKit"/>
-		<path confName="VBAToolKit_DEV">Source\ConfTest\vtkGitFunctionsTester.cls</path>
-		<path confName="VBAToolKit_2003"/>
-	</module>
-	<module>
-		<name>vtkFileSystemUtilities</name>
-		<path confName="VBAToolKit">Source\ConfProd\vtkFileSystemUtilities.bas</path>
-		<path confName="VBAToolKit_DEV">Source\ConfProd\vtkFileSystemUtilities.bas</path>
-		<path confName="VBAToolKit_2003">Source\ConfProd\vtkFileSystemUtilities.bas</path>
-	</module>
-	<module>
-		<name>vtkFileSystemUtilitiesTester</name>
-		<path confName="VBAToolKit"/>
-		<path confName="VBAToolKit_DEV">Source\ConfTest\vtkFileSystemUtilitiesTester.cls</path>
-		<path confName="VBAToolKit_2003"/>
-	</module>
-	<module>
-		<name>vtkShellAndWait</name>
-		<path confName="VBAToolKit">Source\ConfProd\vtkShellAndWait.bas</path>
-		<path confName="VBAToolKit_DEV">Source\ConfProd\vtkShellAndWait.bas</path>
-		<path confName="VBAToolKit_2003">Source\ConfProd\vtkShellAndWait.bas</path>
-	</module>
-	<module>
-		<name>vtkConfiguration</name>
-		<path confName="VBAToolKit">Source\ConfProd\vtkConfiguration.cls</path>
-		<path confName="VBAToolKit_DEV">Source\ConfProd\vtkConfiguration.cls</path>
-		<path confName="VBAToolKit_2003">Source\ConfProd\vtkConfiguration.cls</path>
-	</module>
-	<module>
-		<name>vtkConfigurationTester</name>
-		<path confName="VBAToolKit"/>
-		<path confName="VBAToolKit_DEV">Source\ConfTest\vtkConfigurationTester.cls</path>
-		<path confName="VBAToolKit_2003"/>
-	</module>
-	<module>
-		<name>vtkModule</name>
-		<path confName="VBAToolKit">Source\ConfProd\vtkModule.cls</path>
-		<path confName="VBAToolKit_DEV">Source\ConfProd\vtkModule.cls</path>
-		<path confName="VBAToolKit_2003">Source\ConfProd\vtkModule.cls</path>
-	</module>
-	<module>
-		<name>vtkModuleTester</name>
-		<path confName="VBAToolKit"/>
-		<path confName="VBAToolKit_DEV">Source\ConfTest\vtkModuleTester.cls</path>
-		<path confName="VBAToolKit_2003"/>
-	</module>
-	<module>
-		<name>vtkTestUtilities</name>
-		<path confName="VBAToolKit">Source\ConfTest\vtkTestUtilities.bas</path>
-		<path confName="VBAToolKit_DEV">Source\ConfTest\vtkTestUtilities.bas</path>
-		<path confName="VBAToolKit_2003">Source\ConfTest\vtkTestUtilities.bas</path>
-	</module>
-	<module>
-		<name>vtkExportConfigurationTester</name>
-		<path confName="VBAToolKit"/>
-		<path confName="VBAToolKit_DEV">Source\ConfTest\vtkExportConfigurationTester.cls</path>
-		<path confName="VBAToolKit_2003"/>
-	</module>
-	<module>
-		<name>vtkNormalize</name>
-		<path confName="VBAToolKit">Source\ConfProd\vtkNormalize.bas</path>
-		<path confName="VBAToolKit_DEV">Source\ConfProd\vtkNormalize.bas</path>
-		<path confName="VBAToolKit_2003">Source\ConfProd\vtkNormalize.bas</path>
-	</module>
-	<module>
-		<name>vtkNormalizeTester</name>
-		<path confName="VBAToolKit"/>
-		<path confName="VBAToolKit_DEV">Source\ConfTest\vtkNormalizeTester.cls</path>
-		<path confName="VBAToolKit_2003"/>
-	</module>
-	<module>
-		<name>vtkTestUtilitiesTester</name>
-		<path confName="VBAToolKit"/>
-		<path confName="VBAToolKit_DEV">Source\ConfTest\vtkTestUtilitiesTester.cls</path>
-		<path confName="VBAToolKit_2003"/>
-	</module>
-	<module>
-		<name>vtkXMLUtilities</name>
-		<path confName="VBAToolKit">Source\ConfProd\vtkXMLUtilities.bas</path>
-		<path confName="VBAToolKit_DEV">Source\ConfProd\vtkXMLUtilities.bas</path>
-		<path confName="VBAToolKit_2003">Source\ConfProd\vtkXMLUtilities.bas</path>
-	</module>
-	<module>
-		<name>vtkXMLExportTester</name>
-		<path confName="VBAToolKit"/>
-		<path confName="VBAToolKit_DEV">Source\ConfTest\vtkXMLExportTester.cls</path>
-		<path confName="VBAToolKit_2003"/>
-	</module>
-	<module>
-		<name>vtkRecreateConfigurationTester</name>
-		<path confName="VBAToolKit"/>
-		<path confName="VBAToolKit_DEV">Source\ConfTest\vtkRecreateConfigurationTester.cls</path>
-		<path confName="VBAToolKit_2003"/>
-	</module>
-	<module>
-		<name>vtkRecreateConfigurationForm</name>
-		<path confName="VBAToolKit">Source\ConfProd\vtkRecreateConfigurationForm.frm</path>
-		<path confName="VBAToolKit_DEV">Source\ConfProd\vtkRecreateConfigurationForm.frm</path>
-		<path confName="VBAToolKit_2003">Source\ConfProd\vtkRecreateConfigurationForm.frm</path>
-	</module>
+
+    <info>
+        <vtkConfigurationsVersion>1.0</vtkConfigurationsVersion>
+        <projectName>VBAToolKit</projectName>
+    </info>
+
+    <configuration cID="c1">
+        <name>VBAToolKit</name>
+        <path>Delivery\VBAToolKit.xlam</path>
+    </configuration>
+    <configuration cID="c2">
+        <name>VBAToolKit_DEV</name>
+        <path>Project\VBAToolKit_DEV.xlsm</path>
+    </configuration>
+    <configuration cID="c3">
+        <name>VBAToolKit_2003</name>
+        <path>Delivery\VBAToolKit.xla</path>
+    </configuration>
+    <module mID="m1">
+        <name>vtkImportExportUtilities</name>
+        <modulePath confId="c1">Source\ConfProd\vtkImportExportUtilities.bas</modulePath>
+        <modulePath confId="c2">Source\ConfProd\vtkImportExportUtilities.bas</modulePath>
+        <modulePath confId="c3">Source\ConfProd\vtkImportExportUtilities.bas</modulePath>
+    </module>
+    <module mID="m2">
+        <name>vtkConstants</name>
+        <modulePath confId="c1">Source\ConfProd\vtkConstants.bas</modulePath>
+        <modulePath confId="c2">Source\ConfProd\vtkConstants.bas</modulePath>
+        <modulePath confId="c3">Source\ConfProd\vtkConstants.bas</modulePath>
+    </module>
+    <module mID="m3">
+        <name>vtkCreateProjectTester</name>
+        <modulePath confId="c2">Source\ConfTest\vtkCreateProjectTester.cls</modulePath>
+    </module>
+    <module mID="m4">
+        <name>vtkPathUtilitiesTester</name>
+        <modulePath confId="c2">Source\ConfTest\vtkPathUtilitiesTester.cls</modulePath>
+    </module>
+    <module mID="m5">
+        <name>vtkWorkbookIsOpenTester</name>
+        <modulePath confId="c2">Source\ConfTest\vtkWorkbookIsOpenTester.cls</modulePath>
+    </module>
+    <module mID="m6">
+        <name>RunManager</name>
+        <modulePath confId="c1">Source\VbaUnit\RunManager.cls</modulePath>
+        <modulePath confId="c2">Source\VbaUnit\RunManager.cls</modulePath>
+        <modulePath confId="c3">Source\VbaUnit\RunManager.cls</modulePath>
+    </module>
+    <module mID="m7">
+        <name>TestCaseManager</name>
+        <modulePath confId="c1">Source\VbaUnit\TestCaseManager.cls</modulePath>
+        <modulePath confId="c2">Source\VbaUnit\TestCaseManager.cls</modulePath>
+        <modulePath confId="c3">Source\VbaUnit\TestCaseManager.cls</modulePath>
+    </module>
+    <module mID="m8">
+        <name>TestClassLister</name>
+        <modulePath confId="c1">Source\VbaUnit\TestClassLister.cls</modulePath>
+        <modulePath confId="c2">Source\VbaUnit\TestClassLister.cls</modulePath>
+        <modulePath confId="c3">Source\VbaUnit\TestClassLister.cls</modulePath>
+    </module>
+    <module mID="m9">
+        <name>TesterTemplate</name>
+        <modulePath confId="c1">Source\VbaUnit\TesterTemplate.cls</modulePath>
+        <modulePath confId="c2">Source\VbaUnit\TesterTemplate.cls</modulePath>
+        <modulePath confId="c3">Source\VbaUnit\TesterTemplate.cls</modulePath>
+    </module>
+    <module mID="m10">
+        <name>TestFailure</name>
+        <modulePath confId="c1">Source\VbaUnit\TestFailure.cls</modulePath>
+        <modulePath confId="c2">Source\VbaUnit\TestFailure.cls</modulePath>
+        <modulePath confId="c3">Source\VbaUnit\TestFailure.cls</modulePath>
+    </module>
+    <module mID="m11">
+        <name>TestResult</name>
+        <modulePath confId="c1">Source\VbaUnit\TestResult.cls</modulePath>
+        <modulePath confId="c2">Source\VbaUnit\TestResult.cls</modulePath>
+        <modulePath confId="c3">Source\VbaUnit\TestResult.cls</modulePath>
+    </module>
+    <module mID="m12">
+        <name>TestRunner</name>
+        <modulePath confId="c1">Source\VbaUnit\TestRunner.cls</modulePath>
+        <modulePath confId="c2">Source\VbaUnit\TestRunner.cls</modulePath>
+        <modulePath confId="c3">Source\VbaUnit\TestRunner.cls</modulePath>
+    </module>
+    <module mID="m13">
+        <name>TestSuite</name>
+        <modulePath confId="c1">Source\VbaUnit\TestSuite.cls</modulePath>
+        <modulePath confId="c2">Source\VbaUnit\TestSuite.cls</modulePath>
+        <modulePath confId="c3">Source\VbaUnit\TestSuite.cls</modulePath>
+    </module>
+    <module mID="m14">
+        <name>TestSuiteManager</name>
+        <modulePath confId="c1">Source\VbaUnit\TestSuiteManager.cls</modulePath>
+        <modulePath confId="c2">Source\VbaUnit\TestSuiteManager.cls</modulePath>
+        <modulePath confId="c3">Source\VbaUnit\TestSuiteManager.cls</modulePath>
+    </module>
+    <module mID="m15">
+        <name>VbaUnitMain</name>
+        <modulePath confId="c1">Source\VbaUnit\VbaUnitMain.bas</modulePath>
+        <modulePath confId="c2">Source\VbaUnit\VbaUnitMain.bas</modulePath>
+        <modulePath confId="c3">Source\VbaUnit\VbaUnitMain.bas</modulePath>
+    </module>
+    <module mID="m16">
+        <name>Assert</name>
+        <modulePath confId="c1">Source\VbaUnit\Assert.cls</modulePath>
+        <modulePath confId="c2">Source\VbaUnit\Assert.cls</modulePath>
+        <modulePath confId="c3">Source\VbaUnit\Assert.cls</modulePath>
+    </module>
+    <module mID="m17">
+        <name>AutoGen</name>
+        <modulePath confId="c1">Source\VbaUnit\AutoGen.cls</modulePath>
+        <modulePath confId="c2">Source\VbaUnit\AutoGen.cls</modulePath>
+        <modulePath confId="c3">Source\VbaUnit\AutoGen.cls</modulePath>
+    </module>
+    <module mID="m18">
+        <name>IAssert</name>
+        <modulePath confId="c1">Source\VbaUnit\IAssert.cls</modulePath>
+        <modulePath confId="c2">Source\VbaUnit\IAssert.cls</modulePath>
+        <modulePath confId="c3">Source\VbaUnit\IAssert.cls</modulePath>
+    </module>
+    <module mID="m19">
+        <name>IResultUser</name>
+        <modulePath confId="c1">Source\VbaUnit\IResultUser.cls</modulePath>
+        <modulePath confId="c2">Source\VbaUnit\IResultUser.cls</modulePath>
+        <modulePath confId="c3">Source\VbaUnit\IResultUser.cls</modulePath>
+    </module>
+    <module mID="m20">
+        <name>IRunManager</name>
+        <modulePath confId="c1">Source\VbaUnit\IRunManager.cls</modulePath>
+        <modulePath confId="c2">Source\VbaUnit\IRunManager.cls</modulePath>
+        <modulePath confId="c3">Source\VbaUnit\IRunManager.cls</modulePath>
+    </module>
+    <module mID="m21">
+        <name>ITest</name>
+        <modulePath confId="c1">Source\VbaUnit\ITest.cls</modulePath>
+        <modulePath confId="c2">Source\VbaUnit\ITest.cls</modulePath>
+        <modulePath confId="c3">Source\VbaUnit\ITest.cls</modulePath>
+    </module>
+    <module mID="m22">
+        <name>ITestCase</name>
+        <modulePath confId="c1">Source\VbaUnit\ITestCase.cls</modulePath>
+        <modulePath confId="c2">Source\VbaUnit\ITestCase.cls</modulePath>
+        <modulePath confId="c3">Source\VbaUnit\ITestCase.cls</modulePath>
+    </module>
+    <module mID="m23">
+        <name>ITestManager</name>
+        <modulePath confId="c1">Source\VbaUnit\ITestManager.cls</modulePath>
+        <modulePath confId="c2">Source\VbaUnit\ITestManager.cls</modulePath>
+        <modulePath confId="c3">Source\VbaUnit\ITestManager.cls</modulePath>
+    </module>
+    <module mID="m24">
+        <name>vtkConfigurationManager</name>
+        <modulePath confId="c1">Source\ConfProd\vtkConfigurationManager.cls</modulePath>
+        <modulePath confId="c2">Source\ConfProd\vtkConfigurationManager.cls</modulePath>
+        <modulePath confId="c3">Source\ConfProd\vtkConfigurationManager.cls</modulePath>
+    </module>
+    <module mID="m25">
+        <name>vtkConfigurationManagerTester</name>
+        <modulePath confId="c2">Source\ConfTest\vtkConfigurationManagerTester.cls</modulePath>
+    </module>
+    <module mID="m26">
+        <name>vtkConfigurationManagers</name>
+        <modulePath confId="c1">Source\ConfProd\vtkConfigurationManagers.bas</modulePath>
+        <modulePath confId="c2">Source\ConfProd\vtkConfigurationManagers.bas</modulePath>
+        <modulePath confId="c3">Source\ConfProd\vtkConfigurationManagers.bas</modulePath>
+    </module>
+    <module mID="m27">
+        <name>vtkConfigurationManagersTester</name>
+        <modulePath confId="c2">Source\ConfTest\vtkConfigurationManagersTester.cls</modulePath>
+    </module>
+    <module mID="m28">
+        <name>vtkProjects</name>
+        <modulePath confId="c1">Source\ConfProd\vtkProjects.bas</modulePath>
+        <modulePath confId="c2">Source\ConfProd\vtkProjects.bas</modulePath>
+        <modulePath confId="c3">Source\ConfProd\vtkProjects.bas</modulePath>
+    </module>
+    <module mID="m29">
+        <name>vtkProject</name>
+        <modulePath confId="c1">Source\ConfProd\vtkProject.cls</modulePath>
+        <modulePath confId="c2">Source\ConfProd\vtkProject.cls</modulePath>
+        <modulePath confId="c3">Source\ConfProd\vtkProject.cls</modulePath>
+    </module>
+    <module mID="m30">
+        <name>vtkProjectsTester</name>
+        <modulePath confId="c2">Source\ConfTest\vtkProjectsTester.cls</modulePath>
+    </module>
+    <module mID="m31">
+        <name>vtkProjectTester</name>
+        <modulePath confId="c2">Source\ConfTest\vtkProjectTester.cls</modulePath>
+    </module>
+    <module mID="m32">
+        <name>vtkInitializeVbaUnitTester</name>
+        <modulePath confId="c2">Source\ConfTest\vtkInitializeVbaUnitTester.cls</modulePath>
+    </module>
+    <module mID="m33">
+        <name>vtkExcelUtilities</name>
+        <modulePath confId="c1">Source\ConfProd\vtkExcelUtilities.bas</modulePath>
+        <modulePath confId="c2">Source\ConfProd\vtkExcelUtilities.bas</modulePath>
+        <modulePath confId="c3">Source\ConfProd\vtkExcelUtilities.bas</modulePath>
+    </module>
+    <module mID="m34">
+        <name>vtkProjectCreationUtilities</name>
+        <modulePath confId="c1">Source\ConfProd\vtkProjectCreationUtilities.bas</modulePath>
+        <modulePath confId="c2">Source\ConfProd\vtkProjectCreationUtilities.bas</modulePath>
+        <modulePath confId="c3">Source\ConfProd\vtkProjectCreationUtilities.bas</modulePath>
+    </module>
+    <module mID="m35">
+        <name>vtkMainFunctions</name>
+        <modulePath confId="c1">Source\ConfProd\vtkMainFunctions.bas</modulePath>
+        <modulePath confId="c2">Source\ConfProd\vtkMainFunctions.bas</modulePath>
+        <modulePath confId="c3">Source\ConfProd\vtkMainFunctions.bas</modulePath>
+    </module>
+    <module mID="m36">
+        <name>vtkCreateTreeFolderTester</name>
+        <modulePath confId="c2">Source\ConfTest\vtkCreateTreeFolderTester.cls</modulePath>
+    </module>
+    <module mID="m37">
+        <name>vtkImportExportUtilitiesTester</name>
+        <modulePath confId="c2">Source\ConfTest\vtkImportExportUtilitiesTester.cls</modulePath>
+    </module>
+    <module mID="m38">
+        <name>vtKPathUtilities</name>
+        <modulePath confId="c1">Source\ConfProd\vtKPathUtilities.bas</modulePath>
+        <modulePath confId="c2">Source\ConfProd\vtKPathUtilities.bas</modulePath>
+        <modulePath confId="c3">Source\ConfProd\vtKPathUtilities.bas</modulePath>
+    </module>
+    <module mID="m39">
+        <name>vtkEventHandler</name>
+        <modulePath confId="c1">Source\ConfProd\vtkEventHandler.cls</modulePath>
+        <modulePath confId="c2">Source\ConfProd\vtkEventHandler.cls</modulePath>
+        <modulePath confId="c3">Source\ConfProd\vtkEventHandler.cls</modulePath>
+    </module>
+    <module mID="m40">
+        <name>vtkToolBars</name>
+        <modulePath confId="c1">Source\ConfProd\vtkToolBars.bas</modulePath>
+        <modulePath confId="c2">Source\ConfProd\vtkToolBars.bas</modulePath>
+        <modulePath confId="c3">Source\ConfProd\vtkToolBars.bas</modulePath>
+    </module>
+    <module mID="m41">
+        <name>vtkToolBarsTester</name>
+        <modulePath confId="c2">Source\ConfTest\vtkToolBarsTester.cls</modulePath>
+    </module>
+    <module mID="m42">
+        <name>ThisWorkbook</name>
+        <modulePath confId="c1">Source\ConfProd\ThisWorkbook.cls</modulePath>
+        <modulePath confId="c2">Source\ConfTest\ThisWorkbook.cls</modulePath>
+        <modulePath confId="c3">Source\ConfProd\ThisWorkbook.cls</modulePath>
+    </module>
+    <module mID="m43">
+        <name>vtkCreateProjectForm</name>
+        <modulePath confId="c1">Source\ConfProd\vtkCreateProjectForm.frm</modulePath>
+        <modulePath confId="c2">Source\ConfProd\vtkCreateProjectForm.frm</modulePath>
+        <modulePath confId="c3">Source\ConfProd\vtkCreateProjectForm.frm</modulePath>
+    </module>
+    <module mID="m44">
+        <name>vtkExportOneModuleTester</name>
+        <modulePath confId="c2">Source\ConfTest\vtkExportOneModuleTester.cls</modulePath>
+    </module>
+    <module mID="m45">
+        <name>vtkGitFunctions</name>
+        <modulePath confId="c1">Source\ConfProd\vtkGitFunctions.bas</modulePath>
+        <modulePath confId="c2">Source\ConfProd\vtkGitFunctions.bas</modulePath>
+        <modulePath confId="c3">Source\ConfProd\vtkGitFunctions.bas</modulePath>
+    </module>
+    <module mID="m46">
+        <name>vtkGitFunctionsTester</name>
+        <modulePath confId="c2">Source\ConfTest\vtkGitFunctionsTester.cls</modulePath>
+    </module>
+    <module mID="m47">
+        <name>vtkFileSystemUtilities</name>
+        <modulePath confId="c1">Source\ConfProd\vtkFileSystemUtilities.bas</modulePath>
+        <modulePath confId="c2">Source\ConfProd\vtkFileSystemUtilities.bas</modulePath>
+        <modulePath confId="c3">Source\ConfProd\vtkFileSystemUtilities.bas</modulePath>
+    </module>
+    <module mID="m48">
+        <name>vtkFileSystemUtilitiesTester</name>
+        <modulePath confId="c2">Source\ConfTest\vtkFileSystemUtilitiesTester.cls</modulePath>
+    </module>
+    <module mID="m49">
+        <name>vtkShellAndWait</name>
+        <modulePath confId="c1">Source\ConfProd\vtkShellAndWait.bas</modulePath>
+        <modulePath confId="c2">Source\ConfProd\vtkShellAndWait.bas</modulePath>
+        <modulePath confId="c3">Source\ConfProd\vtkShellAndWait.bas</modulePath>
+    </module>
+    <module mID="m50">
+        <name>vtkConfiguration</name>
+        <modulePath confId="c1">Source\ConfProd\vtkConfiguration.cls</modulePath>
+        <modulePath confId="c2">Source\ConfProd\vtkConfiguration.cls</modulePath>
+        <modulePath confId="c3">Source\ConfProd\vtkConfiguration.cls</modulePath>
+    </module>
+    <module mID="m51">
+        <name>vtkConfigurationTester</name>
+        <modulePath confId="c2">Source\ConfTest\vtkConfigurationTester.cls</modulePath>
+    </module>
+    <module mID="m52">
+        <name>vtkModule</name>
+        <modulePath confId="c1">Source\ConfProd\vtkModule.cls</modulePath>
+        <modulePath confId="c2">Source\ConfProd\vtkModule.cls</modulePath>
+        <modulePath confId="c3">Source\ConfProd\vtkModule.cls</modulePath>
+    </module>
+    <module mID="m53">
+        <name>vtkModuleTester</name>
+        <modulePath confId="c2">Source\ConfTest\vtkModuleTester.cls</modulePath>
+    </module>
+    <module mID="m54">
+        <name>vtkTestUtilities</name>
+        <modulePath confId="c1">Source\ConfTest\vtkTestUtilities.bas</modulePath>
+        <modulePath confId="c2">Source\ConfTest\vtkTestUtilities.bas</modulePath>
+        <modulePath confId="c3">Source\ConfTest\vtkTestUtilities.bas</modulePath>
+    </module>
+    <module mID="m55">
+        <name>vtkExportConfigurationTester</name>
+        <modulePath confId="c2">Source\ConfTest\vtkExportConfigurationTester.cls</modulePath>
+    </module>
+    <module mID="m56">
+        <name>vtkNormalize</name>
+        <modulePath confId="c1">Source\ConfProd\vtkNormalize.bas</modulePath>
+        <modulePath confId="c2">Source\ConfProd\vtkNormalize.bas</modulePath>
+        <modulePath confId="c3">Source\ConfProd\vtkNormalize.bas</modulePath>
+    </module>
+    <module mID="m57">
+        <name>vtkNormalizeTester</name>
+        <modulePath confId="c2">Source\ConfTest\vtkNormalizeTester.cls</modulePath>
+    </module>
+    <module mID="m58">
+        <name>vtkTestUtilitiesTester</name>
+        <modulePath confId="c2">Source\ConfTest\vtkTestUtilitiesTester.cls</modulePath>
+    </module>
+    <module mID="m59">
+        <name>vtkXMLUtilities</name>
+        <modulePath confId="c1">Source\ConfProd\vtkXMLUtilities.bas</modulePath>
+        <modulePath confId="c2">Source\ConfProd\vtkXMLUtilities.bas</modulePath>
+        <modulePath confId="c3">Source\ConfProd\vtkXMLUtilities.bas</modulePath>
+    </module>
+    <module mID="m60">
+        <name>vtkXMLExportTester</name>
+        <modulePath confId="c2">Source\ConfTest\vtkXMLExportTester.cls</modulePath>
+    </module>
+    <module mID="m61">
+        <name>vtkRecreateConfigurationTester</name>
+        <modulePath confId="c2">Source\ConfTest\vtkRecreateConfigurationTester.cls</modulePath>
+    </module>
+    <module mID="m62">
+        <name>vtkRecreateConfigurationForm</name>
+        <modulePath confId="c1">Source\ConfProd\vtkRecreateConfigurationForm.frm</modulePath>
+        <modulePath confId="c2">Source\ConfProd\vtkRecreateConfigurationForm.frm</modulePath>
+        <modulePath confId="c3">Source\ConfProd\vtkRecreateConfigurationForm.frm</modulePath>
+    </module>
 </vtkConf>
