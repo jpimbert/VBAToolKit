@@ -16,6 +16,7 @@ Option Explicit
 '               - 'name' of the module (wrapper to 'parent' methods)
 '               - 'parent' is the configuration manager in which is included the module
 '               - 'number' (read only) is the number of the module in the configuration manager
+'               - 'ID' (read only) is the ID of the module for XML exportation, build with the number
 '             If the module is attached to a configuration at its initialization
 '               - 'configuration' (read only) if the module is attached to a configuration (wrapper to 'parent' methods)
 '               - 'path' (read/write) is the full path for module code source for the configuration (wrapper to 'parent' methods)
@@ -79,6 +80,17 @@ End Property
 '
 Public Property Get Number() As Integer
     Number = m_number
+End Property
+
+'---------------------------------------------------------------------------------------
+' Property  : ID as String (Read Only, initialized with init)
+' Author    : Jean-Pierre Imbert
+' Date      : 28/08/2013
+' Purpose   : The ID of the module for XML exportation
+'---------------------------------------------------------------------------------------
+'
+Public Property Get ID() As String
+    ID = "m" & m_number
 End Property
 
 '---------------------------------------------------------------------------------------

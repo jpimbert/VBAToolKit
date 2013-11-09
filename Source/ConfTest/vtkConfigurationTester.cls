@@ -108,6 +108,13 @@ Public Sub Test_ConfigurationCollection_Number()
     mAssert.Equals confManager.configurations(1).Number, 1, "The number of each vtkConfiguration must be initialized"
 End Sub
 
+Public Sub Test_ConfigurationCollection_ID()
+    ' This test verifies the ID of each vtkConfiguration object
+    ' collection just initialized from an Excel worlbook
+    
+    mAssert.Equals confManager.configurations(1).ID, "c1", "Expected ID for the first vtkConfiguration"
+End Sub
+
 Public Sub Test_AddedConfigurationCollection_Number()
     ' This test verifies the number of each vtkConfiguration object
     ' Added configuration to the collection initialized from an Excel worlbook
@@ -116,6 +123,16 @@ Public Sub Test_AddedConfigurationCollection_Number()
     
     mAssert.Equals confManager.configurations(1).Number, 1, "The number of each vtkConfiguration must be initialized"
     mAssert.Equals confManager.configurations(2).Number, 2, "The number of each vtkConfiguration must be initialized"
+End Sub
+
+Public Sub Test_AddedConfigurationCollection_ID()
+    ' This test verifies the ID of each vtkConfiguration object
+    ' Added configuration to the collection initialized from an Excel worlbook
+    
+    confManager.addConfiguration ("NewConfiguration")
+    
+    mAssert.Equals confManager.configurations(1).ID, "c1", "Expected ID for the first vtkConfiguration"
+    mAssert.Equals confManager.configurations(2).ID, "c2", "Expected ID for the second vtkConfiguration"
 End Sub
 
 Public Sub Test_ConfigurationGetName()
@@ -225,7 +242,9 @@ Private Function ITest_Suite() As TestSuite
     ITest_Suite.AddTest ITest_Manager.ClassName, "Test_ConfigurationCollection_Parent"
     ITest_Suite.AddTest ITest_Manager.ClassName, "Test_AddedConfigurationCollection_Parent"
     ITest_Suite.AddTest ITest_Manager.ClassName, "Test_ConfigurationCollection_Number"
+    ITest_Suite.AddTest ITest_Manager.ClassName, "Test_ConfigurationCollection_ID"
     ITest_Suite.AddTest ITest_Manager.ClassName, "Test_AddedConfigurationCollection_Number"
+    ITest_Suite.AddTest ITest_Manager.ClassName, "Test_AddedConfigurationCollection_ID"
     ITest_Suite.AddTest ITest_Manager.ClassName, "Test_ConfigurationGetName"
     ITest_Suite.AddTest ITest_Manager.ClassName, "Test_ConfigurationGetPath"
     ITest_Suite.AddTest ITest_Manager.ClassName, "Test_ConfigurationSetPath"
@@ -241,7 +260,9 @@ Private Sub ITestCase_RunTest()
         Case "Test_ConfigurationCollection_Parent": Test_ConfigurationCollection_Parent
         Case "Test_AddedConfigurationCollection_Parent": Test_AddedConfigurationCollection_Parent
         Case "Test_ConfigurationCollection_Number": Test_ConfigurationCollection_Number
+        Case "Test_ConfigurationCollection_ID": Test_ConfigurationCollection_ID
         Case "Test_AddedConfigurationCollection_Number": Test_AddedConfigurationCollection_Number
+        Case "Test_AddedConfigurationCollection_ID": Test_AddedConfigurationCollection_ID
         Case "Test_ConfigurationGetName": Test_ConfigurationGetName
         Case "Test_ConfigurationGetPath": Test_ConfigurationGetPath
         Case "Test_ConfigurationSetPath": Test_ConfigurationSetPath

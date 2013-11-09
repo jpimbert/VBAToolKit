@@ -16,6 +16,7 @@ Option Explicit
 '               - 'name' of the configuration (wrapper to 'parent' methods)
 '               - 'parent' is the configuration manager in which is included the configuration
 '               - 'number' (read only) is the number of the configuration in the configuration manager
+'               - 'ID' (read only) is the ID of the configuration for XML exportation, build with its number
 '               - 'path' is the full path for the Excel workbook containing the configuration (wrapper to 'parent' methods)
 '               - 'modules' is a collection of vtkModule objects, all the modules contained in the configuration with non null path (wrapper to 'parent' methods)
 '             A vtkConfiguration object must be initialized with 'init' method
@@ -72,6 +73,17 @@ End Property
 '
 Property Get Number() As Integer
     Number = m_number
+End Property
+
+'---------------------------------------------------------------------------------------
+' Property  : ID as String (Read Only, initialized with init)
+' Author    : Jean-Pierre Imbert
+' Date      : 28/08/2013
+' Purpose   : The ID of the configuration for XML exportation
+'---------------------------------------------------------------------------------------
+'
+Property Get ID() As String
+    ID = "c" & m_number
 End Property
 
 '---------------------------------------------------------------------------------------
