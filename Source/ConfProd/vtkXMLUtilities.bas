@@ -67,6 +67,8 @@ Public Sub vtkExportConfigurationsAsXML(projectName As String, filePath As Strin
         xmlFile.WriteLine Text:="    <configuration cID=""" & cf.ID & """>"
         xmlFile.WriteLine Text:="        <name>" & cf.name & "</name>"
         xmlFile.WriteLine Text:="        <path>" & cf.path & "</path>"
+        xmlFile.WriteLine Text:="        <title>VBAToolKit</title>" ' must be initialized in Workbook with Wb.BuiltinDocumentProperties("Title").Value
+        xmlFile.WriteLine Text:="        <comment>Toolkit improving IDE for VBA projects</comment>" ' must be initialized in Workbook with Wb.BuiltinDocumentProperties("Comments").Value
         xmlFile.WriteLine Text:="    </configuration>"
     Next
     
@@ -119,8 +121,6 @@ Public Sub vtkExportConfigurationsAsXML(projectName As String, filePath As Strin
         End If
         xmlFile.WriteLine Text:="    </reference>"
     Next
-    
-   ' Create Title and Comments for the configuration
     
     ' Close the file
     xmlFile.WriteLine Text:="</vtkConf>"
