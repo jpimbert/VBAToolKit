@@ -79,6 +79,7 @@ Private Sub ITestCase_SetUp(Assert As IAssert)
     ' Load the configuration as a DOM structure for content testing
     Set reloadDom = New MSXML2.DOMDocument
     reloadDom.Load testFilePath
+    reloadDom.setProperty "SelectionLanguage", "XPath"  ' for the use of the contains() function of XPath
     If reloadDom.parseError.ErrorCode <> 0 Then
         Debug.Print "Parse error of " & testFilePath & " in SetUp of vtkXMLExportTester: " & reloadDom.parseError.reason
     End If
@@ -148,7 +149,6 @@ Text_vtkExportConfigurationsAsXML_correctConfigurationContent_Error:
     Exit Sub
 End Sub
 
-
 Public Sub Test_vtkExportConfigurationsAsXML_correctModuleNumber()
 '   modules -> correct number of modules
 
@@ -164,7 +164,6 @@ Test_vtkExportConfigurationsAsXML_correctModuleNumber_Error:
     mAssert.Should False, "Unexpected error " & Err.Number & " (" & Err.Description & ") in " & Err.Source
     Exit Sub
 End Sub
-
 
 Public Sub Test_vtkExportConfigurationsAsXML_correctModuleContent()
 '   modules -> correct content
@@ -182,6 +181,59 @@ Public Sub Test_vtkExportConfigurationsAsXML_correctModuleContent()
 
 Test_vtkExportConfigurationsAsXML_correctModuleContent_Error:
     Err.Source = "Test_vtkExportConfigurationsAsXML_correctModuleContent of module vtkXMLExportTester"
+    mAssert.Should False, "Unexpected error " & Err.Number & " (" & Err.Description & ") in " & Err.Source
+    Exit Sub
+End Sub
+
+Public Sub Test_vtkExportConfigurationsAsXML_correctReferenceNumber()
+'   modules -> correct number of modules
+
+    On Error GoTo Test_vtkExportConfigurationsAsXML_correctReferenceNumber_Error
+    
+    mAssert.Equals reloadDom.SelectNodes("/vtkConf/reference").Length, 10, "Expected number of reference elements"
+
+    On Error GoTo 0
+    Exit Sub
+
+Test_vtkExportConfigurationsAsXML_correctReferenceNumber_Error:
+    Err.Source = "Test_vtkExportConfigurationsAsXML_correctReferenceNumber of module vtkXMLExportTester"
+    mAssert.Should False, "Unexpected error " & Err.Number & " (" & Err.Description & ") in " & Err.Source
+    Exit Sub
+End Sub
+
+Public Sub Test_vtkExportConfigurationsAsXML_correctRefNumByConf()
+'   modules -> correct content
+    
+    On Error GoTo Test_vtkExportConfigurationsAsXML_correctRefNumByConf_Error
+    
+    mAssert.Equals reloadDom.SelectNodes("/vtkConf/reference[contains(@confIDs,""c1"")]/name").Length, 9, "Expected number of references for first configuration"
+    mAssert.Equals reloadDom.SelectNodes("/vtkConf/reference[contains(@confIDs,""c2"")]/name").Length, 10, "Expected number of references for second configuration"
+
+    On Error GoTo 0
+    Exit Sub
+
+Test_vtkExportConfigurationsAsXML_correctRefNumByConf_Error:
+    Err.Source = "Test_vtkExportConfigurationsAsXML_correctRefNumByConf of module vtkXMLExportTester"
+    mAssert.Should False, "Unexpected error " & Err.Number & " (" & Err.Description & ") in " & Err.Source
+    Exit Sub
+End Sub
+
+Public Sub Test_vtkExportConfigurationsAsXML_correctRefContent()
+'   modules -> correct content
+    
+    On Error GoTo Test_vtkExportConfigurationsAsXML_correctRefContent_Error
+    
+    mAssert.Equals reloadDom.SelectNodes("/vtkConf/reference/name[.=""VBAToolKit""]/../guid").Length, 0, "Expected number of GUID element for VBAToolKit reference"
+    mAssert.Equals reloadDom.SelectNodes("/vtkConf/reference/name[.=""MSForms""]/../guid").Length, 1, "Expected number of GUID element for MSXML2 reference"
+
+    mAssert.Equals reloadDom.SelectNodes("/vtkConf/reference/name[.=""VBAToolKit""]/../path").Length, 1, "Expected number of Path element for VBAToolKit reference"
+    mAssert.Equals reloadDom.SelectNodes("/vtkConf/reference/name[.=""MSForms""]/../path").Length, 0, "Expected number of Path element for MSXML2 reference"
+
+    On Error GoTo 0
+    Exit Sub
+
+Test_vtkExportConfigurationsAsXML_correctRefContent_Error:
+    Err.Source = "Test_vtkExportConfigurationsAsXML_correctRefContent of module vtkXMLExportTester"
     mAssert.Should False, "Unexpected error " & Err.Number & " (" & Err.Description & ") in " & Err.Source
     Exit Sub
 End Sub
@@ -283,6 +335,9 @@ Private Function ITest_Suite() As TestSuite
     ITest_Suite.AddTest ITest_Manager.ClassName, "Test_vtkExportConfigurationsAsXML_correctConfigurationNumber"
     ITest_Suite.AddTest ITest_Manager.ClassName, "Test_vtkExportConfigurationsAsXML_correctModuleNumber"
     ITest_Suite.AddTest ITest_Manager.ClassName, "Test_vtkExportConfigurationsAsXML_correctModuleContent"
+    ITest_Suite.AddTest ITest_Manager.ClassName, "Test_vtkExportConfigurationsAsXML_correctReferenceNumber"
+    ITest_Suite.AddTest ITest_Manager.ClassName, "Test_vtkExportConfigurationsAsXML_correctRefNumByConf"
+    ITest_Suite.AddTest ITest_Manager.ClassName, "Test_vtkExportConfigurationsAsXML_correctRefContent"
     ITest_Suite.AddTest ITest_Manager.ClassName, "Test_vtkExportConfigurationsAsXML_NoProject"
     ITest_Suite.AddTest ITest_Manager.ClassName, "Test_vtkExportConfigurationsAsXML_WrongPath"
     ITest_Suite.AddTest ITest_Manager.ClassName, "Test_vtkExportConfigurationsAsXML_InexistantFile"
@@ -296,6 +351,9 @@ Private Sub ITestCase_RunTest()
         Case "Test_vtkExportConfigurationsAsXML_correctConfigurationNumber": Test_vtkExportConfigurationsAsXML_correctConfigurationNumber
         Case "Test_vtkExportConfigurationsAsXML_correctModuleNumber": Test_vtkExportConfigurationsAsXML_correctModuleNumber
         Case "Test_vtkExportConfigurationsAsXML_correctModuleContent": Test_vtkExportConfigurationsAsXML_correctModuleContent
+        Case "Test_vtkExportConfigurationsAsXML_correctReferenceNumber": Test_vtkExportConfigurationsAsXML_correctReferenceNumber
+        Case "Test_vtkExportConfigurationsAsXML_correctRefNumByConf": Test_vtkExportConfigurationsAsXML_correctRefNumByConf
+        Case "Test_vtkExportConfigurationsAsXML_correctRefContent": Test_vtkExportConfigurationsAsXML_correctRefContent
         Case "Test_vtkExportConfigurationsAsXML_NoProject": Test_vtkExportConfigurationsAsXML_NoProject
         Case "Test_vtkExportConfigurationsAsXML_WrongPath": Test_vtkExportConfigurationsAsXML_WrongPath
         Case "Test_vtkExportConfigurationsAsXML_InexistantFile": Test_vtkExportConfigurationsAsXML_InexistantFile

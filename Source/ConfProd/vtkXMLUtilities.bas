@@ -1,4 +1,5 @@
 Attribute VB_Name = "vtkXMLUtilities"
+Option Explicit
 '---------------------------------------------------------------------------------------
 ' Module    : vtkXMLUtilities
 ' Author    : Lucas Vitorino
@@ -82,7 +83,44 @@ Public Sub vtkExportConfigurationsAsXML(projectName As String, filePath As Strin
     Next
     
     ' Create References elements
-    ' Create Title and Comments for the configuration
+    '   Designed only to be used with an active Workbook being a _DEV VBA project
+    '   All references are exported to the XML configuration file
+    '   except the VBAToolKit reference that is exported only for the _DEV configuration
+    Dim r As VBIDE.Reference, allConfIDs As String, confIDsOnlyDEV As String
+    ' Build ConfIDs lists
+    For Each cf In cm.configurations
+        If Not allConfIDs Like "" Then
+            allConfIDs = allConfIDs & " " & cf.ID
+           Else
+            allConfIDs = """" & cf.ID
+        End If
+        If Right(cf.name, 4) Like "_DEV" Then
+            If Not confIDsExceptDEV Like "" Then
+                confIDsOnlyDEV = confIDsOnlyDEV & " " & cf.ID
+               Else
+                confIDsOnlyDEV = """" & cf.ID
+            End If
+        End If
+    Next
+    allConfIDs = allConfIDs & """"
+    confIDsOnlyDEV = confIDsOnlyDEV & """"
+    ' Add reference elements to the XML configuration file
+    For Each r In ActiveWorkbook.VBProject.References
+        If r.name Like "VBAToolKit" Then
+            xmlFile.WriteLine Text:="    <reference confIDs=" & confIDsOnlyDEV & ">"
+           Else
+            xmlFile.WriteLine Text:="    <reference confIDs=" & allConfIDs & ">"
+        End If
+        xmlFile.WriteLine Text:="        <name>" & r.name & "</name>"
+        If r.GUID Like "" Then
+            xmlFile.WriteLine Text:="        <path>" & r.fullPath & "</path>"
+           Else
+            xmlFile.WriteLine Text:="        <guid>" & r.GUID & "</guid>"
+        End If
+        xmlFile.WriteLine Text:="    </reference>"
+    Next
+    
+   ' Create Title and Comments for the configuration
     
     ' Close the file
     xmlFile.WriteLine Text:="</vtkConf>"
