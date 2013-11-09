@@ -56,9 +56,6 @@ End Property
 Private Sub ITestCase_SetUp(Assert As IAssert)
     Set mAssert = Assert
     
-    Dim Source As String, destination As String
-    Source = vtkPathToTemplateFolder & "\" & initializedWorkbookName
-    destination = vtkPathToTestFolder & "\" & initializedWorkbookName
     Set initializedWorkbook = getTestFileFromTemplate(fileName:=initializedWorkbookName, openExcel:=True)
     Set confManager = vtkConfigurationManagerForProject(initializedProjectName)
 End Sub
@@ -66,6 +63,7 @@ End Sub
 Private Sub ITestCase_TearDown()
     vtkCloseAndKillWorkbook Wb:=initializedWorkbook ' close the existing Excel project
     vtkResetConfigurationManagers             ' reset all configuration managers
+    VBAToolKit.resetTestFolder
 End Sub
 
 Public Sub Test_ConfigurationCollection_Count()
@@ -125,6 +123,16 @@ Public Sub Test_AddedConfigurationCollection_Number()
     mAssert.Equals confManager.configurations(2).Number, 2, "The number of each vtkConfiguration must be initialized"
 End Sub
 
+Public Sub Test_AddedConfigurationCollection_isDEV()
+    ' This test verifies the number of each vtkConfiguration object
+    ' Added configuration to the collection initialized from an Excel worlbook
+    
+    confManager.addConfiguration ("NewConfiguration")
+    
+    mAssert.Should confManager.configurations(1).isDEV, "The first configuration is expected to be DEV"
+    mAssert.Should Not confManager.configurations(2).isDEV, "The second configuration is expected to not be DEV"
+End Sub
+
 Public Sub Test_AddedConfigurationCollection_ID()
     ' This test verifies the ID of each vtkConfiguration object
     ' Added configuration to the collection initialized from an Excel worlbook
@@ -143,6 +151,22 @@ Public Sub Test_ConfigurationGetName()
 
     mAssert.Equals confManager.configurations(1).name, "InitializedProject_DEV", "Name of the configuration in the Test workbook"
     mAssert.Equals confManager.configurations("InitializedProject_DEV").name, "InitializedProject_DEV", "Name of the configuration in the Test workbook"
+
+   On Error GoTo 0
+   Exit Sub
+
+M_Error:
+    mAssert.Should False, "Unexpected Error (" & Err.Number & "): " & Err.Description
+End Sub
+
+Public Sub Test_ConfigurationIsDEV_True()
+    ' This test verifies the property isDEV of vtkConfiguration object
+    ' collection just initialized from an Excel worlbook
+    
+   On Error GoTo M_Error
+
+    mAssert.Should confManager.configurations(1).isDEV, "The unique configuration of the project is a DEV one, get by number"
+    mAssert.Should confManager.configurations("InitializedProject_DEV").isDEV, "The unique configuration of the project is a DEV one, get by name"
 
    On Error GoTo 0
    Exit Sub
@@ -244,8 +268,10 @@ Private Function ITest_Suite() As TestSuite
     ITest_Suite.AddTest ITest_Manager.ClassName, "Test_ConfigurationCollection_Number"
     ITest_Suite.AddTest ITest_Manager.ClassName, "Test_ConfigurationCollection_ID"
     ITest_Suite.AddTest ITest_Manager.ClassName, "Test_AddedConfigurationCollection_Number"
+    ITest_Suite.AddTest ITest_Manager.ClassName, "Test_AddedConfigurationCollection_isDEV"
     ITest_Suite.AddTest ITest_Manager.ClassName, "Test_AddedConfigurationCollection_ID"
     ITest_Suite.AddTest ITest_Manager.ClassName, "Test_ConfigurationGetName"
+    ITest_Suite.AddTest ITest_Manager.ClassName, "Test_ConfigurationIsDEV_True"
     ITest_Suite.AddTest ITest_Manager.ClassName, "Test_ConfigurationGetPath"
     ITest_Suite.AddTest ITest_Manager.ClassName, "Test_ConfigurationSetPath"
     ITest_Suite.AddTest ITest_Manager.ClassName, "Test_ConfigurationModules_Initialized"
@@ -262,8 +288,10 @@ Private Sub ITestCase_RunTest()
         Case "Test_ConfigurationCollection_Number": Test_ConfigurationCollection_Number
         Case "Test_ConfigurationCollection_ID": Test_ConfigurationCollection_ID
         Case "Test_AddedConfigurationCollection_Number": Test_AddedConfigurationCollection_Number
+        Case "Test_AddedConfigurationCollection_isDEV": Test_AddedConfigurationCollection_isDEV
         Case "Test_AddedConfigurationCollection_ID": Test_AddedConfigurationCollection_ID
         Case "Test_ConfigurationGetName": Test_ConfigurationGetName
+        Case "Test_ConfigurationIsDEV_True": Test_ConfigurationIsDEV_True
         Case "Test_ConfigurationGetPath": Test_ConfigurationGetPath
         Case "Test_ConfigurationSetPath": Test_ConfigurationSetPath
         Case "Test_ConfigurationModules_Initialized": Test_ConfigurationModules_Initialized

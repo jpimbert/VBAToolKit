@@ -71,7 +71,7 @@ Public Sub vtkExportConfigurationsAsXML(projectName As String, filePath As Strin
     Next
     
     ' Create Module elements
-    Dim md As vtkModule
+    Dim md As vtkModule, modulePath As String
     For Each md In cm.modules
         xmlFile.WriteLine Text:="    <module mID=""" & md.ID & """>"
         xmlFile.WriteLine Text:="        <name>" & md.name & "</name>"
@@ -94,8 +94,8 @@ Public Sub vtkExportConfigurationsAsXML(projectName As String, filePath As Strin
            Else
             allConfIDs = """" & cf.ID
         End If
-        If Right(cf.name, 4) Like "_DEV" Then
-            If Not confIDsExceptDEV Like "" Then
+        If cf.isDEV Then
+            If Not confIDsOnlyDEV Like "" Then
                 confIDsOnlyDEV = confIDsOnlyDEV & " " & cf.ID
                Else
                 confIDsOnlyDEV = """" & cf.ID

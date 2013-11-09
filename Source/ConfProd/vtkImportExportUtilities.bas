@@ -409,9 +409,7 @@ Public Sub vtkRecreateConfiguration(projectName As String, configurationName As 
     vtkImportModulesInAnotherProject projectForModules:=Wb.VBProject, projectName:=projectName, confName:=configurationName
     
     ' Recreate references in the new Excel File
-    Dim toSelf As Boolean
-    toSelf = Right(Wb.VBProject.name, 4) Like "_DEV"
-    VtkActivateReferences Wb:=Wb, toSelf:=toSelf
+    VtkActivateReferences Wb:=Wb, toSelf:=conf.isDEV
     
     ' VB will not let the workbook be saved under the name of an already opened workbook, which
     ' is annoying when recreating an add-in (always opened). The following code works around this.
