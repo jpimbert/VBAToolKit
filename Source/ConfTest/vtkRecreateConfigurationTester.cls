@@ -68,6 +68,7 @@ Private Const VTKConfName = "TestProject_VTKConf"
 Private Const VTKProjectConfName = "VBAToolKit"
 
 Private Const standardRememberedProjectsDTDName As String = "rememberedProjectsDTD.dtd"
+Private Const standardVtkConfigurationsDTDName As String = "vtkConfigurationsDTD.dtd"
 Private Const rememberedProjectsSheetName As String = "VBAToolKitTestProjects.xml"
 
 Private Sub Class_Initialize()
@@ -116,6 +117,11 @@ Private Sub ITestCase_SetUp(Assert As IAssert)
     FileCopy Source:=fso.BuildPath(vtkPathToTemplateFolder, "RecreateConfigurationModules\TestFormModule1.frm"), _
              destination:=fso.BuildPath(testProjectFolder, "TestFormModule1.frm")
     
+    ' Copy the sheet of the new project in the relevant folder, and create a DTD
+    FileCopy Source:=fso.BuildPath(vtkPathToTemplateFolder, testProject.XMLConfigurationName), _
+             destination:=fso.BuildPath(testProjectFolder, testProject.XMLConfigurationStandardRelativePath)
+    
+    createDTDForVtkConfigurations fso.BuildPath(testProjectFolder, "Project\" & standardVtkConfigurationsDTDName)
     
     ' Add the TestProject to the list of remembered projects
     xmlRememberedProjectsFullPath = fso.BuildPath(VBAToolKit.vtkTestPath, rememberedProjectsSheetName)
@@ -123,7 +129,7 @@ Private Sub ITestCase_SetUp(Assert As IAssert)
     ' Add "TestProject" to the list of remembered projects
     vtkAddRememberedProject projectName:=testProject.projectName, _
                             rootFolder:=fso.BuildPath(VBAToolKit.vtkTestPath, testProject.projectName), _
-                            xmlRelativePath:=fso.BuildPath("Project", testProject.XMLConfigurationStandardRelativePath)
+                            xmlRelativePath:=testProject.XMLConfigurationStandardRelativePath
                                             
     ' Set all the configuration objects
     Set cm = vtkConfigurationManagerForProject(testProject.projectName)
@@ -149,6 +155,7 @@ End Sub
 
 Private Sub ITestCase_TearDown()
     On Error Resume Next
+    vtkCloseAndKillWorkbook Wb:=recreatedWb
     VBAToolKit.resetTestFolder
     vtkResetProjects
     vtkResetConfigurationManagers
@@ -185,78 +192,78 @@ End Sub
 '       - normal conf
 '       - xlam
 
-'' --------------------------------------------------------
-''               PRIVATE UTILITY FUNCTIONS
-'' --------------------------------------------------------
-'
-'Private Sub recreateAndSetWb(testProject As vtkProject, testedConf As vtkConfiguration)
-'    ' It is mandatory to create the source files before recreating a configuration
-'    On Error GoTo recreateAndSetWb_Error
-'
-'    vtkRecreateConfiguration testProject.projectName, testedConf.name
-'    Set recreatedWb = Workbooks.Open(VBAToolKit.vtkTestPath & "\" & testProject.projectName & "\" & testedConf.path)
-'
-'    On Error GoTo 0
-'    Exit Sub
-'
-'recreateAndSetWb_Error:
-'    Err.Source = "recreateAndSetWb  of module vtkRecreateConfigurationTester"
-'    Debug.Print "Unexpected error " & Err.Number & " (" & Err.Description & ") in " & Err.Source
-'    Err.Raise Err.Number, Err.Source, Err.Description
-'    Exit Sub
-'End Sub
-'
-'
-'' --------------------------------------------------------
-''                       TESTS
-'' --------------------------------------------------------
-'
-'Public Sub Test_vtkRecreateConfiguration_workbookIsCreatedInTheGoodPath_normalConf()
-'' workbook is created in the good path
-'
-'    On Error GoTo Test_vtkRecreateConfiguration_workbookIsCreatedInTheGoodPath_normalConf_Error
-'
-'    Set testedConf = normalConf
-'
-'    recreateAndSetWb testProject, testedConf
-'
-'    mAssert.Should fso.FileExists(VBAToolKit.vtkTestPath & "\" & testProject.projectName & "\" & testedConf.path), _
-'                   "The configuration should have been created in the designated path."
-'
-'    On Error GoTo 0
-'    Exit Sub
-'
-'Test_vtkRecreateConfiguration_workbookIsCreatedInTheGoodPath_normalConf_Error:
-'    Err.Source = "Test_vtkRecreateConfiguration_workbookIsCreatedInTheGoodPath_normalConf of module vtkRecreateConfigurationTester"
-'    mAssert.Should False, "Unexpected error " & Err.Number & " (" & Err.Description & ") in " & Err.Source
-'    Exit Sub
-'End Sub
+' --------------------------------------------------------
+'               PRIVATE UTILITY FUNCTIONS
+' --------------------------------------------------------
+
+Private Sub recreateAndSetWb(testProject As vtkProject, testedConf As vtkConfiguration)
+    ' It is mandatory to create the source files before recreating a configuration
+    On Error GoTo recreateAndSetWb_Error
+
+    vtkRecreateConfiguration testProject.projectName, testedConf.name
+    Set recreatedWb = Workbooks.Open(VBAToolKit.vtkTestPath & "\" & testProject.projectName & "\" & testedConf.path)
+
+    On Error GoTo 0
+    Exit Sub
+
+recreateAndSetWb_Error:
+    Err.Source = "recreateAndSetWb  of module vtkRecreateConfigurationTester"
+    Debug.Print "Unexpected error " & Err.Number & " (" & Err.Description & ") in " & Err.Source
+    Err.Raise Err.Number, Err.Source, Err.Description
+    Exit Sub
+End Sub
+
+
+' --------------------------------------------------------
+'                       TESTS
+' --------------------------------------------------------
+
+Public Sub Test_vtkRecreateConfiguration_workbookIsCreatedInTheGoodPath_normalConf()
+' workbook is created in the good path
+
+    On Error GoTo Test_vtkRecreateConfiguration_workbookIsCreatedInTheGoodPath_normalConf_Error
+
+    Set testedConf = normalConf
+
+    recreateAndSetWb testProject, testedConf
+
+    mAssert.Should fso.FileExists(VBAToolKit.vtkTestPath & "\" & testProject.projectName & "\" & testedConf.path), _
+                   "The configuration should have been created in the designated path."
+
+    On Error GoTo 0
+    Exit Sub
+
+Test_vtkRecreateConfiguration_workbookIsCreatedInTheGoodPath_normalConf_Error:
+    Err.Source = "Test_vtkRecreateConfiguration_workbookIsCreatedInTheGoodPath_normalConf of module vtkRecreateConfigurationTester"
+    mAssert.Should False, "Unexpected error " & Err.Number & " (" & Err.Description & ") in " & Err.Source
+    Exit Sub
+End Sub
 
 
 
-'''Public Sub Test_vtkRecreateConfiguration_workbookIsCreatedInTheGoodPath_emptyConf()
-'''' workbook is created in the good path
-'''
-'''    On Error GoTo Test_vtkRecreateConfiguration_workbookIsCreatedInTheGoodPath_emptyConf_Error
-'''
-'''    Set testedConf = emptyConf
-'''
-'''    recreateAndSetWb testProject, testedConf
-'''
-'''    mAssert.Should fso.FileExists(VBAToolKit.vtkTestPath & "\" & testProject.projectName & "\" & testedConf.path), _
-'''                   "The configuration should have been created in the designated path."
-'''
-'''    On Error GoTo 0
-'''    Exit Sub
-'''
-'''Test_vtkRecreateConfiguration_workbookIsCreatedInTheGoodPath_emptyConf_Error:
-'''    Err.Source = "Test_vtkRecreateConfiguration_workbookIsCreatedInTheGoodPath_emptyConf of module vtkRecreateConfigurationTester"
-'''    mAssert.Should False, "Unexpected error " & Err.Number & " (" & Err.Description & ") in " & Err.Source
-'''    Exit Sub
-'''End Sub
-'''
-'''
-'''
+Public Sub Test_vtkRecreateConfiguration_workbookIsCreatedInTheGoodPath_emptyConf()
+' workbook is created in the good path
+
+    On Error GoTo Test_vtkRecreateConfiguration_workbookIsCreatedInTheGoodPath_emptyConf_Error
+
+    Set testedConf = emptyConf
+
+    recreateAndSetWb testProject, testedConf
+
+    mAssert.Should fso.FileExists(VBAToolKit.vtkTestPath & "\" & testProject.projectName & "\" & testedConf.path), _
+                   "The configuration should have been created in the designated path."
+
+    On Error GoTo 0
+    Exit Sub
+
+Test_vtkRecreateConfiguration_workbookIsCreatedInTheGoodPath_emptyConf_Error:
+    Err.Source = "Test_vtkRecreateConfiguration_workbookIsCreatedInTheGoodPath_emptyConf of module vtkRecreateConfigurationTester"
+    mAssert.Should False, "Unexpected error " & Err.Number & " (" & Err.Description & ") in " & Err.Source
+    Exit Sub
+End Sub
+
+
+
 '''Public Sub Test_vtkRecreateConfiguration_workbookIsCreatedInTheGoodPath_multitypeConf()
 '''' workbook is created in the good path
 '''
