@@ -104,19 +104,6 @@ Private Sub ITestCase_SetUp(Assert As IAssert)
     createRememberedProjectsXMLSheet sheetPath:=fso.BuildPath(VBAToolKit.vtkTestPath, rememberedProjectsSheetName), _
                                      dtdPath:=fso.BuildPath(VBAToolKit.vtkTestPath, standardRememberedProjectsDTDName)
     
-    ' Copy the modules (mandatory to recreate the configuration)
-    FileCopy Source:=fso.BuildPath(vtkPathToTemplateFolder, "RecreateConfigurationModules\TestModule1.bas"), _
-             destination:=fso.BuildPath(testProjectFolder, "TestModule1.bas")
-             
-    FileCopy Source:=fso.BuildPath(vtkPathToTemplateFolder, "RecreateConfigurationModules\TestModule2.bas"), _
-             destination:=fso.BuildPath(testProjectFolder, "TestModule2.bas")
-    
-    FileCopy Source:=fso.BuildPath(vtkPathToTemplateFolder, "RecreateConfigurationModules\TestClassModule1.cls"), _
-             destination:=fso.BuildPath(testProjectFolder, "TestClassModule1.cls")
-    
-    FileCopy Source:=fso.BuildPath(vtkPathToTemplateFolder, "RecreateConfigurationModules\TestFormModule1.frm"), _
-             destination:=fso.BuildPath(testProjectFolder, "TestFormModule1.frm")
-    
     ' Copy the sheet of the new project in the relevant folder, and create a DTD
     FileCopy Source:=fso.BuildPath(vtkPathToTemplateFolder, testProject.XMLConfigurationName), _
              destination:=fso.BuildPath(testProjectFolder, testProject.XMLConfigurationStandardRelativePath)
@@ -199,6 +186,20 @@ End Sub
 Private Sub recreateAndSetWb(testProject As vtkProject, testedConf As vtkConfiguration)
     ' It is mandatory to create the source files before recreating a configuration
     On Error GoTo recreateAndSetWb_Error
+    
+    ' Copy the modules (mandatory to recreate the configuration)
+    FileCopy Source:=fso.BuildPath(vtkPathToTemplateFolder, "RecreateConfigurationModules\TestModule1.bas"), _
+             destination:=fso.BuildPath(testProjectFolder, "TestModule1.bas")
+             
+    FileCopy Source:=fso.BuildPath(vtkPathToTemplateFolder, "RecreateConfigurationModules\TestModule2.bas"), _
+             destination:=fso.BuildPath(testProjectFolder, "TestModule2.bas")
+    
+    FileCopy Source:=fso.BuildPath(vtkPathToTemplateFolder, "RecreateConfigurationModules\TestClassModule1.cls"), _
+             destination:=fso.BuildPath(testProjectFolder, "TestClassModule1.cls")
+    
+    FileCopy Source:=fso.BuildPath(vtkPathToTemplateFolder, "RecreateConfigurationModules\TestFormModule1.frm"), _
+             destination:=fso.BuildPath(testProjectFolder, "TestFormModule1.frm")
+    
 
     vtkRecreateConfiguration testProject.projectName, testedConf.name
     Set recreatedWb = Workbooks.Open(VBAToolKit.vtkTestPath & "\" & testProject.projectName & "\" & testedConf.path)
@@ -264,53 +265,53 @@ End Sub
 
 
 
-'''Public Sub Test_vtkRecreateConfiguration_workbookIsCreatedInTheGoodPath_multitypeConf()
-'''' workbook is created in the good path
-'''
-'''    On Error GoTo Test_vtkRecreateConfiguration_workbookIsCreatedInTheGoodPath_multitypeConf_Error
-'''
-'''    Set testedConf = multitypeConf
-'''
-'''    recreateAndSetWb testProject, testedConf
-'''
-'''    mAssert.Should fso.FileExists(VBAToolKit.vtkTestPath & "\" & testProject.projectName & "\" & testedConf.path), _
-'''                   "The configuration should have been created in the designated path."
-'''
-'''    On Error GoTo 0
-'''    Exit Sub
-'''
-'''Test_vtkRecreateConfiguration_workbookIsCreatedInTheGoodPath_multitypeConf_Error:
-'''    Err.Source = "Test_vtkRecreateConfiguration_workbookIsCreatedInTheGoodPath_multitypeConf of module vtkRecreateConfigurationTester"
-'''    mAssert.Should False, "Unexpected error " & Err.Number & " (" & Err.Description & ") in " & Err.Source
-'''    Exit Sub
-'''End Sub
-'''
-'''
-'''
-'''Public Sub Test_vtkRecreateConfiguration_modulesNotYetExported_normalConf()
-'''' modules have not been exported, normal conf : raise error VTK_NO_SOURCE_FILES
-'''
-'''    On Error GoTo Test_vtkRecreateConfiguration_modulesNotYetExported_normalConf_Error
-'''
-'''    Dim error As Integer: error = 0
-'''
-'''    Set testedConf = normalConf
-'''
-'''    vtkRecreateConfiguration testProject.projectName, testedConf.name
-'''
-'''    mAssert.Equals error, VTK_NO_SOURCE_FILES
-'''
-'''    On Error GoTo 0
-'''    Exit Sub
-'''
-'''Test_vtkRecreateConfiguration_modulesNotYetExported_normalConf_Error:
-'''    error = Err.Number
-'''    Resume Next
-'''End Sub
-'''
-'''
-'''
-'''
+Public Sub Test_vtkRecreateConfiguration_workbookIsCreatedInTheGoodPath_multitypeConf()
+' workbook is created in the good path
+
+    On Error GoTo Test_vtkRecreateConfiguration_workbookIsCreatedInTheGoodPath_multitypeConf_Error
+
+    Set testedConf = multitypeConf
+
+    recreateAndSetWb testProject, testedConf
+
+    mAssert.Should fso.FileExists(VBAToolKit.vtkTestPath & "\" & testProject.projectName & "\" & testedConf.path), _
+                   "The configuration should have been created in the designated path."
+
+    On Error GoTo 0
+    Exit Sub
+
+Test_vtkRecreateConfiguration_workbookIsCreatedInTheGoodPath_multitypeConf_Error:
+    Err.Source = "Test_vtkRecreateConfiguration_workbookIsCreatedInTheGoodPath_multitypeConf of module vtkRecreateConfigurationTester"
+    mAssert.Should False, "Unexpected error " & Err.Number & " (" & Err.Description & ") in " & Err.Source
+    Exit Sub
+End Sub
+
+
+
+Public Sub Test_vtkRecreateConfiguration_modulesNotYetExported_normalConf()
+' modules have not been exported, normal conf : raise error VTK_NO_SOURCE_FILES
+
+    On Error GoTo Test_vtkRecreateConfiguration_modulesNotYetExported_normalConf_Error
+
+    Dim error As Integer: error = 0
+
+    Set testedConf = normalConf
+
+    vtkRecreateConfiguration testProject.projectName, testedConf.name
+
+    mAssert.Equals error, VTK_NO_SOURCE_FILES
+
+    On Error GoTo 0
+    Exit Sub
+
+Test_vtkRecreateConfiguration_modulesNotYetExported_normalConf_Error:
+    error = Err.Number
+    Resume Next
+End Sub
+
+
+
+
 '''Public Sub Test_vtkRecreateConfiguration_modulesNotYetExported_emptyConf()
 '''' modules have not been exported, empty conf : don't raise error, create the file normally
 '''
@@ -778,11 +779,15 @@ End Sub
 Private Function ITest_Suite() As TestSuite
     Set ITest_Suite = New TestSuite
     ITest_Suite.AddTest ITest_Manager.ClassName, "Test_vtkRecreateConfiguration_workbookIsCreatedInTheGoodPath_normalConf"
+    ITest_Suite.AddTest ITest_Manager.ClassName, "Test_vtkRecreateConfiguration_workbookIsCreatedInTheGoodPath_emptyConf"
+    ITest_Suite.AddTest ITest_Manager.ClassName, "Test_vtkRecreateConfiguration_workbookIsCreatedInTheGoodPath_multitypeConf"
 End Function
 
 Private Sub ITestCase_RunTest()
     Select Case mManager.methodName
         Case "Test_vtkRecreateConfiguration_workbookIsCreatedInTheGoodPath_normalConf": Test_vtkRecreateConfiguration_workbookIsCreatedInTheGoodPath_normalConf
+        Case "Test_vtkRecreateConfiguration_workbookIsCreatedInTheGoodPath_emptyConf": Test_vtkRecreateConfiguration_workbookIsCreatedInTheGoodPath_emptyConf
+        Case "Test_vtkRecreateConfiguration_workbookIsCreatedInTheGoodPath_multitypeConf": Test_vtkRecreateConfiguration_workbookIsCreatedInTheGoodPath_multitypeConf
         Case Else: mAssert.Should False, "Invalid test name: " & mManager.methodName
     End Select
 End Sub
