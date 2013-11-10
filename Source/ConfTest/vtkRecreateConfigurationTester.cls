@@ -35,7 +35,7 @@ Implements ITestCase
 Private mManager As TestCaseManager
 Private mAssert As IAssert
 
-Private fso As FileSystemObject
+Private fso As New FileSystemObject
 
 Private Wb As Workbook
 Private recreatedWb As Workbook
@@ -80,7 +80,17 @@ End Property
 
 Private Sub ITestCase_SetUp(Assert As IAssert)
     
-'    Set mAssert = Assert
+    Set mAssert = Assert
+    
+    ' Create the files we'll need for remembering projects
+    createDTDforRememberedProjects sheetPath:=fso.BuildPath(VBAToolKit.vtkTestPath, standardRememberedProjectsDTDName)
+    
+    createRememberedProjectsXMLSheet sheetPath:=fso.BuildPath(VBAToolKit.vtkTestPath, rememberedProjectsSheetName), _
+                                     dtdPath:=fso.BuildPath(VBAToolKit.vtkTestPath, standardRememberedProjectsDTDName)
+    
+    ' Add the TestProject to the list of remembered projects
+    xmlRememberedProjectsFullPath = fso.BuildPath(VBAToolKit.vtkTestPath, rememberedProjectsSheetName)
+    
 '
 '    Set fso = New FileSystemObject
 '

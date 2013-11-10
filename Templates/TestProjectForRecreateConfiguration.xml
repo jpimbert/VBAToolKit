@@ -1,0 +1,110 @@
+<?xml version="1.0" encoding="ISO-8859-1" standalone="no"?>
+<!DOCTYPE vtkConf SYSTEM "vtkConfigurationsDTD.dtd">
+<vtkConf>
+
+	<info>
+		<vtkConfigurationsVersion>2.0</vtkConfigurationsVersion>
+		<projectName>TestProject1</projectName>
+	</info>
+
+	<configuration cID="c01">
+		<name>TestProject</name>
+		<path>TestProject.xlsm</path>
+	</configuration>
+
+	<configuration cID="c02">
+		<name>TestProject_DEV</name>
+		<path>TestProject_DEV.xlsm</path>
+	</configuration>
+
+	<configuration cID="c03">
+		<name>TestProject_notExistingPathConf1</name>
+		<path>testFolder1\TestProject_notExistingPathConf1.xlsm</path>
+	</configuration>
+
+	<configuration cID="c04">
+		<name>TestProject_notExistingPathConf2</name>
+		<path>testFolder1\testFolder2\TestProject_notExistingPathConf2.xlsm</path>
+	</configuration>
+
+	<configuration cID="c05">
+		<name>TestProject_emptyConf</name>
+		<path>TestProject_emptyConf.xlsm</path>
+	</configuration>
+
+	<configuration cID="c06">
+		<name>TestProject_normalConf</name>
+		<path>TestProject_normalConf.xlsm</path>
+	</configuration>
+
+	<configuration cID="c07">
+		<name>TestProject_xlamConf</name>
+		<path>TestProject_xlamConf.xlam</path>
+	</configuration>
+
+	<configuration cID="c08">
+		<name>TestProject_xlsConf</name>
+		<path>TestProject_xlsConf.xls</path>
+	</configuration>
+
+	<configuration cID="c09">
+		<name>TestProject_xlaConf</name>
+		<path>TestProject_xlaConf.xla</path>
+	</configuration>
+
+	<configuration cID="c10">
+		<name>TestProject_multitypeConf</name>
+		<path>TestProject_multitypeConf.xlsm</path>
+	</configuration>
+
+	<configuration cID="c11">
+		<name>TestProject_VTKConf</name>
+		<path>VBAToolKit.xlam</path>
+	</configuration>
+
+	<configuration cID="c12">
+		<name>VBAToolKit</name>
+		<path>VBAToolKit.xlam</path>
+	</configuration>
+
+
+	<module mID="m01">
+		<name>TestModule1</name>
+		<modulePath confId="c02">TestModule1.bas</modulePath>
+		<modulePath confId="c03">TestModule1.bas</modulePath>
+		<modulePath confId="c04">TestModule1.bas</modulePath>
+		<modulePath confId="c06">TestModule1.bas</modulePath>
+		<modulePath confId="c07">TestModule1.bas</modulePath>
+		<modulePath confId="c08">TestModule1.bas</modulePath>
+		<modulePath confId="c09">TestModule1.bas</modulePath>
+		<modulePath confId="c10">TestModule1.bas</modulePath>
+		<modulePath confId="c11">TestModule1.bas</modulePath>
+		<modulePath confId="c12">TestModule1.bas</modulePath>
+	</module>
+
+
+	<module mID="m02">
+		<name>TestModule2</name>
+		<modulePath confId="c02">TestModule2.bas</modulePath>
+		<modulePath confId="c06">TestModule2.bas</modulePath>
+		<modulePath confId="c07">TestModule2.bas</modulePath>
+		<modulePath confId="c08">TestModule2.bas</modulePath>
+		<modulePath confId="c09">TestModule2.bas</modulePath>
+		<modulePath confId="c10">TestModule2.bas</modulePath>
+		<modulePath confId="c11">TestModule2.bas</modulePath>
+		<modulePath confId="c12">TestModule2.bas</modulePath>
+	</module>
+
+
+	<module mID="m03">
+		<name>TestClassModule1</name>
+		<modulePath confId="c10">TestClassModule1.cls</modulePath>
+	</module>
+
+
+	<module mID="m04">
+		<name>TestFromModule1</name>
+		<modulePath confId="c10">TestFormModule1.frm</modulePath>
+	</module>
+
+</vtkConf>
