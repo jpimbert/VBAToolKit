@@ -165,16 +165,16 @@ Test_PropertyName_DefaultLet_Error:
 End Sub
 
 
-'Public Sub TestGetConfigurationsFromNewProject()
-''       Verify the list of the configurations of a new project
-'    mAssert.Equals newConfManager.configurationCount, 2, "There must be two configurations in a new project"
-'    mAssert.Equals newConfManager.configuration(0), "", "Inexistant configuration number 0"
-'    mAssert.Equals newConfManager.configuration(1), newProjectName, "Name of the first configuration"
-'    mAssert.Equals newConfManager.configuration(2), newProjectName & "_DEV", "Name of the second configuration"
-'    mAssert.Equals newConfManager.configuration(3), "", "Inexistant configuration number 3"
-'    mAssert.Equals newConfManager.configuration(-23), "", "Inexistant configuration number -23"
-'    mAssert.Equals newConfManager.configuration(150), "", "Inexistant configuration number 150"
-'End Sub
+Public Sub TestGetConfigurationsFromNewProject()
+'       Verify the list of the configurations of a new project
+    mAssert.Equals newConfManager.configurationCount, 2, "There must be two configurations in a new project"
+    mAssert.Equals newConfManager.configuration(0), "", "Inexistant configuration number 0"
+    mAssert.Equals newConfManager.configuration(1), newProjectName, "Name of the first configuration"
+    mAssert.Equals newConfManager.configuration(2), newProjectName & "_DEV", "Name of the second configuration"
+    mAssert.Equals newConfManager.configuration(3), "", "Inexistant configuration number 3"
+    mAssert.Equals newConfManager.configuration(-23), "", "Inexistant configuration number -23"
+    mAssert.Equals newConfManager.configuration(150), "", "Inexistant configuration number 150"
+End Sub
 
 
 ''Public Sub TestGetConfigurationsFromExistingProject()
