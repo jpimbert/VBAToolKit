@@ -38,8 +38,6 @@ Private mAssert As IAssert
 Private projectName As String      ' default workbook Name for test
 Private project As vtkProject      ' Default vtkProject for test
 
-Private fso As New FileSystemObject
-
 Private Sub Class_Initialize()
     Set mManager = New TestCaseManager
 End Sub
@@ -59,8 +57,6 @@ Private Sub ITestCase_SetUp(Assert As IAssert)
 End Sub
 
 Private Sub ITestCase_TearDown()
-    vtkResetProjects
-    Set project = Nothing
 End Sub
 
 Public Sub TestNullProject()
@@ -108,7 +104,6 @@ Public Sub TestXMLConfigurationName()
 '       Verify the project path
     mAssert.Equals project.XMLConfigurationName, "TestProject.xml", "The project confighuration standard name"
 End Sub
-
 
 Private Function ITest_Suite() As TestSuite
     Set ITest_Suite = New TestSuite

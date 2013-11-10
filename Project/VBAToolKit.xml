@@ -355,6 +355,12 @@
         <modulePath confId="c2">Source\ConfProd\vtkRecreateConfigurationForm.frm</modulePath>
         <modulePath confId="c3">Source\ConfProd\vtkRecreateConfigurationForm.frm</modulePath>
     </module>
+    <module mID="m63">
+        <name>vtkXMLFilesCreator</name>
+        <modulePath confId="c1">Source\ConfProd\vtkXMLFilesCreator.bas</modulePath>
+        <modulePath confId="c2">Source\ConfProd\vtkXMLFilesCreator.bas</modulePath>
+        <modulePath confId="c3">Source\ConfProd\vtkXMLFilesCreator.bas</modulePath>
+    </module>
     <reference confIDs="c1 c2 c3">
         <name>VBA</name>
         <guid>{000204EF-0000-0000-C000-000000000046}</guid>
@@ -391,8 +397,12 @@
         <name>MSXML2</name>
         <guid>{F5078F18-C551-11D3-89B9-0000F81FE221}</guid>
     </reference>
+    <reference confIDs="c1 c2 c3">
+        <name>ADODB</name>
+        <guid>{00000206-0000-0010-8000-00AA006D2EA4}</guid>
+    </reference>
     <reference confIDs="c2">
         <name>VBAToolKit</name>
-        <path>C:\Documents and Settings\Demonn\Application Data\Microsoft\AddIns\VBAToolKit.xlam</path>
+        <path>C:\Documents and Settings\Administrator\Application Data\Microsoft\AddIns\VBAToolKit.xlam</path>
     </reference>
 </vtkConf>

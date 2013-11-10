@@ -193,9 +193,9 @@ End Sub
 'Public Sub Test_AddedConfigurationCollection_Number()
 '    ' This test verifies the number of each vtkConfiguration object
 '    ' Added configuration to the collection initialized from an Excel worlbook
-'    
+'
 '    confManager.addConfiguration ("NewConfiguration")
-'    
+'
 '    mAssert.Equals confManager.configurations(1).Number, 1, "The number of each vtkConfiguration must be initialized"
 '    mAssert.Equals confManager.configurations(2).Number, 2, "The number of each vtkConfiguration must be initialized"
 'End Sub
@@ -203,9 +203,9 @@ End Sub
 'Public Sub Test_AddedConfigurationCollection_isDEV()
 '    ' This test verifies the number of each vtkConfiguration object
 '    ' Added configuration to the collection initialized from an Excel worlbook
-'    
+'
 '    confManager.addConfiguration ("NewConfiguration")
-'    
+'
 '    mAssert.Should confManager.configurations(1).isDEV, "The first configuration is expected to be DEV"
 '    mAssert.Should Not confManager.configurations(2).isDEV, "The second configuration is expected to not be DEV"
 'End Sub
@@ -213,9 +213,9 @@ End Sub
 'Public Sub Test_AddedConfigurationCollection_ID()
 '    ' This test verifies the ID of each vtkConfiguration object
 '    ' Added configuration to the collection initialized from an Excel worlbook
-'    
+'
 '    confManager.addConfiguration ("NewConfiguration")
-'    
+'
 '    mAssert.Equals confManager.configurations(1).ID, "c1", "Expected ID for the first vtkConfiguration"
 '    mAssert.Equals confManager.configurations(2).ID, "c2", "Expected ID for the second vtkConfiguration"
 'End Sub
