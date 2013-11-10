@@ -110,14 +110,34 @@ Public Sub Test_ModuleCollection_Number()
     Next i
 End Sub
 
+Public Sub Test_ModuleCollection_ID()
+    ' This test verifies the ID of each vtkModule object
+    ' collection just initialized from an Excel worlbook
+    Dim i As Integer
+    For i = 1 To 4
+        mAssert.Equals confManager.modules(i).ID, "m" & i, "Expected ID for module " & i
+    Next i
+End Sub
+
 Public Sub Test_AddedModuleCollection_Number()
-    ' This test verifies the number of each vtkModule object
+    ' This test verifies the Number of each vtkModule object
     ' Added module to the collection initialized from an Excel worlbook
     
     confManager.addModule ("NewConfiguration")
     Dim i As Integer
     For i = 1 To 5
         mAssert.Equals confManager.modules(i).Number, i, "The number of vtkModule " & i
+    Next i
+End Sub
+
+Public Sub Test_AddedModuleCollection_ID()
+    ' This test verifies the ID of each vtkModule object
+    ' Added module to the collection initialized from an Excel worlbook
+    
+    confManager.addModule ("NewConfiguration")
+    Dim i As Integer
+    For i = 1 To 5
+        mAssert.Equals confManager.modules(i).ID, "m" & i, "Expected ID of vtkModule " & i
     Next i
 End Sub
 
@@ -366,7 +386,9 @@ Private Function ITest_Suite() As TestSuite
     ITest_Suite.AddTest ITest_Manager.ClassName, "Test_ModuleCollection_Parent"
     ITest_Suite.AddTest ITest_Manager.ClassName, "Test_AddedModuleCollection_Parent"
     ITest_Suite.AddTest ITest_Manager.ClassName, "Test_ModuleCollection_Number"
+    ITest_Suite.AddTest ITest_Manager.ClassName, "Test_ModuleCollection_ID"
     ITest_Suite.AddTest ITest_Manager.ClassName, "Test_AddedModuleCollection_Number"
+    ITest_Suite.AddTest ITest_Manager.ClassName, "Test_AddedModuleCollection_ID"
     ITest_Suite.AddTest ITest_Manager.ClassName, "Test_ModuleGetName"
     ITest_Suite.AddTest ITest_Manager.ClassName, "Test_GetPathForConfiguration_ExistingConfiguration"
     ITest_Suite.AddTest ITest_Manager.ClassName, "Test_GetPathForConfiguration_InexistingConfigurationRaiseError"
@@ -392,7 +414,9 @@ Private Sub ITestCase_RunTest()
         Case "Test_ModuleCollection_Parent": Test_ModuleCollection_Parent
         Case "Test_AddedModuleCollection_Parent": Test_AddedModuleCollection_Parent
         Case "Test_ModuleCollection_Number": Test_ModuleCollection_Number
+        Case "Test_ModuleCollection_ID": Test_ModuleCollection_ID
         Case "Test_AddedModuleCollection_Number": Test_AddedModuleCollection_Number
+        Case "Test_AddedModuleCollection_ID": Test_AddedModuleCollection_ID
         Case "Test_ModuleGetName": Test_ModuleGetName
         Case "Test_GetPathForConfiguration_ExistingConfiguration": Test_GetPathForConfiguration_ExistingConfiguration
         Case "Test_GetPathForConfiguration_InexistingConfigurationRaiseError": Test_GetPathForConfiguration_InexistingConfigurationRaiseError

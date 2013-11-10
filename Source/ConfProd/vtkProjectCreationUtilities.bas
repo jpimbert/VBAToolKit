@@ -118,7 +118,7 @@ Public Sub vtkAddBeforeSaveHandlerInDEVWorkbook(Wb As Workbook, projectName As S
                                                                     " , onlyModified:=True" & _
                                                                     vbNewLine & _
                                                                     vbNewLine & _
-    "   " & wbVTKName & ".vtkWriteXMLDOMToFile " & wbVTKName & ".vtkExportAsXMLDOM(""" & projectName & """), " & _
+    "   " & wbVTKName & ".vtkExportConfigurationsAsXML projectName:=""" & projectName & """, filePath:=" & _
     wbVTKName & ".vtkPathOfCurrentProject(ThisWorkbook) & ""\"" & " & wbVTKName & ".vtkProjectForName(""" & projectName & """).XMLConfigurationStandardRelativePath" & vbNewLine & _
     "End Sub" & vbNewLine
     
