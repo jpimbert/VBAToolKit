@@ -27,6 +27,8 @@ Attribute VB_Name = "vtkXMLFilesCreator"
 '   limitations under the License.
 '---------------------------------------------------------------------------------------
 
+Option Explicit
+
 '---------------------------------------------------------------------------------------
 ' Procedure : createProjectXMLSheet
 ' Author    : Lucas Vitorino
@@ -48,6 +50,11 @@ Public Sub createInitializedXMLSheetForProject(sheetPath As String, _
     Dim xmlFile As TextStream
     Set xmlFile = fso.CreateTextFile(fileName:=sheetPath, Overwrite:=True)
   
+    Dim deliveryConfId As String
+    Dim devConfId As String
+    deliveryConfId = "c01"
+    devConfId = "c02"
+  
     ' Create the XML preamble
     xmlFile.WriteLine Text:="<?xml version=""1.0"" encoding=""ISO-8859-1"" standalone=""no""?>"
     xmlFile.WriteLine Text:="<!DOCTYPE vtkConf SYSTEM """ & dtdPath & """>"
@@ -62,15 +69,15 @@ Public Sub createInitializedXMLSheetForProject(sheetPath As String, _
     xmlFile.WriteBlankLines Lines:=1
     
     ' Create the 2 configurations
-    xmlFile.WriteLine Text:="    <configuration cID=""c01"">"
+    xmlFile.WriteLine Text:="    <configuration cID=""" & deliveryConfId & """>"
+    xmlFile.WriteLine Text:="        <name>" & projectName & "</name>"
+    xmlFile.WriteLine Text:="        <path>" & fso.GetParentFolderName(fso.GetParentFolderName(sheetPath)) & "\Delivery\" & projectName & ".xlsm</path>"
+    xmlFile.WriteLine Text:="    </configuration>"
+    xmlFile.WriteLine Text:="    <configuration cID=""" & devConfId & """>"
     xmlFile.WriteLine Text:="        <name>" & projectName & "_DEV</name>"
     xmlFile.WriteLine Text:="        <path>" & fso.GetParentFolderName(fso.GetParentFolderName(sheetPath)) & "\Project\" & projectName & "_DEV.xlsm</path>"
     xmlFile.WriteLine Text:="    </configuration>"
     xmlFile.WriteBlankLines Lines:=1
-    xmlFile.WriteLine Text:="    <configuration cID=""c02"">"
-    xmlFile.WriteLine Text:="        <name>" & projectName & "</name>"
-    xmlFile.WriteLine Text:="        <path>" & fso.GetParentFolderName(fso.GetParentFolderName(sheetPath)) & "\Delivery\" & projectName & ".xlsm</path>"
-    xmlFile.WriteLine Text:="    </configuration>"
     xmlFile.WriteBlankLines Lines:=1
     
     ' Create all the VBAUnit modules
@@ -82,7 +89,7 @@ Public Sub createInitializedXMLSheetForProject(sheetPath As String, _
         Set module = ThisWorkbook.VBProject.VBComponents(moduleName)
         xmlFile.WriteLine Text:="    <module mID=""m" & i & """>"
         xmlFile.WriteLine Text:="        <name>" & moduleName & "</name>"
-        xmlFile.WriteLine Text:="        <modulePath confId=""c01"">" & vtkStandardPathForModule(module) & "</modulePath>"
+        xmlFile.WriteLine Text:="        <modulePath confId=""" & devConfId & """>" & vtkStandardPathForModule(module) & "</modulePath>"
         xmlFile.WriteLine Text:="    </module>"
         xmlFile.WriteBlankLines Lines:=1
     Next i
@@ -90,7 +97,7 @@ Public Sub createInitializedXMLSheetForProject(sheetPath As String, _
     ' Create the references for the DEV and the delivery configurations
     Dim tmpRef As VBIDE.Reference
     For Each tmpRef In listOfDefaultReferences
-        xmlFile.WriteLine Text:="    <reference confIDs=""c01 c02"">"
+        xmlFile.WriteLine Text:="    <reference confIDs=""" & deliveryConfId & " " & devConfId & """>"
         xmlFile.WriteLine Text:="        <name>" & tmpRef.name & "</name>"
         xmlFile.WriteLine Text:="        <guid>" & tmpRef.GUID & "</guid>"
         xmlFile.WriteLine Text:="    </reference>"
@@ -99,7 +106,7 @@ Public Sub createInitializedXMLSheetForProject(sheetPath As String, _
     
     ' Create the reference "to self" only for the DEV configuration
     If addReferenceToSelf Then
-        xmlFile.WriteLine Text:="    <reference confIDs=""c01"">"
+        xmlFile.WriteLine Text:="    <reference confIDs=""" & devConfId & """>"
         xmlFile.WriteLine Text:="        <name>" & ThisWorkbook.VBProject.name & "</name>"
         xmlFile.WriteLine Text:="        <guid>" & ThisWorkbook.name & "</guid>"
         xmlFile.WriteLine Text:="    </reference>"

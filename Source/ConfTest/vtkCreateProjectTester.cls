@@ -166,10 +166,10 @@ Public Sub TestProjectIsNamedcorrectly()
 
     Dim returnValue As Long
     returnValue = vtkCreateProject(path:=VBAToolKit.vtkTestPath, name:=vtkTestProjectName, displayError:=False)
-    
+
     Dim dom As New MSXML2.DOMDocument
     dom.Load VBAToolKit.vtkTestPath & "\" & vtkTestProjectName & "\" & "Project" & "\" & vtkTestProjectName & ".xml"
-    
+
     mAssert.Equals dom.SelectSingleNode("/vtkConf/info/projectName[0]").Text, vtkTestProjectName, "the project name in the sheet must be like " & vtkTestProjectName
 
     On Error GoTo 0
@@ -186,14 +186,14 @@ End Sub
 Public Sub TestDevProjectIsNamedcorrectly()
 'test that the dev configuration is named correctly in the configuration sheet
     On Error GoTo TestDevProjectIsNamedcorrectly_Error
-    
+
     Dim returnValue As Long
     returnValue = vtkCreateProject(path:=VBAToolKit.vtkTestPath, name:=vtkTestProjectName, displayError:=False)
-    
+
     Dim dom As New MSXML2.DOMDocument
     dom.Load VBAToolKit.vtkTestPath & "\" & vtkTestProjectName & "\" & "Project" & "\" & vtkTestProjectName & ".xml"
-    
-    mAssert.Equals dom.SelectSingleNode("/vtkConf/configuration[@cID=""c01""]/name[0]").Text, vtkTestProjectName & "_DEV", "the dev configuration must be called " & vtkTestProjectName & "_DEV"
+
+    mAssert.Equals dom.SelectSingleNode("/vtkConf/configuration[@cID=""c02""]/name[0]").Text, vtkTestProjectName & "_DEV", "the dev configuration must be called " & vtkTestProjectName & "_DEV"
 
     On Error GoTo 0
     Exit Sub
@@ -212,12 +212,12 @@ Public Sub TestDelivProjectIsNamedcorrectly()
 
     Dim returnValue As Long
     returnValue = vtkCreateProject(path:=VBAToolKit.vtkTestPath, name:=vtkTestProjectName, displayError:=False)
-    
+
     Dim dom As New MSXML2.DOMDocument
     dom.Load VBAToolKit.vtkTestPath & "\" & vtkTestProjectName & "\" & "Project" & "\" & vtkTestProjectName & ".xml"
-    
-    mAssert.Equals dom.SelectSingleNode("/vtkConf/configuration[@cID=""c02""]/name[0]").Text, vtkTestProjectName, "the delivery configuration must be called " & vtkTestProjectName
- 
+
+    mAssert.Equals dom.SelectSingleNode("/vtkConf/configuration[@cID=""c01""]/name[0]").Text, vtkTestProjectName, "the delivery configuration must be called " & vtkTestProjectName
+
     On Error GoTo 0
     Exit Sub
 
@@ -253,10 +253,10 @@ Public Sub TestDefaultReferencesArePresent()
     On Error GoTo TestDefaultReferencesArePresent_Error
 
     vtkCreateProject path:=VBAToolKit.vtkTestPath, name:=vtkTestProjectName, displayError:=False
-    
+
     Dim dom As New MSXML2.DOMDocument
     dom.Load VBAToolKit.vtkTestPath & "\" & vtkTestProjectName & "\" & "Project" & "\" & vtkTestProjectName & ".xml"
-    
+
     Dim tmpRef As VBIDE.Reference
     For Each tmpRef In listOfDefaultReferences
         mAssert.Equals dom.SelectNodes("/vtkConf/reference[name=""" & tmpRef.name & """]").Length, 1, "The reference " & tmpRef.name & " should be present in the sheet."
@@ -276,18 +276,18 @@ End Sub
 Public Sub TestToSelfReferenceIsPresentAndActivatedByDefaultForDEV()
 ' test that the DEV configuration has a reference to the workbook that created the project
     On Error GoTo TestToSelfReferenceIsPresentAndActivatedByDefaultForDEV_Error
-    
+
     vtkCreateProject path:=VBAToolKit.vtkTestPath, name:=vtkTestProjectName, displayError:=False
-    
+
     Dim dom As New MSXML2.DOMDocument
     dom.Load VBAToolKit.vtkTestPath & "\" & vtkTestProjectName & "\" & "Project" & "\" & vtkTestProjectName & ".xml"
-    
+
     Dim confId As String
     confId = dom.SelectSingleNode("/vtkConf/configuration[name=""" & vtkTestProjectName & "_DEV""]/@cID").Text
-    
+
     ' Test presence and value of the reference
     mAssert.Equals dom.SelectNodes("/vtkConf/reference[@confIDs=""" & confId & """][name=""" & ThisWorkbook.VBProject.name & """]").Length, 1, "The reference to the current workbook must be present."
-    
+
     On Error GoTo 0
     Exit Sub
 
@@ -337,7 +337,7 @@ Public Sub TestReferencesOfDeliveryConfigurationAreActivated()
     Dim dom As New MSXML2.DOMDocument
     dom.Load VBAToolKit.vtkTestPath & "\" & vtkTestProjectName & "\" & "Project" & "\" & vtkTestProjectName & ".xml"
     dom.setProperty "SelectionLanguage", "XPath"
-    
+
     Dim confId As String
     confId = dom.SelectSingleNode("/vtkConf/configuration[name=""" & vtkTestProjectName & """]/@cID").Text
 
@@ -362,7 +362,7 @@ Public Sub TestNewProjectIsRemembered()
     On Error GoTo TestNewProjectIsRemembered_Error
 
     vtkCreateProject path:=VBAToolKit.vtkTestPath, name:=vtkTestProjectName, displayError:=False
-    
+
     mAssert.Should vtkRootPathForProject(vtkTestProjectName) <> "", "The root path of the newly created project should be detected."
     mAssert.Should vtkXmlRelPathForProject(vtkTestProjectName) <> "", "The xml relative path of the newly created project should be detected."
 
