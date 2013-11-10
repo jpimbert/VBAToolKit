@@ -427,7 +427,8 @@ End Sub
 '''    Exit Sub
 '''
 '''End Sub
-'''
+
+
 '''Public Sub Test_vtkCreateProject_handlerAddedInDEVWorkbook_xmlIsCreated()
 '''' creating a project : the xml export of its configuration should exist as the DEV workbook is saved in vtkCreateProject
 '''
