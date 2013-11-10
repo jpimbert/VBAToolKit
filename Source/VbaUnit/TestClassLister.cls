@@ -41,7 +41,6 @@ Public Function SelectTestClass(TestClassName As String) As ITest
         Case "vtkCreateProjectTester": Set SelectTestClass = New vtkCreateProjectTester
         Case "vtkPathUtilitiesTester": Set SelectTestClass = New vtkPathUtilitiesTester
         Case "vtkWorkbookIsOpenTester": Set SelectTestClass = New vtkWorkbookIsOpenTester
-        Case "vtkProjectsTester": Set SelectTestClass = New vtkProjectsTester
         Case "vtkProjectTester": Set SelectTestClass = New vtkProjectTester
         Case "vtkInitializeVbaUnitTester": Set SelectTestClass = New vtkInitializeVbaUnitTester
         Case "vtkCreateTreeFolderTester": Set SelectTestClass = New vtkCreateTreeFolderTester
@@ -49,17 +48,18 @@ Public Function SelectTestClass(TestClassName As String) As ITest
         Case "vtkToolBarsTester": Set SelectTestClass = New vtkToolBarsTester
         Case "vtkExportOneModuleTester": Set SelectTestClass = New vtkExportOneModuleTester
         Case "vtkGitFunctionsTester": Set SelectTestClass = New vtkGitFunctionsTester
-        Case "vtkModuleTester": Set SelectTestClass = New vtkModuleTester
         Case "vtkExportConfigurationTester": Set SelectTestClass = New vtkExportConfigurationTester
         Case "vtkNormalizeTester": Set SelectTestClass = New vtkNormalizeTester
         Case "vtkTestUtilitiesTester": Set SelectTestClass = New vtkTestUtilitiesTester
-        Case "vtkXMLExportTester": Set SelectTestClass = New vtkXMLExportTester
         Case "vtkRecreateConfigurationTester": Set SelectTestClass = New vtkRecreateConfigurationTester
         Case "vtkConfigurationManagersTester": Set SelectTestClass = New vtkConfigurationManagersTester
         Case "vtkConfigurationManagerTester": Set SelectTestClass = New vtkConfigurationManagerTester
-        Case "vtkConfigurationTester": Set SelectTestClass = New vtkConfigurationTester
         Case "vtkFileSystemUtilitiesTester": Set SelectTestClass = New vtkFileSystemUtilitiesTester
         Case "vtkXMLUtilitiesTester": Set SelectTestClass = New vtkXMLUtilitiesTester
+        Case "vtkModuleTester": Set SelectTestClass = New vtkModuleTester
+        Case "vtkConfigurationTester": Set SelectTestClass = New vtkConfigurationTester
+        Case "vtkXMLExportTester": Set SelectTestClass = New vtkXMLExportTester
+        Case "vtkProjectsTester": Set SelectTestClass = New vtkProjectsTester
         Case Else:
     End Select
 End Function

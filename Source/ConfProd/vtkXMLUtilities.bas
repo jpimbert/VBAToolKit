@@ -147,6 +147,69 @@ vtkExportConfigurationsAsXML_Error:
     Err.Raise Err.Number, s, Err.Description
 End Sub
 
+'---------------------------------------------------------------------------------------
+' Procedure : vtkWriteXMLDOMToFile
+' Author    : Lucas Vitorino
+' Purpose   : - Write an XML DOM to a xml text file.
+'             - The content of the file is nicely indented, to be human-readable.
+'             - Overwrite the output file if it exists.
+' Raises    : - VTK_DOM_NOT_INITIALIZED
+'             - VTK_UNEXPECTED_ERRROR
+' Notes     : Heavily based on code from Baptiste Wicht, http://baptiste-wicht.developpez.com/
+'---------------------------------------------------------------------------------------
+'
+Public Sub vtkWriteXMLDOMToFile(dom As MSXML2.DOMDocument, filePath As String)
+
+    Dim rdr As MSXML2.SAXXMLReader
+    Dim wrt As MSXML2.MXXMLWriter
+    
+    On Error GoTo vtkWriteXMLDOMToFile_Error
+    
+    ' Check DOM intialization
+    If dom Is Nothing Then
+        Err.Raise VTK_DOM_NOT_INITIALIZED
+    End If
+    
+    Set rdr = CreateObject("MSXML2.SAXXMLReader")
+    Set wrt = CreateObject("MSXML2.MXXMLWriter")
+    
+    Dim oStream As ADODB.Stream
+    Set oStream = CreateObject("ADODB.STREAM")
+    oStream.Open
+    oStream.Charset = "ISO-8859-1"
+
+    wrt.indent = True
+    wrt.Encoding = "ISO-8859-1"
+    wrt.output = oStream
+    Set rdr.contentHandler = wrt
+    Set rdr.errorHandler = wrt
+
+    rdr.Parse dom
+    wrt.flush
+
+    oStream.SaveToFile filePath, adSaveCreateOverWrite
+
+    On Error GoTo 0
+    Exit Sub
+
+vtkWriteXMLDOMToFile_Error:
+    Err.Source = "function vtkWriteXMLDOMToFile of module vtkXMLutilities"
+    
+    Select Case Err.Number
+        Case VTK_DOM_NOT_INITIALIZED
+            Err.Description = "Dom object is not initialized."
+        Case 3004 ' ADODB.Stream.SaveToFile failed because it couldn't find the path
+            Err.Number = VTK_WRONG_FILE_PATH
+            Err.Description = "File path is wrong. Make sure the folder tree is valid."
+        Case Else
+            Err.Number = VTK_UNEXPECTED_ERROR
+    End Select
+
+    Err.Raise Err.Number, Err.Source, Err.Description
+    
+    Exit Sub
+
+End Sub
 
 '---------------------------------------------------------------------------------------
 ' Procedure : vtkCreateListOfRememberedProjects
@@ -155,13 +218,14 @@ End Sub
 ' Raises    : - VTK_UNEXPECTED_ERROR
 '             - VTK_DOM_NOT_INITIALIZED
 '             - VTK_WRONG_FILE_PATH
+' Notes     : Useless now
 '---------------------------------------------------------------------------------------
 '
 Public Sub vtkCreateListOfRememberedProjects(filePath As String)
-    
+
     Dim dom As MSXML2.DOMDocument
     Dim rootNode As MSXML2.IXMLDOMNode
-    
+
     On Error GoTo vtkCreateListOfRememberedProjects_Error
 
     ' Create the processing instruction
@@ -178,7 +242,7 @@ Public Sub vtkCreateListOfRememberedProjects(filePath As String)
 
 vtkCreateListOfRememberedProjects_Error:
     Err.Source = "vtkCreateXMLListOfRememberedProjects of module vtkXMLUtilities"
-    
+
     Select Case Err.Number
         Case VTK_WRONG_FILE_PATH ' ADODB.Stream.SaveToFile failed because it couldn't find the path
             ' Do nothing but forward the error
@@ -187,9 +251,9 @@ vtkCreateListOfRememberedProjects_Error:
     End Select
 
     Err.Raise Err.Number, Err.Source, Err.Description
-    
+
     Exit Sub
-    
+
 End Sub
 
 
@@ -258,7 +322,7 @@ vtkAddProjectToListOfRememberedProjects_Error:
         Case VTK_WRONG_FILE_PATH
             Err.Description = "The file path you specified is wrong. Make sure the folder tree is valid."
         Case Else
-            Err.Number = VTK_UNEXEPECTED_ERROR
+            Err.Number = VTK_UNEXPECTED_ERROR
     End Select
     
     Err.Raise Err.Number, Err.Source, Err.Description

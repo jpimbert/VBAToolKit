@@ -40,6 +40,7 @@ Private fso As New FileSystemObject
 Private Wb As Workbook
 Private recreatedWb As Workbook
 Private testProject As vtkProject
+Private testProjectFolder As String
 Private normalConf As vtkConfiguration
 Private emptyConf As vtkConfiguration
 Private notExistingPathConf1 As vtkConfiguration
@@ -54,7 +55,7 @@ Private testedConf As vtkConfiguration
 
 Private cm As vtkConfigurationManager
 
-Private Const testProjectName = "TestProjectForRecreateConf"
+Private Const testProjectName = "TestProjectForRecreateConfiguration"
 Private Const normalConfName = "TestProject_normalConf"
 Private Const emptyConfName = "TestProject_emptyConf"
 Private Const notExistingPathConf1Name = "TestProject_notExistingPathConf1"
@@ -65,6 +66,9 @@ Private Const xlaConfName = "TestProject_xlaConf"
 Private Const multitypeConfName = "TestProject_multitypeConf"
 Private Const VTKConfName = "TestProject_VTKConf"
 Private Const VTKProjectConfName = "VBAToolKit"
+
+Private Const standardRememberedProjectsDTDName As String = "rememberedProjectsDTD.dtd"
+Private Const rememberedProjectsSheetName As String = "VBAToolKitTestProjects.xml"
 
 Private Sub Class_Initialize()
     Set mManager = New TestCaseManager
@@ -82,40 +86,57 @@ Private Sub ITestCase_SetUp(Assert As IAssert)
     
     Set mAssert = Assert
     
+    ' TEMPORARY ---------------
+    VBAToolKit.resetTestFolder
+    vtkResetProjects
+    vtkResetConfigurationManagers
+    ' -------------------------
+    
+    ' Initialize useful variables and environment
+    Set testProject = vtkProjectForName(testProjectName)
+    testProjectFolder = fso.BuildPath(VBAToolKit.vtkTestPath, testProject.projectName)
+    vtkCreateTreeFolder testProjectFolder
+
     ' Create the files we'll need for remembering projects
     createDTDforRememberedProjects sheetPath:=fso.BuildPath(VBAToolKit.vtkTestPath, standardRememberedProjectsDTDName)
     
     createRememberedProjectsXMLSheet sheetPath:=fso.BuildPath(VBAToolKit.vtkTestPath, rememberedProjectsSheetName), _
                                      dtdPath:=fso.BuildPath(VBAToolKit.vtkTestPath, standardRememberedProjectsDTDName)
     
+    ' Copy the modules (mandatory to recreate the configuration)
+    FileCopy Source:=fso.BuildPath(vtkPathToTemplateFolder, "RecreateConfigurationModules\TestModule1.bas"), _
+             destination:=fso.BuildPath(testProjectFolder, "TestModule1.bas")
+             
+    FileCopy Source:=fso.BuildPath(vtkPathToTemplateFolder, "RecreateConfigurationModules\TestModule2.bas"), _
+             destination:=fso.BuildPath(testProjectFolder, "TestModule2.bas")
+    
+    FileCopy Source:=fso.BuildPath(vtkPathToTemplateFolder, "RecreateConfigurationModules\TestClassModule1.cls"), _
+             destination:=fso.BuildPath(testProjectFolder, "TestClassModule1.cls")
+    
+    FileCopy Source:=fso.BuildPath(vtkPathToTemplateFolder, "RecreateConfigurationModules\TestFormModule1.frm"), _
+             destination:=fso.BuildPath(testProjectFolder, "TestFormModule1.frm")
+    
+    
     ' Add the TestProject to the list of remembered projects
     xmlRememberedProjectsFullPath = fso.BuildPath(VBAToolKit.vtkTestPath, rememberedProjectsSheetName)
     
-'
-'    Set fso = New FileSystemObject
-'
-'    Set testProject = vtkProjectForName(testProjectName)
-'
-'    Dim testProjectFolder As String
-'
-'    testProjectFolder = fso.BuildPath(VBAToolKit.vtkTestPath, testProject.projectName)
-'    vtkCreateTreeFolder testProjectFolder
-'
-'    Set Wb = getTestFileFromTemplate(testProject.workbookDEVName, _
-'             destinationName:=fso.BuildPath(testProject.projectName, testProject.projectDEVStandardRelativePath), _
-'             openExcel:=True)
-'    Set cm = vtkConfigurationManagerForProject(testProject.projectName)
-'
-'    Set normalConf = cm.configurations(normalConfName)
-'    Set emptyConf = cm.configurations(emptyConfName)
-'    Set notExistingPathConf1 = cm.configurations(notExistingPathConf1Name)
-'    Set notExistingPathConf2 = cm.configurations(notExistingPathConf2Name)
-'    Set xlsConf = cm.configurations(xlsConfName)
-'    Set xlamConf = cm.configurations(xlamConfName)
-'    Set xlaConf = cm.configurations(xlaConfName)
-'    Set multitypeConf = cm.configurations(multitypeConfName)
-'    Set VTKConf = cm.configurations(VTKConfName)
-'    Set VTKProjectConf = cm.configurations(VTKProjectConfName)
+    ' Add "TestProject" to the list of remembered projects
+    vtkAddRememberedProject projectName:=testProject.projectName, _
+                            rootFolder:=fso.BuildPath(VBAToolKit.vtkTestPath, testProject.projectName), _
+                            xmlRelativePath:=fso.BuildPath("Project", testProject.XMLConfigurationStandardRelativePath)
+                                            
+    ' Set all the configuration objects
+    Set cm = vtkConfigurationManagerForProject(testProject.projectName)
+    Set normalConf = cm.configurations(normalConfName)
+    Set emptyConf = cm.configurations(emptyConfName)
+    Set notExistingPathConf1 = cm.configurations(notExistingPathConf1Name)
+    Set notExistingPathConf2 = cm.configurations(notExistingPathConf2Name)
+    Set xlsConf = cm.configurations(xlsConfName)
+    Set xlamConf = cm.configurations(xlamConfName)
+    Set xlaConf = cm.configurations(xlaConfName)
+    Set multitypeConf = cm.configurations(multitypeConfName)
+    Set VTKConf = cm.configurations(VTKConfName)
+    Set VTKProjectConf = cm.configurations(VTKProjectConfName)
 
     On Error GoTo 0
     Exit Sub
@@ -127,12 +148,10 @@ err_handler:
 End Sub
 
 Private Sub ITestCase_TearDown()
-'    On Error Resume Next
-'    vtkCloseAndKillWorkbook Wb
-'    vtkCloseAndKillWorkbook recreatedWb
-'    VBAToolKit.resetTestFolder
-'    vtkResetProjects
-'    vtkResetConfigurationManagers
+    On Error Resume Next
+    VBAToolKit.resetTestFolder
+    vtkResetProjects
+    vtkResetConfigurationManagers
 End Sub
 
 ' TESTS TO BE WRITTEN
@@ -166,56 +185,55 @@ End Sub
 '       - normal conf
 '       - xlam
 
-'''' --------------------------------------------------------
-''''               PRIVATE UTILITY FUNCTIONS
-'''' --------------------------------------------------------
-'''
-'''Private Sub exportModulesAndRecreateWb(Wb As Workbook, testProject As vtkProject, testedConf As vtkConfiguration)
-'''    ' It is mandatory to create the source files before recreating a configuration
-'''    On Error GoTo exportModulesAndRecreateWb_Error
-'''
-'''    vtkExportConfiguration Wb.VBProject, testProject.projectName, testedConf.name
-'''    vtkRecreateConfiguration testProject.projectName, testedConf.name
-'''    Set recreatedWb = Workbooks.Open(VBAToolKit.vtkTestPath & "\" & testProject.projectName & "\" & testedConf.path)
-'''
-'''    On Error GoTo 0
-'''    Exit Sub
-'''
-'''exportModulesAndRecreateWb_Error:
-'''    Err.Source = "exportModulesAndRecreateWb of module vtkRecreateConfigurationTester"
-'''    Debug.Print "Unexpected error " & Err.Number & " (" & Err.Description & ") in " & Err.Source
-'''    Err.Raise Err.Number, Err.Source, Err.Description
-'''    Exit Sub
-'''End Sub
-'''
-'''
-'''' --------------------------------------------------------
-''''                       TESTS
-'''' --------------------------------------------------------
-'''
-'''Public Sub Test_vtkRecreateConfiguration_workbookIsCreatedInTheGoodPath_normalConf()
-'''' workbook is created in the good path
-'''
-'''    On Error GoTo Test_vtkRecreateConfiguration_workbookIsCreatedInTheGoodPath_normalConf_Error
-'''
-'''    Set testedConf = normalConf
-'''
-'''    exportModulesAndRecreateWb Wb, testProject, testedConf
-'''
-'''    mAssert.Should fso.FileExists(VBAToolKit.vtkTestPath & "\" & testProject.projectName & "\" & testedConf.path), _
-'''                   "The configuration should have been created in the designated path."
-'''
-'''    On Error GoTo 0
-'''    Exit Sub
-'''
-'''Test_vtkRecreateConfiguration_workbookIsCreatedInTheGoodPath_normalConf_Error:
-'''    Err.Source = "Test_vtkRecreateConfiguration_workbookIsCreatedInTheGoodPath_normalConf of module vtkRecreateConfigurationTester"
-'''    mAssert.Should False, "Unexpected error " & Err.Number & " (" & Err.Description & ") in " & Err.Source
-'''    Exit Sub
-'''End Sub
-'''
-'''
-'''
+'' --------------------------------------------------------
+''               PRIVATE UTILITY FUNCTIONS
+'' --------------------------------------------------------
+'
+'Private Sub recreateAndSetWb(testProject As vtkProject, testedConf As vtkConfiguration)
+'    ' It is mandatory to create the source files before recreating a configuration
+'    On Error GoTo recreateAndSetWb_Error
+'
+'    vtkRecreateConfiguration testProject.projectName, testedConf.name
+'    Set recreatedWb = Workbooks.Open(VBAToolKit.vtkTestPath & "\" & testProject.projectName & "\" & testedConf.path)
+'
+'    On Error GoTo 0
+'    Exit Sub
+'
+'recreateAndSetWb_Error:
+'    Err.Source = "recreateAndSetWb  of module vtkRecreateConfigurationTester"
+'    Debug.Print "Unexpected error " & Err.Number & " (" & Err.Description & ") in " & Err.Source
+'    Err.Raise Err.Number, Err.Source, Err.Description
+'    Exit Sub
+'End Sub
+'
+'
+'' --------------------------------------------------------
+''                       TESTS
+'' --------------------------------------------------------
+'
+'Public Sub Test_vtkRecreateConfiguration_workbookIsCreatedInTheGoodPath_normalConf()
+'' workbook is created in the good path
+'
+'    On Error GoTo Test_vtkRecreateConfiguration_workbookIsCreatedInTheGoodPath_normalConf_Error
+'
+'    Set testedConf = normalConf
+'
+'    recreateAndSetWb testProject, testedConf
+'
+'    mAssert.Should fso.FileExists(VBAToolKit.vtkTestPath & "\" & testProject.projectName & "\" & testedConf.path), _
+'                   "The configuration should have been created in the designated path."
+'
+'    On Error GoTo 0
+'    Exit Sub
+'
+'Test_vtkRecreateConfiguration_workbookIsCreatedInTheGoodPath_normalConf_Error:
+'    Err.Source = "Test_vtkRecreateConfiguration_workbookIsCreatedInTheGoodPath_normalConf of module vtkRecreateConfigurationTester"
+'    mAssert.Should False, "Unexpected error " & Err.Number & " (" & Err.Description & ") in " & Err.Source
+'    Exit Sub
+'End Sub
+
+
+
 '''Public Sub Test_vtkRecreateConfiguration_workbookIsCreatedInTheGoodPath_emptyConf()
 '''' workbook is created in the good path
 '''
@@ -223,7 +241,7 @@ End Sub
 '''
 '''    Set testedConf = emptyConf
 '''
-'''    exportModulesAndRecreateWb Wb, testProject, testedConf
+'''    recreateAndSetWb testProject, testedConf
 '''
 '''    mAssert.Should fso.FileExists(VBAToolKit.vtkTestPath & "\" & testProject.projectName & "\" & testedConf.path), _
 '''                   "The configuration should have been created in the designated path."
@@ -246,7 +264,7 @@ End Sub
 '''
 '''    Set testedConf = multitypeConf
 '''
-'''    exportModulesAndRecreateWb Wb, testProject, testedConf
+'''    recreateAndSetWb testProject, testedConf
 '''
 '''    mAssert.Should fso.FileExists(VBAToolKit.vtkTestPath & "\" & testProject.projectName & "\" & testedConf.path), _
 '''                   "The configuration should have been created in the designated path."
@@ -321,7 +339,7 @@ End Sub
 '''
 '''    Set testedConf = notExistingPathConf1
 '''
-'''    exportModulesAndRecreateWb Wb, testProject, testedConf
+'''    recreateAndSetWb testProject, testedConf
 '''
 '''    mAssert.Equals error, 0, _
 '''                    "Error " & error & " (" & Err.Description & ") occured. It shouldn't have."
@@ -347,7 +365,7 @@ End Sub
 '''
 '''    Set testedConf = notExistingPathConf2
 '''
-'''    exportModulesAndRecreateWb Wb, testProject, testedConf
+'''    recreateAndSetWb testProject, testedConf
 '''
 '''    mAssert.Equals error, 0, _
 '''                    "Error " & error & " (" & Err.Description & ") occured. It shouldn't have."
@@ -372,7 +390,7 @@ End Sub
 '''
 '''    Set testedConf = normalConf
 '''
-'''    exportModulesAndRecreateWb Wb, testProject, testedConf
+'''    recreateAndSetWb testProject, testedConf
 '''
 '''    Dim mo As vtkModule
 '''    Dim vbCmp As VBComponent
@@ -408,7 +426,7 @@ End Sub
 '''
 '''    Set testedConf = multitypeConf
 '''
-'''    exportModulesAndRecreateWb Wb, testProject, testedConf
+'''    recreateAndSetWb testProject, testedConf
 '''
 '''    Dim mo As vtkModule
 '''    Dim vbCmp As VBComponent
@@ -451,7 +469,7 @@ End Sub
 '''    Dim refIsActive As Boolean
 '''    Dim guidArray() As String
 '''
-'''    exportModulesAndRecreateWb Wb, testProject, testedConf
+'''    recreateAndSetWb testProject, testedConf
 '''
 '''    ' Listing expected references in a collection
 '''    numRef = 4
@@ -490,7 +508,7 @@ End Sub
 '''    Set testedConf = normalConf
 '''
 '''    ' Set recreatedWb and open it
-'''    exportModulesAndRecreateWb Wb, testProject, testedConf
+'''    recreateAndSetWb testProject, testedConf
 '''
 '''    mAssert.Equals recreatedWb.VBProject.name, testedConf.name, _
 '''                   "The created project should have the same name as the recreated configuration."
@@ -513,7 +531,7 @@ End Sub
 '''
 '''    Set testedConf = normalConf
 '''
-'''    exportModulesAndRecreateWb Wb, testProject, testedConf
+'''    recreateAndSetWb testProject, testedConf
 '''
 '''    mAssert.Equals recreatedWb.FileFormat, _
 '''                   xlOpenXMLWorkbookMacroEnabled, _
@@ -537,7 +555,7 @@ End Sub
 '''
 '''    Set testedConf = xlamConf
 '''
-'''    exportModulesAndRecreateWb Wb, testProject, testedConf
+'''    recreateAndSetWb testProject, testedConf
 '''
 '''    mAssert.Equals recreatedWb.FileFormat, _
 '''                   xlOpenXMLAddIn, _
@@ -561,7 +579,7 @@ End Sub
 '''
 '''    Set testedConf = xlsConf
 '''
-'''    exportModulesAndRecreateWb Wb, testProject, testedConf
+'''    recreateAndSetWb testProject, testedConf
 '''
 '''    mAssert.Equals recreatedWb.FileFormat, _
 '''                   xlExcel8, _
@@ -586,7 +604,7 @@ End Sub
 ''''
 ''''    Set testedConf = xlaConf
 ''''
-''''    exportModulesAndRecreateWb Wb, testProject, testedConf
+''''    recreateAndSetWb testProject, testedConf
 ''''
 ''''    mAssert.Equals recreatedWb.FileFormat, _
 ''''                   xlAddIn, _
@@ -613,7 +631,7 @@ End Sub
 '''    Set testedConf = normalConf
 '''
 '''    ' Create and open recreatedWb
-'''    exportModulesAndRecreateWb Wb, testProject, testedConf
+'''    recreateAndSetWb testProject, testedConf
 '''
 '''    ' Recreate configuration with recreateWb already open
 '''    vtkRecreateConfiguration testProject.projectName, testedConf.name
@@ -702,7 +720,7 @@ End Sub
 '''    oldSize = fso.GetFile(VBAToolKit.vtkTestPath & "\" & testProject.projectName & "\" & testedConf.path).Size
 '''
 '''    ' Create and open recreatedWb
-'''    exportModulesAndRecreateWb Wb, testProject, testedConf
+'''    recreateAndSetWb testProject, testedConf
 '''
 '''    newSize = fso.GetFile(VBAToolKit.vtkTestPath & "\" & testProject.projectName & "\" & testedConf.path).Size
 '''
@@ -733,7 +751,7 @@ End Sub
 '''    oldSize = fso.GetFile(VBAToolKit.vtkTestPath & "\" & testProject.projectName & "\" & testedConf.path).Size
 '''
 '''    ' Create and open recreatedWb
-'''    exportModulesAndRecreateWb Wb, testProject, testedConf
+'''    recreateAndSetWb testProject, testedConf
 '''
 '''    newSize = fso.GetFile(VBAToolKit.vtkTestPath & "\" & testProject.projectName & "\" & testedConf.path).Size
 '''
@@ -753,47 +771,11 @@ End Sub
 Private Function ITest_Suite() As TestSuite
     Set ITest_Suite = New TestSuite
     ITest_Suite.AddTest ITest_Manager.ClassName, "Test_vtkRecreateConfiguration_workbookIsCreatedInTheGoodPath_normalConf"
-    ITest_Suite.AddTest ITest_Manager.ClassName, "Test_vtkRecreateConfiguration_workbookIsCreatedInTheGoodPath_emptyConf"
-    ITest_Suite.AddTest ITest_Manager.ClassName, "Test_vtkRecreateConfiguration_workbookIsCreatedInTheGoodPath_multitypeConf"
-    ITest_Suite.AddTest ITest_Manager.ClassName, "Test_vtkRecreateConfiguration_modulesNotYetExported_normalConf"
-    ITest_Suite.AddTest ITest_Manager.ClassName, "Test_vtkRecreateConfiguration_modulesNotYetExported_emptyConf"
-    ITest_Suite.AddTest ITest_Manager.ClassName, "Test_vtkRecreateConfiguration_pathDoesNotExistYet1"
-    ITest_Suite.AddTest ITest_Manager.ClassName, "Test_vtkRecreateConfiguration_pathDoesNotExistYet2"
-    ITest_Suite.AddTest ITest_Manager.ClassName, "Test_vtkRecreateConfiguration_allModulesArePresent_normalConf"
-    ITest_Suite.AddTest ITest_Manager.ClassName, "Test_vtkRecreateConfiguration_allModulesArePresent_multitypeConf"
-    ITest_Suite.AddTest ITest_Manager.ClassName, "Test_vtkRecreateConfiguration_referencesAreActivated"
-    ITest_Suite.AddTest ITest_Manager.ClassName, "Test_vtkRecreateConfiguration_nameOfTheVBProjectIsCorrect"
-    ITest_Suite.AddTest ITest_Manager.ClassName, "Test_vtkRecreateConfiguration_formatLikeExtension_XLSM"
-    ITest_Suite.AddTest ITest_Manager.ClassName, "Test_vtkRecreateConfiguration_formatLikeExtension_XLAM"
-    ITest_Suite.AddTest ITest_Manager.ClassName, "Test_vtkRecreateConfiguration_formatLikeExtension_XLS"
-    ITest_Suite.AddTest ITest_Manager.ClassName, "Test_vtkRecreateConfiguration_workbookOpen"
-    ITest_Suite.AddTest ITest_Manager.ClassName, "Test_vtkRecreateConfiguration_addInOpen_XLAM"
-    ITest_Suite.AddTest ITest_Manager.ClassName, "Test_vtkRecreateConfiguration_workbookAndVbProjectAlreadyOpen"
-    ITest_Suite.AddTest ITest_Manager.ClassName, "Test_vtkRecreateConfiguration_overwriteFile_normal"
-    ITest_Suite.AddTest ITest_Manager.ClassName, "Test_vtkRecreateConfiguration_overwriteFile_addIn"
 End Function
 
 Private Sub ITestCase_RunTest()
     Select Case mManager.methodName
         Case "Test_vtkRecreateConfiguration_workbookIsCreatedInTheGoodPath_normalConf": Test_vtkRecreateConfiguration_workbookIsCreatedInTheGoodPath_normalConf
-        Case "Test_vtkRecreateConfiguration_workbookIsCreatedInTheGoodPath_emptyConf": Test_vtkRecreateConfiguration_workbookIsCreatedInTheGoodPath_emptyConf
-        Case "Test_vtkRecreateConfiguration_workbookIsCreatedInTheGoodPath_multitypeConf": Test_vtkRecreateConfiguration_workbookIsCreatedInTheGoodPath_multitypeConf
-        Case "Test_vtkRecreateConfiguration_modulesNotYetExported_normalConf": Test_vtkRecreateConfiguration_modulesNotYetExported_normalConf
-        Case "Test_vtkRecreateConfiguration_modulesNotYetExported_emptyConf": Test_vtkRecreateConfiguration_modulesNotYetExported_emptyConf
-        Case "Test_vtkRecreateConfiguration_pathDoesNotExistYet1": Test_vtkRecreateConfiguration_pathDoesNotExistYet1
-        Case "Test_vtkRecreateConfiguration_pathDoesNotExistYet2": Test_vtkRecreateConfiguration_pathDoesNotExistYet2
-        Case "Test_vtkRecreateConfiguration_allModulesArePresent_normalConf": Test_vtkRecreateConfiguration_allModulesArePresent_normalConf
-        Case "Test_vtkRecreateConfiguration_allModulesArePresent_multitypeConf": Test_vtkRecreateConfiguration_allModulesArePresent_multitypeConf
-        Case "Test_vtkRecreateConfiguration_referencesAreActivated": Test_vtkRecreateConfiguration_referencesAreActivated
-        Case "Test_vtkRecreateConfiguration_nameOfTheVBProjectIsCorrect": Test_vtkRecreateConfiguration_nameOfTheVBProjectIsCorrect
-        Case "Test_vtkRecreateConfiguration_formatLikeExtension_XLSM": Test_vtkRecreateConfiguration_formatLikeExtension_XLSM
-        Case "Test_vtkRecreateConfiguration_formatLikeExtension_XLAM": Test_vtkRecreateConfiguration_formatLikeExtension_XLAM
-        Case "Test_vtkRecreateConfiguration_formatLikeExtension_XLS": Test_vtkRecreateConfiguration_formatLikeExtension_XLS
-        Case "Test_vtkRecreateConfiguration_workbookOpen": Test_vtkRecreateConfiguration_workbookOpen
-        Case "Test_vtkRecreateConfiguration_addInOpen_XLAM": Test_vtkRecreateConfiguration_addInOpen_XLAM
-        Case "Test_vtkRecreateConfiguration_workbookAndVbProjectAlreadyOpen": Test_vtkRecreateConfiguration_workbookAndVbProjectAlreadyOpen
-        Case "Test_vtkRecreateConfiguration_overwriteFile_normal": Test_vtkRecreateConfiguration_overwriteFile_normal
-        Case "Test_vtkRecreateConfiguration_overwriteFile_addIn": Test_vtkRecreateConfiguration_overwriteFile_addIn
         Case Else: mAssert.Should False, "Invalid test name: " & mManager.methodName
     End Select
 End Sub

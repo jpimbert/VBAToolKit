@@ -3,8 +3,8 @@
 <vtkConf>
 
 	<info>
-		<vtkConfigurationsVersion>2.0</vtkConfigurationsVersion>
-		<projectName>TestProject1</projectName>
+		<vtkConfigurationsVersion>1.0</vtkConfigurationsVersion>
+		<projectName>TestProjectForRecreateCOnfiguration</projectName>
 	</info>
 
 	<configuration cID="c01">
