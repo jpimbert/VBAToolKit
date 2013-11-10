@@ -122,10 +122,6 @@ Private Sub ITestCase_TearDown()
     vtkCleanFolder VBAToolKit.vtkTestPath 'TMP
 End Sub
 
-' TESTS TO ADD
-' configuration does not exist
-' path to sheet is not valid / sheet has a wrong format
-
 
 Public Sub Test_PropertyName_DefaultGet()
     '   Verify that the Property Name is the Default property for vtkConfigurationManager
@@ -177,68 +173,68 @@ Public Sub TestGetConfigurationsFromNewProject()
 End Sub
 
 
-''Public Sub TestGetConfigurationsFromExistingProject()
-'''       Verify the list of the configurations of an existing project
-''
-''    On Error GoTo TestGetConfigurationsFromExistingProject_Error
-''
-''    mAssert.Equals existingConfManager.configurationCount, 2, "There must be two configurations in the existing template project"
-''    mAssert.Equals existingConfManager.configuration(0), "", "Inexistant configuration number 0"
-''    mAssert.Equals existingConfManager.configuration(1), existingProjectName, "Name of the first configuration"
-''    mAssert.Equals existingConfManager.configuration(2), existingProjectName & "_DEV", "Name of the second configuration"
-''    mAssert.Equals existingConfManager.configuration(3), "", "Inexistant configuration number 3"
-''    mAssert.Equals existingConfManager.configuration(-23), "", "Inexistant configuration number -23"
-''    mAssert.Equals existingConfManager.configuration(150), "", "Inexistant configuration number 150"
-''
-''    On Error GoTo 0
-''    Exit Sub
-''
-''TestGetConfigurationsFromExistingProject_Error:
-''    Err.Source = "Sub TestGetConfigurationsFromExistingProject in module vtkConfigurationManagerTester"
-''    Debug.Print "Error " & Err.Number & " : " & Err.Description & " in " & Err.Source
-''    mAssert.Should False, "Unexpected Error " & Err.Number & " (" & Err.Description & ") in " & Err.Source
-''    Exit Sub
-''
-''End Sub
-''
-''
-''Public Sub TestGetConfigurationPathWithNumberFromExistingProject()
-'''       Verify the capability to get the configuration path by number
-''    mAssert.Equals existingConfManager.getConfigurationPathWithNumber(0), "", "Inexistant configuration number 0"
-''    mAssert.Equals existingConfManager.getConfigurationPathWithNumber(1), "Delivery\ExistingProject.xlsm", "Path of first configuration given by number"
-''    mAssert.Equals existingConfManager.getConfigurationPathWithNumber(2), "Project\ExistingProject_DEV.xlsm", "Path of second configuration given by number"
-''    mAssert.Equals existingConfManager.getConfigurationPathWithNumber(3), "", "Inexistant configuration number 3"
-''End Sub
+Public Sub TestGetConfigurationsFromExistingProject()
+'       Verify the list of the configurations of an existing project
 
-'Public Sub TestGetConfigurationNumbersFromNewProject()
-''       Verify the capability to get the number of a configuration
-'    mAssert.Equals newConfManager.configurationCount, 2, "There must be two configurations in a new project"
-'    mAssert.Equals newConfManager.getConfigurationNumber(newProjectName), 1, "Number of the main configuration"
-'    mAssert.Equals newConfManager.getConfigurationNumber(newProjectName & "_DEV"), 2, "Number of the Development configuration"
-'    mAssert.Equals newConfManager.getConfigurationNumber("InexistantConfiguration"), 0, "Inexistant configuration"
-'End Sub
+    On Error GoTo TestGetConfigurationsFromExistingProject_Error
 
-''Public Sub TestGetConfigurationPathFromExistingProject()
-'''       Verify the capability to get a configutaion path given the configuration name
-''    mAssert.Equals existingConfManager.getConfigurationPath(existingProjectName), "Delivery\ExistingProject.xlsm", "Path of the main configuration"
-''    mAssert.Equals existingConfManager.getConfigurationPath(existingProjectName & "_DEV"), "Project\ExistingProject_DEV.xlsm", "Path of the Development configuration"
-''    mAssert.Equals existingConfManager.getConfigurationPath("InexistantConfiguration"), "", "Inexistant configuration"
-''End Sub
-''
-''
-''Public Sub TestGetModulesFromExistingProject()
-'''       Verify the capability to retrieve the list of Modules from an existing project
-''    mAssert.Equals existingConfManager.moduleCount, 5, "There must be five modules in the existing project"
-''    mAssert.Equals existingConfManager.module(0), "", "Inexistant module number 0"
-''    mAssert.Equals existingConfManager.module(1), "Module1", "Name of the first module"
-''    mAssert.Equals existingConfManager.module(2), "Module2", "Name of the second module"
-''    mAssert.Equals existingConfManager.module(3), "Module3", "Name of the third module"
-''    mAssert.Equals existingConfManager.module(4), "Module4", "Name of the fourth module"
-''    mAssert.Equals existingConfManager.module(5), "Module5", "Name of the fifth module"
-''    mAssert.Equals existingConfManager.module(6), "", "Inexistant module number 6"
-''    mAssert.Equals existingConfManager.module(-23), "", "Inexistant module number -23"
-''    mAssert.Equals existingConfManager.module(150), "", "Inexistant module number 150"
-''End Sub
+    mAssert.Equals existingConfManager.configurationCount, 2, "There must be two configurations in the existing template project"
+    mAssert.Equals existingConfManager.configuration(0), "", "Inexistant configuration number 0"
+    mAssert.Equals existingConfManager.configuration(1), existingProjectName, "Name of the first configuration"
+    mAssert.Equals existingConfManager.configuration(2), existingProjectName & "_DEV", "Name of the second configuration"
+    mAssert.Equals existingConfManager.configuration(3), "", "Inexistant configuration number 3"
+    mAssert.Equals existingConfManager.configuration(-23), "", "Inexistant configuration number -23"
+    mAssert.Equals existingConfManager.configuration(150), "", "Inexistant configuration number 150"
+
+    On Error GoTo 0
+    Exit Sub
+
+TestGetConfigurationsFromExistingProject_Error:
+    Err.Source = "Sub TestGetConfigurationsFromExistingProject in module vtkConfigurationManagerTester"
+    Debug.Print "Error " & Err.Number & " : " & Err.Description & " in " & Err.Source
+    mAssert.Should False, "Unexpected Error " & Err.Number & " (" & Err.Description & ") in " & Err.Source
+    Exit Sub
+
+End Sub
+
+
+Public Sub TestGetConfigurationPathWithNumberFromExistingProject()
+'       Verify the capability to get the configuration path by number
+    mAssert.Equals existingConfManager.getConfigurationPathWithNumber(0), "", "Inexistant configuration number 0"
+    mAssert.Equals existingConfManager.getConfigurationPathWithNumber(1), "Delivery\ExistingProject.xlsm", "Path of first configuration given by number"
+    mAssert.Equals existingConfManager.getConfigurationPathWithNumber(2), "Project\ExistingProject_DEV.xlsm", "Path of second configuration given by number"
+    mAssert.Equals existingConfManager.getConfigurationPathWithNumber(3), "", "Inexistant configuration number 3"
+End Sub
+
+Public Sub TestGetConfigurationNumbersFromNewProject()
+'       Verify the capability to get the number of a configuration
+    mAssert.Equals newConfManager.configurationCount, 2, "There must be two configurations in a new project"
+    mAssert.Equals newConfManager.getConfigurationNumber(newProjectName), 1, "Number of the main configuration"
+    mAssert.Equals newConfManager.getConfigurationNumber(newProjectName & "_DEV"), 2, "Number of the Development configuration"
+    mAssert.Equals newConfManager.getConfigurationNumber("InexistantConfiguration"), 0, "Inexistant configuration"
+End Sub
+
+Public Sub TestGetConfigurationPathFromExistingProject()
+'       Verify the capability to get a configutaion path given the configuration name
+    mAssert.Equals existingConfManager.getConfigurationPath(existingProjectName), "Delivery\ExistingProject.xlsm", "Path of the main configuration"
+    mAssert.Equals existingConfManager.getConfigurationPath(existingProjectName & "_DEV"), "Project\ExistingProject_DEV.xlsm", "Path of the Development configuration"
+    mAssert.Equals existingConfManager.getConfigurationPath("InexistantConfiguration"), "", "Inexistant configuration"
+End Sub
+
+
+Public Sub TestGetModulesFromExistingProject()
+'       Verify the capability to retrieve the list of Modules from an existing project
+    mAssert.Equals existingConfManager.moduleCount, 5, "There must be five modules in the existing project"
+    mAssert.Equals existingConfManager.module(0), "", "Inexistant module number 0"
+    mAssert.Equals existingConfManager.module(1), "Module1", "Name of the first module"
+    mAssert.Equals existingConfManager.module(2), "Module2", "Name of the second module"
+    mAssert.Equals existingConfManager.module(3), "Module3", "Name of the third module"
+    mAssert.Equals existingConfManager.module(4), "Module4", "Name of the fourth module"
+    mAssert.Equals existingConfManager.module(5), "Module5", "Name of the fifth module"
+    mAssert.Equals existingConfManager.module(6), "", "Inexistant module number 6"
+    mAssert.Equals existingConfManager.module(-23), "", "Inexistant module number -23"
+    mAssert.Equals existingConfManager.module(150), "", "Inexistant module number 150"
+End Sub
 
 
 'Public Sub TestGetModulesFromNewProject()
@@ -252,32 +248,32 @@ End Sub
 'End Sub
 
 
-''Public Sub TestGetModuleNumbersFromExistingProject()
-'''       Verify the capability to get the number of a configuration
-''    mAssert.Equals existingConfManager.getModuleNumber("Module0"), 0, "Inexistant module"
-''    mAssert.Equals existingConfManager.getModuleNumber("Module1"), 1, "First Module"
-''    mAssert.Equals existingConfManager.getModuleNumber("Module2"), 2, "Second Module"
-''    mAssert.Equals existingConfManager.getModuleNumber("Module3"), 3, "Third module"
-''    mAssert.Equals existingConfManager.getModuleNumber("Module4"), 4, "Fourth module"
-''    mAssert.Equals existingConfManager.getModuleNumber("Module5"), 5, "Fifth module"
-''    mAssert.Equals existingConfManager.getModuleNumber("InexistantModule"), 0, "Inexistant module"
-''End Sub
-''
-''Public Sub TestGetModulePathWithNumberFromExistingProject()
-''''       Verify the capability to get the module path by number
-''    mAssert.Equals existingConfManager.getModulePathWithNumber(numModule:=0, numConfiguration:=2), "", "Inexistant module path number 0,2"
-''    mAssert.Equals existingConfManager.getModulePathWithNumber(numModule:=3, numConfiguration:=3), "", "Inexistant module path number 3,3"
-''    mAssert.Equals existingConfManager.getModulePathWithNumber(numModule:=1, numConfiguration:=1), "Path1Module1", "Module path number 1,1"
-''    mAssert.Equals existingConfManager.getModulePathWithNumber(numModule:=1, numConfiguration:=2), "", "Module path number 1,2"
-''    mAssert.Equals existingConfManager.getModulePathWithNumber(numModule:=2, numConfiguration:=1), "", "Module path number 2,1"
-''    mAssert.Equals existingConfManager.getModulePathWithNumber(numModule:=2, numConfiguration:=2), "Path2Module2", "Module path number 2,2"
-''    mAssert.Equals existingConfManager.getModulePathWithNumber(numModule:=3, numConfiguration:=1), "", "Module path number 3,1"
-''    mAssert.Equals existingConfManager.getModulePathWithNumber(numModule:=3, numConfiguration:=2), "", "Module path number 3,2"
-''    mAssert.Equals existingConfManager.getModulePathWithNumber(numModule:=4, numConfiguration:=1), "Path1Module4", "Module path number 4,1"
-''    mAssert.Equals existingConfManager.getModulePathWithNumber(numModule:=4, numConfiguration:=2), "Path2Module4", "Module path number 4,2"
-''    mAssert.Equals existingConfManager.getModulePathWithNumber(numModule:=5, numConfiguration:=1), "", "Module path number 5,1"
-''    mAssert.Equals existingConfManager.getModulePathWithNumber(numModule:=5, numConfiguration:=2), "Path2Module5", "Module path number 5,2"
-''End Sub
+Public Sub TestGetModuleNumbersFromExistingProject()
+'       Verify the capability to get the number of a configuration
+    mAssert.Equals existingConfManager.getModuleNumber("Module0"), 0, "Inexistant module"
+    mAssert.Equals existingConfManager.getModuleNumber("Module1"), 1, "First Module"
+    mAssert.Equals existingConfManager.getModuleNumber("Module2"), 2, "Second Module"
+    mAssert.Equals existingConfManager.getModuleNumber("Module3"), 3, "Third module"
+    mAssert.Equals existingConfManager.getModuleNumber("Module4"), 4, "Fourth module"
+    mAssert.Equals existingConfManager.getModuleNumber("Module5"), 5, "Fifth module"
+    mAssert.Equals existingConfManager.getModuleNumber("InexistantModule"), 0, "Inexistant module"
+End Sub
+
+Public Sub TestGetModulePathWithNumberFromExistingProject()
+''       Verify the capability to get the module path by number
+    mAssert.Equals existingConfManager.getModulePathWithNumber(numModule:=0, numConfiguration:=2), "", "Inexistant module path number 0,2"
+    mAssert.Equals existingConfManager.getModulePathWithNumber(numModule:=3, numConfiguration:=3), "", "Inexistant module path number 3,3"
+    mAssert.Equals existingConfManager.getModulePathWithNumber(numModule:=1, numConfiguration:=1), "Path1Module1", "Module path number 1,1"
+    mAssert.Equals existingConfManager.getModulePathWithNumber(numModule:=1, numConfiguration:=2), "", "Module path number 1,2"
+    mAssert.Equals existingConfManager.getModulePathWithNumber(numModule:=2, numConfiguration:=1), "", "Module path number 2,1"
+    mAssert.Equals existingConfManager.getModulePathWithNumber(numModule:=2, numConfiguration:=2), "Path2Module2", "Module path number 2,2"
+    mAssert.Equals existingConfManager.getModulePathWithNumber(numModule:=3, numConfiguration:=1), "", "Module path number 3,1"
+    mAssert.Equals existingConfManager.getModulePathWithNumber(numModule:=3, numConfiguration:=2), "", "Module path number 3,2"
+    mAssert.Equals existingConfManager.getModulePathWithNumber(numModule:=4, numConfiguration:=1), "Path1Module4", "Module path number 4,1"
+    mAssert.Equals existingConfManager.getModulePathWithNumber(numModule:=4, numConfiguration:=2), "Path2Module4", "Module path number 4,2"
+    mAssert.Equals existingConfManager.getModulePathWithNumber(numModule:=5, numConfiguration:=1), "", "Module path number 5,1"
+    mAssert.Equals existingConfManager.getModulePathWithNumber(numModule:=5, numConfiguration:=2), "Path2Module5", "Module path number 5,2"
+End Sub
 
 'Public Sub TestRootPathForExistingProject()
 '    mAssert.Equals existingConfManager.rootPath, vtkPathOfCurrentProject, "The root Path is not initialized for a new Workbook"
@@ -292,14 +288,28 @@ End Sub
 'End Sub
 
 
+Public Sub TestpathToSheetIsNotValid()
+' path to sheet is not valid -> relevant error should be thrown
+    On Error GoTo TestpathToSheetIsNotValid_Error
+    
+    Dim dummy As Integer
 
+    ' Delete sheet
+    fso.DeleteFile fso.BuildPath(VBAToolKit.vtkTestPath, existingXMLSheetNameForTests)
 
+    ' Execute operation, should throw error and go to handler
+    dummy = existingConfManager.configurationCount
 
+    mAssert.Should False, "An error should have been thrown."
 
+    On Error GoTo 0
+    Exit Sub
 
+TestpathToSheetIsNotValid_Error:
+    mAssert.Equals Err.Number, VTK_SHEET_NOT_VALID, "The relevant error should have been raised."
+    Exit Sub
 
-
-
+End Sub
 
 
 
@@ -464,6 +474,14 @@ Private Function ITest_Suite() As TestSuite
     ITest_Suite.AddTest ITest_Manager.ClassName, "Test_PropertyName_DefaultGet"
     ITest_Suite.AddTest ITest_Manager.ClassName, "Test_PropertyName_DefaultLet"
     ITest_Suite.AddTest ITest_Manager.ClassName, "TestGetConfigurationsFromNewProject"
+    ITest_Suite.AddTest ITest_Manager.ClassName, "TestGetConfigurationsFromExistingProject"
+    ITest_Suite.AddTest ITest_Manager.ClassName, "TestGetConfigurationPathWithNumberFromExistingProject"
+    ITest_Suite.AddTest ITest_Manager.ClassName, "TestGetConfigurationNumbersFromNewProject"
+    ITest_Suite.AddTest ITest_Manager.ClassName, "TestGetConfigurationPathFromExistingProject"
+    ITest_Suite.AddTest ITest_Manager.ClassName, "TestGetModulesFromExistingProject"
+    ITest_Suite.AddTest ITest_Manager.ClassName, "TestGetModuleNumbersFromExistingProject"
+    ITest_Suite.AddTest ITest_Manager.ClassName, "TestGetModulePathWithNumberFromExistingProject"
+    ITest_Suite.AddTest ITest_Manager.ClassName, "TestpathToSheetIsNotValid"
 End Function
 
 Private Sub ITestCase_RunTest()
@@ -471,6 +489,14 @@ Private Sub ITestCase_RunTest()
         Case "Test_PropertyName_DefaultGet": Test_PropertyName_DefaultGet
         Case "Test_PropertyName_DefaultLet": Test_PropertyName_DefaultLet
         Case "TestGetConfigurationsFromNewProject": TestGetConfigurationsFromNewProject
+        Case "TestGetConfigurationsFromExistingProject": TestGetConfigurationsFromExistingProject
+        Case "TestGetConfigurationPathWithNumberFromExistingProject": TestGetConfigurationPathWithNumberFromExistingProject
+        Case "TestGetConfigurationNumbersFromNewProject": TestGetConfigurationNumbersFromNewProject
+        Case "TestGetConfigurationPathFromExistingProject": TestGetConfigurationPathFromExistingProject
+        Case "TestGetModulesFromExistingProject": TestGetModulesFromExistingProject
+        Case "TestGetModuleNumbersFromExistingProject": TestGetModuleNumbersFromExistingProject
+        Case "TestGetModulePathWithNumberFromExistingProject": TestGetModulePathWithNumberFromExistingProject
+        Case "TestpathToSheetIsNotValid": TestpathToSheetIsNotValid
         Case Else: mAssert.Should False, "Invalid test name: " & mManager.methodName
     End Select
 End Sub
