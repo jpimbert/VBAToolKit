@@ -103,7 +103,7 @@
 
 
 	<module mID="m04">
-		<name>TestFromModule1</name>
+		<name>TestFormModule1</name>
 		<modulePath confId="c10">TestFormModule1.frm</modulePath>
 	</module>
 
