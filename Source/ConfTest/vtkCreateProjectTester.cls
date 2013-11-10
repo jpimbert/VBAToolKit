@@ -374,36 +374,16 @@ TestNewProjectIsRemembered_Error:
 End Sub
 
 
-'''Public Sub Test_VBAUnitModulesExportation()
-'''    '   Verify that VBA modules are exported from VBAToolkit to the new project
-'''    Dim returnValue As Long, fso As New FileSystemObject
-'''
-'''    returnValue = vtkCreateProject(path:=VBAToolKit.vtkTestPath, name:=vtkTestProjectName, displayError:=False)
-'''
-'''    mAssert.Should fso.FileExists(VBAToolKit.vtkTestPath & "\" & vtkTestProjectName & "\" & "Source\VbaUnit\" & "VbaUnitMain.bas"), "VBAUnitMain module have to be exported"
-'''End Sub
-'''
-'''Public Sub Test_VBAUnitModulesImportation()
-'''    '   Verify that VBA modules are imported in the new project
-'''    Dim returnValue As Long, fso As New FileSystemObject
-'''
-'''    returnValue = vtkCreateProject(path:=VBAToolKit.vtkTestPath, name:=vtkTestProjectName, displayError:=False)
-'''
-'''
-'''   On Error GoTo Test_VBAUnitModulesImportation_Error
-'''    mAssert.Should Not Workbooks(vtkTestProjectName & "_DEV.xlsm").VBProject.VBComponents("VBAUnitMain") Is Nothing, "VBAUnitMain module have to be imported"
-'''    mAssert.Should Not Workbooks(vtkTestProjectName & "_DEV.xlsm").VBProject.VBComponents("TestClassLister") Is Nothing, "TestClassLister module have to be imported"
-'''    mAssert.Should Not Workbooks(vtkTestProjectName & "_DEV.xlsm").VBProject.VBComponents("TestRunner") Is Nothing, "TestRunner module have to be imported"
-'''    mAssert.Should Not Workbooks(vtkTestProjectName & "_DEV.xlsm").VBProject.VBComponents("IRunManager") Is Nothing, "IRunManager module have to be imported"
-'''    mAssert.Should Not Workbooks(vtkTestProjectName & "_DEV.xlsm").VBProject.VBComponents("TestResult") Is Nothing, "TestResult module have to be imported"
-'''   On Error GoTo 0
-'''   Exit Sub
-'''
-'''Test_VBAUnitModulesImportation_Error:
-'''    mAssert.Should False, "No error have to be raised during project creation (Err=" & Err.Number & ": " & Err.Description & ")"
-'''End Sub
-'''
-'''
+Public Sub Test_VBAUnitModulesExportation()
+    '   Verify that VBA modules are exported from VBAToolkit to the new project
+    Dim returnValue As Long, fso As New FileSystemObject
+
+    returnValue = vtkCreateProject(path:=VBAToolKit.vtkTestPath, name:=vtkTestProjectName, displayError:=False)
+
+    mAssert.Should fso.FileExists(VBAToolKit.vtkTestPath & "\" & vtkTestProjectName & "\" & "Source\VbaUnit\" & "VbaUnitMain.bas"), "VBAUnitMain module have to be exported"
+End Sub
+
+
 '''Public Sub Test_vtkCreateProject_handlerAddedInDEVWorkbook_modulesAreExported()
 '''' creating a project, modifying an existing module in the DEV workbook, save => module must be exported
 '''
@@ -487,6 +467,7 @@ Private Function ITest_Suite() As TestSuite
     ITest_Suite.AddTest ITest_Manager.ClassName, "TestReferencesOfDevConfigurationAreActivated"
     ITest_Suite.AddTest ITest_Manager.ClassName, "TestReferencesOfDeliveryConfigurationAreActivated"
     ITest_Suite.AddTest ITest_Manager.ClassName, "TestNewProjectIsRemembered"
+    ITest_Suite.AddTest ITest_Manager.ClassName, "Test_VBAUnitModulesExportation"
 End Function
 
 Private Sub ITestCase_RunTest()
@@ -504,6 +485,7 @@ Private Sub ITestCase_RunTest()
         Case "TestReferencesOfDevConfigurationAreActivated": TestReferencesOfDevConfigurationAreActivated
         Case "TestReferencesOfDeliveryConfigurationAreActivated": TestReferencesOfDeliveryConfigurationAreActivated
         Case "TestNewProjectIsRemembered": TestNewProjectIsRemembered
+        Case "Test_VBAUnitModulesExportation": Test_VBAUnitModulesExportation
         Case Else: mAssert.Should False, "Invalid test name: " & mManager.methodName
     End Select
 End Sub

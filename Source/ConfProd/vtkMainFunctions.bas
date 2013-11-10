@@ -76,18 +76,19 @@ Public Function vtkCreateProject(path As String, name As String, Optional displa
     ' Create the DTD sheet for the XML vtkConfigurations sheet in the same folder
     createDTDForVtkConfigurations sheetPath:=fso.BuildPath(rootPath, fso.BuildPath(fso.GetParentFolderName(project.XMLConfigurationStandardRelativePath), "vtkConfigurationsDTD.dtd"))
     
-    ' Get VBAUnit modules from VBAToolkit (This workbook = current running code)
-    ' /!\ For that we need to manage the configuration manager thing, we will do it later
-    'vtkExportModulesFromAnotherProject projectWithModules:=ThisWorkbook.VBProject, projectName:=project.projectName, confName:=project.projectDEVName
-
     ' Insert the BeforeSave handler in the newly created project
     ' /!\ For that we need to manage the "ThisWorkbook" object, we will do it later
     ' vtkAddBeforeSaveHandlerInDEVWorkbook Wb:=Wb, projectName:=project.projectName, confName:=project.projectDEVName
         
     ' Add the newly created project to the list of projects remembered by VBAToolKit
-    vtkAddRememberedProject projectName:=projectName, _
+    vtkAddRememberedProject projectName:=project.projectName, _
                             rootFolder:=rootPath, _
                             xmlRelativePath:=project.XMLConfigurationStandardRelativePath
+    
+    
+    ' Get VBAUnit modules from VBAToolkit (This workbook = current running code)
+    vtkExportModulesFromAnotherProject projectWithModules:=ThisWorkbook.VBProject, projectName:=project.projectName, confName:=project.projectDEVName
+
     
     ' Initialize git
     On Error GoTo vtkCreateProject_ErrorGit
