@@ -282,8 +282,11 @@ Public Sub TestToSelfReferenceIsPresentAndActivatedByDefaultForDEV()
     Dim dom As New MSXML2.DOMDocument
     dom.Load VBAToolKit.vtkTestPath & "\" & vtkTestProjectName & "\" & "Project" & "\" & vtkTestProjectName & ".xml"
     
+    Dim confId As String
+    confId = dom.SelectSingleNode("/vtkConf/configuration[name=""" & vtkTestProjectName & "_DEV""]/@cID").Text
+    
     ' Test presence and value of the reference
-    mAssert.Equals dom.SelectNodes("/vtkConf/reference[@confIDs=""c01""][name=""" & ThisWorkbook.VBProject.name & """]").Length, 1, "The reference to the current workbook must be present."
+    mAssert.Equals dom.SelectNodes("/vtkConf/reference[@confIDs=""" & confId & """][name=""" & ThisWorkbook.VBProject.name & """]").Length, 1, "The reference to the current workbook must be present."
     
     On Error GoTo 0
     Exit Sub

@@ -124,7 +124,7 @@ End Sub
 
 ' TESTS TO ADD
 ' configuration does not exist
-' sheet path to sheet is not valid
+' path to sheet is not valid / sheet has a wrong format
 
 
 Public Sub Test_PropertyName_DefaultGet()
@@ -163,13 +163,6 @@ Test_PropertyName_DefaultLet_Error:
     Exit Sub
 
 End Sub
-
-
-''Public Sub TestConfigurationSheetFormatForExistingProjet()
-'''       Verify the retrieved configuration sheet from an existing project
-''    Dim dom As New MSXML2.DOMDocument
-''    mAssert.Should dom.Load(existingConfManager.configurationDOM), "Sheet is not formatted well."
-''End Sub
 
 
 'Public Sub TestGetConfigurationsFromNewProject()
@@ -470,12 +463,14 @@ Private Function ITest_Suite() As TestSuite
     Set ITest_Suite = New TestSuite
     ITest_Suite.AddTest ITest_Manager.ClassName, "Test_PropertyName_DefaultGet"
     ITest_Suite.AddTest ITest_Manager.ClassName, "Test_PropertyName_DefaultLet"
+    ITest_Suite.AddTest ITest_Manager.ClassName, "TestGetConfigurationsFromNewProject"
 End Function
 
 Private Sub ITestCase_RunTest()
     Select Case mManager.methodName
         Case "Test_PropertyName_DefaultGet": Test_PropertyName_DefaultGet
         Case "Test_PropertyName_DefaultLet": Test_PropertyName_DefaultLet
+        Case "TestGetConfigurationsFromNewProject": TestGetConfigurationsFromNewProject
         Case Else: mAssert.Should False, "Invalid test name: " & mManager.methodName
     End Select
 End Sub
