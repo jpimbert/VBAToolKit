@@ -120,10 +120,6 @@ Property Get path() As String
     path = m_parent.getConfigurationPathWithNumber(m_number)
 End Property
 
-Property Let path(newPath As String)
-    m_parent.setConfigurationPathWithNumber m_number, newPath
-End Property
-
 '---------------------------------------------------------------------------------------
 ' Property  : modules as collection (Read Only)
 ' Author    : Jean-Pierre Imbert

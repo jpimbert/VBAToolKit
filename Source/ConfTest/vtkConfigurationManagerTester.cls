@@ -495,6 +495,7 @@ Private Function ITest_Suite() As TestSuite
     ITest_Suite.AddTest ITest_Manager.ClassName, "TestGetModuleNumbersFromExistingProject"
     ITest_Suite.AddTest ITest_Manager.ClassName, "TestGetModulePathWithNumberFromExistingProject"
     ITest_Suite.AddTest ITest_Manager.ClassName, "TestpathToSheetIsNotValid"
+    ITest_Suite.AddTest ITest_Manager.ClassName, "TestRefCountForNormalConf"
 End Function
 
 Private Sub ITestCase_RunTest()
@@ -510,6 +511,7 @@ Private Sub ITestCase_RunTest()
         Case "TestGetModuleNumbersFromExistingProject": TestGetModuleNumbersFromExistingProject
         Case "TestGetModulePathWithNumberFromExistingProject": TestGetModulePathWithNumberFromExistingProject
         Case "TestpathToSheetIsNotValid": TestpathToSheetIsNotValid
+        Case "TestRefCountForNormalConf": TestRefCountForNormalConf
         Case Else: mAssert.Should False, "Invalid test name: " & mManager.methodName
     End Select
 End Sub

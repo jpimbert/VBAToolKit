@@ -4,13 +4,13 @@
 
 	<info>
 		<vtkConfigurationsVersion>2.0</vtkConfigurationsVersion>
-		<projectName>InitializedProjet</projectName>
+		<projectName>InitializedProject</projectName>
 	</info>
 
 
 	<configuration cID="c01">
-		<name>InitializedProjet_DEV</name>
-		<path>Tests\InitializedProjet_DEV.xlsm</path>
+		<name>InitializedProject_DEV</name>
+		<path>Tests\InitializedProject_DEV.xlsm</path>
 	</configuration>
 
 
