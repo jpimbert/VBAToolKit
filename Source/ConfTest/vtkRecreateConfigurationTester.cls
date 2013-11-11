@@ -465,8 +465,6 @@ Test_vtkRecreateConfiguration_allModulesArePresent_multitypeConf_Error:
 End Sub
 
 
-
-
 'Public Sub Test_vtkRecreateConfiguration_referencesAreActivated()
 '' references are activated
 '' will probably change in the near future as reference management in configurations will change
@@ -510,32 +508,32 @@ End Sub
 '    Exit Sub
 'End Sub
 '
-'
-'
-'Public Sub Test_vtkRecreateConfiguration_nameOfTheVBProjectIsCorrect()
-'' name of the vbproject is correct : same name as the recreated configuration
-'
-'    On Error GoTo Test_vtkRecreateConfiguration_nameOfTheVBProjectIsCorrect_Error
-'
-'    Set testedConf = normalConf
-'
-'    ' Set recreatedWb and open it
-'    exportModulesAndRecreateWb Wb, testProject, testedConf
-'
-'    mAssert.Equals recreatedWb.VBProject.name, testedConf.name, _
-'                   "The created project should have the same name as the recreated configuration."
-'
-'    On Error GoTo 0
-'    Exit Sub
-'
-'Test_vtkRecreateConfiguration_nameOfTheVBProjectIsCorrect_Error:
-'    Err.Source = "Test_vtkRecreateConfiguration_nameOfTheVBProjectIsCorrect of module vtkRecreateConfigurationTester"
-'    mAssert.Should False, "Unexpected error " & Err.Number & " (" & Err.Description & ") in " & Err.Source
-'    Exit Sub
-'End Sub
-'
-'
-'
+
+
+Public Sub Test_vtkRecreateConfiguration_nameOfTheVBProjectIsCorrect()
+' name of the vbproject is correct : same name as the recreated configuration
+
+    On Error GoTo Test_vtkRecreateConfiguration_nameOfTheVBProjectIsCorrect_Error
+
+    Set testedConf = normalConf
+
+    ' Set recreatedWb and open it
+    exportModulesAndRecreateWb Wb, testProject, testedConf
+
+    mAssert.Equals recreatedWb.VBProject.name, testedConf.name, _
+                   "The created project should have the same name as the recreated configuration."
+
+    On Error GoTo 0
+    Exit Sub
+
+Test_vtkRecreateConfiguration_nameOfTheVBProjectIsCorrect_Error:
+    Err.Source = "Test_vtkRecreateConfiguration_nameOfTheVBProjectIsCorrect of module vtkRecreateConfigurationTester"
+    mAssert.Should False, "Unexpected error " & Err.Number & " (" & Err.Description & ") in " & Err.Source
+    Exit Sub
+End Sub
+
+
+
 'Public Sub Test_vtkRecreateConfiguration_formatLikeExtension_XLSM()
 '' test the xlsm format
 '
@@ -790,16 +788,6 @@ Private Function ITest_Suite() As TestSuite
     ITest_Suite.AddTest ITest_Manager.ClassName, "Test_vtkRecreateConfiguration_pathDoesNotExistYet2"
     ITest_Suite.AddTest ITest_Manager.ClassName, "Test_vtkRecreateConfiguration_allModulesArePresent_normalConf"
     ITest_Suite.AddTest ITest_Manager.ClassName, "Test_vtkRecreateConfiguration_allModulesArePresent_multitypeConf"
-    ITest_Suite.AddTest ITest_Manager.ClassName, "Test_vtkRecreateConfiguration_referencesAreActivated"
-    ITest_Suite.AddTest ITest_Manager.ClassName, "Test_vtkRecreateConfiguration_nameOfTheVBProjectIsCorrect"
-    ITest_Suite.AddTest ITest_Manager.ClassName, "Test_vtkRecreateConfiguration_formatLikeExtension_XLSM"
-    ITest_Suite.AddTest ITest_Manager.ClassName, "Test_vtkRecreateConfiguration_formatLikeExtension_XLAM"
-    ITest_Suite.AddTest ITest_Manager.ClassName, "Test_vtkRecreateConfiguration_formatLikeExtension_XLS"
-    ITest_Suite.AddTest ITest_Manager.ClassName, "Test_vtkRecreateConfiguration_workbookOpen"
-    ITest_Suite.AddTest ITest_Manager.ClassName, "Test_vtkRecreateConfiguration_addInOpen_XLAM"
-    ITest_Suite.AddTest ITest_Manager.ClassName, "Test_vtkRecreateConfiguration_workbookAndVbProjectAlreadyOpen"
-    ITest_Suite.AddTest ITest_Manager.ClassName, "Test_vtkRecreateConfiguration_overwriteFile_normal"
-    ITest_Suite.AddTest ITest_Manager.ClassName, "Test_vtkRecreateConfiguration_overwriteFile_addIn"
 End Function
 
 Private Sub ITestCase_RunTest()
@@ -813,7 +801,6 @@ Private Sub ITestCase_RunTest()
         Case "Test_vtkRecreateConfiguration_pathDoesNotExistYet2": Test_vtkRecreateConfiguration_pathDoesNotExistYet2
         Case "Test_vtkRecreateConfiguration_allModulesArePresent_normalConf": Test_vtkRecreateConfiguration_allModulesArePresent_normalConf
         Case "Test_vtkRecreateConfiguration_allModulesArePresent_multitypeConf": Test_vtkRecreateConfiguration_allModulesArePresent_multitypeConf
-        Case "Test_vtkRecreateConfiguration_referencesAreActivated": Test_vtkRecreateConfiguration_referencesAreActivated
         Case Else: mAssert.Should False, "Invalid test name: " & mManager.methodName
     End Select
 End Sub
