@@ -466,6 +466,7 @@ End Sub
 
 
 
+
 'Public Sub Test_vtkRecreateConfiguration_referencesAreActivated()
 '' references are activated
 '' will probably change in the near future as reference management in configurations will change
@@ -480,7 +481,7 @@ End Sub
 '    Dim refIsActive As Boolean
 '    Dim guidArray() As String
 '
-'    getModulesAndRecreateWb testProject, testedConf
+'    exportModulesAndRecreateWb Wb, testProject, testedConf
 '
 '    ' Listing expected references in a collection
 '    numRef = 4
@@ -519,7 +520,7 @@ End Sub
 '    Set testedConf = normalConf
 '
 '    ' Set recreatedWb and open it
-'    getModulesAndRecreateWb testProject, testedConf
+'    exportModulesAndRecreateWb Wb, testProject, testedConf
 '
 '    mAssert.Equals recreatedWb.VBProject.name, testedConf.name, _
 '                   "The created project should have the same name as the recreated configuration."
@@ -542,7 +543,7 @@ End Sub
 '
 '    Set testedConf = normalConf
 '
-'    getModulesAndRecreateWb testProject, testedConf
+'    exportModulesAndRecreateWb Wb, testProject, testedConf
 '
 '    mAssert.Equals recreatedWb.FileFormat, _
 '                   xlOpenXMLWorkbookMacroEnabled, _
@@ -566,7 +567,7 @@ End Sub
 '
 '    Set testedConf = xlamConf
 '
-'    getModulesAndRecreateWb testProject, testedConf
+'    exportModulesAndRecreateWb Wb, testProject, testedConf
 '
 '    mAssert.Equals recreatedWb.FileFormat, _
 '                   xlOpenXMLAddIn, _
@@ -590,7 +591,7 @@ End Sub
 '
 '    Set testedConf = xlsConf
 '
-'    getModulesAndRecreateWb testProject, testedConf
+'    exportModulesAndRecreateWb Wb, testProject, testedConf
 '
 '    mAssert.Equals recreatedWb.FileFormat, _
 '                   xlExcel8, _
@@ -615,7 +616,7 @@ End Sub
 ''
 ''    Set testedConf = xlaConf
 ''
-''    getModulesAndRecreateWb testProject, testedConf
+''    exportModulesAndRecreateWb Wb, testProject, testedConf
 ''
 ''    mAssert.Equals recreatedWb.FileFormat, _
 ''                   xlAddIn, _
@@ -642,7 +643,7 @@ End Sub
 '    Set testedConf = normalConf
 '
 '    ' Create and open recreatedWb
-'    getModulesAndRecreateWb testProject, testedConf
+'    exportModulesAndRecreateWb Wb, testProject, testedConf
 '
 '    ' Recreate configuration with recreateWb already open
 '    vtkRecreateConfiguration testProject.projectName, testedConf.name
@@ -731,7 +732,7 @@ End Sub
 '    oldSize = fso.GetFile(VBAToolKit.vtkTestPath & "\" & testProject.projectName & "\" & testedConf.path).Size
 '
 '    ' Create and open recreatedWb
-'    getModulesAndRecreateWb testProject, testedConf
+'    exportModulesAndRecreateWb Wb, testProject, testedConf
 '
 '    newSize = fso.GetFile(VBAToolKit.vtkTestPath & "\" & testProject.projectName & "\" & testedConf.path).Size
 '
@@ -762,7 +763,7 @@ End Sub
 '    oldSize = fso.GetFile(VBAToolKit.vtkTestPath & "\" & testProject.projectName & "\" & testedConf.path).Size
 '
 '    ' Create and open recreatedWb
-'    getModulesAndRecreateWb testProject, testedConf
+'    exportModulesAndRecreateWb Wb, testProject, testedConf
 '
 '    newSize = fso.GetFile(VBAToolKit.vtkTestPath & "\" & testProject.projectName & "\" & testedConf.path).Size
 '
@@ -789,6 +790,16 @@ Private Function ITest_Suite() As TestSuite
     ITest_Suite.AddTest ITest_Manager.ClassName, "Test_vtkRecreateConfiguration_pathDoesNotExistYet2"
     ITest_Suite.AddTest ITest_Manager.ClassName, "Test_vtkRecreateConfiguration_allModulesArePresent_normalConf"
     ITest_Suite.AddTest ITest_Manager.ClassName, "Test_vtkRecreateConfiguration_allModulesArePresent_multitypeConf"
+    ITest_Suite.AddTest ITest_Manager.ClassName, "Test_vtkRecreateConfiguration_referencesAreActivated"
+    ITest_Suite.AddTest ITest_Manager.ClassName, "Test_vtkRecreateConfiguration_nameOfTheVBProjectIsCorrect"
+    ITest_Suite.AddTest ITest_Manager.ClassName, "Test_vtkRecreateConfiguration_formatLikeExtension_XLSM"
+    ITest_Suite.AddTest ITest_Manager.ClassName, "Test_vtkRecreateConfiguration_formatLikeExtension_XLAM"
+    ITest_Suite.AddTest ITest_Manager.ClassName, "Test_vtkRecreateConfiguration_formatLikeExtension_XLS"
+    ITest_Suite.AddTest ITest_Manager.ClassName, "Test_vtkRecreateConfiguration_workbookOpen"
+    ITest_Suite.AddTest ITest_Manager.ClassName, "Test_vtkRecreateConfiguration_addInOpen_XLAM"
+    ITest_Suite.AddTest ITest_Manager.ClassName, "Test_vtkRecreateConfiguration_workbookAndVbProjectAlreadyOpen"
+    ITest_Suite.AddTest ITest_Manager.ClassName, "Test_vtkRecreateConfiguration_overwriteFile_normal"
+    ITest_Suite.AddTest ITest_Manager.ClassName, "Test_vtkRecreateConfiguration_overwriteFile_addIn"
 End Function
 
 Private Sub ITestCase_RunTest()
@@ -802,6 +813,7 @@ Private Sub ITestCase_RunTest()
         Case "Test_vtkRecreateConfiguration_pathDoesNotExistYet2": Test_vtkRecreateConfiguration_pathDoesNotExistYet2
         Case "Test_vtkRecreateConfiguration_allModulesArePresent_normalConf": Test_vtkRecreateConfiguration_allModulesArePresent_normalConf
         Case "Test_vtkRecreateConfiguration_allModulesArePresent_multitypeConf": Test_vtkRecreateConfiguration_allModulesArePresent_multitypeConf
+        Case "Test_vtkRecreateConfiguration_referencesAreActivated": Test_vtkRecreateConfiguration_referencesAreActivated
         Case Else: mAssert.Should False, "Invalid test name: " & mManager.methodName
     End Select
 End Sub
