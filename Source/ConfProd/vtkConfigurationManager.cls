@@ -746,7 +746,7 @@ End Function
 
 
 '---------------------------------------------------------------------------------------
-' Procedure : getTitleForConfiguration
+' Procedure : getConfigurationTitle
 ' Author    : Lucas Vitorino
 ' Purpose   : Get the title of the configuration as it is described in the sheet.
 ' Notes     : If this function returns "", it can mean that  the configuration does not exist or
@@ -758,5 +758,22 @@ Public Function getConfigurationTitle(confName As String) As String
         getConfigurationTitle = configurationDOM.SelectSingleNode("/vtkConf/configuration[name=""" & confName & """]/title[0]").Text
     Else
         getConfigurationTitle = ""
+    End If
+End Function
+
+
+'---------------------------------------------------------------------------------------
+' Procedure : getConfigurationComment
+' Author    : Lucas Vitorino
+' Purpose   : Get the comment of the configuration as it is described in the sheet.
+' Notes     : If this function returns "", it can mean that  the configuration does not exist or
+'             that the configuration has no comment.
+'---------------------------------------------------------------------------------------
+'
+Public Function getConfigurationComment(confName As String) As String
+    If getConfigurationNumber(confName) <> 0 And configurationDOM.SelectNodes("/vtkConf/configuration[name=""" & confName & """]/comment").Length > 0 Then
+        getConfigurationComment = configurationDOM.SelectSingleNode("/vtkConf/configuration[name=""" & confName & """]/comment[0]").Text
+    Else
+        getConfigurationComment = ""
     End If
 End Function

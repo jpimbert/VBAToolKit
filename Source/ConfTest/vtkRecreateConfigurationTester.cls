@@ -834,7 +834,6 @@ Test_vtkRecreateConfiguration_title_Error:
     mAssert.Should False, "Unexpected Error " & Err.Number & " (" & Err.Description & ") in " & Err.Source
     Exit Sub
 
-
 End Sub
 
 

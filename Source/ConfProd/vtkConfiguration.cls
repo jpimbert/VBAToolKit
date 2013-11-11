@@ -159,3 +159,13 @@ End Property
 Property Get title() As String
     title = m_parent.getConfigurationTitle(name)
 End Property
+
+'---------------------------------------------------------------------------------------
+' Procedure : comment
+' Author    : Lucas Vitorino
+' Purpose   : The comment of the configuration
+'---------------------------------------------------------------------------------------
+'
+Property Get comment() As String
+    title = m_parent.getConfigurationComment(name)
+End Property

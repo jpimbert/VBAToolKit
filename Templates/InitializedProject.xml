@@ -12,6 +12,7 @@
 		<name>InitializedProject_DEV</name>
 		<path>Tests\InitializedProject_DEV.xlsm</path>
 		<title>Title</title>
+		<comment>Comment</comment>
 	</configuration>
 
 

@@ -237,6 +237,24 @@ TestTitle_Error:
 
 End Sub
 
+
+Public Sub TestComment()
+' assert the comment is retrieved correctly via the configuration manager
+    On Error GoTo TestComment_Error
+
+    mAssert.Equals confManager.configurations(1).comment, "Comment"
+
+    On Error GoTo 0
+    Exit Sub
+
+TestTitle_Error:
+    Err.Source = "vtkConfigurationTester::TestComment"
+    mAssert.Should False, "Unexpected Error " & Err.Number & " (" & Err.Description & ") in " & Err.Source
+    Exit Sub
+
+End Sub
+
+
 'Public Sub Test_AddedConfigurationCollection_Number()
 '    ' This test verifies the number of each vtkConfiguration object
 '    ' Added configuration to the collection initialized from an Excel worlbook
@@ -357,6 +375,7 @@ Private Function ITest_Suite() As TestSuite
     ITest_Suite.AddTest ITest_Manager.ClassName, "Test_ConfigurationModules_Initialized"
     ITest_Suite.AddTest ITest_Manager.ClassName, "Test_ConfigurationCollection_ID"
     ITest_Suite.AddTest ITest_Manager.ClassName, "TestRefListForNormalConf"
+    ITest_Suite.AddTest ITest_Manager.ClassName, "TestTitle"
 End Function
 
 Private Sub ITestCase_RunTest()
@@ -369,6 +388,7 @@ Private Sub ITestCase_RunTest()
         Case "Test_ConfigurationModules_Initialized": Test_ConfigurationModules_Initialized
         Case "Test_ConfigurationCollection_ID": Test_ConfigurationCollection_ID
         Case "TestRefListForNormalConf": TestRefListForNormalConf
+        Case "TestTitle": TestTitle
         Case Else: mAssert.Should False, "Invalid test name: " & mManager.methodName
     End Select
 End Sub
