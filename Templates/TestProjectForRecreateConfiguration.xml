@@ -67,6 +67,11 @@
 		<path>VBAToolKit.xlam</path>
 	</configuration>
 
+	<configuration cID="c13">
+		<name>TestProject_faultyRefConf</name>
+		<path>TestProject_faultyRefConf.xlsm</path>
+	</configuration>
+
 
 	<module mID="m01">
 		<name>TestModule1</name>
@@ -115,6 +120,11 @@
 	<reference confIDs="c06">
 		<name>Shell32</name>
 		<guid>{50A7E9B0-70EF-11D1-B75A-00A0C90564FE}</guid>
+	</reference>
+
+	<reference confIDs="c13">
+		<name>Faulty Ref</name>
+		<guid>{dummyGUID}</guid>
 	</reference>
 
 </vtkConf>

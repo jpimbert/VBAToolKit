@@ -370,7 +370,7 @@ Public Sub vtkRecreateConfiguration(projectName As String, configurationName As 
     Dim cm As vtkConfigurationManager
     Dim rootPath As String
     Dim wbpath As String
-    Dim Wb As Workbook
+    Dim wb As Workbook
     Dim tmpWb As Workbook
     Dim fso As New FileSystemObject
 
@@ -400,25 +400,29 @@ Public Sub vtkRecreateConfiguration(projectName As String, configurationName As 
     Next
     
     ' Create a new Excel file
-    Set Wb = vtkCreateExcelWorkbook()
+    Set wb = vtkCreateExcelWorkbook()
     
     ' Set the projectName
-    Wb.VBProject.name = configurationName
+    wb.VBProject.name = configurationName
     
     ' Import all modules for this configuration from the source directory
-    vtkImportModulesInAnotherProject projectForModules:=Wb.VBProject, projectName:=projectName, confName:=configurationName
+    vtkImportModulesInAnotherProject projectForModules:=wb.VBProject, projectName:=projectName, confName:=configurationName
     
     ' Recreate references in the new Excel File
+        
+    On Error GoTo vtkRecreateConfiguration_referenceError
+    
     Dim tmpRef As vtkReference
     For Each tmpRef In conf.references
         If tmpRef.guid <> "" Then
-            Wb.VBProject.references.AddFromGuid tmpRef.guid, 0, 0
+            wb.VBProject.references.AddFromGuid tmpRef.guid, 0, 0
         ElseIf tmpRef.path <> "" Then
-            Wb.VBProject.references.AddFromFile tmpRef.path
+            wb.VBProject.references.AddFromFile tmpRef.path
         End If
     Next
-    If conf.isDEV Then Wb.VBProject.references.AddFromFile tmpRef.path
+    If conf.isDEV Then wb.VBProject.references.AddFromFile tmpRef.path
 
+    On Error GoTo vtkRecreateConfiguration_Error
     
     ' VB will not let the workbook be saved under the name of an already opened workbook, which
     ' is annoying when recreating an add-in (always opened). The following code works around this.
@@ -434,11 +438,11 @@ Public Sub vtkRecreateConfiguration(projectName As String, configurationName As 
     vtkCreateFolderPath tmpPath
     
     ' Without this line, an xla file is not created with the right format
-    If vtkDefaultFileFormat(wbpath) = xlAddIn Then Wb.IsAddin = True
+    If vtkDefaultFileFormat(wbpath) = xlAddIn Then wb.IsAddin = True
     
     ' Save the new workbook with the correct extension
-    Wb.SaveAs fileName:=tmpPath, FileFormat:=vtkDefaultFileFormat(wbpath)
-    Wb.Close saveChanges:=False
+    wb.SaveAs fileName:=tmpPath, FileFormat:=vtkDefaultFileFormat(wbpath)
+    wb.Close saveChanges:=False
     
     ' Delete the old workbook if it exists
     Dim fullWbpath As String
@@ -451,13 +455,20 @@ Public Sub vtkRecreateConfiguration(projectName As String, configurationName As 
     On Error GoTo 0
     Exit Sub
 
+vtkRecreateConfiguration_referenceError:
+    Err.Number = VTK_REFERENCE_ERROR
+    GoTo vtkRecreateConfiguration_Error
+
 vtkRecreateConfiguration_Error:
 
-    If Not Wb Is Nothing Then Wb.Close saveChanges:=False
+    If Not wb Is Nothing Then wb.Close saveChanges:=False
 
     Err.Source = "vtkRecreateConfiguration of module vtkImportExportUtilities"
     
     Select Case Err.Number
+        Case VTK_REFERENCE_ERROR
+            Err.Number = VTK_REFERENCE_ERROR
+            Err.Description = "There was a problem activating reference " & tmpRef.name & ""
         Case VTK_WORKBOOK_ALREADY_OPEN
             Err.Number = VTK_WORKBOOK_ALREADY_OPEN
             Err.Description = "The configuration you're trying to create (" & configurationName & ") corresponds to an open workbook. " & _
