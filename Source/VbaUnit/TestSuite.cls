@@ -13,8 +13,8 @@ Implements ITest
 Private mTests As Collection
 Private mManager As TestSuiteManager
 
-Public Function TESTS() As Collection
-    Set TESTS = mTests
+Public Function Tests() As Collection
+    Set Tests = mTests
 End Function
 
 Public Sub AddTest(TestClassName As String, Optional methodName As String)

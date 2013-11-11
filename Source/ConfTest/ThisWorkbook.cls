@@ -45,7 +45,7 @@ End Sub
 
 Private Sub Workbook_BeforeSave(ByVal SaveAsUI As Boolean, Cancel As Boolean)
     ' Export and normalize modules
-    VBAToolKit.vtkExportConfiguration ThisWorkbook.VBProject, "VBAToolKit", "VBAToolKit_DEV", True
+    VBAToolKit.vtkExportConfiguration ThisWorkbook.VBProject, "VBAToolKit", "VBAToolKit_DEV", False
     
     ' Export as XML
     VBAToolKit.vtkExportConfigurationsAsXML projectName:="VBAToolKit", filePath:=VBAToolKit.vtkPathOfCurrentProject(ThisWorkbook) & "\" & VBAToolKit.vtkProjectForName("VBAToolKit").XMLConfigurationStandardRelativePath

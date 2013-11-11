@@ -42,7 +42,7 @@ Public Function vtkProjectForName(projectName As String) As vtkProject
     ' Create the collection if it doesn't exist
     If projects Is Nothing Then
         Set projects = New Collection
-    End If
+        End If
     ' search for the configuration manager in the collection
     Dim cm As vtkProject
     On Error Resume Next
@@ -68,14 +68,3 @@ Public Sub vtkResetProjects()
     Set projects = Nothing
 End Sub
 
-
-'---------------------------------------------------------------------------------------
-' Procedure : getCurrentProjectName
-' Author    : Lucas Vitorino
-' Purpose   : Get the project name associated with the active DEV workbook.
-' Notes     : Temporary and not tested
-'---------------------------------------------------------------------------------------
-'
-Public Function getCurrentProjectName() As String
-    getCurrentProjectName = vtkStripPathOrNameOfVtkExtension(ActiveWorkbook.FullName, "DEV")
-End Function

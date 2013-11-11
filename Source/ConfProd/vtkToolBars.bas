@@ -196,10 +196,10 @@ End Sub
 '---------------------------------------------------------------------------------------
 '
 Public Sub vtkReactivateVBEToolBar()
-    Dim C As CommandBarControl
+    Dim c As CommandBarControl
     vtkClearEventHandlers
-    For Each C In Application.VBE.CommandBars(toolBarName).Controls
-        vtkAddEventHandler action:=C.onAction, cmdBarCtl:=C
+    For Each c In Application.VBE.CommandBars(toolBarName).Controls
+        vtkAddEventHandler action:=c.onAction, cmdBarCtl:=c
     Next
 End Sub
 

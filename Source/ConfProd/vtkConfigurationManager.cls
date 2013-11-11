@@ -275,7 +275,7 @@ Public Function configurations() As Collection
     For i = 1 To configurationCount
         Set c = New vtkConfiguration
         c.init confManager:=Me, confNumber:=i
-        col.Add Item:=c, Key:=configuration(i)
+        col.Add Item:=C, Key:=configuration(i)
     Next i
     Set configurations = col
 End Function
