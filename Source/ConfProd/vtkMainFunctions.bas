@@ -189,8 +189,9 @@ Public Sub vtkRecreateConfiguration(projectName As String, configurationName As 
 
     On Error GoTo vtkRecreateConfiguration_Error
     
-    ' Set the title
+    ' Set the title and the comments
     Wb.BuiltinDocumentProperties("Title").Value = conf.title
+    Wb.BuiltinDocumentProperties("Comments").Value = conf.comment
     
     ' VB will not let the workbook be saved under the name of an already opened workbook, which
     ' is annoying when recreating an add-in (always opened). The following code works around this.

@@ -837,6 +837,29 @@ Test_vtkRecreateConfiguration_title_Error:
 End Sub
 
 
+Public Sub Test_vtkRecreateConfiguration_comment()
+' the comment of the workbook should be right
+
+    On Error GoTo Test_vtkRecreateConfiguration_comment_Error
+
+    Set testedConf = normalConf
+    
+    ' Create and open recreatedWb
+    getModulesAndRecreateWb testProject, testedConf
+
+    mAssert.Equals recreatedWb.BuiltinDocumentProperties("Comments"), "This conf is normal"
+
+    On Error GoTo 0
+    Exit Sub
+
+Test_vtkRecreateConfiguration_comment_Error:
+    Err.Source = "vtkRecreateConfigurationTester::Test_vtkRecreateConfiguration_comment"
+    mAssert.Should False, "Unexpected Error " & Err.Number & " (" & Err.Description & ") in " & Err.Source
+    Exit Sub
+
+End Sub
+
+
 Private Function ITest_Suite() As TestSuite
     Set ITest_Suite = New TestSuite
     ITest_Suite.AddTest ITest_Manager.ClassName, "Test_vtkRecreateConfiguration_workbookIsCreatedInTheGoodPath_normalConf"
@@ -861,6 +884,7 @@ Private Function ITest_Suite() As TestSuite
     ITest_Suite.AddTest ITest_Manager.ClassName, "Test_vtkRecreateConfiguration_overwriteFile_normal"
     ITest_Suite.AddTest ITest_Manager.ClassName, "Test_vtkRecreateConfiguration_overwriteFile_addIn"
     ITest_Suite.AddTest ITest_Manager.ClassName, "Test_vtkRecreateConfiguration_title"
+    ITest_Suite.AddTest ITest_Manager.ClassName, "Test_vtkRecreateConfiguration_comment"
 End Function
 
 Private Sub ITestCase_RunTest()
@@ -887,6 +911,7 @@ Private Sub ITestCase_RunTest()
         Case "Test_vtkRecreateConfiguration_overwriteFile_normal": Test_vtkRecreateConfiguration_overwriteFile_normal
         Case "Test_vtkRecreateConfiguration_overwriteFile_addIn": Test_vtkRecreateConfiguration_overwriteFile_addIn
         Case "Test_vtkRecreateConfiguration_title": Test_vtkRecreateConfiguration_title
+        Case "Test_vtkRecreateConfiguration_comment": Test_vtkRecreateConfiguration_comment
         Case Else: mAssert.Should False, "Invalid test name: " & mManager.methodName
     End Select
 End Sub

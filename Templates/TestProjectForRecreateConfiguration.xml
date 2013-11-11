@@ -36,6 +36,7 @@
 		<name>TestProject_normalConf</name>
 		<path>TestProject_normalConf.xlsm</path>
 		<title>Normal Conf</title>
+		<comment>This conf is normal</comment>
 	</configuration>
 
 	<configuration cID="c07">

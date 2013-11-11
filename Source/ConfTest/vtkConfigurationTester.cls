@@ -247,7 +247,7 @@ Public Sub TestComment()
     On Error GoTo 0
     Exit Sub
 
-TestTitle_Error:
+TestComment_Error:
     Err.Source = "vtkConfigurationTester::TestComment"
     mAssert.Should False, "Unexpected Error " & Err.Number & " (" & Err.Description & ") in " & Err.Source
     Exit Sub
@@ -376,6 +376,7 @@ Private Function ITest_Suite() As TestSuite
     ITest_Suite.AddTest ITest_Manager.ClassName, "Test_ConfigurationCollection_ID"
     ITest_Suite.AddTest ITest_Manager.ClassName, "TestRefListForNormalConf"
     ITest_Suite.AddTest ITest_Manager.ClassName, "TestTitle"
+    ITest_Suite.AddTest ITest_Manager.ClassName, "TestComment"
 End Function
 
 Private Sub ITestCase_RunTest()
@@ -389,6 +390,7 @@ Private Sub ITestCase_RunTest()
         Case "Test_ConfigurationCollection_ID": Test_ConfigurationCollection_ID
         Case "TestRefListForNormalConf": TestRefListForNormalConf
         Case "TestTitle": TestTitle
+        Case "TestComment": TestComment
         Case Else: mAssert.Should False, "Invalid test name: " & mManager.methodName
     End Select
 End Sub
