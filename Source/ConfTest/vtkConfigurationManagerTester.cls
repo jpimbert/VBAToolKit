@@ -516,11 +516,35 @@ End Sub
 
 Private Function ITest_Suite() As TestSuite
     Set ITest_Suite = New TestSuite
+    ITest_Suite.AddTest ITest_Manager.ClassName, "Test_PropertyName_DefaultGet"
+    ITest_Suite.AddTest ITest_Manager.ClassName, "Test_PropertyName_DefaultLet"
+    ITest_Suite.AddTest ITest_Manager.ClassName, "TestGetConfigurationsFromNewProject"
+    ITest_Suite.AddTest ITest_Manager.ClassName, "TestGetConfigurationsFromExistingProject"
+    ITest_Suite.AddTest ITest_Manager.ClassName, "TestGetConfigurationPathWithNumberFromExistingProject"
+    ITest_Suite.AddTest ITest_Manager.ClassName, "TestGetConfigurationNumbersFromNewProject"
+    ITest_Suite.AddTest ITest_Manager.ClassName, "TestGetConfigurationPathFromExistingProject"
+    ITest_Suite.AddTest ITest_Manager.ClassName, "TestGetModulesFromExistingProject"
+    ITest_Suite.AddTest ITest_Manager.ClassName, "TestGetModuleNumbersFromExistingProject"
+    ITest_Suite.AddTest ITest_Manager.ClassName, "TestGetModulePathWithNumberFromExistingProject"
+    ITest_Suite.AddTest ITest_Manager.ClassName, "TestpathToSheetIsNotValid"
+    ITest_Suite.AddTest ITest_Manager.ClassName, "TestRefCount"
     ITest_Suite.AddTest ITest_Manager.ClassName, "TestRefListForNormalConf"
 End Function
 
 Private Sub ITestCase_RunTest()
     Select Case mManager.methodName
+        Case "Test_PropertyName_DefaultGet": Test_PropertyName_DefaultGet
+        Case "Test_PropertyName_DefaultLet": Test_PropertyName_DefaultLet
+        Case "TestGetConfigurationsFromNewProject": TestGetConfigurationsFromNewProject
+        Case "TestGetConfigurationsFromExistingProject": TestGetConfigurationsFromExistingProject
+        Case "TestGetConfigurationPathWithNumberFromExistingProject": TestGetConfigurationPathWithNumberFromExistingProject
+        Case "TestGetConfigurationNumbersFromNewProject": TestGetConfigurationNumbersFromNewProject
+        Case "TestGetConfigurationPathFromExistingProject": TestGetConfigurationPathFromExistingProject
+        Case "TestGetModulesFromExistingProject": TestGetModulesFromExistingProject
+        Case "TestGetModuleNumbersFromExistingProject": TestGetModuleNumbersFromExistingProject
+        Case "TestGetModulePathWithNumberFromExistingProject": TestGetModulePathWithNumberFromExistingProject
+        Case "TestpathToSheetIsNotValid": TestpathToSheetIsNotValid
+        Case "TestRefCount": TestRefCount
         Case "TestRefListForNormalConf": TestRefListForNormalConf
         Case Else: mAssert.Should False, "Invalid test name: " & mManager.methodName
     End Select

@@ -139,3 +139,13 @@ Property Get modules() As Collection
     Next i
     Set modules = col
 End Property
+
+'---------------------------------------------------------------------------------------
+' Procedure : references
+' Author    : Lucas Vitorino
+' Purpose   : The collection of references attached to the configuration
+'---------------------------------------------------------------------------------------
+'
+Property Get references() As Collection
+    Set references = m_parent.getReferencesForConfiguration(Number)
+End Property

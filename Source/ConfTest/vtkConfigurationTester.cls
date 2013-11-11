@@ -190,6 +190,36 @@ Public Sub Test_ConfigurationCollection_ID()
 End Sub
 
 
+Public Sub TestRefListForNormalConf()
+' ensure the list of references returned is valid
+
+    On Error GoTo TestRefListForNormalConf_Error
+
+    Dim retCol As New Collection
+    Set retCol = confManager.configurations(1).references
+    
+    mAssert.Equals retCol.Item(1).name, "Reference1"
+    mAssert.Equals retCol.Item(1).guid, "GuidReference1"
+    mAssert.Equals retCol.Item(1).path, ""
+    
+    mAssert.Equals retCol.Item(2).name, "Reference2"
+    mAssert.Equals retCol.Item(2).guid, "GuidReference2"
+    mAssert.Equals retCol.Item(2).path, ""
+    
+    mAssert.Equals retCol.Item(3).name, "Reference3"
+    mAssert.Equals retCol.Item(3).guid, ""
+    mAssert.Equals retCol.Item(3).path, "PathReference3"
+
+    On Error GoTo 0
+    Exit Sub
+
+TestRefListForNormalConf_Error:
+    Err.Source = "vtkConfigurationTester::TestRefListForNormalConf"
+    mAssert.Should False, "Unexpected Error " & Err.Number & " (" & Err.Description & ") in " & Err.Source
+    Exit Sub
+
+End Sub
+
 'Public Sub Test_AddedConfigurationCollection_Number()
 '    ' This test verifies the number of each vtkConfiguration object
 '    ' Added configuration to the collection initialized from an Excel worlbook
@@ -306,8 +336,10 @@ Private Function ITest_Suite() As TestSuite
     ITest_Suite.AddTest ITest_Manager.ClassName, "Test_ConfigurationCollection_Parent"
     ITest_Suite.AddTest ITest_Manager.ClassName, "Test_ConfigurationCollection_Number"
     ITest_Suite.AddTest ITest_Manager.ClassName, "Test_ConfigurationGetName"
-    ITest_Suite.AddTest ITest_Manager.ClassName, "Test_ConfigurationGetPath"
+    ITest_Suite.AddTest ITest_Manager.ClassName, "Test_ConfigurationGetpath"
     ITest_Suite.AddTest ITest_Manager.ClassName, "Test_ConfigurationModules_Initialized"
+    ITest_Suite.AddTest ITest_Manager.ClassName, "Test_ConfigurationCollection_ID"
+    ITest_Suite.AddTest ITest_Manager.ClassName, "TestRefListForNormalConf"
 End Function
 
 Private Sub ITestCase_RunTest()
@@ -316,8 +348,10 @@ Private Sub ITestCase_RunTest()
         Case "Test_ConfigurationCollection_Parent": Test_ConfigurationCollection_Parent
         Case "Test_ConfigurationCollection_Number": Test_ConfigurationCollection_Number
         Case "Test_ConfigurationGetName": Test_ConfigurationGetName
-        Case "Test_ConfigurationGetPath": Test_ConfigurationGetpath
+        Case "Test_ConfigurationGetpath": Test_ConfigurationGetpath
         Case "Test_ConfigurationModules_Initialized": Test_ConfigurationModules_Initialized
+        Case "Test_ConfigurationCollection_ID": Test_ConfigurationCollection_ID
+        Case "TestRefListForNormalConf": TestRefListForNormalConf
         Case Else: mAssert.Should False, "Invalid test name: " & mManager.methodName
     End Select
 End Sub
