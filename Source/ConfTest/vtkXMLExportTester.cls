@@ -44,7 +44,7 @@ Private fso As New FileSystemObject
 
 Private testWorkbook As Workbook
 Private cm As vtkConfigurationManager
-Private testFilePath As String
+Private testFilepath As String
 
 Private reloadDom As MSXML2.DOMDocument
 
@@ -73,15 +73,15 @@ Private Sub ITestCase_SetUp(Assert As IAssert)
     Set cm = vtkConfigurationManagerForProject(testProjectName)
 
     ' Export the test project configuration in XML format
-    testFilePath = VBAToolKit.vtkTestPath & "\" & testFileName
-    vtkExportConfigurationsAsXML projectName:=testProjectName, filePath:=testFilePath
+    testFilepath = VBAToolKit.vtkTestPath & "\" & testFileName
+    vtkExportConfigurationsAsXML projectName:=testProjectName, filePath:=testFilepath
     
     ' Load the configuration as a DOM structure for content testing
     Set reloadDom = New MSXML2.DOMDocument
-    reloadDom.Load testFilePath
+    reloadDom.Load testFilepath
     reloadDom.setProperty "SelectionLanguage", "XPath"  ' for the use of the contains() function of XPath
     If reloadDom.parseError.ErrorCode <> 0 Then
-        Debug.Print "Parse error of " & testFilePath & " in SetUp of vtkXMLExportTester: " & reloadDom.parseError.reason
+        Debug.Print "Parse error of " & testFilepath & " in SetUp of vtkXMLExportTester: " & reloadDom.parseError.reason
     End If
     
 End Sub
@@ -273,8 +273,8 @@ Public Sub Test_vtkExportConfigurationsAsXML_InexistantFile()
 
    On Error GoTo Test_vtkExportConfigurationsAsXML_InexistantFile_Error
 
-    vtkExportConfigurationsAsXML projectName:=testProjectName, filePath:=testFilePath
-    mAssert.Should fso.FileExists(testFilePath), "The configuration file must be created when exporting a project"
+    vtkExportConfigurationsAsXML projectName:=testProjectName, filePath:=testFilepath
+    mAssert.Should fso.FileExists(testFilepath), "The configuration file must be created when exporting a project"
 
    On Error GoTo 0
    Exit Sub
@@ -290,13 +290,13 @@ Public Sub Test_vtkExportConfigurationsAsXML_ExistantFile()
 
     ' Create an empty file
     Dim f As TextStream
-    Set f = fso.CreateTextFile(testFilePath)
+    Set f = fso.CreateTextFile(testFilepath)
     f.WriteLine ("Unexpected line in a XML file")
     f.Close
     
-    vtkExportConfigurationsAsXML projectName:=testProjectName, filePath:=testFilePath
+    vtkExportConfigurationsAsXML projectName:=testProjectName, filePath:=testFilepath
     ' Verifies the first line
-    Set f = fso.OpenTextFile(testFilePath)
+    Set f = fso.OpenTextFile(testFilepath)
     Dim line As String
     line = f.ReadLine
     f.Close

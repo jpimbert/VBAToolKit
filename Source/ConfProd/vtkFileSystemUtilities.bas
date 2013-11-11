@@ -68,7 +68,7 @@ End Function
 '               - VTK_RETVAL_UNEXPECTED_ERR if other error
 '---------------------------------------------------------------------------------------
 '
-Public Function vtkCleanFolder(folderPath As String) As Integer
+Public Function vtkCleanFolder(folderpath As String) As Integer
     
     On Error GoTo vtkCleanFolder_Error
     
@@ -77,7 +77,7 @@ Public Function vtkCleanFolder(folderPath As String) As Integer
     Dim subFolder As Scripting.Folder
     Dim File As Scripting.File
     ' Will raise an error if folderPath does not correspond to a valid folder
-    Set sourceFolder = fso.GetFolder(folderPath)
+    Set sourceFolder = fso.GetFolder(folderpath)
 
     ' Erase the files in the folder, even the hidden ones
     For Each File In sourceFolder.Files
@@ -113,7 +113,7 @@ End Function
 '               - VTK_RETVAL_UNEXPECTED_ERR if other error
 '---------------------------------------------------------------------------------------
 '
-Public Function vtkDeleteFolder(folderPath As String)
+Public Function vtkDeleteFolder(folderpath As String)
     
     Dim fso As New Scripting.FileSystemObject
     Dim sourceFolder As Scripting.Folder
@@ -121,9 +121,9 @@ Public Function vtkDeleteFolder(folderPath As String)
     On Error GoTo vtkDeleteFolder_Error
 
     'Will raise an error if the folder doesn't exist
-    Set sourceFolder = fso.GetFolder(folderPath)
+    Set sourceFolder = fso.GetFolder(folderpath)
     
-    vtkCleanFolder (folderPath)
+    vtkCleanFolder (folderpath)
     fso.DeleteFolder (sourceFolder.path)
 
     On Error GoTo 0
@@ -148,14 +148,14 @@ End Function
 ' Returns   : Boolean. True if the folder exists, hidden or not, False in other cases.
 '---------------------------------------------------------------------------------------
 '
-Public Function vtkDoesFolderExist(folderPath As String) As Integer
+Public Function vtkDoesFolderExist(folderpath As String) As Integer
 
     On Error GoTo vtkDoesFolderExist_Error
     
     'Dir(etc,vbDirectory) returns True even if the specified thing is not a directory
     Dim fso As New FileSystemObject
     'Will raise an error 76 if wrong path or not a folder
-    fso.GetFolder (folderPath)
+    fso.GetFolder (folderpath)
     
     On Error GoTo 0
     vtkDoesFolderExist = True
@@ -199,17 +199,17 @@ Public Sub vtkCreateFolderPath(fileOrFolderPath As String)
     
     ' Finding the path of the folder to be created, whether a file or folder path
     '   has been given
-    Dim folderPath As String
+    Dim folderpath As String
     If Not fso.GetExtensionName(fileOrFolderPath) Like "" Then
-        folderPath = fso.GetParentFolderName(fileOrFolderPath)
+        folderpath = fso.GetParentFolderName(fileOrFolderPath)
     Else
-        folderPath = fileOrFolderPath
+        folderpath = fileOrFolderPath
     End If
     
     ' Main loop
     Dim currentFolder As String
     Dim folderArray() As String
-    folderArray = Split(folderPath, "\")
+    folderArray = Split(folderpath, "\")
     Dim i As Integer: i = 0
     
     currentFolder = folderArray(i)

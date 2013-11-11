@@ -62,9 +62,9 @@ Private Sub ITestCase_SetUp(Assert As IAssert)
     vtkResetProjects
     
     ' Create the files we'll need for remembering projects
-    createDTDforRememberedProjects sheetPath:=fso.BuildPath(VBAToolKit.vtkTestPath, standardRememberedProjectsDTDName)
+    createDTDforRememberedProjects sheetpath:=fso.BuildPath(VBAToolKit.vtkTestPath, standardRememberedProjectsDTDName)
     
-    createRememberedProjectsXMLSheet sheetPath:=fso.BuildPath(VBAToolKit.vtkTestPath, rememberedProjectsSheetName), _
+    createRememberedProjectsXMLSheet sheetpath:=fso.BuildPath(VBAToolKit.vtkTestPath, rememberedProjectsSheetName), _
                                      dtdPath:=fso.BuildPath(VBAToolKit.vtkTestPath, standardRememberedProjectsDTDName)
     
     ' Add the TestProject to the list of remembered projects

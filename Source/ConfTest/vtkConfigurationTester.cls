@@ -146,7 +146,7 @@ M_Error:
     mAssert.Should False, "Unexpected Error (" & Err.Number & "): " & Err.Description
 End Sub
 
-Public Sub Test_ConfigurationGetPath()
+Public Sub Test_ConfigurationGetpath()
     ' This test verifies the path of each vtkConfiguration object
     ' collection just initialized from an Excel worlbook
     
@@ -316,7 +316,7 @@ Private Sub ITestCase_RunTest()
         Case "Test_ConfigurationCollection_Parent": Test_ConfigurationCollection_Parent
         Case "Test_ConfigurationCollection_Number": Test_ConfigurationCollection_Number
         Case "Test_ConfigurationGetName": Test_ConfigurationGetName
-        Case "Test_ConfigurationGetPath": Test_ConfigurationGetPath
+        Case "Test_ConfigurationGetPath": Test_ConfigurationGetpath
         Case "Test_ConfigurationModules_Initialized": Test_ConfigurationModules_Initialized
         Case Else: mAssert.Should False, "Invalid test name: " & mManager.methodName
     End Select

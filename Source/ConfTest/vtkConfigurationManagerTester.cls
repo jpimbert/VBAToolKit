@@ -82,7 +82,7 @@ Private Sub ITestCase_SetUp(Assert As IAssert)
     Set newProject = vtkProjectForName(newProjectName)
     
     ' Create the XML sheet listing the rememberd projects
-    createRememberedProjectsXMLSheet sheetPath:=fso.BuildPath(VBAToolKit.vtkTestPath, rememberedProjectsSheetName), _
+    createRememberedProjectsXMLSheet sheetpath:=fso.BuildPath(VBAToolKit.vtkTestPath, rememberedProjectsSheetName), _
                                      dtdPath:=rememberedProjectsDTDName
     
     xmlRememberedProjectsFullPath = fso.BuildPath(VBAToolKit.vtkTestPath, rememberedProjectsSheetName)
@@ -291,7 +291,7 @@ End Sub
 Public Sub TestpathToSheetIsNotValid()
 ' path to sheet is not valid -> relevant error should be thrown
     On Error GoTo TestpathToSheetIsNotValid_Error
-    
+
     Dim dummy As Integer
 
     ' Delete sheet
@@ -312,12 +312,12 @@ TestpathToSheetIsNotValid_Error:
 End Sub
 
 
-Public Sub TestRefCountForNormalConf()
+Public Sub TestRefCount()
 ' get the correct number of references for a configuration with 3 references
 
     On Error GoTo TestRefCountForNormalConf_Error
 
-    mAssert.Equals existingConfManager.refCount, 3, "There are 3 references in the configuration description"
+    mAssert.Equals existingConfManager.refCount, 3, "There are 3 references in the project description"
 
     On Error GoTo 0
     Exit Sub
@@ -328,6 +328,28 @@ TestRefCountForNormalConf_Error:
     Exit Sub
 
 End Sub
+
+
+'Public Sub TestRefListForNormalConf()
+'' ensure the list of references returned is valid
+'
+'    On Error GoTo TestRefListForNormalConf_Error
+'
+'    Dim retCol As New Collection
+'    Set retCol = existingConfManager.getReferencesForConfiguration(existingConfManager.getConfigurationNumber(existingProjectName & "_DEV"))
+'
+'    mAssert.Should True
+'
+'    On Error GoTo 0
+'    Exit Sub
+'
+'TestRefListForNormalConf_Error:
+'    Err.Source = "vtkConfigurationManagerTester::TestRefListForNormalConf"
+'    mAssert.Should False, "Unexpected Error " & Err.Number & " (" & Err.Description & ") in " & Err.Source
+'    Exit Sub
+'
+'End Sub
+
 
 
 
@@ -495,7 +517,7 @@ Private Function ITest_Suite() As TestSuite
     ITest_Suite.AddTest ITest_Manager.ClassName, "TestGetModuleNumbersFromExistingProject"
     ITest_Suite.AddTest ITest_Manager.ClassName, "TestGetModulePathWithNumberFromExistingProject"
     ITest_Suite.AddTest ITest_Manager.ClassName, "TestpathToSheetIsNotValid"
-    ITest_Suite.AddTest ITest_Manager.ClassName, "TestRefCountForNormalConf"
+    ITest_Suite.AddTest ITest_Manager.ClassName, "TestRefCount"
 End Function
 
 Private Sub ITestCase_RunTest()
@@ -511,7 +533,7 @@ Private Sub ITestCase_RunTest()
         Case "TestGetModuleNumbersFromExistingProject": TestGetModuleNumbersFromExistingProject
         Case "TestGetModulePathWithNumberFromExistingProject": TestGetModulePathWithNumberFromExistingProject
         Case "TestpathToSheetIsNotValid": TestpathToSheetIsNotValid
-        Case "TestRefCountForNormalConf": TestRefCountForNormalConf
+        Case "TestRefCount": TestRefCount
         Case Else: mAssert.Should False, "Invalid test name: " & mManager.methodName
     End Select
 End Sub

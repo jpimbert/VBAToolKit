@@ -361,6 +361,16 @@
         <modulePath confId="c2">Source\ConfProd\vtkXMLFilesCreator.bas</modulePath>
         <modulePath confId="c3">Source\ConfProd\vtkXMLFilesCreator.bas</modulePath>
     </module>
+    <module mID="m64">
+        <name>vtkReference</name>
+        <modulePath confId="c1">Source\ConfProd\vtkReference.cls</modulePath>
+        <modulePath confId="c2">Source\ConfProd\vtkReference.cls</modulePath>
+        <modulePath confId="c3">Source\ConfProd\vtkReference.cls</modulePath>
+    </module>
+    <module mID="m65">
+        <name>vtkReferenceTester</name>
+        <modulePath confId="c2">Source\ConfTest\vtkReferenceTester.cls</modulePath>
+    </module>
     <reference confIDs="c1 c2 c3">
         <name>VBA</name>
         <guid>{000204EF-0000-0000-C000-000000000046}</guid>

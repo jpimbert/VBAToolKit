@@ -369,7 +369,7 @@ End Sub
 Public Sub vtkRecreateConfiguration(projectName As String, configurationName As String)
     Dim cm As vtkConfigurationManager
     Dim rootPath As String
-    Dim wbPath As String
+    Dim wbpath As String
     Dim Wb As Workbook
     Dim tmpWb As Workbook
     Dim fso As New FileSystemObject
@@ -381,12 +381,12 @@ Public Sub vtkRecreateConfiguration(projectName As String, configurationName As 
     rootPath = cm.rootPath
     
     ' Get the configuration number in the project and the path of the file
-    wbPath = cm.getConfigurationPath(configuration:=configurationName)
+    wbpath = cm.getConfigurationPath(configuration:=configurationName)
     
     ' Make sure the workbook we want to create is not open
     ' NB : open add-ins don't count and are managed further down
     For Each tmpWb In Workbooks
-        If tmpWb.name Like fso.GetFileName(wbPath) Then Err.Raise VTK_WORKBOOK_ALREADY_OPEN
+        If tmpWb.name Like fso.GetFileName(wbpath) Then Err.Raise VTK_WORKBOOK_ALREADY_OPEN
     Next
     
     'Make sure the source files exist
@@ -415,29 +415,29 @@ Public Sub vtkRecreateConfiguration(projectName As String, configurationName As 
     ' is annoying when recreating an add-in (always opened). The following code works around this.
     Dim tmpPath As String
     ' Add a random string to the file name of the workbook that will be saved
-    tmpPath = fso.BuildPath(rootPath & "\" & fso.GetParentFolderName(wbPath), _
-              vtkStripFilePathOrNameOfExtension(fso.GetFileName(wbPath)) & _
+    tmpPath = fso.BuildPath(rootPath & "\" & fso.GetParentFolderName(wbpath), _
+              vtkStripFilePathOrNameOfExtension(fso.GetFileName(wbpath)) & _
               CStr(Round((99999 - 10000 + 1) * Rnd(), 0)) + 10000 & _
-              "." & fso.GetExtensionName(wbPath))
+              "." & fso.GetExtensionName(wbpath))
     
     ' Create the the folder containing the workbook if a 1-level or less deep folder structure
     ' is specified in the configuration path.
     vtkCreateFolderPath tmpPath
     
     ' Without this line, an xla file is not created with the right format
-    If vtkDefaultFileFormat(wbPath) = xlAddIn Then Wb.IsAddin = True
+    If vtkDefaultFileFormat(wbpath) = xlAddIn Then Wb.IsAddin = True
     
     ' Save the new workbook with the correct extension
-    Wb.SaveAs fileName:=tmpPath, FileFormat:=vtkDefaultFileFormat(wbPath)
+    Wb.SaveAs fileName:=tmpPath, FileFormat:=vtkDefaultFileFormat(wbpath)
     Wb.Close saveChanges:=False
     
     ' Delete the old workbook if it exists
     Dim fullWbpath As String
-    fullWbpath = rootPath & "\" & wbPath
+    fullWbpath = rootPath & "\" & wbpath
     If fso.FileExists(fullWbpath) Then fso.DeleteFile (fullWbpath)
     
     ' Rename the new workbook without the random string
-    fso.GetFile(tmpPath).name = fso.GetFileName(rootPath & "\" & wbPath)
+    fso.GetFile(tmpPath).name = fso.GetFileName(rootPath & "\" & wbpath)
     
     On Error GoTo 0
     Exit Sub
@@ -497,19 +497,19 @@ Public Function vtkExportConfiguration(projectWithModules As VBProject, projectN
     Set cm = vtkConfigurationManagerForProject(projectName)
     For Each mo In cm.configurations(confName).modules
         
-        Dim modulePath As String
-        modulePath = cm.rootPath & "\" & mo.path
+        Dim modulepath As String
+        modulepath = cm.rootPath & "\" & mo.path
                    
         ' The conditon to export could be simplified in
         '   If Not (onlyModified And fso.FileExists(modulePath) And mo.VBAModule) Then <export>
         ' but it doesn't seem to work, so we stick to this code.
-        If onlyModified And fso.FileExists(modulePath) Then
+        If onlyModified And fso.FileExists(modulepath) Then
             If mo.VBAModule.Saved = False Then
-                vtkExportOneModule projectWithModules, mo.name, modulePath
+                vtkExportOneModule projectWithModules, mo.name, modulepath
                 exportedModulesCount = exportedModulesCount + 1
             End If
         Else
-            vtkExportOneModule projectWithModules, mo.name, modulePath
+            vtkExportOneModule projectWithModules, mo.name, modulepath
             exportedModulesCount = exportedModulesCount + 1
         End If
         

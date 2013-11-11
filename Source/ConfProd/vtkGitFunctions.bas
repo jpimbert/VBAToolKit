@@ -47,7 +47,7 @@ Option Explicit
 '               - VTK_UNEXPECTED_ERR
 '---------------------------------------------------------------------------------------
 '
-Public Function vtkInitializeGit(folderPath As String, Optional logFile As String = "")
+Public Function vtkInitializeGit(folderpath As String, Optional logFile As String = "")
     Dim tmpLogFileName As String
     tmpLogFileName = "initialize.log"
     Dim logFileFullPath As String
@@ -65,14 +65,14 @@ Public Function vtkInitializeGit(folderPath As String, Optional logFile As Strin
     End If
     
     ' Potentially raise VTK_FORBIDDEN_PARAMETER
-    convertedFolderPath = vtkGitConvertWinPath(folderPath)
+    convertedFolderPath = vtkGitConvertWinPath(folderpath)
     
-    If vtkDoesFolderExist(folderPath) = False Then
+    If vtkDoesFolderExist(folderpath) = False Then
         Err.Raise VTK_WRONG_FOLDER_PATH, "", "Folder path not found."
     End If
     
-    If vtkDoesFolderExist(folderPath & "\.git") = True Then
-        Err.Raise VTK_GIT_ALREADY_INITIALIZED_IN_FOLDER, "", "Git has already been initialized in the folder " & folderPath
+    If vtkDoesFolderExist(folderpath & "\.git") = True Then
+        Err.Raise VTK_GIT_ALREADY_INITIALIZED_IN_FOLDER, "", "Git has already been initialized in the folder " & folderpath
     End If
     
     ' Get the path of the log file that will be used
@@ -82,12 +82,12 @@ Public Function vtkInitializeGit(folderPath As String, Optional logFile As Strin
         Dim splittedLogFilePath() As String
         splittedLogFilePath = Split(logFile, ":")
         If splittedLogFilePath(LBound(splittedLogFilePath)) = logFile Then
-            logFileFullPath = folderPath & "\" & logFile
+            logFileFullPath = folderpath & "\" & logFile
         End If
         ' convert and potentially raise error
         convertedLogFilePath = vtkGitConvertWinPath(logFileFullPath)
     Else
-        convertedLogFilePath = vtkGitConvertWinPath(folderPath & "\" & tmpLogFileName)
+        convertedLogFilePath = vtkGitConvertWinPath(folderpath & "\" & tmpLogFileName)
     End If
     
     ' Intializing git using a shell command and redirecting the output flow in the log file
@@ -96,7 +96,7 @@ Public Function vtkInitializeGit(folderPath As String, Optional logFile As Strin
     
     ' Check if the initialization went well
     Dim logFileContent As String
-    logFileContent = vtkTextFileReader(folderPath & "\" & tmpLogFileName)
+    logFileContent = vtkTextFileReader(folderpath & "\" & tmpLogFileName)
     If Left(logFileContent, 12) <> Chr(10) & "Initialized" Then
         Err.Raise VTK_GIT_PROBLEM_DURING_INITIALIZATION, , "There was a problem during Git initialization." _
         & vbCrLf & "Content of the log file : " & logFileContent
@@ -104,14 +104,14 @@ Public Function vtkInitializeGit(folderPath As String, Optional logFile As Strin
     
     ' Delete file if tmp
     If logFile = "" Then
-        Kill folderPath & "\" & tmpLogFileName
+        Kill folderpath & "\" & tmpLogFileName
     End If
     
     ' Delete the default git exclude file
-    fso.DeleteFile folderPath & "\.git\info\exclude", True
+    fso.DeleteFile folderpath & "\.git\info\exclude", True
     
     ' Create it again and fill it with the content we want.
-    Set contentStream = fso.CreateTextFile(folderPath & "\.git\info\exclude")
+    Set contentStream = fso.CreateTextFile(folderpath & "\.git\info\exclude")
     contentStream.WriteLine "# Ignore the content of the Tests and GitLog folders"
     contentStream.WriteLine "/Tests/*"
     contentStream.WriteLine "/GitLog/*"
@@ -124,7 +124,7 @@ Public Function vtkInitializeGit(folderPath As String, Optional logFile As Strin
     contentStream.Close
     
     ' Adds all the files in the folder tree to the git repository
-    ShellAndWait "cmd.exe /c cd " & folderPath & " & git add " & ". ", 0, vbHide, AbandonWait
+    ShellAndWait "cmd.exe /c cd " & folderpath & " & git add " & ". ", 0, vbHide, AbandonWait
      
     On Error GoTo 0
     vtkInitializeGit = VTK_OK

@@ -41,14 +41,14 @@ Option Explicit
 '             - The folder structure is supposed to be a standard VBAToolKit project structure.
 '---------------------------------------------------------------------------------------
 '
-Public Sub createInitializedXMLSheetForProject(sheetPath As String, _
+Public Sub createInitializedXMLSheetForProject(sheetpath As String, _
                                     projectName As String, _
                                     Optional dtdPath As String = "../Templates/vtkConfigurationsDTD.dtd", _
                                     Optional addReferenceToSelf As Boolean = True)
 
     Dim fso As New FileSystemObject
     Dim xmlFile As TextStream
-    Set xmlFile = fso.CreateTextFile(fileName:=sheetPath, Overwrite:=True)
+    Set xmlFile = fso.CreateTextFile(fileName:=sheetpath, Overwrite:=True)
   
     Dim deliveryConfId As String
     Dim devConfId As String
@@ -71,11 +71,11 @@ Public Sub createInitializedXMLSheetForProject(sheetPath As String, _
     ' Create the 2 configurations
     xmlFile.WriteLine Text:="    <configuration cID=""" & deliveryConfId & """>"
     xmlFile.WriteLine Text:="        <name>" & projectName & "</name>"
-    xmlFile.WriteLine Text:="        <path>" & fso.GetParentFolderName(fso.GetParentFolderName(sheetPath)) & "\Delivery\" & projectName & ".xlsm</path>"
+    xmlFile.WriteLine Text:="        <path>" & fso.GetParentFolderName(fso.GetParentFolderName(sheetpath)) & "\Delivery\" & projectName & ".xlsm</path>"
     xmlFile.WriteLine Text:="    </configuration>"
     xmlFile.WriteLine Text:="    <configuration cID=""" & devConfId & """>"
     xmlFile.WriteLine Text:="        <name>" & projectName & "_DEV</name>"
-    xmlFile.WriteLine Text:="        <path>" & fso.GetParentFolderName(fso.GetParentFolderName(sheetPath)) & "\Project\" & projectName & "_DEV.xlsm</path>"
+    xmlFile.WriteLine Text:="        <path>" & fso.GetParentFolderName(fso.GetParentFolderName(sheetpath)) & "\Project\" & projectName & "_DEV.xlsm</path>"
     xmlFile.WriteLine Text:="    </configuration>"
     xmlFile.WriteBlankLines Lines:=1
     xmlFile.WriteBlankLines Lines:=1
@@ -99,7 +99,7 @@ Public Sub createInitializedXMLSheetForProject(sheetPath As String, _
     For Each tmpRef In listOfDefaultReferences
         xmlFile.WriteLine Text:="    <reference confIDs=""" & deliveryConfId & " " & devConfId & """>"
         xmlFile.WriteLine Text:="        <name>" & tmpRef.name & "</name>"
-        xmlFile.WriteLine Text:="        <guid>" & tmpRef.GUID & "</guid>"
+        xmlFile.WriteLine Text:="        <guid>" & tmpRef.guid & "</guid>"
         xmlFile.WriteLine Text:="    </reference>"
         xmlFile.WriteBlankLines Lines:=1
     Next
@@ -126,11 +126,11 @@ End Sub
 '             a project with all its configurations.
 '---------------------------------------------------------------------------------------
 '
-Public Sub createDTDForVtkConfigurations(sheetPath As String)
+Public Sub createDTDForVtkConfigurations(sheetpath As String)
     
     Dim fso As New FileSystemObject
     Dim xmlFile As TextStream
-    Set xmlFile = fso.CreateTextFile(fileName:=sheetPath, Overwrite:=True)
+    Set xmlFile = fso.CreateTextFile(fileName:=sheetpath, Overwrite:=True)
     
     xmlFile.WriteLine Text:="<!ELEMENT vtkConf (info,configuration*, module*, reference*)>"
     xmlFile.WriteBlankLines Lines:=1
@@ -171,12 +171,12 @@ End Sub
 '             - The folder structure is supposed to be a standard VBAToolKit project structure.
 '---------------------------------------------------------------------------------------
 '
-Public Sub createRememberedProjectsXMLSheet(sheetPath As String, _
+Public Sub createRememberedProjectsXMLSheet(sheetpath As String, _
                                             Optional dtdPath As String = "../Templates/vtkRememberedProjectsDTD.dtd")
 
     Dim fso As New FileSystemObject
     Dim xmlFile As TextStream
-    Set xmlFile = fso.CreateTextFile(fileName:=sheetPath, Overwrite:=True)
+    Set xmlFile = fso.CreateTextFile(fileName:=sheetpath, Overwrite:=True)
 
     xmlFile.WriteLine Text:="<?xml version=""1.0"" encoding=""ISO-8859-1"" standalone=""no""?>"
     xmlFile.WriteLine Text:="<!DOCTYPE vtkConf SYSTEM """ & dtdPath & """>"
@@ -201,11 +201,11 @@ End Sub
 '             the projects rememberd by VBAToolKit (name, rootFolder, xmlRelativePath)
 '---------------------------------------------------------------------------------------
 '
-Public Sub createDTDforRememberedProjects(sheetPath As String)
+Public Sub createDTDforRememberedProjects(sheetpath As String)
     
     Dim fso As New FileSystemObject
     Dim xmlFile As TextStream
-    Set xmlFile = fso.CreateTextFile(fileName:=sheetPath, Overwrite:=True)
+    Set xmlFile = fso.CreateTextFile(fileName:=sheetpath, Overwrite:=True)
     
     xmlFile.WriteLine Text:="<!ELEMENT rememberedProjects (info,project*)>"
     xmlFile.WriteLine Text:="    <!ELEMENT info (version)>"

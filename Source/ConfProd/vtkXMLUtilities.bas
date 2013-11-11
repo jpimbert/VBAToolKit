@@ -73,13 +73,13 @@ Public Sub vtkExportConfigurationsAsXML(projectName As String, filePath As Strin
     Next
     
     ' Create Module elements
-    Dim md As vtkModule, modulePath As String
+    Dim md As vtkModule, modulepath As String
     For Each md In cm.modules
         xmlFile.WriteLine Text:="    <module mID=""" & md.ID & """>"
         xmlFile.WriteLine Text:="        <name>" & md.name & "</name>"
         For Each cf In cm.configurations
-            modulePath = md.getPathForConfiguration(confName:=cf.name)
-            If Not modulePath Like "" Then xmlFile.WriteLine Text:="        <modulePath confId=""" & cf.ID & """>" & modulePath & "</modulePath>"
+            modulepath = md.getPathForConfiguration(confName:=cf.name)
+            If Not modulepath Like "" Then xmlFile.WriteLine Text:="        <modulePath confId=""" & cf.ID & """>" & modulepath & "</modulePath>"
         Next
         xmlFile.WriteLine Text:="    </module>"
     Next
@@ -107,17 +107,17 @@ Public Sub vtkExportConfigurationsAsXML(projectName As String, filePath As Strin
     allConfIDs = allConfIDs & """"
     confIDsOnlyDEV = confIDsOnlyDEV & """"
     ' Add reference elements to the XML configuration file
-    For Each r In ActiveWorkbook.VBProject.References
+    For Each r In ActiveWorkbook.VBProject.references
         If r.name Like "VBAToolKit" Then
             xmlFile.WriteLine Text:="    <reference confIDs=" & confIDsOnlyDEV & ">"
            Else
             xmlFile.WriteLine Text:="    <reference confIDs=" & allConfIDs & ">"
         End If
         xmlFile.WriteLine Text:="        <name>" & r.name & "</name>"
-        If r.GUID Like "" Then
+        If r.guid Like "" Then
             xmlFile.WriteLine Text:="        <path>" & r.fullPath & "</path>"
            Else
-            xmlFile.WriteLine Text:="        <guid>" & r.GUID & "</guid>"
+            xmlFile.WriteLine Text:="        <guid>" & r.guid & "</guid>"
         End If
         xmlFile.WriteLine Text:="    </reference>"
     Next

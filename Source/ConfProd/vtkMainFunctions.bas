@@ -69,12 +69,12 @@ Public Function vtkCreateProject(path As String, name As String, Optional displa
     If internalError <> VTK_OK Then GoTo vtkCreateProject_ErrorTreeFolder
     
     ' Create the XML vtkConfigurations sheet in the standard folder, the dtd is supposed to be in the same folder
-    createInitializedXMLSheetForProject sheetPath:=fso.BuildPath(rootPath, project.XMLConfigurationStandardRelativePath), _
+    createInitializedXMLSheetForProject sheetpath:=fso.BuildPath(rootPath, project.XMLConfigurationStandardRelativePath), _
                                         projectName:=project.projectName, _
                                         dtdPath:="vtkConfigurationsDTD.dtd"
                                         
     ' Create the DTD sheet for the XML vtkConfigurations sheet in the same folder
-    createDTDForVtkConfigurations sheetPath:=fso.BuildPath(rootPath, fso.BuildPath(fso.GetParentFolderName(project.XMLConfigurationStandardRelativePath), "vtkConfigurationsDTD.dtd"))
+    createDTDForVtkConfigurations sheetpath:=fso.BuildPath(rootPath, fso.BuildPath(fso.GetParentFolderName(project.XMLConfigurationStandardRelativePath), "vtkConfigurationsDTD.dtd"))
     
     ' Insert the BeforeSave handler in the newly created project
     ' /!\ For that we need to manage the "ThisWorkbook" object, we will do it later

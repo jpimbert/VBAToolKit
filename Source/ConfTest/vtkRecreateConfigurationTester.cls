@@ -100,9 +100,9 @@ Private Sub ITestCase_SetUp(Assert As IAssert)
     vtkCreateTreeFolder testProjectFolder
 
     ' Create the files we'll need for remembering projects
-    createDTDforRememberedProjects sheetPath:=fso.BuildPath(VBAToolKit.vtkTestPath, standardRememberedProjectsDTDName)
+    createDTDforRememberedProjects sheetpath:=fso.BuildPath(VBAToolKit.vtkTestPath, standardRememberedProjectsDTDName)
     
-    createRememberedProjectsXMLSheet sheetPath:=fso.BuildPath(VBAToolKit.vtkTestPath, rememberedProjectsSheetName), _
+    createRememberedProjectsXMLSheet sheetpath:=fso.BuildPath(VBAToolKit.vtkTestPath, rememberedProjectsSheetName), _
                                      dtdPath:=fso.BuildPath(VBAToolKit.vtkTestPath, standardRememberedProjectsDTDName)
     
     ' Copy the sheet of the new project in the relevant folder, and create a DTD

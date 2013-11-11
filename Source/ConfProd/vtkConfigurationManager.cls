@@ -82,11 +82,11 @@ End Property
 
 Public Property Let projectName(ByVal sprojectName As String)
 
-    Dim sheetPath As String
-    sheetPath = fso.BuildPath(vtkRootPathForProject(sprojectName), vtkXmlRelPathForProject(sprojectName))
-    If m_projectName <> sprojectName And fso.FileExists(sheetPath) Then
+    Dim sheetpath As String
+    sheetpath = fso.BuildPath(vtkRootPathForProject(sprojectName), vtkXmlRelPathForProject(sprojectName))
+    If m_projectName <> sprojectName And fso.FileExists(sheetpath) Then
         m_projectName = sprojectName
-        m_xmlSheetPath = sheetPath
+        m_xmlSheetPath = sheetpath
         m_rootPath = ""
         'setConfigurationSheet      ' Reset the configuration sheet when the attached project is changed
     End If
@@ -652,3 +652,69 @@ refCount_Error:
     Exit Property
 
 End Property
+
+
+''---------------------------------------------------------------------------------------
+'' Procedure : getReferencesForConfiguration
+'' Author    : Lucas Vitorino
+'' Purpose   : Get the collection of references for the n-th configuration.
+'' Return    : A collection of VBIDE.Reference objects.
+''---------------------------------------------------------------------------------------
+''
+'Public Function getReferencesForConfiguration(numConfiguration As Integer) As Collection
+'
+'    On Error GoTo getReferencesForConfiguration_Error
+'
+'    Dim retCol As New Collection
+'    Dim tmpNode As MSXML2.IXMLDOMNode
+'    Dim tmpRef As VBIDE.Reference
+'    Dim confId As Integer
+'
+'    If numConfiguration >= 1 And numConfiguration <= refCount Then
+'        confId = configurationDOM.SelectSingleNode("vtkConf/configuration[" & numConfiguration - 1 & "]/@cID").Text
+'
+'        For Each tmpNode In configurationDOM.SelectNodes("vtkConf/reference[@confIDs[contains(.,""" & confId & """)]]")
+'            tmpRef.name = tmpNode.SelectSingleNode("/name[0]").Text
+'
+'            ' The DTD ensures both the fields will not be filled
+'            If configurationDOM.SelectNodes("/guid").Length > 0 Then
+'                'tmpRef.GUID = configurationDOM.SelectSingleNode("/vtkConf/reference[" & i - 1 & "]/guid[0]").Text
+'                tmpRef.GUID = configurationDOM.SelectSingleNode("/guid[0]").Text
+'            End If
+'
+'            If configurationDOM.SelectNodes("/path").Length > 0 Then
+'                'tmpRref.fullPath = configurationDOM.SelectSingleNode("/vtkConf/reference[" & i - 1 & "]/path[0]").Text
+'                tmpRref.fullPath = configurationDOM.SelectSingleNode("/path[0]").Text
+'            End If
+'
+'            col.Add Item:=tmpRef, Key:=tmpRef.name
+'
+'            ' Reinitialize the reference object
+'            tmpRef.name = ""
+'            tmpRef.GUID = ""
+'            tmpRref.fullPath = ""
+'
+'        Next
+'
+'    End If
+'
+'    On Error GoTo 0
+'    Set getReferencesForConfiguration = retCol
+'    Exit Function
+'
+'getReferencesForConfiguration_Error:
+'    Err.Source = "vtkConfigurationManager::getReferencesForConfiguration"
+'
+'    Select Case Err.Number
+'        Case VTK_SHEET_NOT_VALID
+'            ' do nothing but froward the error
+'        Case Else
+'            Err.Number = VTK_UNEXPECTED_ERROR
+'    End Select
+'
+'    Err.Raise Err.Number, Err.Source, Err.Description
+'
+'    Exit Function
+'
+'End Function
+
