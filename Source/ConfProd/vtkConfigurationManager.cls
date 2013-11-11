@@ -82,11 +82,11 @@ End Property
 
 Public Property Let projectName(ByVal sprojectName As String)
 
-    Dim sheetpath As String
-    sheetpath = fso.BuildPath(vtkRootPathForProject(sprojectName), vtkXmlRelPathForProject(sprojectName))
-    If m_projectName <> sprojectName And fso.FileExists(sheetpath) Then
+    Dim sheetPath As String
+    sheetPath = fso.BuildPath(vtkRootPathForProject(sprojectName), vtkXmlRelPathForProject(sprojectName))
+    If m_projectName <> sprojectName And fso.FileExists(sheetPath) Then
         m_projectName = sprojectName
-        m_xmlSheetPath = sheetpath
+        m_xmlSheetPath = sheetPath
         m_rootPath = ""
         'setConfigurationSheet      ' Reset the configuration sheet when the attached project is changed
     End If
@@ -742,4 +742,21 @@ Public Function getReferencesForConfiguration(confName As String) As Collection
         Set getReferencesForConfiguration = Nothing
     End If
     
+End Function
+
+
+'---------------------------------------------------------------------------------------
+' Procedure : getTitleForConfiguration
+' Author    : Lucas Vitorino
+' Purpose   : Get the title of the configuration as it is described in the sheet.
+' Notes     : If this function returns "", it can mean that  the configuration does not exist or
+'             that the configuration has no title.
+'---------------------------------------------------------------------------------------
+'
+Public Function getConfigurationTitle(confName As String) As String
+    If getConfigurationNumber(confName) <> 0 And configurationDOM.SelectNodes("/vtkConf/configuration[name=""" & confName & """]/title").Length > 0 Then
+        getConfigurationTitle = configurationDOM.SelectSingleNode("/vtkConf/configuration[name=""" & confName & """]/title[0]").Text
+    Else
+        getConfigurationTitle = ""
+    End If
 End Function

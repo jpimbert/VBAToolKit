@@ -82,7 +82,7 @@ Private Sub ITestCase_SetUp(Assert As IAssert)
     Set newProject = vtkProjectForName(newProjectName)
     
     ' Create the XML sheet listing the rememberd projects
-    createRememberedProjectsXMLSheet sheetpath:=fso.BuildPath(VBAToolKit.vtkTestPath, rememberedProjectsSheetName), _
+    createRememberedProjectsXMLSheet sheetPath:=fso.BuildPath(VBAToolKit.vtkTestPath, rememberedProjectsSheetName), _
                                      dtdPath:=rememberedProjectsDTDName
     
     xmlRememberedProjectsFullPath = fso.BuildPath(VBAToolKit.vtkTestPath, rememberedProjectsSheetName)
@@ -361,6 +361,21 @@ TestRefListForNormalConf_Error:
 End Sub
 
 
+Public Sub TestTitleNormalConf()
+' test if the title is retrieved correctly
+    On Error GoTo TestTitleNormalConf_Error
+
+    mAssert.Equals existingConfManager.getConfigurationTitle(existingProjectName), "Existing Project Delivery version"
+
+    On Error GoTo 0
+    Exit Sub
+
+TestTitleNormalConf_Error:
+    Err.Source = "vtkConfigurationManagerTester::TestTitleNormalConf"
+    mAssert.Should False, "Unexpected Error " & Err.Number & " (" & Err.Description & ") in " & Err.Source
+    Exit Sub
+
+End Sub
 
 
 '''Public Sub Test_AddConfigurationInExistingProject_Name()
@@ -529,6 +544,7 @@ Private Function ITest_Suite() As TestSuite
     ITest_Suite.AddTest ITest_Manager.ClassName, "TestpathToSheetIsNotValid"
     ITest_Suite.AddTest ITest_Manager.ClassName, "TestRefCount"
     ITest_Suite.AddTest ITest_Manager.ClassName, "TestRefListForNormalConf"
+    ITest_Suite.AddTest ITest_Manager.ClassName, "TestTitleNormalConf"
 End Function
 
 Private Sub ITestCase_RunTest()
@@ -546,6 +562,7 @@ Private Sub ITestCase_RunTest()
         Case "TestpathToSheetIsNotValid": TestpathToSheetIsNotValid
         Case "TestRefCount": TestRefCount
         Case "TestRefListForNormalConf": TestRefListForNormalConf
+        Case "TestTitleNormalConf": TestTitleNormalConf
         Case Else: mAssert.Should False, "Invalid test name: " & mManager.methodName
     End Select
 End Sub

@@ -220,6 +220,23 @@ TestRefListForNormalConf_Error:
 
 End Sub
 
+
+Public Sub TestTitle()
+' assert the title is retrieved correctly via the configuration manager
+    On Error GoTo TestTitle_Error
+
+    mAssert.Equals confManager.configurations(1).title, "Title"
+
+    On Error GoTo 0
+    Exit Sub
+
+TestTitle_Error:
+    Err.Source = "vtkConfigurationTester::TestTitle"
+    mAssert.Should False, "Unexpected Error " & Err.Number & " (" & Err.Description & ") in " & Err.Source
+    Exit Sub
+
+End Sub
+
 'Public Sub Test_AddedConfigurationCollection_Number()
 '    ' This test verifies the number of each vtkConfiguration object
 '    ' Added configuration to the collection initialized from an Excel worlbook

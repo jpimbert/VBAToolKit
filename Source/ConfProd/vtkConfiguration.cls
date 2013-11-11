@@ -149,3 +149,13 @@ End Property
 Property Get references() As Collection
     Set references = m_parent.getReferencesForConfiguration(name)
 End Property
+
+'---------------------------------------------------------------------------------------
+' Procedure : title
+' Author    : Lucas Vitorino
+' Purpose   : The title of the configuration
+'---------------------------------------------------------------------------------------
+'
+Property Get title() As String
+    title = m_parent.getConfigurationTitle(name)
+End Property
