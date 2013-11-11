@@ -107,4 +107,14 @@
 		<modulePath confId="c10">TestFormModule1.frm</modulePath>
 	</module>
 
+	<reference confIDs="c06">
+		<name>Scripting</name>
+		<guid>{420B2830-E718-11CF-893D-00A0C9054228}</guid>
+	</reference>
+
+	<reference confIDs="c06">
+		<name>Shell32</name>
+		<guid>{50A7E9B0-70EF-11D1-B75A-00A0C90564FE}</guid>
+	</reference>
+
 </vtkConf>

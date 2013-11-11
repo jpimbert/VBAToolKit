@@ -482,49 +482,46 @@ Test_vtkRecreateConfiguration_allModulesArePresent_multitypeConf_Error:
 End Sub
 
 
-'Public Sub Test_vtkRecreateConfiguration_referencesAreActivated()
-'' references are activated
-'' will probably change in the near future as reference management in configurations will change
-'
-'    On Error GoTo Test_vtkRecreateConfiguration_referencesAreActivated_Error
-'
-'    Set testedConf = normalConf
-'
-'    Dim numRef As Integer
-'    Dim ref As Reference
-'    Dim i As Integer
-'    Dim refIsActive As Boolean
-'    Dim guidArray() As String
-'
-'    getModulesAndRecreateWb  testProject, testedConf
-'
-'    ' Listing expected references in a collection
-'    numRef = 4
-'    ReDim guidArray(1 To numRef) As String
-'    guidArray(1) = "{420B2830-E718-11CF-893D-00A0C9054228}" 'Scripting : Microsoft scripting runtime
-'    guidArray(2) = "{0002E157-0000-0000-C000-000000000046}" ' VBIDE : Microsoft visual basic for applications extensibility 5.3
-'    guidArray(3) = "{50A7E9B0-70EF-11D1-B75A-00A0C90564FE}" ' Shell32 : Microsoft Shell Controls and Automation+
-'    guidArray(4) = "{F5078F18-C551-11D3-89B9-0000F81FE221}" ' MSXML2 : Microsoft XML V5.0
-'
-'    ' For each GUID in the array, check if it is in the project references
-'    For i = 1 To numRef
-'        refIsActive = False
-'        For Each ref In recreatedWb.VBProject.References
-'            If ref.GUID = guidArray(i) Then refIsActive = True
-'        Next
-'
-'        mAssert.Should refIsActive, "The reference with GUID = " & guidArray(i) & " is not activated : it should."
-'    Next
-'
-'    On Error GoTo 0
-'    Exit Sub
-'
-'Test_vtkRecreateConfiguration_referencesAreActivated_Error:
-'    Err.Source = "Test_vtkRecreateConfiguration_referencesAreActivated of module vtkRecreateConfigurationTester"
-'    mAssert.Should False, "Unexpected error " & Err.Number & " (" & Err.Description & ") in " & Err.Source
-'    Exit Sub
-'End Sub
-'
+Public Sub Test_vtkRecreateConfiguration_referencesAreActivated()
+' references are activated
+
+    On Error GoTo Test_vtkRecreateConfiguration_referencesAreActivated_Error
+
+    Set testedConf = normalConf
+
+    Dim numRef As Integer
+    Dim ref As Reference
+    Dim i As Integer
+    Dim refIsActive As Boolean
+    Dim guidArray() As String
+
+    getModulesAndRecreateWb testProject, testedConf
+
+    ' Listing expected references in a collection
+    numRef = 2
+    ReDim guidArray(1 To numRef) As String
+    guidArray(1) = "{420B2830-E718-11CF-893D-00A0C9054228}" 'Scripting : Microsoft scripting runtime
+    guidArray(2) = "{50A7E9B0-70EF-11D1-B75A-00A0C90564FE}" ' Shell32 : Microsoft Shell Controls and Automation+
+
+    ' For each GUID in the array, check if it is in the project references
+    For i = 1 To numRef
+        refIsActive = False
+        For Each ref In recreatedWb.VBProject.references
+            If ref.guid = guidArray(i) Then refIsActive = True
+        Next
+
+        mAssert.Should refIsActive, "The reference with GUID = " & guidArray(i) & " is not activated : it should."
+    Next
+
+    On Error GoTo 0
+    Exit Sub
+
+Test_vtkRecreateConfiguration_referencesAreActivated_Error:
+    Err.Source = "Test_vtkRecreateConfiguration_referencesAreActivated of module vtkRecreateConfigurationTester"
+    mAssert.Should False, "Unexpected error " & Err.Number & " (" & Err.Description & ") in " & Err.Source
+    Exit Sub
+End Sub
+
 
 
 Public Sub Test_vtkRecreateConfiguration_nameOfTheVBProjectIsCorrect()
@@ -796,46 +793,12 @@ End Sub
 
 Private Function ITest_Suite() As TestSuite
     Set ITest_Suite = New TestSuite
-    ITest_Suite.AddTest ITest_Manager.ClassName, "Test_vtkRecreateConfiguration_workbookIsCreatedInTheGoodPath_normalConf"
-    ITest_Suite.AddTest ITest_Manager.ClassName, "Test_vtkRecreateConfiguration_workbookIsCreatedInTheGoodPath_emptyConf"
-    ITest_Suite.AddTest ITest_Manager.ClassName, "Test_vtkRecreateConfiguration_workbookIsCreatedInTheGoodPath_multitypeConf"
-    ITest_Suite.AddTest ITest_Manager.ClassName, "Test_vtkRecreateConfiguration_modulesNotYetExported_normalConf"
-    ITest_Suite.AddTest ITest_Manager.ClassName, "Test_vtkRecreateConfiguration_modulesNotYetExported_emptyConf"
-    ITest_Suite.AddTest ITest_Manager.ClassName, "Test_vtkRecreateConfiguration_pathDoesNotExistYet1"
-    ITest_Suite.AddTest ITest_Manager.ClassName, "Test_vtkRecreateConfiguration_pathDoesNotExistYet2"
-    ITest_Suite.AddTest ITest_Manager.ClassName, "Test_vtkRecreateConfiguration_allModulesArePresent_normalConf"
-    ITest_Suite.AddTest ITest_Manager.ClassName, "Test_vtkRecreateConfiguration_allModulesArePresent_multitypeConf"
-    ITest_Suite.AddTest ITest_Manager.ClassName, "Test_vtkRecreateConfiguration_nameOfTheVBProjectIsCorrect"
-    ITest_Suite.AddTest ITest_Manager.ClassName, "Test_vtkRecreateConfiguration_formatLikeExtension_XLSM"
-    ITest_Suite.AddTest ITest_Manager.ClassName, "Test_vtkRecreateConfiguration_formatLikeExtension_XLAM"
-    ITest_Suite.AddTest ITest_Manager.ClassName, "Test_vtkRecreateConfiguration_formatLikeExtension_XLS"
-    ITest_Suite.AddTest ITest_Manager.ClassName, "Test_vtkRecreateConfiguration_workbookOpen"
-    ITest_Suite.AddTest ITest_Manager.ClassName, "Test_vtkRecreateConfiguration_addInOpen_XLAM"
-    ITest_Suite.AddTest ITest_Manager.ClassName, "Test_vtkRecreateConfiguration_workbookAndVbProjectAlreadyOpen"
-    ITest_Suite.AddTest ITest_Manager.ClassName, "Test_vtkRecreateConfiguration_overwriteFile_normal"
-    ITest_Suite.AddTest ITest_Manager.ClassName, "Test_vtkRecreateConfiguration_overwriteFile_addIn"
+    ITest_Suite.AddTest ITest_Manager.ClassName, "Test_vtkRecreateConfiguration_referencesAreActivated"
 End Function
 
 Private Sub ITestCase_RunTest()
     Select Case mManager.methodName
-        Case "Test_vtkRecreateConfiguration_workbookIsCreatedInTheGoodPath_normalConf": Test_vtkRecreateConfiguration_workbookIsCreatedInTheGoodPath_normalConf
-        Case "Test_vtkRecreateConfiguration_workbookIsCreatedInTheGoodPath_emptyConf": Test_vtkRecreateConfiguration_workbookIsCreatedInTheGoodPath_emptyConf
-        Case "Test_vtkRecreateConfiguration_workbookIsCreatedInTheGoodPath_multitypeConf": Test_vtkRecreateConfiguration_workbookIsCreatedInTheGoodPath_multitypeConf
-        Case "Test_vtkRecreateConfiguration_modulesNotYetExported_normalConf": Test_vtkRecreateConfiguration_modulesNotYetExported_normalConf
-        Case "Test_vtkRecreateConfiguration_modulesNotYetExported_emptyConf": Test_vtkRecreateConfiguration_modulesNotYetExported_emptyConf
-        Case "Test_vtkRecreateConfiguration_pathDoesNotExistYet1": Test_vtkRecreateConfiguration_pathDoesNotExistYet1
-        Case "Test_vtkRecreateConfiguration_pathDoesNotExistYet2": Test_vtkRecreateConfiguration_pathDoesNotExistYet2
-        Case "Test_vtkRecreateConfiguration_allModulesArePresent_normalConf": Test_vtkRecreateConfiguration_allModulesArePresent_normalConf
-        Case "Test_vtkRecreateConfiguration_allModulesArePresent_multitypeConf": Test_vtkRecreateConfiguration_allModulesArePresent_multitypeConf
-        Case "Test_vtkRecreateConfiguration_nameOfTheVBProjectIsCorrect": Test_vtkRecreateConfiguration_nameOfTheVBProjectIsCorrect
-        Case "Test_vtkRecreateConfiguration_formatLikeExtension_XLSM": Test_vtkRecreateConfiguration_formatLikeExtension_XLSM
-        Case "Test_vtkRecreateConfiguration_formatLikeExtension_XLAM": Test_vtkRecreateConfiguration_formatLikeExtension_XLAM
-        Case "Test_vtkRecreateConfiguration_formatLikeExtension_XLS": Test_vtkRecreateConfiguration_formatLikeExtension_XLS
-        Case "Test_vtkRecreateConfiguration_workbookOpen": Test_vtkRecreateConfiguration_workbookOpen
-        Case "Test_vtkRecreateConfiguration_addInOpen_XLAM": Test_vtkRecreateConfiguration_addInOpen_XLAM
-        Case "Test_vtkRecreateConfiguration_workbookAndVbProjectAlreadyOpen": Test_vtkRecreateConfiguration_workbookAndVbProjectAlreadyOpen
-        Case "Test_vtkRecreateConfiguration_overwriteFile_normal": Test_vtkRecreateConfiguration_overwriteFile_normal
-        Case "Test_vtkRecreateConfiguration_overwriteFile_addIn": Test_vtkRecreateConfiguration_overwriteFile_addIn
+        Case "Test_vtkRecreateConfiguration_referencesAreActivated": Test_vtkRecreateConfiguration_referencesAreActivated
         Case Else: mAssert.Should False, "Invalid test name: " & mManager.methodName
     End Select
 End Sub

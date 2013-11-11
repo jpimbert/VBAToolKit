@@ -677,8 +677,8 @@ Public Function getReferencesForConfigurationNumber(numConfiguration As Integer)
     ' If this property is set directly in the configurationDOM property, it breaks, so we do it here
     Set tmpDom = configurationDOM
     tmpDom.setProperty "SelectionLanguage", "XPath"
-    
-    If numConfiguration >= 1 And numConfiguration <= refCount Then
+
+    If numConfiguration >= 1 And numConfiguration <= configurationCount Then
         ' The line below is incorrect because of XPath. Setting the selection language of the DOM to XPath makes
         ' the default index change from 0 to 1
         'confId = tmpDom.SelectSingleNode("/vtkConf/configuration[" & numConfiguration - 1 & "]/@cID").Text
