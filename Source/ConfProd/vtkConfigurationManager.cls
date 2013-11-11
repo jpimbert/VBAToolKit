@@ -144,13 +144,15 @@ Public Property Get configurationDOM() As MSXML2.DOMDocument
     Dim dom As New MSXML2.DOMDocument
     dom.async = False
     dom.validateOnParse = True
+
     If dom.Load(m_xmlSheetPath) <> True Then
         Set configurationDOM = Nothing
         Err.Raise VTK_SHEET_NOT_VALID
         Exit Property
     End If
-    Set configurationDOM = dom
 
+    Set configurationDOM = dom
+    
     On Error GoTo 0
     Exit Property
 
@@ -295,6 +297,7 @@ Public Function getConfigurationNumber(configuration As String) As Integer
     On Error GoTo getConfigurationNumber_Error
 
     For i = 1 To configurationCount
+        If configurationDOM Is Nothing Then Debug.Print "confDOm is nothing"
         If configurationDOM.SelectSingleNode("/vtkConf/configuration[" & i - 1 & "]/name[0]").Text = configuration Then
             getConfigurationNumber = i
             Exit Function
@@ -308,7 +311,7 @@ Public Function getConfigurationNumber(configuration As String) As Integer
 
 getConfigurationNumber_Error:
     Err.Source = "vtkConfigurationManager::getConfigurationNumber"
-    
+    Debug.Print Err.Number, Err.Description
     Select Case Err.Number
         Case VTK_SHEET_NOT_VALID
             ' do nothing but froward the error
@@ -654,67 +657,68 @@ refCount_Error:
 End Property
 
 
-''---------------------------------------------------------------------------------------
-'' Procedure : getReferencesForConfiguration
-'' Author    : Lucas Vitorino
-'' Purpose   : Get the collection of references for the n-th configuration.
-'' Return    : A collection of VBIDE.Reference objects.
-''---------------------------------------------------------------------------------------
-''
-'Public Function getReferencesForConfiguration(numConfiguration As Integer) As Collection
+'---------------------------------------------------------------------------------------
+' Procedure : getReferencesForConfiguration
+' Author    : Lucas Vitorino
+' Purpose   : Get the collection of references for the n-th configuration.
+' Return    : A collection of VBIDE.Reference objects.
+'---------------------------------------------------------------------------------------
 '
-'    On Error GoTo getReferencesForConfiguration_Error
-'
-'    Dim retCol As New Collection
-'    Dim tmpNode As MSXML2.IXMLDOMNode
-'    Dim tmpRef As VBIDE.Reference
-'    Dim confId As Integer
-'
-'    If numConfiguration >= 1 And numConfiguration <= refCount Then
-'        confId = configurationDOM.SelectSingleNode("vtkConf/configuration[" & numConfiguration - 1 & "]/@cID").Text
-'
-'        For Each tmpNode In configurationDOM.SelectNodes("vtkConf/reference[@confIDs[contains(.,""" & confId & """)]]")
-'            tmpRef.name = tmpNode.SelectSingleNode("/name[0]").Text
-'
-'            ' The DTD ensures both the fields will not be filled
-'            If configurationDOM.SelectNodes("/guid").Length > 0 Then
-'                'tmpRef.GUID = configurationDOM.SelectSingleNode("/vtkConf/reference[" & i - 1 & "]/guid[0]").Text
-'                tmpRef.GUID = configurationDOM.SelectSingleNode("/guid[0]").Text
-'            End If
-'
-'            If configurationDOM.SelectNodes("/path").Length > 0 Then
-'                'tmpRref.fullPath = configurationDOM.SelectSingleNode("/vtkConf/reference[" & i - 1 & "]/path[0]").Text
-'                tmpRref.fullPath = configurationDOM.SelectSingleNode("/path[0]").Text
-'            End If
-'
-'            col.Add Item:=tmpRef, Key:=tmpRef.name
-'
-'            ' Reinitialize the reference object
-'            tmpRef.name = ""
-'            tmpRef.GUID = ""
-'            tmpRref.fullPath = ""
-'
-'        Next
-'
-'    End If
-'
-'    On Error GoTo 0
-'    Set getReferencesForConfiguration = retCol
-'    Exit Function
-'
-'getReferencesForConfiguration_Error:
-'    Err.Source = "vtkConfigurationManager::getReferencesForConfiguration"
-'
-'    Select Case Err.Number
-'        Case VTK_SHEET_NOT_VALID
-'            ' do nothing but froward the error
-'        Case Else
-'            Err.Number = VTK_UNEXPECTED_ERROR
-'    End Select
-'
-'    Err.Raise Err.Number, Err.Source, Err.Description
-'
-'    Exit Function
-'
-'End Function
+Public Function getReferencesForConfiguration(numConfiguration As Integer) As Collection
+
+    On Error GoTo getReferencesForConfiguration_Error
+
+    Dim tmpDom As New MSXML2.DOMDocument
+    Dim retCol As New Collection
+    Dim tmpNode As MSXML2.IXMLDOMNode
+    Dim tmpRef As New vtkReference
+    Dim confId As String
+
+    ' If this property is set directly in the configurationDOM property, it breaks, so we do it here
+    Set tmpDom = configurationDOM
+    tmpDom.setProperty "SelectionLanguage", "XPath"
+
+    If numConfiguration >= 1 And numConfiguration <= refCount Then
+        confId = tmpDom.SelectSingleNode("vtkConf/configuration[" & numConfiguration - 1 & "]/@cID").Text
+
+        For Each tmpNode In tmpDom.SelectNodes("vtkConf/reference[@confIDs[contains(.,""" & confId & """)]]")
+            ' The first child is the name (DTD)
+            tmpRef.name = tmpNode.FirstChild.Text
+
+            ' The DTD ensures both the fields will not be filled
+            If tmpNode.ChildNodes.Item(1).BaseName Like "guid" Then
+                tmpRef.guid = tmpNode.ChildNodes.Item(1).Text
+            ElseIf tmpNode.ChildNodes.Item(1).BaseName Like "path" Then
+                tmpRef.path = tmpNode.ChildNodes.Item(1).Text
+            End If
+            
+            retCol.Add Item:=tmpRef, Key:=tmpRef.name
+
+            ' Reinitialize the reference object
+            Set tmpRef = Nothing
+            Set tmpRef = New vtkReference
+
+        Next
+
+    End If
+
+    On Error GoTo 0
+    Set getReferencesForConfiguration = retCol
+    Exit Function
+
+getReferencesForConfiguration_Error:
+    Err.Source = "vtkConfigurationManager::getReferencesForConfiguration"
+
+    Select Case Err.Number
+        Case VTK_SHEET_NOT_VALID
+            ' do nothing but froward the error
+        Case Else
+            Err.Number = VTK_UNEXPECTED_ERROR
+    End Select
+
+    Err.Raise Err.Number, Err.Source, Err.Description
+
+    Exit Function
+
+End Function
 
