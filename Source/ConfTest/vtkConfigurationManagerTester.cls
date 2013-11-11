@@ -336,7 +336,7 @@ Public Sub TestRefListForNormalConf()
     On Error GoTo TestRefListForNormalConf_Error
 
     Dim retCol As New Collection
-    Set retCol = existingConfManager.getReferencesForConfiguration(existingConfManager.getConfigurationNumber(existingProjectName & "_DEV"))
+    Set retCol = existingConfManager.getReferencesForConfigurationNumber(existingConfManager.getConfigurationNumber(existingProjectName & "_DEV"))
 
     mAssert.Equals retCol.Item(1).name, "Reference1"
     mAssert.Equals retCol.Item(1).guid, "GuidReference1"

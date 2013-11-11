@@ -147,5 +147,5 @@ End Property
 '---------------------------------------------------------------------------------------
 '
 Property Get references() As Collection
-    Set references = m_parent.getReferencesForConfiguration(Number)
+    Set references = m_parent.getReferencesForConfiguration(name)
 End Property

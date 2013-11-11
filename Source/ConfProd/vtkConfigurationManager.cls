@@ -661,12 +661,12 @@ End Property
 ' Procedure : getReferencesForConfiguration
 ' Author    : Lucas Vitorino
 ' Purpose   : Get the collection of references for the n-th configuration.
-' Return    : A collection of VBIDE.Reference objects.
+' Return    : A collection of vtkReference objects.
 '---------------------------------------------------------------------------------------
 '
-Public Function getReferencesForConfiguration(numConfiguration As Integer) As Collection
+Public Function getReferencesForConfigurationNumber(numConfiguration As Integer) As Collection
 
-    On Error GoTo getReferencesForConfiguration_Error
+    On Error GoTo getReferencesForConfigurationNumber_Error
 
     Dim tmpDom As New MSXML2.DOMDocument
     Dim retCol As New Collection
@@ -707,11 +707,11 @@ Public Function getReferencesForConfiguration(numConfiguration As Integer) As Co
     End If
 
     On Error GoTo 0
-    Set getReferencesForConfiguration = retCol
+    Set getReferencesForConfigurationNumber = retCol
     Exit Function
 
-getReferencesForConfiguration_Error:
-    Err.Source = "vtkConfigurationManager::getReferencesForConfiguration"
+getReferencesForConfigurationNumber_Error:
+    Err.Source = "vtkConfigurationManager::getReferencesForConfigurationNumber"
 
     Select Case Err.Number
         Case VTK_SHEET_NOT_VALID
@@ -726,3 +726,20 @@ getReferencesForConfiguration_Error:
 
 End Function
 
+
+'---------------------------------------------------------------------------------------
+' Procedure : getReferencesForConfiguration
+' Author    : Lucas Vitorino
+' Purpose   : Get the collection of references for the configuration of the given name.
+' Return    : - A collection of vtkReference objects if the configuration exists
+'             - Nothing if it does not
+'---------------------------------------------------------------------------------------
+'
+Public Function getReferencesForConfiguration(confName As String) As Collection
+    If getConfigurationNumber(confName) <> 0 Then
+        Set getReferencesForConfiguration = getReferencesForConfigurationNumber(getConfigurationNumber(confName))
+    Else
+        Set getReferencesForConfiguration = Nothing
+    End If
+    
+End Function
