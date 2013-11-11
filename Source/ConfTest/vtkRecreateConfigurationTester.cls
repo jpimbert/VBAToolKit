@@ -623,28 +623,28 @@ End Sub
 
 
 
-'Public Sub Test_vtkRecreateConfiguration_formatLikeExtension_XLA()
-'' test the xla format
-'' test failing, don 't know why
-'
-'    On Error GoTo Test_vtkRecreateConfiguration_formatLikeExtension_XLA_Error
-'
-'    Set testedConf = xlaConf
-'
-'    getModulesAndRecreateWb testProject, testedConf
-'
-'    mAssert.Equals recreatedWb.FileFormat, _
-'                   xlAddIn, _
-'                   "File format is wrong."
-'
-'    On Error GoTo 0
-'    Exit Sub
-'
-'Test_vtkRecreateConfiguration_formatLikeExtension_XLA_Error:
-'    Err.Source = "Test_vtkRecreateConfiguration_formatLikeExtension_XLA of module vtkRecreateConfigurationTester"
-'    mAssert.Should False, "Unexpected error " & Err.Number & " (" & Err.Description & ") in " & Err.Source
-'    Exit Sub
-'End Sub
+Public Sub Test_vtkRecreateConfiguration_formatLikeExtension_XLA()
+' test the xla format
+' test failing, don 't know why
+
+    On Error GoTo Test_vtkRecreateConfiguration_formatLikeExtension_XLA_Error
+
+    Set testedConf = xlaConf
+
+    getModulesAndRecreateWb testProject, testedConf
+
+    mAssert.Equals recreatedWb.FileFormat, _
+                   xlAddIn, _
+                   "File format is wrong."
+
+    On Error GoTo 0
+    Exit Sub
+
+Test_vtkRecreateConfiguration_formatLikeExtension_XLA_Error:
+    Err.Source = "Test_vtkRecreateConfiguration_formatLikeExtension_XLA of module vtkRecreateConfigurationTester"
+    mAssert.Should False, "Unexpected error " & Err.Number & " (" & Err.Description & ") in " & Err.Source
+    Exit Sub
+End Sub
 
 
 
@@ -811,6 +811,7 @@ Private Function ITest_Suite() As TestSuite
     ITest_Suite.AddTest ITest_Manager.ClassName, "Test_vtkRecreateConfiguration_formatLikeExtension_XLS"
     ITest_Suite.AddTest ITest_Manager.ClassName, "Test_vtkRecreateConfiguration_workbookOpen"
     ITest_Suite.AddTest ITest_Manager.ClassName, "Test_vtkRecreateConfiguration_addInOpen_XLAM"
+    ITest_Suite.AddTest ITest_Manager.ClassName, "Test_vtkRecreateConfiguration_workbookAndVbProjectAlreadyOpen"
     ITest_Suite.AddTest ITest_Manager.ClassName, "Test_vtkRecreateConfiguration_overwriteFile_normal"
     ITest_Suite.AddTest ITest_Manager.ClassName, "Test_vtkRecreateConfiguration_overwriteFile_addIn"
 End Function
@@ -832,6 +833,7 @@ Private Sub ITestCase_RunTest()
         Case "Test_vtkRecreateConfiguration_formatLikeExtension_XLS": Test_vtkRecreateConfiguration_formatLikeExtension_XLS
         Case "Test_vtkRecreateConfiguration_workbookOpen": Test_vtkRecreateConfiguration_workbookOpen
         Case "Test_vtkRecreateConfiguration_addInOpen_XLAM": Test_vtkRecreateConfiguration_addInOpen_XLAM
+        Case "Test_vtkRecreateConfiguration_workbookAndVbProjectAlreadyOpen": Test_vtkRecreateConfiguration_workbookAndVbProjectAlreadyOpen
         Case "Test_vtkRecreateConfiguration_overwriteFile_normal": Test_vtkRecreateConfiguration_overwriteFile_normal
         Case "Test_vtkRecreateConfiguration_overwriteFile_addIn": Test_vtkRecreateConfiguration_overwriteFile_addIn
         Case Else: mAssert.Should False, "Invalid test name: " & mManager.methodName

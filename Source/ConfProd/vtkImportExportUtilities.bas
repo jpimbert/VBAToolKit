@@ -409,7 +409,7 @@ Public Sub vtkRecreateConfiguration(projectName As String, configurationName As 
     vtkImportModulesInAnotherProject projectForModules:=Wb.VBProject, projectName:=projectName, confName:=configurationName
     
     ' Recreate references in the new Excel File
-    VtkActivateReferences Wb:=Wb, toSelf:=conf.isDEV
+    VtkActivateReferences Wb:=wb, toSelf:=conf.isDEV
     
     ' VB will not let the workbook be saved under the name of an already opened workbook, which
     ' is annoying when recreating an add-in (always opened). The following code works around this.
@@ -423,6 +423,9 @@ Public Sub vtkRecreateConfiguration(projectName As String, configurationName As 
     ' Create the the folder containing the workbook if a 1-level or less deep folder structure
     ' is specified in the configuration path.
     vtkCreateFolderPath tmpPath
+    
+    ' Without this line, an xla file is not created with the right format
+    If vtkDefaultFileFormat(wbPath) = xlAddIn Then Wb.IsAddin = True
     
     ' Save the new workbook with the correct extension
     Wb.SaveAs fileName:=tmpPath, FileFormat:=vtkDefaultFileFormat(wbPath)
