@@ -620,3 +620,35 @@ getModulePathWithNumber_Error:
 
 
 End Function
+
+
+'---------------------------------------------------------------------------------------
+' Procedure : refCount
+' Author    : Lucas Vitorino
+' Purpose   : Get the number of references used by all the configurations of a project.
+'---------------------------------------------------------------------------------------
+'
+Public Property Get refCount()
+
+    On Error GoTo refCount_Error
+
+    refCount = configurationDOM.SelectNodes("/vtkConf/reference").Length
+
+    On Error GoTo 0
+    Exit Property
+
+refCount_Error:
+    Err.Source = "vtkConfigurationManager::refCount"
+    
+    Select Case Err.Number
+        Case VTK_SHEET_NOT_VALID
+            ' do nothing but froward the error
+        Case Else
+            Err.Number = VTK_UNEXPECTED_ERROR
+    End Select
+        
+    Err.Raise Err.Number, Err.Source, Err.Description
+    
+    Exit Property
+
+End Property

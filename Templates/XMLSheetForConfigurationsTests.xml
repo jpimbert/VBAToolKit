@@ -49,4 +49,19 @@
 		<modulePath confId="c02">Path2Module5</modulePath>
 	</module>
 
+	<reference confIDs="c01">
+		<name>Reference1</name>
+		<guid>GuidReference1</guid>
+	</reference>
+
+	<reference confIDs="c01 c02">
+		<name>Reference2</name>
+		<guid>GuidReference2</guid>
+	</reference>
+
+	<reference confIDs="c01">
+		<name>Reference3</name>
+		<path>PathReference3</path>
+	</reference>
+
 </vtkConf>

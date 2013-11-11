@@ -312,9 +312,22 @@ TestpathToSheetIsNotValid_Error:
 End Sub
 
 
+Public Sub TestRefCountForNormalConf()
+' get the correct number of references for a configuration with 3 references
 
+    On Error GoTo TestRefCountForNormalConf_Error
 
+    mAssert.Equals existingConfManager.refCount, 3, "There are 3 references in the configuration description"
 
+    On Error GoTo 0
+    Exit Sub
+
+TestRefCountForNormalConf_Error:
+    Err.Source = "vtkConfigurationManagerTester::TestRefCountForNormalConf"
+    mAssert.Should False, "Unexpected Error " & Err.Number & " (" & Err.Description & ") in " & Err.Source
+    Exit Sub
+
+End Sub
 
 
 
