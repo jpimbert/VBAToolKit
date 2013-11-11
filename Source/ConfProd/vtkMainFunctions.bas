@@ -69,12 +69,12 @@ Public Function vtkCreateProject(path As String, name As String, Optional displa
     If internalError <> VTK_OK Then GoTo vtkCreateProject_ErrorTreeFolder
     
     ' Create the XML vtkConfigurations sheet in the standard folder, the dtd is supposed to be in the same folder
-    createInitializedXMLSheetForProject sheetpath:=fso.BuildPath(rootPath, project.XMLConfigurationStandardRelativePath), _
+    createInitializedXMLSheetForProject sheetPath:=fso.BuildPath(rootPath, project.XMLConfigurationStandardRelativePath), _
                                         projectName:=project.projectName, _
                                         dtdPath:="vtkConfigurationsDTD.dtd"
                                         
     ' Create the DTD sheet for the XML vtkConfigurations sheet in the same folder
-    createDTDForVtkConfigurations sheetpath:=fso.BuildPath(rootPath, fso.BuildPath(fso.GetParentFolderName(project.XMLConfigurationStandardRelativePath), "vtkConfigurationsDTD.dtd"))
+    createDTDForVtkConfigurations sheetPath:=fso.BuildPath(rootPath, fso.BuildPath(fso.GetParentFolderName(project.XMLConfigurationStandardRelativePath), "vtkConfigurationsDTD.dtd"))
     
     ' Insert the BeforeSave handler in the newly created project
     ' /!\ For that we need to manage the "ThisWorkbook" object, we will do it later
@@ -110,3 +110,151 @@ vtkCreateProject_ErrorGit:
     If displayError Then MsgBox "Error " & Err.Number & " (" & Err.Description & ") in procedure vtkCreateProject of Module MainFunctions"
 
 End Function
+
+
+'---------------------------------------------------------------------------------------
+' Procedure : vtkRecreateConfiguration
+' Author    : JPI-Conseil
+' Purpose   : Recreate a complete configuration based on
+'             - the vtkConfiguration sheet of the project
+'             - the exported modules located in the Source folder
+'
+' Params    : - projectName
+'             - configurationName
+'
+' Raises    : - VTK_UNEXPECTED_ERROR
+'             - VTK_WORKBOOK_ALREADY_OPEN
+'             - VTK_NO_SOURCE_FILES
+'             - VTK_WRONG_FILE_PATH
+'
+' WARNING : We use vtkImportOneModule because the document module importation is
+'           not efficient with VBComponents.Import (creation of a double class module
+'           instead of import the Document code)
+'
+'---------------------------------------------------------------------------------------
+'
+Public Sub vtkRecreateConfiguration(projectName As String, configurationName As String)
+    Dim cm As vtkConfigurationManager
+    Dim rootPath As String
+    Dim wbPath As String
+    Dim Wb As Workbook
+    Dim tmpWb As Workbook
+    Dim fso As New FileSystemObject
+
+    On Error GoTo vtkRecreateConfiguration_Error
+    
+    ' Get the project and the rootPath of the project
+    Set cm = vtkConfigurationManagerForProject(projectName)
+    rootPath = cm.rootPath
+    
+    ' Get the configuration number in the project and the path of the file
+    wbPath = cm.getConfigurationPath(configuration:=configurationName)
+    
+    ' Make sure the workbook we want to create is not open
+    ' NB : open add-ins don't count and are managed further down
+    For Each tmpWb In Workbooks
+        If tmpWb.name Like fso.GetFileName(wbPath) Then Err.Raise VTK_WORKBOOK_ALREADY_OPEN
+    Next
+    
+    'Make sure the source files exist
+    Dim mo As vtkModule
+    Dim conf As vtkConfiguration
+    Set conf = cm.configurations(configurationName)
+    For Each mo In conf.modules
+        If fso.FileExists(rootPath & "\" & mo.getPathForConfiguration(configurationName)) = False Then
+            Err.Raise VTK_NO_SOURCE_FILES
+        End If
+    Next
+    
+    ' Create a new Excel file
+    Set Wb = vtkCreateExcelWorkbook()
+    
+    ' Set the projectName
+    Wb.VBProject.name = configurationName
+    
+    ' Import all modules for this configuration from the source directory
+    vtkImportModulesInAnotherProject projectForModules:=Wb.VBProject, projectName:=projectName, confName:=configurationName
+    
+    ' Recreate references in the new Excel File
+    On Error GoTo vtkRecreateConfiguration_referenceError
+    Dim tmpRef As vtkReference
+    For Each tmpRef In conf.references
+        If tmpRef.guid <> "" Then
+            Wb.VBProject.references.AddFromGuid tmpRef.guid, 0, 0
+        ElseIf tmpRef.path <> "" Then
+            Wb.VBProject.references.AddFromFile tmpRef.path
+        End If
+    Next
+    If conf.isDEV Then Wb.VBProject.references.AddFromFile ThisWorkbook.FullName
+
+    On Error GoTo vtkRecreateConfiguration_Error
+    
+    ' Set the title
+    Wb.BuiltinDocumentProperties("Title").Value = conf.title
+    
+    ' VB will not let the workbook be saved under the name of an already opened workbook, which
+    ' is annoying when recreating an add-in (always opened). The following code works around this.
+    Dim tmpPath As String
+    ' Add a random string to the file name of the workbook that will be saved
+    tmpPath = fso.BuildPath(rootPath & "\" & fso.GetParentFolderName(wbPath), _
+              vtkStripFilePathOrNameOfExtension(fso.GetFileName(wbPath)) & _
+              CStr(Round((99999 - 10000 + 1) * Rnd(), 0)) + 10000 & _
+              "." & fso.GetExtensionName(wbPath))
+    
+    ' Create the the folder containing the workbook if a 1-level or less deep folder structure
+    ' is specified in the configuration path.
+    vtkCreateFolderPath tmpPath
+    
+    ' Without this line, an xla file is not created with the right format
+    If vtkDefaultFileFormat(wbPath) = xlAddIn Then Wb.IsAddin = True
+    
+    ' Save the new workbook with the correct extension
+    Wb.SaveAs fileName:=tmpPath, FileFormat:=vtkDefaultFileFormat(wbPath)
+    Wb.Close saveChanges:=False
+    
+    ' Delete the old workbook if it exists
+    Dim fullWbpath As String
+    fullWbpath = rootPath & "\" & wbPath
+    If fso.FileExists(fullWbpath) Then fso.DeleteFile (fullWbpath)
+    
+    ' Rename the new workbook without the random string
+    fso.GetFile(tmpPath).name = fso.GetFileName(rootPath & "\" & wbPath)
+    
+    On Error GoTo 0
+    Exit Sub
+
+vtkRecreateConfiguration_referenceError:
+    Err.Number = VTK_REFERENCE_ERROR
+    GoTo vtkRecreateConfiguration_Error
+
+vtkRecreateConfiguration_Error:
+
+    If Not Wb Is Nothing Then Wb.Close saveChanges:=False
+
+    Err.Source = "vtkRecreateConfiguration of module vtkImportExportUtilities"
+    
+    Select Case Err.Number
+        Case VTK_REFERENCE_ERROR
+            Err.Number = VTK_REFERENCE_ERROR
+            Err.Description = "There was a problem activating reference " & tmpRef.name & ""
+        Case VTK_WORKBOOK_ALREADY_OPEN
+            Err.Number = VTK_WORKBOOK_ALREADY_OPEN
+            Err.Description = "The configuration you're trying to create (" & configurationName & ") corresponds to an open workbook. " & _
+                              "Please close it before recreating the configuration."
+        Case VTK_NO_SOURCE_FILES
+            Err.Number = VTK_NO_SOURCE_FILES
+            Err.Description = "The configuration you're trying to create (" & configurationName & ") is missing one or several source files." & _
+                              "Please export the modules in their relevant path before recreating the configuration."
+        Case VTK_WRONG_FILE_PATH
+            Err.Number = VTK_WRONG_FILE_PATH
+            Err.Description = "The configuration you're trying to create (" & configurationName & ") has a invalid path." & _
+                              "Please check if the folder structure it needs is not more than one-level deep."
+        Case Else
+            Err.Number = VTK_UNEXPECTED_ERROR
+    End Select
+
+    Err.Raise Err.Number, Err.Source, Err.Description
+    
+    Exit Sub
+    
+End Sub
