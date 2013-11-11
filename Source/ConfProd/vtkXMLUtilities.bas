@@ -50,8 +50,30 @@ Public Sub vtkExportConfigurationsAsXML(projectName As String, filePath As Strin
     Set xmlFile = fso.CreateTextFile(fileName:=filePath, Overwrite:=True)
 
     ' Create the XML preamble
-    xmlFile.WriteLine Text:="<?xml version=""1.0"" encoding=""ISO-8859-1"" standalone=""no""?>"
-    xmlFile.WriteLine Text:="<!DOCTYPE vtkConf SYSTEM ""vtkConfigurationsDTD.dtd"">"
+    xmlFile.WriteLine Text:="<?xml version=""1.0"" encoding=""ISO-8859-1"" standalone=""yes""?>"
+'    xmlFile.WriteLine Text:="<?xml version=""1.0"" encoding=""ISO-8859-1"" standalone=""no""?>"
+'    xmlFile.WriteLine Text:="<!DOCTYPE vtkConf SYSTEM ""vtkConfigurationsDTD.dtd"">"
+    xmlFile.WriteLine Text:="<!DOCTYPE vtkConf SYSTEM ["
+    xmlFile.WriteLine Text:="<!ELEMENT vtkConf (info,configuration*, module*, reference*)>"
+    xmlFile.WriteLine Text:="        <!ELEMENT info (vtkConfigurationsVersion,projectName)>"
+    xmlFile.WriteLine Text:="                <!ELEMENT vtkConfigurationsVersion (#PCDATA)>"
+    xmlFile.WriteLine Text:="                <!ELEMENT projectName (#PCDATA)>"
+    xmlFile.WriteLine Text:="        <!ELEMENT configuration (name,path,templatePath?,title?,comment?)>"
+    xmlFile.WriteLine Text:="         <!ATTLIST configuration cID ID #REQUIRED>"
+    xmlFile.WriteLine Text:="                <!ELEMENT name (#PCDATA)>"
+    xmlFile.WriteLine Text:="                <!ELEMENT path (#PCDATA)>"
+    xmlFile.WriteLine Text:="                <!ELEMENT templatePath (#PCDATA)>"
+    xmlFile.WriteLine Text:="                <!ELEMENT title        (#PCDATA)>"
+    xmlFile.WriteLine Text:="                <!ELEMENT comment (#PCDATA)>"
+    xmlFile.WriteLine Text:="        <!ELEMENT module (name, modulePath*)>"
+    xmlFile.WriteLine Text:="         <!ATTLIST module mID ID #REQUIRED>"
+    xmlFile.WriteLine Text:="                <!ELEMENT modulePath (#PCDATA)>"
+    xmlFile.WriteLine Text:="                <!ATTLIST modulePath confId IDREF #REQUIRED>"
+    xmlFile.WriteLine Text:="        <!ELEMENT reference (name, (guid|path))>"
+    xmlFile.WriteLine Text:="         <!ATTLIST reference confIDs IDREFS #REQUIRED>"
+    xmlFile.WriteLine Text:="                <!ELEMENT guid (#PCDATA)>"
+    xmlFile.WriteLine Text:="]>"
+    
     xmlFile.WriteLine Text:="<vtkConf>"
     xmlFile.WriteBlankLines Lines:=1
     xmlFile.WriteLine Text:="    <info>"
