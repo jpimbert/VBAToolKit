@@ -269,6 +269,7 @@ Public Sub vtkExportOneModule(project As VBProject, moduleName As String, filePa
     Exit Sub
 
 vtkExportOneModule_Error:
+    Debug.Print Err.Number, Err.Description
     If Err.Number = 9 Then
         Err.Raise Number:=VTK_UNKNOWN_MODULE, Source:="ExportOneModule", Description:="Module to export doesn't exist : " & moduleName
        Else
@@ -345,151 +346,7 @@ vtkImportModulesInAnotherProject_Error:
     Err.Raise VTK_UNEXPECTED_ERROR, "vtkImportModulesInAnotherProject_Error", "Unexpected error when importing modules into " & projectForModules.name & " : " & Err.Description
 End Sub
 
-'---------------------------------------------------------------------------------------
-' Procedure : vtkRecreateConfiguration
-' Author    : JPI-Conseil
-' Purpose   : Recreate a complete configuration based on
-'             - the vtkConfiguration sheet of the project
-'             - the exported modules located in the Source folder
-'
-' Params    : - projectName
-'             - configurationName
-'
-' Raises    : - VTK_UNEXPECTED_ERROR
-'             - VTK_WORKBOOK_ALREADY_OPEN
-'             - VTK_NO_SOURCE_FILES
-'             - VTK_WRONG_FILE_PATH
-'
-' WARNING : We use vtkImportOneModule because the document module importation is
-'           not efficient with VBComponents.Import (creation of a double class module
-'           instead of import the Document code)
-'
-'---------------------------------------------------------------------------------------
-'
-Public Sub vtkRecreateConfiguration(projectName As String, configurationName As String)
-    Dim cm As vtkConfigurationManager
-    Dim rootPath As String
-    Dim wbpath As String
-    Dim wb As Workbook
-    Dim tmpWb As Workbook
-    Dim fso As New FileSystemObject
 
-    On Error GoTo vtkRecreateConfiguration_Error
-    
-    ' Get the project and the rootPath of the project
-    Set cm = vtkConfigurationManagerForProject(projectName)
-    rootPath = cm.rootPath
-    
-    ' Get the configuration number in the project and the path of the file
-    wbpath = cm.getConfigurationPath(configuration:=configurationName)
-    
-    ' Make sure the workbook we want to create is not open
-    ' NB : open add-ins don't count and are managed further down
-    For Each tmpWb In Workbooks
-        If tmpWb.name Like fso.GetFileName(wbpath) Then Err.Raise VTK_WORKBOOK_ALREADY_OPEN
-    Next
-    
-    'Make sure the source files exist
-    Dim mo As vtkModule
-    Dim conf As vtkConfiguration
-    Set conf = cm.configurations(configurationName)
-    For Each mo In conf.modules
-        If fso.FileExists(rootPath & "\" & mo.getPathForConfiguration(configurationName)) = False Then
-            Err.Raise VTK_NO_SOURCE_FILES
-        End If
-    Next
-    
-    ' Create a new Excel file
-    Set wb = vtkCreateExcelWorkbook()
-    
-    ' Set the projectName
-    wb.VBProject.name = configurationName
-    
-    ' Import all modules for this configuration from the source directory
-    vtkImportModulesInAnotherProject projectForModules:=wb.VBProject, projectName:=projectName, confName:=configurationName
-    
-    ' Recreate references in the new Excel File
-        
-    On Error GoTo vtkRecreateConfiguration_referenceError
-    
-    Dim tmpRef As vtkReference
-    For Each tmpRef In conf.references
-        If tmpRef.guid <> "" Then
-            wb.VBProject.references.AddFromGuid tmpRef.guid, 0, 0
-        ElseIf tmpRef.path <> "" Then
-            wb.VBProject.references.AddFromFile tmpRef.path
-        End If
-    Next
-    If conf.isDEV Then wb.VBProject.references.AddFromFile tmpRef.path
-
-    On Error GoTo vtkRecreateConfiguration_Error
-    
-    ' VB will not let the workbook be saved under the name of an already opened workbook, which
-    ' is annoying when recreating an add-in (always opened). The following code works around this.
-    Dim tmpPath As String
-    ' Add a random string to the file name of the workbook that will be saved
-    tmpPath = fso.BuildPath(rootPath & "\" & fso.GetParentFolderName(wbpath), _
-              vtkStripFilePathOrNameOfExtension(fso.GetFileName(wbpath)) & _
-              CStr(Round((99999 - 10000 + 1) * Rnd(), 0)) + 10000 & _
-              "." & fso.GetExtensionName(wbpath))
-    
-    ' Create the the folder containing the workbook if a 1-level or less deep folder structure
-    ' is specified in the configuration path.
-    vtkCreateFolderPath tmpPath
-    
-    ' Without this line, an xla file is not created with the right format
-    If vtkDefaultFileFormat(wbpath) = xlAddIn Then wb.IsAddin = True
-    
-    ' Save the new workbook with the correct extension
-    wb.SaveAs fileName:=tmpPath, FileFormat:=vtkDefaultFileFormat(wbpath)
-    wb.Close saveChanges:=False
-    
-    ' Delete the old workbook if it exists
-    Dim fullWbpath As String
-    fullWbpath = rootPath & "\" & wbpath
-    If fso.FileExists(fullWbpath) Then fso.DeleteFile (fullWbpath)
-    
-    ' Rename the new workbook without the random string
-    fso.GetFile(tmpPath).name = fso.GetFileName(rootPath & "\" & wbpath)
-    
-    On Error GoTo 0
-    Exit Sub
-
-vtkRecreateConfiguration_referenceError:
-    Err.Number = VTK_REFERENCE_ERROR
-    GoTo vtkRecreateConfiguration_Error
-
-vtkRecreateConfiguration_Error:
-
-    If Not wb Is Nothing Then wb.Close saveChanges:=False
-
-    Err.Source = "vtkRecreateConfiguration of module vtkImportExportUtilities"
-    
-    Select Case Err.Number
-        Case VTK_REFERENCE_ERROR
-            Err.Number = VTK_REFERENCE_ERROR
-            Err.Description = "There was a problem activating reference " & tmpRef.name & ""
-        Case VTK_WORKBOOK_ALREADY_OPEN
-            Err.Number = VTK_WORKBOOK_ALREADY_OPEN
-            Err.Description = "The configuration you're trying to create (" & configurationName & ") corresponds to an open workbook. " & _
-                              "Please close it before recreating the configuration."
-        Case VTK_NO_SOURCE_FILES
-            Err.Number = VTK_NO_SOURCE_FILES
-            Err.Description = "The configuration you're trying to create (" & configurationName & ") is missing one or several source files." & _
-                              "Please export the modules in their relevant path before recreating the configuration."
-        Case VTK_WRONG_FILE_PATH
-            Err.Number = VTK_WRONG_FILE_PATH
-            Err.Description = "The configuration you're trying to create (" & configurationName & ") has a invalid path." & _
-                              "Please check if the folder structure it needs is not more than one-level deep."
-        Case Else
-            Err.Number = VTK_UNEXPECTED_ERROR
-    End Select
-
-    Err.Raise Err.Number, Err.Source, Err.Description
-    
-    Exit Sub
-    
-End Sub
 
 '---------------------------------------------------------------------------------------
 ' Procedure : vtkExportConfiguration
@@ -517,19 +374,19 @@ Public Function vtkExportConfiguration(projectWithModules As VBProject, projectN
     Set cm = vtkConfigurationManagerForProject(projectName)
     For Each mo In cm.configurations(confName).modules
         
-        Dim modulepath As String
-        modulepath = cm.rootPath & "\" & mo.path
+        Dim modulePath As String
+        modulePath = cm.rootPath & "\" & mo.path
                    
         ' The conditon to export could be simplified in
         '   If Not (onlyModified And fso.FileExists(modulePath) And mo.VBAModule) Then <export>
         ' but it doesn't seem to work, so we stick to this code.
-        If onlyModified And fso.FileExists(modulepath) Then
+        If onlyModified And fso.FileExists(modulePath) Then
             If mo.VBAModule.Saved = False Then
-                vtkExportOneModule projectWithModules, mo.name, modulepath
+                vtkExportOneModule projectWithModules, mo.name, modulePath
                 exportedModulesCount = exportedModulesCount + 1
             End If
         Else
-            vtkExportOneModule projectWithModules, mo.name, modulepath
+            vtkExportOneModule projectWithModules, mo.name, modulePath
             exportedModulesCount = exportedModulesCount + 1
         End If
         
