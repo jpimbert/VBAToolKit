@@ -23,36 +23,6 @@ Attribute VB_Name = "vtkProjectCreationUtilities"
 Option Explicit
 
 '---------------------------------------------------------------------------------------
-' Procedure : vtkInitializeVbaUnitNamesAndPathes
-' Author    : Abdelfattah Lahbib
-' Date      : 09/05/2013
-' Purpose   : - Initialize DEV project ConfSheet with vbaunit module names and pathes
-'             - Return True if module names and paths are initialized without error
-'---------------------------------------------------------------------------------------
-'
-Public Function vtkInitializeVbaUnitNamesAndPathes(project As String) As Boolean
-    Dim i As Integer, cm As vtkConfigurationManager, ret As Boolean, nm As Integer, nc As Integer, ext As String
-    Dim moduleName As String, module As VBComponent
-    
-    Set cm = vtkConfigurationManagerForProject(project)
-    nc = cm.getConfigurationNumber(vtkProjectForName(project).projectDEVName)
-    ret = (nc > 0)
-    
-    For i = 1 To vtkVBAUnitModulesList.Count
-        moduleName = vtkVBAUnitModulesList.Item(i)
-        Set module = ThisWorkbook.VBProject.VBComponents(moduleName)
-        
-        nm = cm.addModule(moduleName)
-        ret = ret And (nm > 0)
-        
-        cm.setModulePathWithNumber path:=vtkStandardPathForModule(module), numModule:=nm, numConfiguration:=nc
-        
-    Next i
-    
-    vtkInitializeVbaUnitNamesAndPathes = ret
-End Function
-
-'---------------------------------------------------------------------------------------
 ' Procedure : VtkAvtivateReferences
 ' Author    : Abdelfattah Lahbib
 ' Date      : 26/04/2013
