@@ -341,11 +341,11 @@ Public Sub TestRefListForNormalConf()
     mAssert.Equals retCol.Item(1).name, "Reference1"
     mAssert.Equals retCol.Item(1).guid, "GuidReference1"
     mAssert.Equals retCol.Item(1).path, ""
-    
+
     mAssert.Equals retCol.Item(2).name, "Reference2"
     mAssert.Equals retCol.Item(2).guid, "GuidReference2"
     mAssert.Equals retCol.Item(2).path, ""
-    
+
     mAssert.Equals retCol.Item(3).name, "Reference3"
     mAssert.Equals retCol.Item(3).guid, ""
     mAssert.Equals retCol.Item(3).path, "PathReference3"
@@ -393,6 +393,25 @@ TestTitleNormalConf_Error:
     Exit Sub
 
 End Sub
+
+
+Public Sub TestTemplatePathNormalConf()
+' test if the template path of the configuration is retrieved correctly
+
+    On Error GoTo TestTemplatePathNormalConf_Error
+
+    mAssert.Equals existingConfManager.getConfigurationTemplatePath(existingProjectName), "C:\Dummy\Template.xlsm"
+
+    On Error GoTo 0
+    Exit Sub
+
+TestTemplatePathNormalConf_Error:
+    Err.Source = "vtkConfigurationManagerTester::TestTemplatePathNormalConf"
+    mAssert.Should False, "Unexpected Error " & Err.Number & " (" & Err.Description & ") in " & Err.Source
+    Exit Sub
+
+End Sub
+
 
 '''Public Sub Test_AddConfigurationInExistingProject_Name()
 ''''       Verify the add of configuration in an existing project
@@ -547,40 +566,12 @@ End Sub
 
 Private Function ITest_Suite() As TestSuite
     Set ITest_Suite = New TestSuite
-    ITest_Suite.AddTest ITest_Manager.ClassName, "Test_PropertyName_DefaultGet"
-    ITest_Suite.AddTest ITest_Manager.ClassName, "Test_PropertyName_DefaultLet"
-    ITest_Suite.AddTest ITest_Manager.ClassName, "TestGetConfigurationsFromNewProject"
-    ITest_Suite.AddTest ITest_Manager.ClassName, "TestGetConfigurationsFromExistingProject"
-    ITest_Suite.AddTest ITest_Manager.ClassName, "TestGetConfigurationPathWithNumberFromExistingProject"
-    ITest_Suite.AddTest ITest_Manager.ClassName, "TestGetConfigurationNumbersFromNewProject"
-    ITest_Suite.AddTest ITest_Manager.ClassName, "TestGetConfigurationPathFromExistingProject"
-    ITest_Suite.AddTest ITest_Manager.ClassName, "TestGetModulesFromExistingProject"
-    ITest_Suite.AddTest ITest_Manager.ClassName, "TestGetModuleNumbersFromExistingProject"
-    ITest_Suite.AddTest ITest_Manager.ClassName, "TestGetModulePathWithNumberFromExistingProject"
-    ITest_Suite.AddTest ITest_Manager.ClassName, "TestpathToSheetIsNotValid"
-    ITest_Suite.AddTest ITest_Manager.ClassName, "TestRefCount"
-    ITest_Suite.AddTest ITest_Manager.ClassName, "TestRefListForNormalConf"
-    ITest_Suite.AddTest ITest_Manager.ClassName, "TestTitleNormalConf"
-    ITest_Suite.AddTest ITest_Manager.ClassName, "TestCommentNormalConf"
+    ITest_Suite.AddTest ITest_Manager.ClassName, "TestTemplatePathNormalConf"
 End Function
 
 Private Sub ITestCase_RunTest()
     Select Case mManager.methodName
-        Case "Test_PropertyName_DefaultGet": Test_PropertyName_DefaultGet
-        Case "Test_PropertyName_DefaultLet": Test_PropertyName_DefaultLet
-        Case "TestGetConfigurationsFromNewProject": TestGetConfigurationsFromNewProject
-        Case "TestGetConfigurationsFromExistingProject": TestGetConfigurationsFromExistingProject
-        Case "TestGetConfigurationPathWithNumberFromExistingProject": TestGetConfigurationPathWithNumberFromExistingProject
-        Case "TestGetConfigurationNumbersFromNewProject": TestGetConfigurationNumbersFromNewProject
-        Case "TestGetConfigurationPathFromExistingProject": TestGetConfigurationPathFromExistingProject
-        Case "TestGetModulesFromExistingProject": TestGetModulesFromExistingProject
-        Case "TestGetModuleNumbersFromExistingProject": TestGetModuleNumbersFromExistingProject
-        Case "TestGetModulePathWithNumberFromExistingProject": TestGetModulePathWithNumberFromExistingProject
-        Case "TestpathToSheetIsNotValid": TestpathToSheetIsNotValid
-        Case "TestRefCount": TestRefCount
-        Case "TestRefListForNormalConf": TestRefListForNormalConf
-        Case "TestTitleNormalConf": TestTitleNormalConf
-        Case "TestCommentNormalConf": TestCommentNormalConf
+        Case "TestTemplatePathNormalConf": TestTemplatePathNormalConf
         Case Else: mAssert.Should False, "Invalid test name: " & mManager.methodName
     End Select
 End Sub

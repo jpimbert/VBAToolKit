@@ -834,3 +834,39 @@ getConfigurationComment_Error:
 
     Exit Function
 End Function
+
+
+'---------------------------------------------------------------------------------------
+' Procedure : getConfigurationTemplatePath
+' Author    : Lucas Vitorino
+' Purpose   : Get the template of the configuration as it is described in the sheet.
+' Notes     : If this function returns "", it can mean that  the configuration does not exist or
+'             that the configuration has no comment.
+'---------------------------------------------------------------------------------------
+'
+Public Function getConfigurationTemplatePath(confName As String) As String
+    On Error GoTo getConfigurationTemplatePath_Error
+    
+    If getConfigurationNumber(confName) <> 0 And configurationDOM.SelectNodes("/vtkConf/configuration[name=""" & confName & """]/templatePath").Length > 0 Then
+        getConfigurationTemplatePath = configurationDOM.SelectSingleNode("/vtkConf/configuration[name=""" & confName & """]/templatePath[0]").Text
+    Else
+        getConfigurationTemplatePath = ""
+    End If
+
+    On Error GoTo 0
+    Exit Function
+
+getConfigurationTemplatePath_Error:
+    Err.Source = "vtkConfigurationManager::getConfigurationTemplatePath"
+    
+    Select Case Err.Number
+        Case VTK_SHEET_NOT_VALID
+            ' do nothing but froward the error
+        Case Else
+            Err.Number = VTK_UNEXPECTED_ERROR
+    End Select
+
+    Err.Raise Err.Number, Err.Source, Err.Description
+
+    Exit Function
+End Function

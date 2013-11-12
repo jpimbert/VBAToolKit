@@ -11,6 +11,7 @@
 	<configuration cID="c01">
 		<name>ExistingProject</name>
 		<path>Delivery\ExistingProject.xlsm</path>
+		<templatePath>C:\Dummy\Template.xlsm</templatePath>
 		<title>Existing Project Delivery version</title>
 		<comment>This is the Delivery configuration of ExistingProject</comment>
 	</configuration>
