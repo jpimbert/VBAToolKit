@@ -736,12 +736,31 @@ End Function
 '---------------------------------------------------------------------------------------
 '
 Public Function getReferencesForConfiguration(confName As String) As Collection
+    On Error GoTo getReferencesForConfiguration_Error
+
     If getConfigurationNumber(confName) <> 0 Then
         Set getReferencesForConfiguration = getReferencesForConfigurationNumber(getConfigurationNumber(confName))
     Else
         Set getReferencesForConfiguration = Nothing
     End If
+
+    On Error GoTo 0
+    Exit Function
+
+getReferencesForConfiguration_Error:
+    Err.Source = "vtkConfigurationManager::getReferencesForConfiguration"
     
+    Select Case Err.Number
+        Case VTK_SHEET_NOT_VALID
+            ' do nothing but froward the error
+        Case Else
+            Err.Number = VTK_UNEXPECTED_ERROR
+    End Select
+
+    Err.Raise Err.Number, Err.Source, Err.Description
+
+    Exit Function
+
 End Function
 
 
@@ -754,11 +773,30 @@ End Function
 '---------------------------------------------------------------------------------------
 '
 Public Function getConfigurationTitle(confName As String) As String
+    On Error GoTo getConfigurationTitle_Error
+
     If getConfigurationNumber(confName) <> 0 And configurationDOM.SelectNodes("/vtkConf/configuration[name=""" & confName & """]/title").Length > 0 Then
         getConfigurationTitle = configurationDOM.SelectSingleNode("/vtkConf/configuration[name=""" & confName & """]/title[0]").Text
     Else
         getConfigurationTitle = ""
     End If
+
+    On Error GoTo 0
+    Exit Function
+
+getConfigurationTitle_Error:
+    Err.Source = "vtkConfigurationManager::getConfigurationTitle"
+    
+    Select Case Err.Number
+        Case VTK_SHEET_NOT_VALID
+            ' do nothing but froward the error
+        Case Else
+            Err.Number = VTK_UNEXPECTED_ERROR
+    End Select
+
+    Err.Raise Err.Number, Err.Source, Err.Description
+
+    Exit Function
 End Function
 
 
@@ -771,9 +809,28 @@ End Function
 '---------------------------------------------------------------------------------------
 '
 Public Function getConfigurationComment(confName As String) As String
+    On Error GoTo getConfigurationComment_Error
+
     If getConfigurationNumber(confName) <> 0 And configurationDOM.SelectNodes("/vtkConf/configuration[name=""" & confName & """]/comment").Length > 0 Then
         getConfigurationComment = configurationDOM.SelectSingleNode("/vtkConf/configuration[name=""" & confName & """]/comment[0]").Text
     Else
         getConfigurationComment = ""
     End If
+
+    On Error GoTo 0
+    Exit Function
+
+getConfigurationComment_Error:
+    Err.Source = "vtkConfigurationManager::getConfigurationComment"
+    
+    Select Case Err.Number
+        Case VTK_SHEET_NOT_VALID
+            ' do nothing but froward the error
+        Case Else
+            Err.Number = VTK_UNEXPECTED_ERROR
+    End Select
+
+    Err.Raise Err.Number, Err.Source, Err.Description
+
+    Exit Function
 End Function
