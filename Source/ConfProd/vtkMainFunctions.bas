@@ -166,11 +166,13 @@ Public Sub vtkRecreateConfiguration(projectName As String, configurationName As 
         End If
     Next
     
-    ' Create a new Excel file
-    Set Wb = vtkCreateExcelWorkbook()
-    
-    ' Set the projectName
-    Wb.VBProject.name = configurationName
+    ' Create a new Excel file andset the name of the VBProject, if there is no template
+    If conf.templatePath = "" Then
+        Set Wb = vtkCreateExcelWorkbook()
+        Wb.VBProject.name = configurationName
+    Else
+        Set Wb = Workbooks.Open(fso.BuildPath(rootPath, conf.templatePath))
+    End If
     
     ' Import all modules for this configuration from the source directory
     vtkImportModulesInAnotherProject projectForModules:=Wb.VBProject, projectName:=projectName, confName:=configurationName

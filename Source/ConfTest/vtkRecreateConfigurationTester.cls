@@ -137,6 +137,10 @@ Private Sub ITestCase_SetUp(Assert As IAssert)
     Set VTKProjectConf = cm.configurations(VTKProjectConfName)
     Set faultyRefConf = cm.configurations(faultyRefConfName)
     Set xlsmTemplateConf = cm.configurations(xlsmTemplateConfName)
+    
+    ' Copy the workbook templates
+    FileCopy Source:=fso.BuildPath(vtkPathToTemplateFolder, "xlsmTemplateWorkbook.xlsm"), _
+             destination:=fso.BuildPath(testProjectFolder, "xlsmTemplateWorkbook.xlsm")
 
     On Error GoTo 0
     Exit Sub
@@ -244,7 +248,7 @@ End Sub
 ' --------------------------------------------------------
 '                       TESTS
 ' --------------------------------------------------------
-
+'
 Public Sub Test_vtkRecreateConfiguration_workbookIsCreatedInTheGoodPath_normalConf()
 ' workbook is created in the good path
 
@@ -925,7 +929,7 @@ Public Sub Test_vtkRecreateConfiguration_templateXlsmWorksheet()
     getModulesAndRecreateWb testProject, testedConf
 
     ' Test the presence of the worksheet from the template
-    mAssert.Should Not recreatedWb.Worksheets("xlsmTemplateWorksheet") Is Nothing
+    mAssert.Should Not recreatedWb.Worksheets("xlsmTemplateSheet") Is Nothing
     
     mAssert.Should True, "The above shouldn't have thrown any error."
 

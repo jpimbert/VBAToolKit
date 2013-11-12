@@ -77,7 +77,7 @@
 	<configuration cID="c14">
 		<name>TestProject_xlsmTemplateConf</name>
 		<path>TestProject_xlsmTemplateConf.xlsm</path>
-		<templatePath>Templates\xlsmTemplateWorkbook.xlsm</templatePath>
+		<templatePath>xlsmTemplateWorkbook.xlsm</templatePath>
 	</configuration>
 
 	<module mID="m01">
