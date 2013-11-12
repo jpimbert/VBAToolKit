@@ -41,7 +41,7 @@ Private mAssert As IAssert
 Private fso As New FileSystemObject
 
 Private Const standardRememberedProjectsDTDName As String = "vtkRememberedProjectsDTD.dtd"
-Private Const rememberedProjectsSheetName As String = "VBAToolKitRememberdProjects.xml"
+Private Const rememberedProjectsSheetName As String = "VBAToolKitRememberedProjects.xml"
 
 Private Sub Class_Initialize()
     Set mManager = New TestCaseManager

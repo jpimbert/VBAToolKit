@@ -50,7 +50,7 @@ Private xlsConf As vtkConfiguration
 Private xlamConf As vtkConfiguration
 Private xlaConf As vtkConfiguration
 Private multitypeConf As vtkConfiguration
-Private VTKConf As vtkConfiguration
+Private vtkConf As vtkConfiguration
 Private VTKProjectConf As vtkConfiguration
 Private testedConf As vtkConfiguration
 Private faultyRefConf As vtkConfiguration
@@ -139,7 +139,7 @@ Private Sub ITestCase_SetUp(Assert As IAssert)
     Set xlamConf = cm.configurations(xlamConfName)
     Set xlaConf = cm.configurations(xlaConfName)
     Set multitypeConf = cm.configurations(multitypeConfName)
-    Set VTKConf = cm.configurations(VTKConfName)
+    Set vtkConf = cm.configurations(VTKConfName)
     Set VTKProjectConf = cm.configurations(VTKProjectConfName)
     Set faultyRefConf = cm.configurations(faultyRefConfName)
     Set xlsmTemplateConf = cm.configurations(xlsmTemplateConfName)
@@ -734,7 +734,7 @@ Public Sub Test_vtkRecreateConfiguration_addInOpen_XLAM()
 
     On Error GoTo Test_vtkRecreateConfiguration_addInOpen_Error
 
-    Set testedConf = VTKConf
+    Set testedConf = vtkConf
 
     ' Recreate the configuration called just like an actived add-in : "VBAToolKit.xlam"
     ' NB : the recreated workbook is not opened
