@@ -24,7 +24,7 @@
 
 	<module mID="m02">
 		<name>TestClass</name>
-		<modulePath confId="c01">Tests\TestModule.cls</modulePath>
+		<modulePath confId="c01">Tests\TestClass.cls</modulePath>
 	</module>
 
 	<module mID="m03">

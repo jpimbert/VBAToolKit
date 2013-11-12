@@ -134,22 +134,6 @@ Public Function getPathForConfiguration(confName As String) As String
 End Function
 
 '---------------------------------------------------------------------------------------
-' Procedure : setPathForConfiguration
-' Author    : Jean-Pierre Imbert
-' Date      : 28/08/2013
-' Purpose   : change the path of the module for a specific configuration
-' Error Raised :
-'           VTK_INEXISTANT_CONFIGURATION if the configuration is inexistant
-'---------------------------------------------------------------------------------------
-'
-Public Function setPathForConfiguration(confName As String, newPath As String) As String
-    Dim cn As Integer
-    cn = parent.getConfigurationNumber(confName)
-    If cn = 0 Then Err.Raise VTK_INEXISTANT_CONFIGURATION, "vtkModule getPathForConfiguration", "Configuration """ & confName & """ in project """ & parent.projectName & """"
-    parent.setModulePathWithNumber path:=newPath, numModule:=Number, numConfiguration:=cn
-End Function
-
-'---------------------------------------------------------------------------------------
 ' Procedure : configuration
 ' Author    : Jean-Pierre Imbert
 ' Date      : 28/08/2013
