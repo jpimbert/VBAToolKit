@@ -163,216 +163,217 @@ Test_vtkExportConfigurationsAsXML_correctDomContent_Error:
 End Sub
 
 
-Public Sub Test_vtkExportConfigurationsAsXML_correctConfigurationNumber()
-'   configurations -> correct number of configurations
-
-    On Error GoTo Test_vtkExportConfigurationsAsXML_correctConfigurationNumber_Error
-
-    mAssert.Equals reloadDom.SelectNodes("/vtkConf/configuration").Length, cm.configurationCount, "Expected number of configuration elements"
-
-    On Error GoTo 0
-    Exit Sub
-
-Test_vtkExportConfigurationsAsXML_correctConfigurationNumber_Error:
-    Err.Source = "Test_vtkExportConfigurationsAsXML_correctConfigurationNumber of module vtkXMLExportTester"
-    mAssert.Should False, "Unexpected error " & Err.Number & " (" & Err.Description & ") in " & Err.Source
-    Resume Next
-End Sub
-
-
-Public Sub Text_vtkExportConfigurationsAsXML_correctConfigurationContent()
-'   configurations -> correct content
-
-    On Error GoTo Text_vtkExportConfigurationsAsXML_correctConfigurationContent_Error
-
-    mAssert.Equals reloadDom.SelectSingleNode("/vtkConf/configuration[@cID=""c1""]/name").Text, "TestProject", "Expected name of first configuration"
-    mAssert.Equals reloadDom.SelectSingleNode("/vtkConf/configuration[@cID=""c1""]/path").Text, "Project\TestProject.xlsm", "Expected path of first configuration"
-
-    mAssert.Equals reloadDom.SelectSingleNode("/vtkConf/configuration[@cID=""c2""]/name").Text, "TestProject_DEV", "Expected name of second configuration"
-    mAssert.Equals reloadDom.SelectSingleNode("/vtkConf/configuration[@cID=""c2""]/path").Text, "Project\TestProject_DEV.xlsm", "Expected path of second configuration"
-
-    On Error GoTo 0
-    Exit Sub
-
-Text_vtkExportConfigurationsAsXML_correctConfigurationContent_Error:
-    Err.Source = "Text_vtkExportConfigurationsAsXML_correctConfigurationContent of module vtkXMLExportTester"
-    mAssert.Should False, "Unexpected error " & Err.Number & " (" & Err.Description & ") in " & Err.Source
-    Exit Sub
-End Sub
-
-Public Sub Test_vtkExportConfigurationsAsXML_correctModuleNumber()
-'   modules -> correct number of modules
-
-    On Error GoTo Test_vtkExportConfigurationsAsXML_correctModuleNumber_Error
-
-    mAssert.Equals reloadDom.SelectNodes("/vtkConf/module").Length, cm.moduleCount, "Expected number of module elements"
-
-    On Error GoTo 0
-    Exit Sub
-
-Test_vtkExportConfigurationsAsXML_correctModuleNumber_Error:
-    Err.Source = "Test_vtkExportConfigurationsAsXML_correctModuleNumber of module vtkXMLExportTester"
-    mAssert.Should False, "Unexpected error " & Err.Number & " (" & Err.Description & ") in " & Err.Source
-    Exit Sub
-End Sub
-
-Public Sub Test_vtkExportConfigurationsAsXML_correctModuleContent()
-'   modules -> correct content
-
-    On Error GoTo Test_vtkExportConfigurationsAsXML_correctModuleContent_Error
-
-    mAssert.Equals reloadDom.SelectSingleNode("/vtkConf/module[@mID=""m1""]/name").Text, "TestModule1", "Expected name of first module"
-    mAssert.Equals reloadDom.SelectSingleNode("/vtkConf/module[@mID=""m1""]/modulePath[@confId=""c2""]").Text, "Project\TestModule1.bas", "Expected path of first module for the second configuration"
-
-    mAssert.Equals reloadDom.SelectSingleNode("/vtkConf/module[@mID=""m2""]/name").Text, "TestModule2", "Expected name of second module"
-    mAssert.Equals reloadDom.SelectSingleNode("/vtkConf/module[@mID=""m2""]/modulePath[@confId=""c2""]").Text, "Project\TestModule2.bas", "Expected path of second module for the second configuration"
-
-    On Error GoTo 0
-    Exit Sub
-
-Test_vtkExportConfigurationsAsXML_correctModuleContent_Error:
-    Err.Source = "Test_vtkExportConfigurationsAsXML_correctModuleContent of module vtkXMLExportTester"
-    mAssert.Should False, "Unexpected error " & Err.Number & " (" & Err.Description & ") in " & Err.Source
-    Exit Sub
-End Sub
-
-Public Sub Test_vtkExportConfigurationsAsXML_correctReferenceNumber()
-'   modules -> correct number of modules
-
-    On Error GoTo Test_vtkExportConfigurationsAsXML_correctReferenceNumber_Error
-
-    mAssert.Equals reloadDom.SelectNodes("/vtkConf/reference").Length, 10, "Expected number of reference elements"
-
-    On Error GoTo 0
-    Exit Sub
-
-Test_vtkExportConfigurationsAsXML_correctReferenceNumber_Error:
-    Err.Source = "Test_vtkExportConfigurationsAsXML_correctReferenceNumber of module vtkXMLExportTester"
-    mAssert.Should False, "Unexpected error " & Err.Number & " (" & Err.Description & ") in " & Err.Source
-    Exit Sub
-End Sub
-
-Public Sub Test_vtkExportConfigurationsAsXML_correctRefNumByConf()
-'   modules -> correct content
-
-    On Error GoTo Test_vtkExportConfigurationsAsXML_correctRefNumByConf_Error
-
-    mAssert.Equals reloadDom.SelectNodes("/vtkConf/reference[contains(@confIDs,""c1"")]/name").Length, 9, "Expected number of references for first configuration"
-    mAssert.Equals reloadDom.SelectNodes("/vtkConf/reference[contains(@confIDs,""c2"")]/name").Length, 10, "Expected number of references for second configuration"
-
-    On Error GoTo 0
-    Exit Sub
-
-Test_vtkExportConfigurationsAsXML_correctRefNumByConf_Error:
-    Err.Source = "Test_vtkExportConfigurationsAsXML_correctRefNumByConf of module vtkXMLExportTester"
-    mAssert.Should False, "Unexpected error " & Err.Number & " (" & Err.Description & ") in " & Err.Source
-    Exit Sub
-End Sub
-
-Public Sub Test_vtkExportConfigurationsAsXML_correctRefContent()
-'   modules -> correct content
-
-    On Error GoTo Test_vtkExportConfigurationsAsXML_correctRefContent_Error
-
-    mAssert.Equals reloadDom.SelectNodes("/vtkConf/reference/name[.=""VBAToolKit""]/../guid").Length, 0, "Expected number of GUID element for VBAToolKit reference"
-    mAssert.Equals reloadDom.SelectNodes("/vtkConf/reference/name[.=""MSForms""]/../guid").Length, 1, "Expected number of GUID element for MSXML2 reference"
-
-    mAssert.Equals reloadDom.SelectNodes("/vtkConf/reference/name[.=""VBAToolKit""]/../path").Length, 1, "Expected number of Path element for VBAToolKit reference"
-    mAssert.Equals reloadDom.SelectNodes("/vtkConf/reference/name[.=""MSForms""]/../path").Length, 0, "Expected number of Path element for MSXML2 reference"
-
-    On Error GoTo 0
-    Exit Sub
-
-Test_vtkExportConfigurationsAsXML_correctRefContent_Error:
-    Err.Source = "Test_vtkExportConfigurationsAsXML_correctRefContent of module vtkXMLExportTester"
-    mAssert.Should False, "Unexpected error " & Err.Number & " (" & Err.Description & ") in " & Err.Source
-    Exit Sub
-End Sub
-
-Public Sub Test_vtkExportConfigurationsAsXML_NoProject()
-'   Verifies that an attempt to export a nonexistant project configuration raises the proper error
-
-   On Error GoTo Test_vtkExportConfigurationsAsXML_NoProject_Error
-
-    vtkExportConfigurationsAsXML projectName:="InexistantProject", filePath:=""
-    mAssert.Should False, "An error should occur when exporting an inexistant project"
-
-   On Error GoTo 0
-   Exit Sub
-
-Test_vtkExportConfigurationsAsXML_NoProject_Error:
-    mAssert.Equals Err.Number, VTK_WORKBOOK_NOT_OPEN, "Bad error raised when exporting an inexistant project"
-End Sub
-
-Public Sub Test_vtkExportConfigurationsAsXML_WrongPath()
-'   Verifies that an attempt to export a project configuration in a bad path raises the proper error
-
-   On Error GoTo Test_vtkExportConfigurationsAsXML_WrongPath_Error
-
-    vtkExportConfigurationsAsXML projectName:=testProjectName, filePath:="c:\InexistantFolder\file.xml"
-    mAssert.Should False, "An error should occur when exporting in a wrong path"
-
-   On Error GoTo 0
-   Exit Sub
-
-Test_vtkExportConfigurationsAsXML_WrongPath_Error:
-    mAssert.Equals Err.Number, VTK_WRONG_FILE_PATH, "Bad error raised when exporting in a wrong path"
-End Sub
-
-Public Sub Test_vtkExportConfigurationsAsXML_InexistantFile()
-'   Verifies that a new configuration file is created if not yet existing
-
-   On Error GoTo Test_vtkExportConfigurationsAsXML_InexistantFile_Error
-
-    vtkExportConfigurationsAsXML projectName:=testProjectName, filePath:=testFilepath
-    mAssert.Should fso.FileExists(testFilepath), "The configuration file must be created when exporting a project"
-
-   On Error GoTo 0
-   Exit Sub
-
-Test_vtkExportConfigurationsAsXML_InexistantFile_Error:
-    mAssert.Should False, "Unexpected error " & Err.Number & " (" & Err.Description & ")"
-End Sub
-
-Public Sub Test_vtkExportConfigurationsAsXML_ExistantFile()
-'   Verifies that an old configuration file is erased and rewritten
-
-   On Error GoTo Test_vtkExportConfigurationsAsXML_ExistantFile_Error
-
-    ' Create an empty file
-    Dim f As TextStream
-    Set f = fso.CreateTextFile(testFilepath)
-    f.WriteLine ("Unexpected line in a XML file")
-    f.Close
-
-    vtkExportConfigurationsAsXML projectName:=testProjectName, filePath:=testFilepath
-    ' Verifies the first line
-    Set f = fso.OpenTextFile(testFilepath)
-    Dim line As String
-    line = f.ReadLine
-    f.Close
-    mAssert.Equals line, "<?xml version=""1.0"" encoding=""ISO-8859-1"" standalone=""no""?>", "First line of the configuration file"
-
-   On Error GoTo 0
-   Exit Sub
-
-Test_vtkExportConfigurationsAsXML_ExistantFile_Error:
-    mAssert.Should False, "Unexpected error " & Err.Number & " (" & Err.Description & ")"
-End Sub
-
-Public Sub Test_vtkExportConfigurationsAsXML_fileContentIsValidDom()
-'   load content of the file -> file content is a valid DOM
-
-    On Error GoTo Test_vtkExportConfigurationsAsXML_fileContentIsValidDom_Error
-
-    mAssert.Equals reloadDom.parseError.ErrorCode, 0, "Dom should be readable without parse error"
-
-    On Error GoTo 0
-    Exit Sub
-
-Test_vtkExportConfigurationsAsXML_fileContentIsValidDom_Error:
-    mAssert.Should False, "Unexpected error " & Err.Number & " (" & Err.Description & ")"
-End Sub
+'Public Sub Test_vtkExportConfigurationsAsXML_correctConfigurationNumber()
+''   configurations -> correct number of configurations
+'
+'    On Error GoTo Test_vtkExportConfigurationsAsXML_correctConfigurationNumber_Error
+'
+'    mAssert.Equals reloadDom.SelectNodes("/vtkConf/configuration").Length, cm.configurationCount, "Expected number of configuration elements"
+'
+'    On Error GoTo 0
+'    Exit Sub
+'
+'Test_vtkExportConfigurationsAsXML_correctConfigurationNumber_Error:
+'    Err.Source = "Test_vtkExportConfigurationsAsXML_correctConfigurationNumber of module vtkXMLExportTester"
+'    mAssert.Should False, "Unexpected error " & Err.Number & " (" & Err.Description & ") in " & Err.Source
+'    Resume Next
+'End Sub
+'
+'
+'Public Sub Text_vtkExportConfigurationsAsXML_correctConfigurationContent()
+''   configurations -> correct content
+'
+'    On Error GoTo Text_vtkExportConfigurationsAsXML_correctConfigurationContent_Error
+'
+'    mAssert.Equals reloadDom.SelectSingleNode("/vtkConf/configuration[@cID=""c1""]/name").Text, "TestProject", "Expected name of first configuration"
+'    mAssert.Equals reloadDom.SelectSingleNode("/vtkConf/configuration[@cID=""c1""]/path").Text, "Project\TestProject.xlsm", "Expected path of first configuration"
+'
+'    mAssert.Equals reloadDom.SelectSingleNode("/vtkConf/configuration[@cID=""c2""]/name").Text, "TestProject_DEV", "Expected name of second configuration"
+'    mAssert.Equals reloadDom.SelectSingleNode("/vtkConf/configuration[@cID=""c2""]/path").Text, "Project\TestProject_DEV.xlsm", "Expected path of second configuration"
+'
+'    On Error GoTo 0
+'    Exit Sub
+'
+'Text_vtkExportConfigurationsAsXML_correctConfigurationContent_Error:
+'    Err.Source = "Text_vtkExportConfigurationsAsXML_correctConfigurationContent of module vtkXMLExportTester"
+'    mAssert.Should False, "Unexpected error " & Err.Number & " (" & Err.Description & ") in " & Err.Source
+'    Exit Sub
+'End Sub
+'
+'
+'Public Sub Test_vtkExportConfigurationsAsXML_correctModuleNumber()
+''   modules -> correct number of modules
+'
+'    On Error GoTo Test_vtkExportConfigurationsAsXML_correctModuleNumber_Error
+'
+'    mAssert.Equals reloadDom.SelectNodes("/vtkConf/module").Length, cm.moduleCount, "Expected number of module elements"
+'
+'    On Error GoTo 0
+'    Exit Sub
+'
+'Test_vtkExportConfigurationsAsXML_correctModuleNumber_Error:
+'    Err.Source = "Test_vtkExportConfigurationsAsXML_correctModuleNumber of module vtkXMLExportTester"
+'    mAssert.Should False, "Unexpected error " & Err.Number & " (" & Err.Description & ") in " & Err.Source
+'    Exit Sub
+'End Sub
+'
+'Public Sub Test_vtkExportConfigurationsAsXML_correctModuleContent()
+''   modules -> correct content
+'
+'    On Error GoTo Test_vtkExportConfigurationsAsXML_correctModuleContent_Error
+'
+'    mAssert.Equals reloadDom.SelectSingleNode("/vtkConf/module[@mID=""m1""]/name").Text, "TestModule1", "Expected name of first module"
+'    mAssert.Equals reloadDom.SelectSingleNode("/vtkConf/module[@mID=""m1""]/modulePath[@confId=""c2""]").Text, "Project\TestModule1.bas", "Expected path of first module for the second configuration"
+'
+'    mAssert.Equals reloadDom.SelectSingleNode("/vtkConf/module[@mID=""m2""]/name").Text, "TestModule2", "Expected name of second module"
+'    mAssert.Equals reloadDom.SelectSingleNode("/vtkConf/module[@mID=""m2""]/modulePath[@confId=""c2""]").Text, "Project\TestModule2.bas", "Expected path of second module for the second configuration"
+'
+'    On Error GoTo 0
+'    Exit Sub
+'
+'Test_vtkExportConfigurationsAsXML_correctModuleContent_Error:
+'    Err.Source = "Test_vtkExportConfigurationsAsXML_correctModuleContent of module vtkXMLExportTester"
+'    mAssert.Should False, "Unexpected error " & Err.Number & " (" & Err.Description & ") in " & Err.Source
+'    Exit Sub
+'End Sub
+'
+'Public Sub Test_vtkExportConfigurationsAsXML_correctReferenceNumber()
+''   modules -> correct number of modules
+'
+'    On Error GoTo Test_vtkExportConfigurationsAsXML_correctReferenceNumber_Error
+'
+'    mAssert.Equals reloadDom.SelectNodes("/vtkConf/reference").Length, 10, "Expected number of reference elements"
+'
+'    On Error GoTo 0
+'    Exit Sub
+'
+'Test_vtkExportConfigurationsAsXML_correctReferenceNumber_Error:
+'    Err.Source = "Test_vtkExportConfigurationsAsXML_correctReferenceNumber of module vtkXMLExportTester"
+'    mAssert.Should False, "Unexpected error " & Err.Number & " (" & Err.Description & ") in " & Err.Source
+'    Exit Sub
+'End Sub
+'
+'Public Sub Test_vtkExportConfigurationsAsXML_correctRefNumByConf()
+''   modules -> correct content
+'
+'    On Error GoTo Test_vtkExportConfigurationsAsXML_correctRefNumByConf_Error
+'
+'    mAssert.Equals reloadDom.SelectNodes("/vtkConf/reference[contains(@confIDs,""c1"")]/name").Length, 9, "Expected number of references for first configuration"
+'    mAssert.Equals reloadDom.SelectNodes("/vtkConf/reference[contains(@confIDs,""c2"")]/name").Length, 10, "Expected number of references for second configuration"
+'
+'    On Error GoTo 0
+'    Exit Sub
+'
+'Test_vtkExportConfigurationsAsXML_correctRefNumByConf_Error:
+'    Err.Source = "Test_vtkExportConfigurationsAsXML_correctRefNumByConf of module vtkXMLExportTester"
+'    mAssert.Should False, "Unexpected error " & Err.Number & " (" & Err.Description & ") in " & Err.Source
+'    Exit Sub
+'End Sub
+'
+'Public Sub Test_vtkExportConfigurationsAsXML_correctRefContent()
+''   modules -> correct content
+'
+'    On Error GoTo Test_vtkExportConfigurationsAsXML_correctRefContent_Error
+'
+'    mAssert.Equals reloadDom.SelectNodes("/vtkConf/reference/name[.=""VBAToolKit""]/../guid").Length, 0, "Expected number of GUID element for VBAToolKit reference"
+'    mAssert.Equals reloadDom.SelectNodes("/vtkConf/reference/name[.=""MSForms""]/../guid").Length, 1, "Expected number of GUID element for MSXML2 reference"
+'
+'    mAssert.Equals reloadDom.SelectNodes("/vtkConf/reference/name[.=""VBAToolKit""]/../path").Length, 1, "Expected number of Path element for VBAToolKit reference"
+'    mAssert.Equals reloadDom.SelectNodes("/vtkConf/reference/name[.=""MSForms""]/../path").Length, 0, "Expected number of Path element for MSXML2 reference"
+'
+'    On Error GoTo 0
+'    Exit Sub
+'
+'Test_vtkExportConfigurationsAsXML_correctRefContent_Error:
+'    Err.Source = "Test_vtkExportConfigurationsAsXML_correctRefContent of module vtkXMLExportTester"
+'    mAssert.Should False, "Unexpected error " & Err.Number & " (" & Err.Description & ") in " & Err.Source
+'    Exit Sub
+'End Sub
+'
+'Public Sub Test_vtkExportConfigurationsAsXML_NoProject()
+''   Verifies that an attempt to export a nonexistant project configuration raises the proper error
+'
+'   On Error GoTo Test_vtkExportConfigurationsAsXML_NoProject_Error
+'
+'    vtkExportConfigurationsAsXML projectName:="InexistantProject", filePath:=""
+'    mAssert.Should False, "An error should occur when exporting an inexistant project"
+'
+'   On Error GoTo 0
+'   Exit Sub
+'
+'Test_vtkExportConfigurationsAsXML_NoProject_Error:
+'    mAssert.Equals Err.Number, VTK_WORKBOOK_NOT_OPEN, "Bad error raised when exporting an inexistant project"
+'End Sub
+'
+'Public Sub Test_vtkExportConfigurationsAsXML_WrongPath()
+''   Verifies that an attempt to export a project configuration in a bad path raises the proper error
+'
+'   On Error GoTo Test_vtkExportConfigurationsAsXML_WrongPath_Error
+'
+'    vtkExportConfigurationsAsXML projectName:=testProjectName, filePath:="c:\InexistantFolder\file.xml"
+'    mAssert.Should False, "An error should occur when exporting in a wrong path"
+'
+'   On Error GoTo 0
+'   Exit Sub
+'
+'Test_vtkExportConfigurationsAsXML_WrongPath_Error:
+'    mAssert.Equals Err.Number, VTK_WRONG_FILE_PATH, "Bad error raised when exporting in a wrong path"
+'End Sub
+'
+'Public Sub Test_vtkExportConfigurationsAsXML_InexistantFile()
+''   Verifies that a new configuration file is created if not yet existing
+'
+'   On Error GoTo Test_vtkExportConfigurationsAsXML_InexistantFile_Error
+'
+'    vtkExportConfigurationsAsXML projectName:=testProjectName, filePath:=testFilepath
+'    mAssert.Should fso.FileExists(testFilepath), "The configuration file must be created when exporting a project"
+'
+'   On Error GoTo 0
+'   Exit Sub
+'
+'Test_vtkExportConfigurationsAsXML_InexistantFile_Error:
+'    mAssert.Should False, "Unexpected error " & Err.Number & " (" & Err.Description & ")"
+'End Sub
+'
+'Public Sub Test_vtkExportConfigurationsAsXML_ExistantFile()
+''   Verifies that an old configuration file is erased and rewritten
+'
+'   On Error GoTo Test_vtkExportConfigurationsAsXML_ExistantFile_Error
+'
+'    ' Create an empty file
+'    Dim f As TextStream
+'    Set f = fso.CreateTextFile(testFilepath)
+'    f.WriteLine ("Unexpected line in a XML file")
+'    f.Close
+'
+'    vtkExportConfigurationsAsXML projectName:=testProjectName, filePath:=testFilepath
+'    ' Verifies the first line
+'    Set f = fso.OpenTextFile(testFilepath)
+'    Dim line As String
+'    line = f.ReadLine
+'    f.Close
+'    mAssert.Equals line, "<?xml version=""1.0"" encoding=""ISO-8859-1"" standalone=""no""?>", "First line of the configuration file"
+'
+'   On Error GoTo 0
+'   Exit Sub
+'
+'Test_vtkExportConfigurationsAsXML_ExistantFile_Error:
+'    mAssert.Should False, "Unexpected error " & Err.Number & " (" & Err.Description & ")"
+'End Sub
+'
+'Public Sub Test_vtkExportConfigurationsAsXML_fileContentIsValidDom()
+''   load content of the file -> file content is a valid DOM
+'
+'    On Error GoTo Test_vtkExportConfigurationsAsXML_fileContentIsValidDom_Error
+'
+'    mAssert.Equals reloadDom.parseError.ErrorCode, 0, "Dom should be readable without parse error"
+'
+'    On Error GoTo 0
+'    Exit Sub
+'
+'Test_vtkExportConfigurationsAsXML_fileContentIsValidDom_Error:
+'    mAssert.Should False, "Unexpected error " & Err.Number & " (" & Err.Description & ")"
+'End Sub
 
 '   Other tests to write
 '
@@ -383,11 +384,13 @@ End Sub
 Private Function ITest_Suite() As TestSuite
     Set ITest_Suite = New TestSuite
     ITest_Suite.AddTest ITest_Manager.ClassName, "Test_vtkExportConfigurationsAsXML_correctInfoContent"
+    ITest_Suite.AddTest ITest_Manager.ClassName, "Test_vtkExportConfigurationsAsXML_correctConfigurationNumber"
 End Function
 
 Private Sub ITestCase_RunTest()
     Select Case mManager.methodName
         Case "Test_vtkExportConfigurationsAsXML_correctInfoContent": Test_vtkExportConfigurationsAsXML_correctInfoContent
+        Case "Test_vtkExportConfigurationsAsXML_correctConfigurationNumber": Test_vtkExportConfigurationsAsXML_correctConfigurationNumber
         Case Else: mAssert.Should False, "Invalid test name: " & mManager.methodName
     End Select
 End Sub
