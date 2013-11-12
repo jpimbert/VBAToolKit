@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="ISO-8859-1" standalone="no"?>
+<!DOCTYPE vtkConf SYSTEM "vtkConfigurationsDTD.dtd">
+<vtkConf>
+	<info>
+		<vtkConfigurationsVersion>1.0</vtkConfigurationsVersion>
+		<projectName>TestProject</projectName>
+	</info>
+
+	<configuration cID="c01">
+		<name>TestProject</name>
+		<path>Delivery\TestProject.xlsm</path>
+	</configuration>
+
+	<configuration cID="c02">
+		<name>TestProject_DEV</name>
+		<path>Project\TestProject_DEV.xlsm</path>
+	</configuration>
+
+
+	<module mID="m01">
+		<name>TestModule1</name>
+		<modulePath confId="c02">TestModule1.bas</modulePath>
+	</module>
+
+
+	<module mID="m02">
+		<name>TestModule2</name>
+		<modulePath confId="c02">TestModule2.bas</modulePath>
+	</module>
+
+
+</vtkConf>
