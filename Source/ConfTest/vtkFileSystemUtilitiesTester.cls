@@ -259,12 +259,12 @@ Public Sub Test_vtkCreateFolderPath_folderName1()
 
     On Error GoTo Test_vtkCreateFolderPath_folderName_Error
 
-    Dim folderpath As String
-    folderpath = fso.BuildPath(VBAToolKit.vtkTestPath, "testFolder10")
+    Dim folderPath As String
+    folderPath = fso.BuildPath(VBAToolKit.vtkTestPath, "testFolder10")
 
-    vtkCreateFolderPath folderpath
+    vtkCreateFolderPath folderPath
 
-    mAssert.Should fso.folderExists(folderpath), "Folder should have been created."
+    mAssert.Should fso.folderExists(folderPath), "Folder should have been created."
 
     On Error GoTo 0
     Exit Sub
@@ -282,12 +282,12 @@ Public Sub Test_vtkCreateFolderPath_folderName2()
 
     On Error GoTo Test_vtkCreateFolderPath_folderName_Error
 
-    Dim folderpath As String
-    folderpath = fso.BuildPath(VBAToolKit.vtkTestPath, "testFolder10\testFolder20")
+    Dim folderPath As String
+    folderPath = fso.BuildPath(VBAToolKit.vtkTestPath, "testFolder10\testFolder20")
 
-    vtkCreateFolderPath folderpath
+    vtkCreateFolderPath folderPath
 
-    mAssert.Should fso.folderExists(folderpath), "Folder should have been created."
+    mAssert.Should fso.folderExists(folderPath), "Folder should have been created."
 
     On Error GoTo 0
     Exit Sub
@@ -306,13 +306,13 @@ Public Sub Test_vtkCreateFolderPath_fileName()
     On Error GoTo Test_vtkCreateFolderPath_fileName_Error
 
     Dim filePath As String
-    Dim folderpath As String
+    Dim folderPath As String
     filePath = fso.BuildPath(VBAToolKit.vtkTestPath, "testFolder10\testFolder20\dummy.txt")
-    folderpath = fso.GetParentFolderName(filePath)
+    folderPath = fso.GetParentFolderName(filePath)
 
     vtkCreateFolderPath filePath
 
-    mAssert.Should fso.folderExists(folderpath), _
+    mAssert.Should fso.folderExists(folderPath), _
                    "Folder tree should have been created."
 
     mAssert.Should Not fso.folderExists(filePath), _
@@ -339,10 +339,10 @@ Public Sub Test_vtkCreateFolderPath_relativePath1()
 
     Dim error As Long: error = 0
 
-    Dim folderpath As String
-    folderpath = "testFolder10"
+    Dim folderPath As String
+    folderPath = "testFolder10"
 
-    vtkCreateFolderPath folderpath
+    vtkCreateFolderPath folderPath
 
     mAssert.Equals error, VTK_FORBIDDEN_PARAMETER, _
                    "Function should not accept relative paths"
@@ -363,10 +363,10 @@ Public Sub Test_vtkCreateFolderPath_relativePath2()
 
     Dim error As Long: error = 0
 
-    Dim folderpath As String
-    folderpath = "\testFolder10"
+    Dim folderPath As String
+    folderPath = "\testFolder10"
 
-    vtkCreateFolderPath folderpath
+    vtkCreateFolderPath folderPath
 
     mAssert.Equals error, VTK_FORBIDDEN_PARAMETER, _
                    "Function should not accept relative paths"
@@ -388,10 +388,10 @@ Public Sub Test_vtkCreateFolderPath_wrongDrive()
 
     Dim error As Long: error = 0
 
-    Dim folderpath As String
-    folderpath = "O:\testFolder1\testFolder2"
+    Dim folderPath As String
+    folderPath = "O:\testFolder1\testFolder2"
 
-    vtkCreateFolderPath folderpath
+    vtkCreateFolderPath folderPath
 
     mAssert.Equals error, VTK_WRONG_FOLDER_PATH, _
                    "The drive is not mounted, the call is supposed to fail."
@@ -413,10 +413,10 @@ Public Sub Test_vtkCreateFolderPath_noDotsInPath_dot()
 
     Dim error As Long: error = 0
 
-    Dim folderpath As String
-    folderpath = fso.BuildPath(VBAToolKit.vtkTestPath, ".\testFolder10")
+    Dim folderPath As String
+    folderPath = fso.BuildPath(VBAToolKit.vtkTestPath, ".\testFolder10")
 
-    vtkCreateFolderPath folderpath
+    vtkCreateFolderPath folderPath
 
     mAssert.Equals error, VTK_FORBIDDEN_PARAMETER, _
                    "The function should not accept dots in its path."
@@ -438,10 +438,10 @@ Public Sub Test_vtkCreateFolderPath_noDotsInPath_doubleDot()
 
     Dim error As Long: error = 0
 
-    Dim folderpath As String
-    folderpath = fso.BuildPath(VBAToolKit.vtkTestPath, "testFolder10\..\testFolder20")
+    Dim folderPath As String
+    folderPath = fso.BuildPath(VBAToolKit.vtkTestPath, "testFolder10\..\testFolder20")
 
-    vtkCreateFolderPath folderpath
+    vtkCreateFolderPath folderPath
 
     mAssert.Equals error, VTK_FORBIDDEN_PARAMETER, _
                    "The function should not accept dots in its path."
@@ -462,10 +462,10 @@ Public Sub Test_vtkCreateFolderPath_noDotsInPath_tripleDot()
 
     Dim error As Long: error = 0
 
-    Dim folderpath As String
-    folderpath = fso.BuildPath(VBAToolKit.vtkTestPath, "testFolder10\...\testFolder20")
+    Dim folderPath As String
+    folderPath = fso.BuildPath(VBAToolKit.vtkTestPath, "testFolder10\...\testFolder20")
 
-    vtkCreateFolderPath folderpath
+    vtkCreateFolderPath folderPath
 
     mAssert.Equals error, VTK_FORBIDDEN_PARAMETER, _
                    "The function should not accept dots in its path."

@@ -394,6 +394,7 @@ Private Function ITest_Suite() As TestSuite
     ITest_Suite.AddTest ITest_Manager.ClassName, "TestRefListForNormalConf"
     ITest_Suite.AddTest ITest_Manager.ClassName, "TestTitle"
     ITest_Suite.AddTest ITest_Manager.ClassName, "TestComment"
+    ITest_Suite.AddTest ITest_Manager.ClassName, "TestTemplatePath"
 End Function
 
 Private Sub ITestCase_RunTest()
@@ -408,6 +409,7 @@ Private Sub ITestCase_RunTest()
         Case "TestRefListForNormalConf": TestRefListForNormalConf
         Case "TestTitle": TestTitle
         Case "TestComment": TestComment
+        Case "TestTemplatePath": TestTemplatePath
         Case Else: mAssert.Should False, "Invalid test name: " & mManager.methodName
     End Select
 End Sub
