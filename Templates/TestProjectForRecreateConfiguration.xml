@@ -88,8 +88,14 @@
 
 	<configuration cID="c16">
 		<name>TestProject_xlaTemplateConf</name>
-		<path>TestProject_xlaTemplateConf.xlam</path>
+		<path>TestProject_xlaTemplateConf.xla</path>
 		<templatePath>xlaTemplateWorkbook.xla</templatePath>
+	</configuration>
+
+	<configuration cID="c17">
+		<name>TestProject_xlsTemplateConf</name>
+		<path>TestProject_xlsTemplateConf.xls</path>
+		<templatePath>xlsTemplateWorkbook.xls</templatePath>
 	</configuration>
 
 	<module mID="m01">
