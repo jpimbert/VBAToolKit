@@ -54,6 +54,7 @@ Private VTKConf As vtkConfiguration
 Private VTKProjectConf As vtkConfiguration
 Private testedConf As vtkConfiguration
 Private faultyRefConf As vtkConfiguration
+Private xlsmTemplateConf As vtkConfiguration
 
 Private cm As vtkConfigurationManager
 
@@ -68,6 +69,7 @@ Private Const xlaConfName = "TestProject_xlaConf"
 Private Const multitypeConfName = "TestProject_multitypeConf"
 Private Const VTKConfName = "TestProject_VTKConf"
 Private Const faultyRefConfName = "TestProject_faultyRefConf"
+Private Const xlsmTemplateConfName = "TestProject_xlsmTemplateConf"
 Private Const VTKProjectConfName = "VBAToolKit"
 
 Private Const standardRememberedProjectsDTDName As String = "rememberedProjectsDTD.dtd"
@@ -134,6 +136,7 @@ Private Sub ITestCase_SetUp(Assert As IAssert)
     Set VTKConf = cm.configurations(VTKConfName)
     Set VTKProjectConf = cm.configurations(VTKProjectConfName)
     Set faultyRefConf = cm.configurations(faultyRefConfName)
+    Set xlsmTemplateConf = cm.configurations(xlsmTemplateConfName)
 
     On Error GoTo 0
     Exit Sub
@@ -820,7 +823,7 @@ Public Sub Test_vtkRecreateConfiguration_title()
     On Error GoTo Test_vtkRecreateConfiguration_title_Error
 
     Set testedConf = normalConf
-    
+
     ' Create and open recreatedWb
     getModulesAndRecreateWb testProject, testedConf
 
@@ -843,7 +846,7 @@ Public Sub Test_vtkRecreateConfiguration_comment()
     On Error GoTo Test_vtkRecreateConfiguration_comment_Error
 
     Set testedConf = normalConf
-    
+
     ' Create and open recreatedWb
     getModulesAndRecreateWb testProject, testedConf
 
@@ -859,7 +862,83 @@ Test_vtkRecreateConfiguration_comment_Error:
 
 End Sub
 
+Public Sub Test_vtkRecreateConfiguration_templateXlsmVBProject()
+' ensure the configuration is well created with an xlsm template, and that the VBProjec name is set
+' according to the template
 
+    On Error GoTo Test_vtkRecreateConfiguration_templateXlsmVBProject_Error
+
+    Set testedConf = xlsmTemplateConf
+        
+    ' Create and open recreatedWb
+    getModulesAndRecreateWb testProject, testedConf
+
+    ' Test the VBProjectName
+    mAssert.Equals recreatedWb.VBProject.name, "xlsmTemplateProject"
+
+    On Error GoTo 0
+    Exit Sub
+
+Test_vtkRecreateConfiguration_templateXlsmVBProject_Error:
+    Err.Source = "vtkRecreateConfigurationTester::Test_vtkRecreateConfiguration_templateXlsmVBProject"
+    mAssert.Should False, "Unexpected Error " & Err.Number & " (" & Err.Description & ") in " & Err.Source
+    Exit Sub
+
+End Sub
+
+
+Public Sub Test_vtkRecreateConfiguration_templateXlsmModule()
+' ensure the configuration is well created with an xlsm template, and that the module of the template
+' exists in the recreated Workbook
+
+    On Error GoTo Test_vtkRecreateConfiguration_templateXlsmmodule_Error
+
+    Set testedConf = xlsmTemplateConf
+        
+    ' Create and open recreatedWb
+    getModulesAndRecreateWb testProject, testedConf
+
+    ' Test the presence of the module from the template
+    mAssert.Should Not recreatedWb.VBProject.VBComponents("xlsmTemplateModule") Is Nothing
+    
+    mAssert.Should True, "The above shouldn't have thrown any error."
+
+    On Error GoTo 0
+    Exit Sub
+
+Test_vtkRecreateConfiguration_templateXlsmmodule_Error:
+    Err.Source = "vtkRecreateConfigurationTester::Test_vtkRecreateConfiguration_templateXlsmmodule"
+    mAssert.Should False, "Unexpected Error " & Err.Number & " (" & Err.Description & ") in " & Err.Source
+    Exit Sub
+
+End Sub
+
+Public Sub Test_vtkRecreateConfiguration_templateXlsmWorksheet()
+' ensure the configuration is well created with an xlsm template, and that the worksheet present in the template
+' are present too in the recreatedWb
+
+    On Error GoTo Test_vtkRecreateConfiguration_templateXlsmWorksheet_Error
+
+    Set testedConf = xlsmTemplateConf
+        
+    ' Create and open recreatedWb
+    getModulesAndRecreateWb testProject, testedConf
+
+    ' Test the presence of the worksheet from the template
+    mAssert.Should Not recreatedWb.Worksheets("xlsmTemplateWorksheet") Is Nothing
+    
+    mAssert.Should True, "The above shouldn't have thrown any error."
+
+    On Error GoTo 0
+    Exit Sub
+
+Test_vtkRecreateConfiguration_templateXlsmWorksheet_Error:
+    Err.Source = "vtkRecreateConfigurationTester::Test_vtkRecreateConfiguration_templateXlsmWorksheet"
+    mAssert.Should False, "Unexpected Error " & Err.Number & " (" & Err.Description & ") in " & Err.Source
+    Exit Sub
+
+End Sub
+    
 Private Function ITest_Suite() As TestSuite
     Set ITest_Suite = New TestSuite
     ITest_Suite.AddTest ITest_Manager.ClassName, "Test_vtkRecreateConfiguration_workbookIsCreatedInTheGoodPath_normalConf"
@@ -885,6 +964,9 @@ Private Function ITest_Suite() As TestSuite
     ITest_Suite.AddTest ITest_Manager.ClassName, "Test_vtkRecreateConfiguration_overwriteFile_addIn"
     ITest_Suite.AddTest ITest_Manager.ClassName, "Test_vtkRecreateConfiguration_title"
     ITest_Suite.AddTest ITest_Manager.ClassName, "Test_vtkRecreateConfiguration_comment"
+    ITest_Suite.AddTest ITest_Manager.ClassName, "Test_vtkRecreateConfiguration_templateXlsmVBProject"
+    ITest_Suite.AddTest ITest_Manager.ClassName, "Test_vtkRecreateConfiguration_templateXlsmModule"
+    ITest_Suite.AddTest ITest_Manager.ClassName, "Test_vtkRecreateConfiguration_templateXlsmWorksheet"
 End Function
 
 Private Sub ITestCase_RunTest()
@@ -912,6 +994,9 @@ Private Sub ITestCase_RunTest()
         Case "Test_vtkRecreateConfiguration_overwriteFile_addIn": Test_vtkRecreateConfiguration_overwriteFile_addIn
         Case "Test_vtkRecreateConfiguration_title": Test_vtkRecreateConfiguration_title
         Case "Test_vtkRecreateConfiguration_comment": Test_vtkRecreateConfiguration_comment
+        Case "Test_vtkRecreateConfiguration_templateXlsmVBProject": Test_vtkRecreateConfiguration_templateXlsmVBProject
+        Case "Test_vtkRecreateConfiguration_templateXlsmModule": Test_vtkRecreateConfiguration_templateXlsmModule
+        Case "Test_vtkRecreateConfiguration_templateXlsmWorksheet": Test_vtkRecreateConfiguration_templateXlsmWorksheet
         Case Else: mAssert.Should False, "Invalid test name: " & mManager.methodName
     End Select
 End Sub

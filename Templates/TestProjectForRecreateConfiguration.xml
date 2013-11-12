@@ -74,6 +74,11 @@
 		<path>TestProject_faultyRefConf.xlsm</path>
 	</configuration>
 
+	<configuration cID="c14">
+		<name>TestProject_xlsmTemplateConf</name>
+		<path>TestProject_xlsmTemplateConf.xlsm</path>
+		<templatePath>Templates\xlsmTemplateWorkbook.xlsm</templatePath>
+	</configuration>
 
 	<module mID="m01">
 		<name>TestModule1</name>
