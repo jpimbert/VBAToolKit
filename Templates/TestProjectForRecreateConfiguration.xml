@@ -86,6 +86,12 @@
 		<templatePath>xlamTemplateWorkbook.xlam</templatePath>
 	</configuration>
 
+	<configuration cID="c16">
+		<name>TestProject_xlaTemplateConf</name>
+		<path>TestProject_xlaTemplateConf.xlam</path>
+		<templatePath>xlaTemplateWorkbook.xla</templatePath>
+	</configuration>
+
 	<module mID="m01">
 		<name>TestModule1</name>
 		<modulePath confId="c02">TestModule1.bas</modulePath>
