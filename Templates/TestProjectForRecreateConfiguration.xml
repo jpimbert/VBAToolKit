@@ -80,6 +80,12 @@
 		<templatePath>xlsmTemplateWorkbook.xlsm</templatePath>
 	</configuration>
 
+	<configuration cID="c15">
+		<name>TestProject_xlamTemplateConf</name>
+		<path>TestProject_xlamTemplateConf.xlam</path>
+		<templatePath>xlamTemplateWorkbook.xlam</templatePath>
+	</configuration>
+
 	<module mID="m01">
 		<name>TestModule1</name>
 		<modulePath confId="c02">TestModule1.bas</modulePath>

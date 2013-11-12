@@ -55,6 +55,7 @@ Private VTKProjectConf As vtkConfiguration
 Private testedConf As vtkConfiguration
 Private faultyRefConf As vtkConfiguration
 Private xlsmTemplateConf As vtkConfiguration
+Private xlamTemplateConf As vtkConfiguration
 
 Private cm As vtkConfigurationManager
 
@@ -70,6 +71,7 @@ Private Const multitypeConfName = "TestProject_multitypeConf"
 Private Const VTKConfName = "TestProject_VTKConf"
 Private Const faultyRefConfName = "TestProject_faultyRefConf"
 Private Const xlsmTemplateConfName = "TestProject_xlsmTemplateConf"
+Private Const xlamTemplateConfName = "TestProject_xlamTemplateConf"
 Private Const VTKProjectConfName = "VBAToolKit"
 
 Private Const standardRememberedProjectsDTDName As String = "rememberedProjectsDTD.dtd"
@@ -137,10 +139,15 @@ Private Sub ITestCase_SetUp(Assert As IAssert)
     Set VTKProjectConf = cm.configurations(VTKProjectConfName)
     Set faultyRefConf = cm.configurations(faultyRefConfName)
     Set xlsmTemplateConf = cm.configurations(xlsmTemplateConfName)
+    Set xlamTemplateConf = cm.configurations(xlamTemplateConfName)
     
     ' Copy the workbook templates
     FileCopy Source:=fso.BuildPath(vtkPathToTemplateFolder, "xlsmTemplateWorkbook.xlsm"), _
              destination:=fso.BuildPath(testProjectFolder, "xlsmTemplateWorkbook.xlsm")
+             
+    FileCopy Source:=fso.BuildPath(vtkPathToTemplateFolder, "xlamTemplateWorkbook.xlam"), _
+             destination:=fso.BuildPath(testProjectFolder, "xlamTemplateWorkbook.xlam")
+
 
     On Error GoTo 0
     Exit Sub
@@ -943,6 +950,85 @@ Test_vtkRecreateConfiguration_templateXlsmWorksheet_Error:
 
 End Sub
     
+    
+Public Sub Test_vtkRecreateConfiguration_templateXlamVBProject()
+' ensure the configuration is well created with an xlam template, and that the VBProjec name is set
+' according to the template
+
+    On Error GoTo Test_vtkRecreateConfiguration_templateXlamVBProject_Error
+
+    Set testedConf = xlamTemplateConf
+        
+    ' Create and open recreatedWb
+    getModulesAndRecreateWb testProject, testedConf
+
+    ' Test the VBProjectName
+    mAssert.Equals recreatedWb.VBProject.name, "xlamTemplateProject"
+
+    On Error GoTo 0
+    Exit Sub
+
+Test_vtkRecreateConfiguration_templateXlamVBProject_Error:
+    Err.Source = "vtkRecreateConfigurationTester::Test_vtkRecreateConfiguration_templateXlamVBProject"
+    mAssert.Should False, "Unexpected Error " & Err.Number & " (" & Err.Description & ") in " & Err.Source
+    Exit Sub
+
+End Sub
+
+
+Public Sub Test_vtkRecreateConfiguration_templateXlamModule()
+' ensure the configuration is well created with an xlam template, and that the module of the template
+' exists in the recreated Workbook
+
+    On Error GoTo Test_vtkRecreateConfiguration_templateXlammodule_Error
+
+    Set testedConf = xlamTemplateConf
+        
+    ' Create and open recreatedWb
+    getModulesAndRecreateWb testProject, testedConf
+
+    ' Test the presence of the module from the template
+    mAssert.Should Not recreatedWb.VBProject.VBComponents("xlamTemplateModule") Is Nothing
+    
+    mAssert.Should True, "The above shouldn't have thrown any error."
+
+    On Error GoTo 0
+    Exit Sub
+
+Test_vtkRecreateConfiguration_templateXlammodule_Error:
+    Err.Source = "vtkRecreateConfigurationTester::Test_vtkRecreateConfiguration_templateXlammodule"
+    mAssert.Should False, "Unexpected Error " & Err.Number & " (" & Err.Description & ") in " & Err.Source
+    Exit Sub
+
+End Sub
+
+Public Sub Test_vtkRecreateConfiguration_templateXlamWorksheet()
+' ensure the configuration is well created with an xlam template, and that the worksheet present in the template
+' are present too in the recreatedWb
+
+    On Error GoTo Test_vtkRecreateConfiguration_templateXlamWorksheet_Error
+
+    Set testedConf = xlamTemplateConf
+        
+    ' Create and open recreatedWb
+    getModulesAndRecreateWb testProject, testedConf
+
+    ' Test the presence of the worksheet from the template
+    mAssert.Should Not recreatedWb.Worksheets("xlamTemplateSheet") Is Nothing
+    
+    mAssert.Should True, "The above shouldn't have thrown any error."
+
+    On Error GoTo 0
+    Exit Sub
+
+Test_vtkRecreateConfiguration_templateXlamWorksheet_Error:
+    Err.Source = "vtkRecreateConfigurationTester::Test_vtkRecreateConfiguration_templateXlamWorksheet"
+    mAssert.Should False, "Unexpected Error " & Err.Number & " (" & Err.Description & ") in " & Err.Source
+    Exit Sub
+
+End Sub
+
+
 Private Function ITest_Suite() As TestSuite
     Set ITest_Suite = New TestSuite
     ITest_Suite.AddTest ITest_Manager.ClassName, "Test_vtkRecreateConfiguration_workbookIsCreatedInTheGoodPath_normalConf"
@@ -971,6 +1057,9 @@ Private Function ITest_Suite() As TestSuite
     ITest_Suite.AddTest ITest_Manager.ClassName, "Test_vtkRecreateConfiguration_templateXlsmVBProject"
     ITest_Suite.AddTest ITest_Manager.ClassName, "Test_vtkRecreateConfiguration_templateXlsmModule"
     ITest_Suite.AddTest ITest_Manager.ClassName, "Test_vtkRecreateConfiguration_templateXlsmWorksheet"
+    ITest_Suite.AddTest ITest_Manager.ClassName, "Test_vtkRecreateConfiguration_templateXlamVBProject"
+    ITest_Suite.AddTest ITest_Manager.ClassName, "Test_vtkRecreateConfiguration_templateXlamModule"
+    ITest_Suite.AddTest ITest_Manager.ClassName, "Test_vtkRecreateConfiguration_templateXlamWorksheet"
 End Function
 
 Private Sub ITestCase_RunTest()
@@ -1001,6 +1090,9 @@ Private Sub ITestCase_RunTest()
         Case "Test_vtkRecreateConfiguration_templateXlsmVBProject": Test_vtkRecreateConfiguration_templateXlsmVBProject
         Case "Test_vtkRecreateConfiguration_templateXlsmModule": Test_vtkRecreateConfiguration_templateXlsmModule
         Case "Test_vtkRecreateConfiguration_templateXlsmWorksheet": Test_vtkRecreateConfiguration_templateXlsmWorksheet
+        Case "Test_vtkRecreateConfiguration_templateXlamVBProject": Test_vtkRecreateConfiguration_templateXlamVBProject
+        Case "Test_vtkRecreateConfiguration_templateXlamModule": Test_vtkRecreateConfiguration_templateXlamModule
+        Case "Test_vtkRecreateConfiguration_templateXlamWorksheet": Test_vtkRecreateConfiguration_templateXlamWorksheet
         Case Else: mAssert.Should False, "Invalid test name: " & mManager.methodName
     End Select
 End Sub
