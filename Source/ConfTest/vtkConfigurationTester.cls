@@ -255,6 +255,23 @@ TestComment_Error:
 End Sub
 
 
+Public Sub TestTemplatePath()
+' assert the template path is retrieved correctly via the configuration manager
+
+    On Error GoTo TestTemplatePath_Error
+
+    mAssert.Equals confManager.configurations(1).templatePath, "C:\Dummy\Template.xlsm"
+
+    On Error GoTo 0
+    Exit Sub
+
+TestTemplatePath_Error:
+    Err.Source = "vtkConfigurationTester::TestTemplatePath"
+    mAssert.Should False, "Unexpected Error " & Err.Number & " (" & Err.Description & ") in " & Err.Source
+    Exit Sub
+
+End Sub
+
 'Public Sub Test_AddedConfigurationCollection_Number()
 '    ' This test verifies the number of each vtkConfiguration object
 '    ' Added configuration to the collection initialized from an Excel worlbook

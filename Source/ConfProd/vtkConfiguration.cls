@@ -167,5 +167,16 @@ End Property
 '---------------------------------------------------------------------------------------
 '
 Property Get comment() As String
-    title = m_parent.getConfigurationComment(name)
+    comment = m_parent.getConfigurationComment(name)
+End Property
+
+
+'---------------------------------------------------------------------------------------
+' Procedure : templatePath
+' Author    : Lucas Vitorino
+' Purpose   : The templatePath of the configuration
+'---------------------------------------------------------------------------------------
+'
+Property Get templatePath() As String
+    templatePath = m_parent.getConfigurationTemplatePath(name)
 End Property
