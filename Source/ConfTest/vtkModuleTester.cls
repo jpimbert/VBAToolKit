@@ -38,6 +38,13 @@ Private Const initializedWorkbookName As String = "InitializedProject_DEV.xlsm"
 Private confManager As vtkConfigurationManager   ' Configuration Manager for the new workbook
 Private Const initializedProjectName As String = "InitializedProject"
 
+Private initializedProject As vtkProject
+Private Const standardRememberedProjectsDTDName As String = "vtkRememberedProjectsDTD.dtd"
+Private Const rememberedProjectsSheetName As String = "VBAToolKitRememberdProjects.xml"
+Private Const vtkConfigurationsDTDName As String = "vtkConfigurationsDTD.dtd"
+
+Private fso As New FileSystemObject
+
 Private mManager As TestCaseManager
 Private mAssert As IAssert
 
@@ -56,16 +63,43 @@ End Property
 Private Sub ITestCase_SetUp(Assert As IAssert)
     Set mAssert = Assert
     
-    Dim Source As String, destination As String
-    Source = vtkPathToTemplateFolder & "\" & initializedWorkbookName
-    destination = vtkPathToTestFolder & "\" & initializedWorkbookName
+    Set initializedProject = vtkProjectForName(initializedProjectName)
+    
+    'Dim Source As String, destination As String
+    'Source = vtkPathToTemplateFolder & "\" & initializedWorkbookName
+    'destination = vtkPathToTestFolder & "\" & initializedWorkbookName
     Set initializedWorkbook = getTestFileFromTemplate(fileName:=initializedWorkbookName, openExcel:=True)
+    
+    ' Create the files we'll need for remembering projects
+    createDTDforRememberedProjects sheetPath:=fso.BuildPath(VBAToolKit.vtkTestPath, standardRememberedProjectsDTDName)
+    
+    createRememberedProjectsXMLSheet sheetPath:=fso.BuildPath(VBAToolKit.vtkTestPath, rememberedProjectsSheetName), _
+                                     dtdPath:=fso.BuildPath(VBAToolKit.vtkTestPath, standardRememberedProjectsDTDName)
+    
+    ' Add the TestProject to the list of remembered projects
+    xmlRememberedProjectsFullPath = fso.BuildPath(VBAToolKit.vtkTestPath, rememberedProjectsSheetName)
+    
+    ' Remember the project
+    vtkAddRememberedProject projectName:=initializedProjectName, _
+                            rootFolder:=VBAToolKit.vtkTestPath, _
+                            xmlRelativePath:=initializedProject.XMLConfigurationName
+                            
+    ' Copy the XML sheet that describes the project "Initialized project"
+    FileCopy Source:=fso.BuildPath(vtkPathToTemplateFolder, initializedProject.XMLConfigurationName), _
+             destination:=fso.BuildPath(VBAToolKit.vtkTestPath, initializedProject.XMLConfigurationName)
+             
+    ' Copy the DTD
+    FileCopy Source:=fso.BuildPath(vtkPathToTemplateFolder, vtkConfigurationsDTDName), _
+             destination:=fso.BuildPath(VBAToolKit.vtkTestPath, vtkConfigurationsDTDName)
+    
     Set confManager = vtkConfigurationManagerForProject(initializedProjectName)
 End Sub
 
 Private Sub ITestCase_TearDown()
     vtkCloseAndKillWorkbook Wb:=initializedWorkbook ' close the existing Excel project
     vtkResetConfigurationManagers             ' reset all configuration managers
+    resetTestFolder
+    vtkResetProjects
 End Sub
 
 Public Sub Test_ModuleCollection_Count()
