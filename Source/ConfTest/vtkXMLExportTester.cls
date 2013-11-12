@@ -73,16 +73,6 @@ Private Sub ITestCase_SetUp(Assert As IAssert)
     
     Set testProject = vtkProjectForName(testProjectName)
     
-    
-    ' tmp ----------------------------
-    On Error Resume Next
-    vtkResetProjects
-    vtkResetConfigurationManagers
-    vtkCloseAndKillWorkbook Wb:=testWorkbook
-    VBAToolKit.resetTestFolder
-    On Error GoTo ITestCase_SetUp_Error
-    ' --------------------------------
-    
     ' --- setting up the test environment ---------
     ' Copy the DTD in the Test Folder
     getTestFileFromTemplate fileName:="vtkConfigurationsDTD.dtd", openExcel:=False

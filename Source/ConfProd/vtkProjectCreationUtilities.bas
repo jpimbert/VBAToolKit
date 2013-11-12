@@ -23,27 +23,6 @@ Attribute VB_Name = "vtkProjectCreationUtilities"
 Option Explicit
 
 '---------------------------------------------------------------------------------------
-' Procedure : VtkAvtivateReferences
-' Author    : Abdelfattah Lahbib
-' Date      : 26/04/2013
-' Purpose   : - Check that workbook is open and activate VBIDE and +-scripting references
-'             - Optionally, activate reference to the current workbook (see comments in vtkCreateProject for the use
-'               of this parameter)
-'---------------------------------------------------------------------------------------
-Public Sub VtkActivateReferences(Wb As Workbook, Optional toSelf As Boolean = False)
-    If VtkWorkbookIsOpen(Wb.name) = True Then     'if the workbook is opened
-        On Error Resume Next ' if an extention is already activated, we will try to activate the next one
-        Wb.VBProject.references.AddFromGuid "{420B2830-E718-11CF-893D-00A0C9054228}", 0, 0  ' Scripting : Microsoft scripting runtime
-        Wb.VBProject.references.AddFromGuid "{0002E157-0000-0000-C000-000000000046}", 0, 0  ' VBIDE : Microsoft visual basic for applications extensibility 5.3
-        Wb.VBProject.references.AddFromGuid "{50A7E9B0-70EF-11D1-B75A-00A0C90564FE}", 0, 0  ' Shell32 : Microsoft Shell Controls and Automation
-        Wb.VBProject.references.AddFromGuid "{F5078F18-C551-11D3-89B9-0000F81FE221}", 0, 0  ' MSXML2 : Microsoft XML V5.0
-        Wb.VBProject.references.AddFromGuid "{00000206-0000-0010-8000-00AA006D2EA4}", 0, 0  ' ADODB : Microsoft ActiveX Data Objects V2.6 Library
-        If toSelf Then Wb.VBProject.references.AddFromFile ThisWorkbook.FullName ' if specified, add reference to current workbook.
-        On Error GoTo 0
-    End If
-End Sub
-
-'---------------------------------------------------------------------------------------
 ' Procedure : vtkDisplayActivatedReferencesGuid
 ' Author    : Jean-Pierre Imbert
 ' Date      : 21/08/2013
