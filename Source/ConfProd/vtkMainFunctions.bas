@@ -187,7 +187,6 @@ Public Sub vtkRecreateConfiguration(projectName As String, configurationName As 
             Wb.VBProject.references.AddFromFile tmpRef.path
         End If
     Next
-    If conf.isDEV Then Wb.VBProject.references.AddFromFile ThisWorkbook.FullName
 
     On Error GoTo vtkRecreateConfiguration_Error
     
@@ -203,7 +202,7 @@ Public Sub vtkRecreateConfiguration(projectName As String, configurationName As 
               vtkStripFilePathOrNameOfExtension(fso.GetFileName(wbPath)) & _
               CStr(Round((99999 - 10000 + 1) * Rnd(), 0)) + 10000 & _
               "." & fso.GetExtensionName(wbPath))
-    
+
     ' Create the the folder containing the workbook if a 1-level or less deep folder structure
     ' is specified in the configuration path.
     vtkCreateFolderPath tmpPath

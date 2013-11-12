@@ -41,7 +41,7 @@ Option Explicit
 '             - The folder structure is supposed to be a standard VBAToolKit project structure.
 '---------------------------------------------------------------------------------------
 '
-Public Sub createInitializedXMLSheetForProject(sheetpath As String, _
+Public Sub createInitializedXMLSheetForProject(sheetPath As String, _
                                     projectName As String, _
                                     Optional dtdPath As String = "../Templates/vtkConfigurationsDTD.dtd", _
                                     Optional addReferenceToSelf As Boolean = True)
@@ -71,11 +71,11 @@ Public Sub createInitializedXMLSheetForProject(sheetpath As String, _
     ' Create the 2 configurations
     xmlFile.WriteLine Text:="    <configuration cID=""" & deliveryConfId & """>"
     xmlFile.WriteLine Text:="        <name>" & projectName & "</name>"
-    xmlFile.WriteLine Text:="        <path>" & fso.GetParentFolderName(fso.GetParentFolderName(sheetpath)) & "\Delivery\" & projectName & ".xlsm</path>"
+    xmlFile.WriteLine Text:="        <path>Delivery\" & projectName & ".xlsm</path>"
     xmlFile.WriteLine Text:="    </configuration>"
     xmlFile.WriteLine Text:="    <configuration cID=""" & devConfId & """>"
     xmlFile.WriteLine Text:="        <name>" & projectName & "_DEV</name>"
-    xmlFile.WriteLine Text:="        <path>" & fso.GetParentFolderName(fso.GetParentFolderName(sheetpath)) & "\Project\" & projectName & "_DEV.xlsm</path>"
+    xmlFile.WriteLine Text:="        <path>Project\" & projectName & "_DEV.xlsm</path>"
     xmlFile.WriteLine Text:="    </configuration>"
     xmlFile.WriteBlankLines Lines:=1
     xmlFile.WriteBlankLines Lines:=1
@@ -108,7 +108,7 @@ Public Sub createInitializedXMLSheetForProject(sheetpath As String, _
     If addReferenceToSelf Then
         xmlFile.WriteLine Text:="    <reference confIDs=""" & devConfId & """>"
         xmlFile.WriteLine Text:="        <name>" & ThisWorkbook.VBProject.name & "</name>"
-        xmlFile.WriteLine Text:="        <guid>" & ThisWorkbook.name & "</guid>"
+        xmlFile.WriteLine Text:="        <path>" & ThisWorkbook.FullName & "</path>"
         xmlFile.WriteLine Text:="    </reference>"
         xmlFile.WriteBlankLines Lines:=1
     End If
@@ -126,7 +126,7 @@ End Sub
 '             a project with all its configurations.
 '---------------------------------------------------------------------------------------
 '
-Public Sub createDTDForVtkConfigurations(sheetpath As String)
+Public Sub createDTDForVtkConfigurations(sheetPath As String)
     
     Dim fso As New FileSystemObject
     Dim xmlFile As TextStream
@@ -171,7 +171,7 @@ End Sub
 '             - The folder structure is supposed to be a standard VBAToolKit project structure.
 '---------------------------------------------------------------------------------------
 '
-Public Sub createRememberedProjectsXMLSheet(sheetpath As String, _
+Public Sub createRememberedProjectsXMLSheet(sheetPath As String, _
                                             Optional dtdPath As String = "../Templates/vtkRememberedProjectsDTD.dtd")
 
     Dim fso As New FileSystemObject
@@ -201,7 +201,7 @@ End Sub
 '             the projects rememberd by VBAToolKit (name, rootFolder, xmlRelativePath)
 '---------------------------------------------------------------------------------------
 '
-Public Sub createDTDforRememberedProjects(sheetpath As String)
+Public Sub createDTDforRememberedProjects(sheetPath As String)
     
     Dim fso As New FileSystemObject
     Dim xmlFile As TextStream
