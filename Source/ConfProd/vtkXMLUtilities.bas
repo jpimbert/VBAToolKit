@@ -51,9 +51,7 @@ Public Sub vtkExportConfigurationsAsXML(projectName As String, filePath As Strin
 
     ' Create the XML preamble
     xmlFile.WriteLine Text:="<?xml version=""1.0"" encoding=""ISO-8859-1"" standalone=""yes""?>"
-'    xmlFile.WriteLine Text:="<?xml version=""1.0"" encoding=""ISO-8859-1"" standalone=""no""?>"
-'    xmlFile.WriteLine Text:="<!DOCTYPE vtkConf SYSTEM ""vtkConfigurationsDTD.dtd"">"
-    xmlFile.WriteLine Text:="<!DOCTYPE vtkConf SYSTEM ["
+    xmlFile.WriteLine Text:="<!DOCTYPE vtkConf ["
     xmlFile.WriteLine Text:="<!ELEMENT vtkConf (info,configuration*, module*, reference*)>"
     xmlFile.WriteLine Text:="        <!ELEMENT info (vtkConfigurationsVersion,projectName)>"
     xmlFile.WriteLine Text:="                <!ELEMENT vtkConfigurationsVersion (#PCDATA)>"
@@ -95,13 +93,13 @@ Public Sub vtkExportConfigurationsAsXML(projectName As String, filePath As Strin
     Next
     
     ' Create Module elements
-    Dim md As vtkModule, modulepath As String
+    Dim md As vtkModule, modulePath As String
     For Each md In cm.modules
         xmlFile.WriteLine Text:="    <module mID=""" & md.ID & """>"
         xmlFile.WriteLine Text:="        <name>" & md.name & "</name>"
         For Each cf In cm.configurations
-            modulepath = md.getPathForConfiguration(confName:=cf.name)
-            If Not modulepath Like "" Then xmlFile.WriteLine Text:="        <modulePath confId=""" & cf.ID & """>" & modulepath & "</modulePath>"
+            modulePath = md.getPathForConfiguration(confName:=cf.name)
+            If Not modulePath Like "" Then xmlFile.WriteLine Text:="        <modulePath confId=""" & cf.ID & """>" & modulePath & "</modulePath>"
         Next
         xmlFile.WriteLine Text:="    </module>"
     Next

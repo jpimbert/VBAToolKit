@@ -342,7 +342,7 @@ Public Sub Test_vtkExportConfigurationsAsXML_ExistantFile()
     Dim line As String
     line = f.ReadLine
     f.Close
-    mAssert.Equals line, "<?xml version=""1.0"" encoding=""ISO-8859-1"" standalone=""no""?>", "First line of the configuration file"
+    mAssert.Equals line, "<?xml version=""1.0"" encoding=""ISO-8859-1"" standalone=""yes""?>", "First line of the configuration file"
 
    On Error GoTo 0
    Exit Sub
