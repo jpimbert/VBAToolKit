@@ -40,7 +40,6 @@ Private mAssert As IAssert
 
 Private fso As New FileSystemObject
 
-Private Const standardRememberedProjectsDTDName As String = "vtkRememberedProjectsDTD.dtd"
 Private Const rememberedProjectsSheetName As String = "VBAToolKitRememberedProjects.xml"
 
 Private Sub Class_Initialize()
@@ -62,10 +61,7 @@ Private Sub ITestCase_SetUp(Assert As IAssert)
     vtkResetProjects
     
     ' Create the files we'll need for remembering projects
-    createDTDforRememberedProjects sheetPath:=fso.BuildPath(VBAToolKit.vtkTestPath, standardRememberedProjectsDTDName)
-    
-    createRememberedProjectsXMLSheet sheetPath:=fso.BuildPath(VBAToolKit.vtkTestPath, rememberedProjectsSheetName), _
-                                     dtdPath:=fso.BuildPath(VBAToolKit.vtkTestPath, standardRememberedProjectsDTDName)
+    createRememberedProjectsXMLSheet sheetPath:=fso.BuildPath(VBAToolKit.vtkTestPath, rememberedProjectsSheetName)
     
     ' Add the TestProject to the list of remembered projects
     xmlRememberedProjectsFullPath = fso.BuildPath(VBAToolKit.vtkTestPath, rememberedProjectsSheetName)

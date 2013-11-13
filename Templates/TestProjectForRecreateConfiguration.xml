@@ -1,5 +1,30 @@
-<?xml version="1.0" encoding="ISO-8859-1" standalone="no"?>
-<!DOCTYPE vtkConf SYSTEM "vtkConfigurationsDTD.dtd">
+<?xml version="1.0" encoding="ISO-8859-1" standalone="yes"?>
+<!DOCTYPE vtkConf [
+<!ELEMENT vtkConf (info,configuration*, module*, reference*)>
+
+   <!ELEMENT info (vtkConfigurationsVersion,projectName)>
+       <!ELEMENT vtkConfigurationsVersion (#PCDATA)>
+       <!ELEMENT projectName (#PCDATA)>
+
+   <!ELEMENT configuration (name,path,templatePath?,title?,comment?)>
+    <!ATTLIST configuration cID ID #REQUIRED>
+       <!ELEMENT name (#PCDATA)>
+       <!ELEMENT path (#PCDATA)>
+       <!ELEMENT templatePath (#PCDATA)>
+       <!ELEMENT title (#PCDATA)>
+       <!ELEMENT comment (#PCDATA)>
+
+   <!ELEMENT module (name, modulePath*)>
+    <!ATTLIST module mID ID #REQUIRED>
+       <!ELEMENT modulePath (#PCDATA)>
+       <!ATTLIST modulePath
+           confId IDREF #REQUIRED
+       >
+
+   <!ELEMENT reference (name, (guid|path))>
+    <!ATTLIST reference confIDs IDREFS #REQUIRED>
+       <!ELEMENT guid (#PCDATA)>
+]>
 <vtkConf>
 
 	<info>

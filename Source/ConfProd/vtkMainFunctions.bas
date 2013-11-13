@@ -68,14 +68,10 @@ Public Function vtkCreateProject(path As String, name As String, Optional displa
     internalError = vtkCreateTreeFolder(rootPath)
     If internalError <> VTK_OK Then GoTo vtkCreateProject_ErrorTreeFolder
     
-    ' Create the XML vtkConfigurations sheet in the standard folder, the dtd is supposed to be in the same folder
+    ' Create the XML vtkConfigurations sheet in the standard folder, the dtd is built-in the xml file
     createInitializedXMLSheetForProject sheetPath:=fso.BuildPath(rootPath, project.XMLConfigurationStandardRelativePath), _
-                                        projectName:=project.projectName, _
-                                        dtdPath:="vtkConfigurationsDTD.dtd"
-                                        
-    ' Create the DTD sheet for the XML vtkConfigurations sheet in the same folder
-    createDTDForVtkConfigurations sheetPath:=fso.BuildPath(rootPath, fso.BuildPath(fso.GetParentFolderName(project.XMLConfigurationStandardRelativePath), "vtkConfigurationsDTD.dtd"))
-    
+                                        projectName:=project.projectName
+                                            
     ' Insert the BeforeSave handler in the newly created project
     ' /!\ For that we need to manage the "ThisWorkbook" object, we will do it later
     ' vtkAddBeforeSaveHandlerInDEVWorkbook Wb:=Wb, projectName:=project.projectName, confName:=project.projectDEVName
@@ -208,7 +204,7 @@ Public Sub vtkRecreateConfiguration(projectName As String, configurationName As 
     vtkCreateFolderPath tmpPath
     
     ' Without this line, an xla file is not created with the right format
-    If vtkDefaultFileFormat(wbPath) = xlAddIn Then Wb.IsAddin = True
+    Wb.IsAddin = vtkDefaultIsAddIn(wbPath)
     
     ' Save the new workbook with the correct extension
     Wb.SaveAs fileName:=tmpPath, FileFormat:=vtkDefaultFileFormat(wbPath)

@@ -52,9 +52,6 @@ Private Const existingXMLSheetNameForTests As String = "XMLSheetForConfiguration
 Private Const newProjectXMLName As String = "NewProject"
 Private Const rememberedProjectsSheetName As String = "BlankRememberedProjectsSheet.xml"
 
-Private Const rememberedProjectsDTDName As String = "rememberedProjectsDTD.dtd"
-Private Const vtkConfigurationsDTDName As String = "vtkConfigurationsDTD.dtd"
-
 Private Sub Class_Initialize()
     Set mManager = New TestCaseManager
 End Sub
@@ -82,19 +79,9 @@ Private Sub ITestCase_SetUp(Assert As IAssert)
     Set newProject = vtkProjectForName(newProjectName)
     
     ' Create the XML sheet listing the rememberd projects
-    createRememberedProjectsXMLSheet sheetPath:=fso.BuildPath(VBAToolKit.vtkTestPath, rememberedProjectsSheetName), _
-                                     dtdPath:=rememberedProjectsDTDName
+    createRememberedProjectsXMLSheet sheetPath:=fso.BuildPath(VBAToolKit.vtkTestPath, rememberedProjectsSheetName)
     
     xmlRememberedProjectsFullPath = fso.BuildPath(VBAToolKit.vtkTestPath, rememberedProjectsSheetName)
-                      
-    
-    ' Copy the DTDs
-    FileCopy Source:=fso.BuildPath(vtkPathToTemplateFolder, rememberedProjectsDTDName), _
-             destination:=fso.BuildPath(VBAToolKit.vtkTestPath, rememberedProjectsDTDName)
-    
-    FileCopy Source:=fso.BuildPath(vtkPathToTemplateFolder, vtkConfigurationsDTDName), _
-             destination:=fso.BuildPath(VBAToolKit.vtkTestPath, vtkConfigurationsDTDName)
-    
                          
     ' Copy the XML sheet that describes the project "ExistingProject", and add it to the list of remembered projects
     FileCopy Source:=fso.BuildPath(vtkPathToTemplateFolder, existingXMLSheetNameForTests), _

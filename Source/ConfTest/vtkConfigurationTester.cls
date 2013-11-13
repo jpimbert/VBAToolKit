@@ -38,8 +38,6 @@ Private confManager As vtkConfigurationManager   ' Configuration Manager for the
 Private Const initializedProjectName As String = "InitializedProject"
 
 Private Const initializedProjectXmlSheetName As String = "InitializedProject.xml"
-Private Const rememberedProjectsDTDName As String = "rememberedProjectsDTD.dtd"
-Private Const vtkConfigurationsDTDName As String = "vtkConfigurationsDTD.dtd"
 Private Const rememberedProjectsSheetName As String = "BlankRememberedProjectsSheet.xml"
 
 Private fso As New FileSystemObject
@@ -83,14 +81,6 @@ Private Sub ITestCase_SetUp(Assert As IAssert)
     ' Copy the XML sheet that describes the project "ExistingProject"
     FileCopy Source:=fso.BuildPath(vtkPathToTemplateFolder, initializedProjectXmlSheetName), _
              destination:=fso.BuildPath(VBAToolKit.vtkTestPath, initializedProjectXmlSheetName)
-             
-             
-    ' Copy the DTDs
-    FileCopy Source:=fso.BuildPath(vtkPathToTemplateFolder, rememberedProjectsDTDName), _
-             destination:=fso.BuildPath(VBAToolKit.vtkTestPath, rememberedProjectsDTDName)
-             
-    FileCopy Source:=fso.BuildPath(vtkPathToTemplateFolder, vtkConfigurationsDTDName), _
-             destination:=fso.BuildPath(VBAToolKit.vtkTestPath, vtkConfigurationsDTDName)
              
              
     ' Set the configuration manager

@@ -1,5 +1,13 @@
-<?xml version="1.0" encoding="ISO-8859-1" standalone="no"?>
-<!DOCTYPE rememberedProjects SYSTEM "rememberedProjectsDTD.dtd">
+<?xml version="1.0" encoding="ISO-8859-1" standalone="yes"?>
+<!DOCTYPE rememberedProjects [
+<!ELEMENT rememberedProjects (info,project*)>
+	<!ELEMENT info (version)>
+		<!ELEMENT version (#PCDATA)>
+	<!ELEMENT project (name,rootFolder,xmlRelativePath)>
+		<!ELEMENT name (#PCDATA)>
+		<!ELEMENT rootFolder (#PCDATA)>
+		<!ELEMENT xmlRelativePath (#PCDATA)>
+]>
 <rememberedProjects>
 	<info>
 		<version>1.0</version>

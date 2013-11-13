@@ -56,8 +56,6 @@ Private testConf As vtkConfiguration
 Private testWorkbook As Workbook
 Private newlyCreatedWorkbook As Workbook
 
-Private Const standardVtkConfigurationsDTDName As String = "vtkConfigurationsDTD.dtd"
-Private Const standardRememberedProjectsDTDName As String = "vtkRememberedProjectsDTD.dtd"
 Private Const rememberedProjectsSheetName As String = "VBAToolKitRememberedProjects.xml"
 
 Private fso As New FileSystemObject
@@ -87,10 +85,7 @@ Private Sub ITestCase_SetUp(Assert As IAssert)
     projectDir = fso.BuildPath(VBAToolKit.vtkTestPath, testProject.projectName) & "\" 'to fit with the behaviour of the old version of projectDir
     
     ' Create the files we'll need for remembering projects
-    createDTDforRememberedProjects sheetPath:=fso.BuildPath(VBAToolKit.vtkTestPath, standardRememberedProjectsDTDName)
-    
-    createRememberedProjectsXMLSheet sheetPath:=fso.BuildPath(VBAToolKit.vtkTestPath, rememberedProjectsSheetName), _
-                                     dtdPath:=fso.BuildPath(VBAToolKit.vtkTestPath, standardRememberedProjectsDTDName)
+    createRememberedProjectsXMLSheet sheetPath:=fso.BuildPath(VBAToolKit.vtkTestPath, rememberedProjectsSheetName)
     
     ' Add the TestProject to the list of remembered projects
     xmlRememberedProjectsFullPath = fso.BuildPath(VBAToolKit.vtkTestPath, rememberedProjectsSheetName)
@@ -98,9 +93,7 @@ Private Sub ITestCase_SetUp(Assert As IAssert)
     ' Copy the xml file describing the project TestProject and create its DTD
     FileCopy Source:=fso.BuildPath(vtkPathToTemplateFolder, testProject.XMLConfigurationName), _
              destination:=fso.BuildPath(VBAToolKit.vtkTestPath, testProject.projectName & "\" & testProject.XMLConfigurationName)
-             
-    createDTDForVtkConfigurations fso.BuildPath(VBAToolKit.vtkTestPath, testProject.projectName & "\" & standardVtkConfigurationsDTDName)
-    
+                 
     'Remember the project
     vtkAddRememberedProject projectName:=testProject.projectName, _
                             rootFolder:=fso.BuildPath(VBAToolKit.vtkTestPath, testProject.projectName), _

@@ -78,8 +78,6 @@ Private Const xlaTemplateConfName = "TestProject_xlaTemplateConf"
 Private Const xlsTemplateConfName = "TestProject_xlsTemplateConf"
 Private Const VTKProjectConfName = "VBAToolKit"
 
-Private Const standardRememberedProjectsDTDName As String = "rememberedProjectsDTD.dtd"
-Private Const standardVtkConfigurationsDTDName As String = "vtkConfigurationsDTD.dtd"
 Private Const rememberedProjectsSheetName As String = "VBAToolKitTestProjects.xml"
 
 Private Sub Class_Initialize()
@@ -110,17 +108,12 @@ Private Sub ITestCase_SetUp(Assert As IAssert)
     vtkCreateTreeFolder testProjectFolder
 
     ' Create the files we'll need for remembering projects
-    createDTDforRememberedProjects sheetPath:=fso.BuildPath(VBAToolKit.vtkTestPath, standardRememberedProjectsDTDName)
+    createRememberedProjectsXMLSheet sheetPath:=fso.BuildPath(VBAToolKit.vtkTestPath, rememberedProjectsSheetName)
     
-    createRememberedProjectsXMLSheet sheetPath:=fso.BuildPath(VBAToolKit.vtkTestPath, rememberedProjectsSheetName), _
-                                     dtdPath:=fso.BuildPath(VBAToolKit.vtkTestPath, standardRememberedProjectsDTDName)
-    
-    ' Copy the sheet of the new project in the relevant folder, and create a DTD
+    ' Copy the sheet of the new project in the relevant folder
     FileCopy Source:=fso.BuildPath(vtkPathToTemplateFolder, testProject.XMLConfigurationName), _
              destination:=fso.BuildPath(testProjectFolder, testProject.XMLConfigurationStandardRelativePath)
-    
-    createDTDForVtkConfigurations fso.BuildPath(testProjectFolder, "Project\" & standardVtkConfigurationsDTDName)
-    
+        
     ' Add the TestProject to the list of remembered projects
     xmlRememberedProjectsFullPath = fso.BuildPath(VBAToolKit.vtkTestPath, rememberedProjectsSheetName)
     

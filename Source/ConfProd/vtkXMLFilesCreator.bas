@@ -56,8 +56,31 @@ Public Sub createInitializedXMLSheetForProject(sheetPath As String, _
     devConfId = "c02"
   
     ' Create the XML preamble
-    xmlFile.WriteLine Text:="<?xml version=""1.0"" encoding=""ISO-8859-1"" standalone=""no""?>"
-    xmlFile.WriteLine Text:="<!DOCTYPE vtkConf SYSTEM """ & dtdPath & """>"
+    xmlFile.WriteLine Text:="<?xml version=""1.0"" encoding=""ISO-8859-1"" standalone=""yes""?>"
+    
+    ' Create the built-in DTD
+    xmlFile.WriteLine Text:="<!DOCTYPE vtkConf ["
+    xmlFile.WriteLine Text:="<!ELEMENT vtkConf (info,configuration*, module*, reference*)>"
+    xmlFile.WriteLine Text:="        <!ELEMENT info (vtkConfigurationsVersion,projectName)>"
+    xmlFile.WriteLine Text:="                <!ELEMENT vtkConfigurationsVersion (#PCDATA)>"
+    xmlFile.WriteLine Text:="                <!ELEMENT projectName (#PCDATA)>"
+    xmlFile.WriteLine Text:="        <!ELEMENT configuration (name,path,templatePath?,title?,comment?)>"
+    xmlFile.WriteLine Text:="         <!ATTLIST configuration cID ID #REQUIRED>"
+    xmlFile.WriteLine Text:="                <!ELEMENT name (#PCDATA)>"
+    xmlFile.WriteLine Text:="                <!ELEMENT path (#PCDATA)>"
+    xmlFile.WriteLine Text:="                <!ELEMENT templatePath (#PCDATA)>"
+    xmlFile.WriteLine Text:="                <!ELEMENT title        (#PCDATA)>"
+    xmlFile.WriteLine Text:="                <!ELEMENT comment (#PCDATA)>"
+    xmlFile.WriteLine Text:="        <!ELEMENT module (name, modulePath*)>"
+    xmlFile.WriteLine Text:="         <!ATTLIST module mID ID #REQUIRED>"
+    xmlFile.WriteLine Text:="                <!ELEMENT modulePath (#PCDATA)>"
+    xmlFile.WriteLine Text:="                <!ATTLIST modulePath confId IDREF #REQUIRED>"
+    xmlFile.WriteLine Text:="        <!ELEMENT reference (name, (guid|path))>"
+    xmlFile.WriteLine Text:="         <!ATTLIST reference confIDs IDREFS #REQUIRED>"
+    xmlFile.WriteLine Text:="                <!ELEMENT guid (#PCDATA)>"
+    xmlFile.WriteLine Text:="]>"
+    
+    ' Create the root object
     xmlFile.WriteLine Text:="<vtkConf>"
     xmlFile.WriteBlankLines Lines:=1
     
@@ -120,49 +143,6 @@ Public Sub createInitializedXMLSheetForProject(sheetPath As String, _
 End Sub
 
 '---------------------------------------------------------------------------------------
-' Procedure : createDTDForVtkConfigurations
-' Author    : Lucas Vitorino
-' Purpose   : Create a DTD sheet for vtkConfigurations, that is to say the XML sheet describing
-'             a project with all its configurations.
-'---------------------------------------------------------------------------------------
-'
-Public Sub createDTDForVtkConfigurations(sheetPath As String)
-    
-    Dim fso As New FileSystemObject
-    Dim xmlFile As TextStream
-    Set xmlFile = fso.CreateTextFile(fileName:=sheetpath, Overwrite:=True)
-    
-    xmlFile.WriteLine Text:="<!ELEMENT vtkConf (info,configuration*, module*, reference*)>"
-    xmlFile.WriteBlankLines Lines:=1
-    xmlFile.WriteLine Text:="   <!ELEMENT info (vtkConfigurationsVersion,projectName)>"
-    xmlFile.WriteLine Text:="       <!ELEMENT vtkConfigurationsVersion (#PCDATA)>"
-    xmlFile.WriteLine Text:="       <!ELEMENT projectName (#PCDATA)>"
-    xmlFile.WriteBlankLines Lines:=1
-    xmlFile.WriteLine Text:="   <!ELEMENT configuration (name,path,templatePath?,title?,comment?)>"
-    xmlFile.WriteLine Text:="    <!ATTLIST configuration cID ID #REQUIRED>"
-    xmlFile.WriteLine Text:="       <!ELEMENT name (#PCDATA)>"
-    xmlFile.WriteLine Text:="       <!ELEMENT path (#PCDATA)>"
-    xmlFile.WriteLine Text:="       <!ELEMENT templatePath (#PCDATA)>"
-    xmlFile.WriteLine Text:="       <!ELEMENT title (#PCDATA)>"
-    xmlFile.WriteLine Text:="       <!ELEMENT comment (#PCDATA)>"
-    xmlFile.WriteBlankLines Lines:=1
-    xmlFile.WriteLine Text:="   <!ELEMENT module (name, modulePath*)>"
-    xmlFile.WriteLine Text:="    <!ATTLIST module mID ID #REQUIRED>"
-    xmlFile.WriteLine Text:="       <!ELEMENT modulePath (#PCDATA)>"
-    xmlFile.WriteLine Text:="       <!ATTLIST modulePath"
-    xmlFile.WriteLine Text:="           confId IDREF #REQUIRED"
-    xmlFile.WriteLine Text:="       >"
-    xmlFile.WriteBlankLines Lines:=1
-    xmlFile.WriteLine Text:="   <!ELEMENT reference (name, (guid|path))>"
-    xmlFile.WriteLine Text:="    <!ATTLIST reference confIDs IDREFS #REQUIRED>"
-    xmlFile.WriteLine Text:="       <!ELEMENT guid (#PCDATA)>"
-  
-    xmlFile.Close
-
-End Sub
-
-
-'---------------------------------------------------------------------------------------
 ' Procedure : createRememberedProjectsXMLSheet
 ' Author    : Lucas Vitorino
 ' Purpose   : Create a blank "remembered projects" xml sheet at the given path.
@@ -179,7 +159,15 @@ Public Sub createRememberedProjectsXMLSheet(sheetPath As String, _
     Set xmlFile = fso.CreateTextFile(fileName:=sheetpath, Overwrite:=True)
 
     xmlFile.WriteLine Text:="<?xml version=""1.0"" encoding=""ISO-8859-1"" standalone=""no""?>"
-    xmlFile.WriteLine Text:="<!DOCTYPE vtkConf SYSTEM """ & dtdPath & """>"
+    xmlFile.WriteLine Text:="<!DOCTYPE remeberedProjects ["
+    xmlFile.WriteLine Text:="<!ELEMENT rememberedProjects (info,project*)>"
+    xmlFile.WriteLine Text:="    <!ELEMENT info (version)>"
+    xmlFile.WriteLine Text:="        <!ELEMENT version (#PCDATA)>"
+    xmlFile.WriteLine Text:="    <!ELEMENT project (name,rootFolder,xmlRelativePath)>"
+    xmlFile.WriteLine Text:="        <!ELEMENT name (#PCDATA)>"
+    xmlFile.WriteLine Text:="        <!ELEMENT rootFolder (#PCDATA)>"
+    xmlFile.WriteLine Text:="        <!ELEMENT xmlRelativePath (#PCDATA)>"
+    xmlFile.WriteLine Text:="]"
     xmlFile.WriteBlankLines Lines:=1
     xmlFile.WriteLine Text:="<rememberedProjects>"
     xmlFile.WriteBlankLines Lines:=1
@@ -188,32 +176,6 @@ Public Sub createRememberedProjectsXMLSheet(sheetPath As String, _
     xmlFile.WriteLine Text:="    </info>"
     xmlFile.WriteBlankLines Lines:=1
     xmlFile.WriteLine Text:="</rememberedProjects>"
-    
-    xmlFile.Close
-    
-End Sub
-
-
-'---------------------------------------------------------------------------------------
-' Procedure : createDTDforRememberedProjects
-' Author    : Lucas Vitorino
-' Purpose   : Create a DTD sheet for rememberedProjects, that is to say the XML sheet describing
-'             the projects rememberd by VBAToolKit (name, rootFolder, xmlRelativePath)
-'---------------------------------------------------------------------------------------
-'
-Public Sub createDTDforRememberedProjects(sheetPath As String)
-    
-    Dim fso As New FileSystemObject
-    Dim xmlFile As TextStream
-    Set xmlFile = fso.CreateTextFile(fileName:=sheetpath, Overwrite:=True)
-    
-    xmlFile.WriteLine Text:="<!ELEMENT rememberedProjects (info,project*)>"
-    xmlFile.WriteLine Text:="    <!ELEMENT info (version)>"
-    xmlFile.WriteLine Text:="        <!ELEMENT version (#PCDATA)>"
-    xmlFile.WriteLine Text:="    <!ELEMENT project (name,rootFolder,xmlRelativePath)>"
-    xmlFile.WriteLine Text:="        <!ELEMENT name (#PCDATA)>"
-    xmlFile.WriteLine Text:="        <!ELEMENT rootFolder (#PCDATA)>"
-    xmlFile.WriteLine Text:="        <!ELEMENT xmlRelativePath (#PCDATA)>"
     
     xmlFile.Close
     

@@ -44,8 +44,6 @@ Private Const existingWorkbookName As String = "WorkBookForConfigurationsTests.x
 
 Private Const rememberedProjectsSheetName As String = "BlankRememberedProjectsSheet.xml"
 Private fso As New FileSystemObject
-Private Const rememberedProjectsDTDName As String = "rememberedProjectsDTD.dtd"
-Private Const vtkConfigurationsDTDName As String = "vtkConfigurationsDTD.dtd"
 
 Private Const existingXMLSheetNameForTests As String = "XMLSheetForConfigurationsTests.xml"
 
@@ -94,18 +92,6 @@ Private Sub ITestCase_SetUp(Assert As IAssert)
     ' NB : the content of this file is wrong (projectName is wrong)
     FileCopy Source:=fso.BuildPath(vtkPathToTemplateFolder, existingXMLSheetNameForTests), _
              destination:=fso.BuildPath(VBAToolKit.vtkTestPath, projectName & ".xml")
-
-'    ' Copy the XML sheet that describes the project "NewProject"
-'    FileCopy Source:=fso.BuildPath(vtkPathToTemplateFolder, newProjectXMLSheetName), _
-'             destination:=fso.BuildPath(VBAToolKit.vtkTestPath, newProjectXMLSheetName)
-    
-    
-    ' Copy the DTDs
-    FileCopy Source:=fso.BuildPath(vtkPathToTemplateFolder, rememberedProjectsDTDName), _
-             destination:=fso.BuildPath(VBAToolKit.vtkTestPath, rememberedProjectsDTDName)
-    
-    FileCopy Source:=fso.BuildPath(vtkPathToTemplateFolder, vtkConfigurationsDTDName), _
-             destination:=fso.BuildPath(VBAToolKit.vtkTestPath, vtkConfigurationsDTDName)
     
     ' --------------------------------------------------------
 

@@ -36,7 +36,6 @@ Private mManager As TestCaseManager
 Private mAssert As IAssert
 
 Private fso As New FileSystemObject
-Private Const standardRememberedProjectsDTDName As String = "vtkRememberedProjectsDTD.dtd"
 
 Private Sub Class_Initialize()
     Set mManager = New TestCaseManager
@@ -56,7 +55,6 @@ Private Sub ITestCase_SetUp(Assert As IAssert)
     
     ' Setup the test environment
     xmlRememberedProjectsFullPath = fso.BuildPath(VBAToolKit.vtkTestPath, "VBAToolKitTestProjects.xml")
-    createDTDforRememberedProjects sheetPath:=fso.BuildPath(VBAToolKit.vtkTestPath, standardRememberedProjectsDTDName)
 End Sub
 
 Private Sub ITestCase_TearDown()

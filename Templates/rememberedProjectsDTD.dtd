@@ -1,7 +1,0 @@
-<!ELEMENT rememberedProjects (info,project*)>
-	<!ELEMENT info (version)>
-		<!ELEMENT version (#PCDATA)>
-	<!ELEMENT project (name,rootFolder,xmlRelativePath)>
-		<!ELEMENT name (#PCDATA)>
-		<!ELEMENT rootFolder (#PCDATA)>
-		<!ELEMENT xmlRelativePath (#PCDATA)>

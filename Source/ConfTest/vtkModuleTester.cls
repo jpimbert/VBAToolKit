@@ -39,9 +39,7 @@ Private confManager As vtkConfigurationManager   ' Configuration Manager for the
 Private Const initializedProjectName As String = "InitializedProject"
 
 Private initializedProject As vtkProject
-Private Const standardRememberedProjectsDTDName As String = "vtkRememberedProjectsDTD.dtd"
 Private Const rememberedProjectsSheetName As String = "VBAToolKitRememberdProjects.xml"
-Private Const vtkConfigurationsDTDName As String = "vtkConfigurationsDTD.dtd"
 
 Private fso As New FileSystemObject
 
@@ -71,10 +69,7 @@ Private Sub ITestCase_SetUp(Assert As IAssert)
     Set initializedWorkbook = getTestFileFromTemplate(fileName:=initializedWorkbookName, openExcel:=True)
     
     ' Create the files we'll need for remembering projects
-    createDTDforRememberedProjects sheetPath:=fso.BuildPath(VBAToolKit.vtkTestPath, standardRememberedProjectsDTDName)
-    
-    createRememberedProjectsXMLSheet sheetPath:=fso.BuildPath(VBAToolKit.vtkTestPath, rememberedProjectsSheetName), _
-                                     dtdPath:=fso.BuildPath(VBAToolKit.vtkTestPath, standardRememberedProjectsDTDName)
+    createRememberedProjectsXMLSheet sheetPath:=fso.BuildPath(VBAToolKit.vtkTestPath, rememberedProjectsSheetName)
     
     ' Add the TestProject to the list of remembered projects
     xmlRememberedProjectsFullPath = fso.BuildPath(VBAToolKit.vtkTestPath, rememberedProjectsSheetName)
@@ -87,10 +82,6 @@ Private Sub ITestCase_SetUp(Assert As IAssert)
     ' Copy the XML sheet that describes the project "Initialized project"
     FileCopy Source:=fso.BuildPath(vtkPathToTemplateFolder, initializedProject.XMLConfigurationName), _
              destination:=fso.BuildPath(VBAToolKit.vtkTestPath, initializedProject.XMLConfigurationName)
-             
-    ' Copy the DTD
-    FileCopy Source:=fso.BuildPath(vtkPathToTemplateFolder, vtkConfigurationsDTDName), _
-             destination:=fso.BuildPath(VBAToolKit.vtkTestPath, vtkConfigurationsDTDName)
     
     ' Create our working CM
     Set confManager = vtkConfigurationManagerForProject(initializedProjectName)
