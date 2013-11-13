@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="ISO-8859-1" standalone="yes"?>
-<!DOCTYPE vtkConf SYSTEM [
-<!ELEMENT vtkConf (info,configuration*, module*, reference*)>
+<!DOCTYPE vtkConf [
+    <!ELEMENT vtkConf (info,configuration*, module*, reference*)>
         <!ELEMENT info (vtkConfigurationsVersion,projectName)>
                 <!ELEMENT vtkConfigurationsVersion (#PCDATA)>
                 <!ELEMENT projectName (#PCDATA)>

@@ -131,3 +131,50 @@ Public Sub vtkInitializeConfigurationForActiveWorkBook()
     ActiveWorkbook.Save
     
 End Sub
+
+'---------------------------------------------------------------------------------------
+' Procedure : vtkVerifyConfigurations
+' Author    : Jean-Pierre IMBERT
+' Date      : 13/11/2013
+' Purpose   : Verify the coherence of the configurations description and the real
+'             configuration workbooks and source modules
+'             The verifications performed are :
+'             - All configuration pathes are reachable
+'   To be implemented in next commits
+'             - All modules listed in a configuration description are existing in the configuration
+'             - All modules really present in a configuration are described in the description
+'             - All modules really present in a configuration have a non null path in the description
+'             - All modules pathes are reachable
+'   To be implemented perhaps (?)
+'             - Each code module implemented in a configuration is the same as the source code module
+'   To be ilmplemented later (with XML configuration files)
+'             - All references listed in a configuration description are existing in the configuration
+'             - All references really present in a configuration are described in the description
+'---------------------------------------------------------------------------------------
+'
+Sub vtkVerifyConfigurations()
+    ' Init project and configuration manager
+    Dim prj As vtkProject
+    Set prj = vtkProjectForName(getCurrentProjectName)
+    Dim cm As vtkConfigurationManager
+    Set cm = vtkConfigurationManagerForProject(prj.projectName)
+    
+    ' Declare variables
+    Dim c As vtkConfiguration, m As vtkModule, fso As New FileSystemObject
+    Dim s As String, col As New Collection
+    Debug.Print "----------------------------------------------------"
+    Debug.Print "  Start verification of " & getCurrentProjectName & " project configurations"
+    Debug.Print "----------------------------------------------------"
+   
+    ' Verify configuration pathes
+    For Each c In cm.configurations
+        s = cm.rootPath & "\" & c.path
+        If fso.FileExists(s) Then
+            col.Add Item:=c, Key:=c.name
+           Else
+            Debug.Print "Path of configuration " & c.name & " unreachable (" & s & ")."
+        End If
+    Next
+    
+    Debug.Print "----------------------------------------------------"
+End Sub
