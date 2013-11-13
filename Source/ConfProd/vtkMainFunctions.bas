@@ -177,10 +177,17 @@ Public Sub vtkRecreateConfiguration(projectName As String, configurationName As 
     On Error GoTo vtkRecreateConfiguration_referenceError
     Dim tmpRef As vtkReference
     For Each tmpRef In conf.references
-        If tmpRef.guid <> "" Then
-            Wb.VBProject.references.AddFromGuid tmpRef.guid, 0, 0
-        ElseIf tmpRef.path <> "" Then
-            Wb.VBProject.references.AddFromFile tmpRef.path
+        If tmpRef.name <> "stdole" And _
+           tmpRef.name <> "Office" And _
+           tmpRef.name <> "MSForms" And _
+           tmpRef.name <> "VBA" And _
+           tmpRef.name <> "Excel" _
+           Then 'temporary fix
+           If tmpRef.guid <> "" Then
+                Wb.VBProject.references.AddFromGuid tmpRef.guid, 0, 0
+            ElseIf tmpRef.path <> "" Then
+                Wb.VBProject.references.AddFromFile tmpRef.path
+            End If
         End If
     Next
 

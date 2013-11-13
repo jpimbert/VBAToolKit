@@ -58,6 +58,13 @@ Private Sub initializeList()
     "Tests" & "," & _
     ""
     
+    properlyCasedIdentifiersString = _
+    "folderPath" & "," & _
+    "wbPath" & "," & _
+    "sheetPath" & "," & _
+    "modulePath" & "," & _
+    ""
+    
     properlyCasedIdentifiersArray = Split(properlyCasedIdentifiersString, ",")
     
 End Sub

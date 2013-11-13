@@ -47,7 +47,15 @@ Public Sub vtkExportConfigurationsAsXML(projectName As String, filePath As Strin
     ' Create a new XML configuration file
     Dim fso As New FileSystemObject
     Dim xmlFile As TextStream
-    Set xmlFile = fso.CreateTextFile(fileName:=filePath, Overwrite:=True)
+    
+    Dim tmpPath As String
+    ' Add a random string to the file name of the workbook that will be saved
+    tmpPath = fso.BuildPath(fso.GetParentFolderName(filePath), _
+              vtkStripFilePathOrNameOfExtension(fso.GetFileName(filePath)) & _
+              CStr(Round((99999 - 10000 + 1) * Rnd(), 0)) + 10000 & _
+              "." & fso.GetExtensionName(filePath))
+                            
+    Set xmlFile = fso.CreateTextFile(fileName:=tmpPath, Overwrite:=True)
 
     ' Create the XML preamble
     xmlFile.WriteLine Text:="<?xml version=""1.0"" encoding=""ISO-8859-1"" standalone=""yes""?>"
@@ -145,6 +153,13 @@ Public Sub vtkExportConfigurationsAsXML(projectName As String, filePath As Strin
     ' Close the file
     xmlFile.WriteLine Text:="</vtkConf>"
     xmlFile.Close
+    
+    ' Delete the old file if it exists
+    If fso.FileExists(filePath) Then fso.DeleteFile (filePath)
+    
+    ' Rename the new file without the random string
+    fso.GetFile(tmpPath).name = fso.GetFileName(filePath)
+    
     
    On Error GoTo 0
    Exit Sub
