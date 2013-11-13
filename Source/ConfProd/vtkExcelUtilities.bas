@@ -119,3 +119,16 @@ Public Function vtkDefaultFileFormat(filePath As String) As XlFileFormat
             vtkDefaultFileFormat = 0
         End Select
 End Function
+
+'---------------------------------------------------------------------------------------
+' Function  : vtkDefaultIsAddIn as Boolean
+' Author    : Jean-Pierre Imbert
+' Date      : 11/11/2013
+' Purpose   : return True if the default File Format is an Excel Add-In
+'             - currenttly is add-in if extension is .xla or .xlam
+'---------------------------------------------------------------------------------------
+'
+Public Function vtkDefaultIsAddIn(filePath As String) As Boolean
+    vtkDefaultIsAddIn = (vtkGetFileExtension(filePath) = "xlam") Or (vtkGetFileExtension(filePath) = "xla")
+End Function
+
