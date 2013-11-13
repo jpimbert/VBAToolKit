@@ -77,11 +77,13 @@ End Sub
 ' Author    : Jean-Pierre Imbert
 ' Date      : 07/08/2013
 '
-' WARNING   : for now used only with manual run to convert a VBA project for VBAToolkit
+' WARNING 1 : for now used only with manual run to convert a VBA project for VBAToolkit
+' WARNING 2 : A beforeSave event handler is added even if one is already existing
 '
 ' Purpose   : Create and Initialize a vtkConfiguration sheet for the active workbook
 '             - does nothing if the active workbook already contains a vtkConfiguration worksheet
 '             - initialize the worksheet with all VBA modules contained in the workbook
+'             - a BeforeSave event handler is added to the new ActiveWorkbook
 '             - manage VBAUnit, Tester class and standard modules appropriately
 '             - the suffix "_DEV" is appended to the project name
 '             - the Excel workbook is saved as a new file with DEV appended to the name
@@ -121,6 +123,9 @@ Public Sub vtkInitializeConfigurationForActiveWorkBook()
             End If
         End If
     Next
+    
+    ' Add a BeforeSave event handler for the workbook
+    vtkAddBeforeSaveHandlerInDEVWorkbook Wb:=ActiveWorkbook, projectName:=project.projectName, confName:=project.projectDEVName
     
     ' Save the new workbook
     ActiveWorkbook.Save
