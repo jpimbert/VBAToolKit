@@ -147,13 +147,12 @@ End Sub
 '             The verifications performed are :
 '             - All configuration pathes are reachable
 '             - All modules listed in a configuration description are existing in the configuration
+'             - All modules really present in a configuration are described in the description with non null path
 '   To be implemented in next commits
-'             - All modules really present in a configuration are described in the description
-'             - All modules really present in a configuration have a non null path in the description
 '             - All modules pathes are reachable
 '   To be implemented perhaps (?)
 '             - Each code module implemented in a configuration is the same as the source code module
-'   To be ilmplemented later (with XML configuration files)
+'   To be implemented later (with XML configuration files)
 '             - All references listed in a configuration description are existing in the configuration
 '             - All references really present in a configuration are described in the description
 '---------------------------------------------------------------------------------------
@@ -198,8 +197,20 @@ Sub vtkVerifyConfigurations()
         For Each vbc In cwb(i).Wb.VBProject.VBComponents
            On Error Resume Next
             Set md = mods(vbc.name)
-            If Err.Number = 5 Then
+            If Err.Number <> 0 Then
                 Debug.Print "Module " & vbc.name & " is in configuration workbook " & cwb(i).conf.name & " but not in description of configuration."
+            End If
+           On Error GoTo 0
+        Next
+    Next i
+    
+    ' Verify that all modules in a description are in the configuration
+    For i = 1 To nbConf
+        For Each md In cwb(i).conf.modules
+           On Error Resume Next
+            Set vbc = cwb(i).Wb.VBProject.VBComponents(md.name)
+            If Err.Number <> 0 Then
+                Debug.Print "Module " & md.name & " is in the configuration description of " & cwb(i).conf.name & " but not in the workbook."
             End If
            On Error GoTo 0
         Next
