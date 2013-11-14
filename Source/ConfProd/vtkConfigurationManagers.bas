@@ -148,7 +148,6 @@ End Sub
 '             - All configuration pathes are reachable
 '             - All modules listed in a configuration description are existing in the configuration
 '             - All modules really present in a configuration are described in the description with non null path
-'   To be implemented in next commits
 '             - All modules pathes are reachable
 '   To be implemented perhaps (?)
 '             - Each code module implemented in a configuration is the same as the source code module
@@ -213,6 +212,16 @@ Sub vtkVerifyConfigurations()
                 Debug.Print "Module " & md.name & " is in the configuration description of " & cwb(i).conf.name & " but not in the workbook."
             End If
            On Error GoTo 0
+        Next
+    Next i
+    
+    ' Verify that all modules pathes are reachable
+    For i = 1 To nbConf
+        For Each md In cwb(i).conf.modules
+            s = cm.rootPath & "\" & md.path
+            If Not fso.FileExists(s) Then
+                Debug.Print "Module " & md.name & " path (" & md.path & " is not reachable for the configuration " & cwb(i).conf.name & "."
+            End If
         Next
     Next i
     
