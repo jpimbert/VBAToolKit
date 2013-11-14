@@ -14,6 +14,7 @@ Attribute VB_Creatable = False
 Attribute VB_PredeclaredId = True
 Attribute VB_Exposed = False
 
+
 '---------------------------------------------------------------------------------------
 ' Module    : vtkCreateProjectForm
 ' Author    : Lucas Vitorino
@@ -33,11 +34,12 @@ Attribute VB_Exposed = False
 '   See the License for the specific language governing permissions and
 '   limitations under the License.
 '---------------------------------------------------------------------------------------
-
+Option Explicit
 
 Private cm As vtkConfigurationManager
 Private currentConf As vtkConfiguration
 Private currentProjectName As String
+
 
 '---------------------------------------------------------------------------------------
 ' Procedure : UserForm_Initialize
@@ -58,6 +60,7 @@ Private Sub UserForm_Initialize()
 
     ' Initialize the content of the combo box
     If Not cm Is Nothing Then
+    If cm Is Nothing Then Debug.Print "cm is nothing"
         Dim conf As vtkConfiguration
         For Each conf In cm.configurations
             ConfigurationComboBox.AddItem (conf.name)
@@ -177,3 +180,34 @@ Private Sub enableCreateConfigurationButton()
         CreateConfigurationButton.Enabled = True
     End If
 End Sub
+
+
+'---------------------------------------------------------------------------------------
+' Procedure : getCurrentProjectName
+' Author    : Lucas Vitorino
+' Purpose   : Gets the project name of the current workbook if it finds it in VTK.
+'---------------------------------------------------------------------------------------
+'
+Private Function getCurrentProjectName() As String
+    Dim tmpProj As vtkProject
+    Dim cm As New vtkConfigurationManager
+    Dim tmpConf As vtkConfiguration
+    Dim fso As New FileSystemObject
+    
+    ' For each project
+    For Each tmpProj In listOfRememberedProjects
+        Set cm = vtkConfigurationManagerForProject(tmpProj.projectName)
+        If Not cm Is Nothing Then
+            ' Check the path of every configuration
+            For Each tmpConf In cm.configurations
+                If fso.GetFileName(tmpConf.path) = fso.GetFileName(ThisWorkbook.FullName) Then
+                    getCurrentProjectName = tmpProj.projectName
+                    Exit Function
+                End If
+            Next
+        End If
+    Next
+    
+    getCurrentProjectName = ""
+        
+End Function

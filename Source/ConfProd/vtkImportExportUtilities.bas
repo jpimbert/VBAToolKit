@@ -269,7 +269,6 @@ Public Sub vtkExportOneModule(project As VBProject, moduleName As String, filePa
     Exit Sub
 
 vtkExportOneModule_Error:
-    Debug.Print Err.Number, Err.Description
     If Err.Number = 9 Then
         Err.Raise Number:=VTK_UNKNOWN_MODULE, Source:="ExportOneModule", Description:="Module to export doesn't exist : " & moduleName
        Else
