@@ -390,6 +390,12 @@
         <name>vtkExcelUtilitiesTester</name>
         <modulePath confId="c2">Source\ConfTest\vtkExcelUtilitiesTester.cls</modulePath>
     </module>
+    <module mID="m66">
+        <name>vtkNewRecreateConfigurationForm</name>
+        <modulePath confId="c1">Source\ConfProd\vtkNewRecreateConfigurationForm.frm</modulePath>
+        <modulePath confId="c2">Source\ConfProd\vtkNewRecreateConfigurationForm.frm</modulePath>
+        <modulePath confId="c3">Source\ConfProd\vtkNewRecreateConfigurationForm.frm</modulePath>
+    </module>
     <reference confIDs="c1 c2 c3">
         <name>VBA</name>
         <guid>{000204EF-0000-0000-C000-000000000046}</guid>
