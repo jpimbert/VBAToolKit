@@ -28,6 +28,12 @@ Option Explicit
 '   collection of instances indexed by project names
 Private configurationManagers As Collection
 
+'   Combo type instead of completing the vtkConfiguration class
+Public Type ConfWB
+    conf As vtkConfiguration
+    Wb As Workbook
+    wasOpened As Boolean
+End Type
 
 '---------------------------------------------------------------------------------------
 ' Procedure : vtkConfigurationManagerForProject
@@ -140,8 +146,8 @@ End Sub
 '             configuration workbooks and source modules
 '             The verifications performed are :
 '             - All configuration pathes are reachable
-'   To be implemented in next commits
 '             - All modules listed in a configuration description are existing in the configuration
+'   To be implemented in next commits
 '             - All modules really present in a configuration are described in the description
 '             - All modules really present in a configuration have a non null path in the description
 '             - All modules pathes are reachable
@@ -160,21 +166,48 @@ Sub vtkVerifyConfigurations()
     Set cm = vtkConfigurationManagerForProject(prj.projectName)
     
     ' Declare variables
-    Dim c As vtkConfiguration, m As vtkModule, fso As New FileSystemObject
-    Dim s As String, col As New Collection
+    Dim c As vtkConfiguration, s As String, fso As New FileSystemObject
+    Dim cwb() As ConfWB
+    ReDim cwb(1 To cm.configurationCount) As ConfWB
     Debug.Print "----------------------------------------------------"
     Debug.Print "  Start verification of " & getCurrentProjectName & " project configurations"
     Debug.Print "----------------------------------------------------"
    
     ' Verify configuration pathes
+    Dim nbConf As Integer
+    nbConf = 0
     For Each c In cm.configurations
         s = cm.rootPath & "\" & c.path
         If fso.FileExists(s) Then
-            col.Add Item:=c, Key:=c.name
+            nbConf = nbConf + 1
+            Set cwb(nbConf).conf = c
+           On Error Resume Next
+            Set cwb(nbConf).Wb = Workbooks(fso.GetFileName(s))
+           On Error GoTo 0
+            cwb(nbConf).wasOpened = Not (cwb(nbConf).Wb Is Nothing)
+            If Not cwb(nbConf).wasOpened Then Set cwb(nbConf).Wb = Workbooks.Open(fileName:=s, ReadOnly:=True)
            Else
             Debug.Print "Path of configuration " & c.name & " unreachable (" & s & ")."
         End If
     Next
     
+    ' Verify that all modules in a configuration are in the description
+    Dim i As Integer, mods As Collection, vbc As VBIDE.VBComponent, md As vtkModule
+    For i = 1 To nbConf
+        Set mods = cwb(i).conf.modules
+        For Each vbc In cwb(i).Wb.VBProject.VBComponents
+           On Error Resume Next
+            Set md = mods(vbc.name)
+            If Err.Number = 5 Then
+                Debug.Print "Module " & vbc.name & " is in configuration workbook " & cwb(i).conf.name & " but not in description of configuration."
+            End If
+           On Error GoTo 0
+        Next
+    Next i
+    
+    ' Close all Worbooks opened during this verification
+    For i = 1 To nbConf
+        If Not cwb(i).wasOpened Then cwb(i).Wb.Close saveChanges:=False
+    Next i
     Debug.Print "----------------------------------------------------"
 End Sub
