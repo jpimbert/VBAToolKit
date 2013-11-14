@@ -96,7 +96,7 @@ End Sub
 '             - the Delivery version is described in configuration but not created
 '---------------------------------------------------------------------------------------
 '
-Public Sub vtkInitializeConfigurationForActiveWorkBook()
+Public Sub vtkInitializeConfigurationForActiveWorkBook(Optional withBeforeSaveHandler As Boolean = False)
     ' If a configuration sheet exists, does nothing
     Dim cm As New vtkConfigurationManager
     If cm.isConfigurationInitializedForWorkbook(ExcelName:=ActiveWorkbook.name) Then Exit Sub
@@ -131,7 +131,7 @@ Public Sub vtkInitializeConfigurationForActiveWorkBook()
     Next
     
     ' Add a BeforeSave event handler for the workbook
-    vtkAddBeforeSaveHandlerInDEVWorkbook Wb:=ActiveWorkbook, projectName:=project.projectName, confName:=project.projectDEVName
+    If withBeforeSaveHandler Then vtkAddBeforeSaveHandlerInDEVWorkbook Wb:=ActiveWorkbook, projectName:=project.projectName, confName:=project.projectDEVName
     
     ' Save the new workbook
     ActiveWorkbook.Save
@@ -224,6 +224,27 @@ Sub vtkVerifyConfigurations()
             End If
         Next
     Next i
+    
+    ' Verify that all modules content of all configuration are equal to source modules content
+    ' - Create a project folder tree structure in the test folder of the cirrent project
+    ' - For each configuration
+    '   - Export each module in the test tree folder (to perform a comparaison on normalized export)
+    '   - compare the content of the each file in the tree folder to the one in the source folder
+    ' - Delete the files and folders in the test folder
+    Dim testPath As String, s1 As String
+    testPath = vtkPathToTestFolder(ActiveWorkbook) & "\Temporary"
+    vtkCreateTreeFolder testPath
+    For i = 1 To nbConf
+        For Each md In cwb(i).conf.modules
+            s = cm.rootPath & "\" & md.path
+            s1 = testPath & "\" & md.path
+            vtkExportOneModule cwb(i).Wb.VBProject, md.name, s1
+            If Not compareFiles(s, s1, True) Then
+                Debug.Print "Module " & md.name & " content of source path (" & md.path & " is different from module in the configuration " & cwb(i).conf.name & "."
+            End If
+        Next
+    Next i
+    vtkDeleteFolder testPath
     
     ' Close all Worbooks opened during this verification
     For i = 1 To nbConf

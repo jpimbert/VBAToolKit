@@ -206,3 +206,68 @@ insertDummyProcedureInCodeModule_Error:
 
 End Sub
 
+'---------------------------------------------------------------------------------------
+' Procedure : compareFiles
+' Author    : http://www.freevbcode.com
+' Date      : 14/11/2013
+' Purpose   : Check to see if two files are identical
+'             File1 and File2 = FullPaths of files to compare
+'             StringentCheck (optional): If false (default),
+'             will only compare file lengths.  If true, a
+'             byte by byte comparison is conducted if file lengths are
+'             equal
+'---------------------------------------------------------------------------------------
+'
+Public Function compareFiles(ByVal File1 As String, _
+  ByVal File2 As String, Optional StringentCheck As _
+  Boolean = False) As Boolean
+
+On Error GoTo ErrorHandler
+
+If Dir(File1) = "" Then Exit Function
+If Dir(File2) = "" Then Exit Function
+
+Dim lLen1 As Long, lLen2 As Long
+Dim iFileNum1 As Integer
+Dim iFileNum2 As Integer
+Dim bytArr1() As Byte, bytArr2() As Byte
+Dim lCtr As Long, lStart As Long
+Dim bAns As Boolean
+
+lLen1 = FileLen(File1)
+lLen2 = FileLen(File2)
+If lLen1 <> lLen2 Then
+    compareFiles = False
+    Exit Function
+ElseIf StringentCheck = False Then
+        compareFiles = True
+        Exit Function
+Else
+    iFileNum1 = FreeFile
+    Open File1 For Binary Access Read As #iFileNum1
+    iFileNum2 = FreeFile
+    Open File2 For Binary Access Read As #iFileNum2
+
+    'put contents of both into byte Array
+    bytArr1() = InputB(LOF(iFileNum1), #iFileNum1)
+    bytArr2() = InputB(LOF(iFileNum2), #iFileNum2)
+    lLen1 = UBound(bytArr1)
+    lStart = LBound(bytArr1)
+    
+    bAns = True
+    For lCtr = lStart To lLen1
+        If bytArr1(lCtr) <> bytArr2(lCtr) Then
+            bAns = False
+            Exit For
+        End If
+            
+    Next
+    compareFiles = bAns
+       
+End If
+ 
+ErrorHandler:
+If iFileNum1 > 0 Then Close #iFileNum1
+If iFileNum2 > 0 Then Close #iFileNum2
+End Function
+
