@@ -44,13 +44,17 @@ Private Sub Workbook_AddinUninstall()
 End Sub
 
 Private Sub Workbook_BeforeSave(ByVal SaveAsUI As Boolean, Cancel As Boolean)
-    ' Export and normalize modules
-    VBAToolKit.vtkExportConfiguration ThisWorkbook.VBProject, "VBAToolKit", "VBAToolKit_DEV", True
-    
-    ' Export as XML
-    VBAToolKit.vtkExportConfigurationsAsXML projectName:="VBAToolKit", filePath:=VBAToolKit.vtkPathOfCurrentProject(ThisWorkbook) & "\" & VBAToolKit.vtkProjectForName("VBAToolKit").XMLConfigurationStandardRelativePath
-
+    ' Dirty hack to prevent the Save method from throwing an error during recreation
+    If Not Right(vtkStripFilePathOrNameOfExtension(ThisWorkbook.name), 1) Like "[1-9]" Then
+        ' Export as XML
+        VBAToolKit.vtkExportConfigurationsAsXML projectName:="VBAToolKit", filePath:=VBAToolKit.vtkPathOfCurrentProject(ThisWorkbook) & "\" & VBAToolKit.vtkProjectForName("VBAToolKit").XMLConfigurationStandardRelativePath
+        ' Export and normalize modules
+        VBAToolKit.vtkExportConfiguration ThisWorkbook.VBProject, "VBAToolKit", "VBAToolKit_DEV", True
+    End If
 End Sub
+
+
+
 
 
 

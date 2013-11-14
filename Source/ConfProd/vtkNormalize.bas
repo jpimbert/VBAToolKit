@@ -58,7 +58,8 @@ Private Sub initializeList()
     "Tests" & "," & _
     ""
     
-    properlyCasedIdentifiersString = _
+    ' Too many line continuations won't be tolerated by VBA
+    properlyCasedIdentifiersString = properlyCasedIdentifiersString & _
     "folderPath" & "," & _
     "wbPath" & "," & _
     "sheetPath" & "," & _

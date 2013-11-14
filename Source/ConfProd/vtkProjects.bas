@@ -163,7 +163,7 @@ Public Sub initFromList()
     On Error GoTo initFromList_Error
     
     ' If the collections are not yet initialized
-    If (m_projects Is Nothing) Or (m_xmlRelPathsCol Is Nothing) Or (m_xmlRelPathsCol Is Nothing) Then
+    If (m_projects Is Nothing) Or (m_rootPathsCol Is Nothing) Or (m_xmlRelPathsCol Is Nothing) Then
     
         ' Create the collections
         Set m_projects = New Collection
@@ -475,6 +475,8 @@ Public Function listOfRememberedProjects() As Collection
             retCol.Add Item:=tmpProj, Key:=tmpProj.projectName
         End If
     Next
+
+    Set listOfRememberedProjects = retCol
 
     On Error GoTo 0
     Exit Function
