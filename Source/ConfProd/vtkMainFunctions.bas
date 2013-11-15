@@ -177,17 +177,10 @@ Public Sub vtkRecreateConfiguration(projectName As String, configurationName As 
     On Error GoTo vtkRecreateConfiguration_referenceError
     Dim tmpRef As vtkReference
     For Each tmpRef In conf.references
-        If tmpRef.name <> "stdole" And _
-           tmpRef.name <> "Office" And _
-           tmpRef.name <> "MSForms" And _
-           tmpRef.name <> "VBA" And _
-           tmpRef.name <> "Excel" _
-           Then 'temporary fix
-           If tmpRef.guid <> "" Then
-                Wb.VBProject.references.AddFromGuid tmpRef.guid, 0, 0
-            ElseIf tmpRef.path <> "" Then
-                Wb.VBProject.references.AddFromFile tmpRef.path
-            End If
+        If tmpRef.guid <> "" Then
+            Wb.VBProject.references.AddFromGuid tmpRef.guid, 0, 0
+        ElseIf tmpRef.path <> "" Then
+            Wb.VBProject.references.AddFromFile tmpRef.path
         End If
     Next
 
@@ -229,7 +222,13 @@ Public Sub vtkRecreateConfiguration(projectName As String, configurationName As 
     Exit Sub
 
 vtkRecreateConfiguration_referenceError:
-    Err.Number = VTK_REFERENCE_ERROR
+
+    Select Case Err.Number
+        Case 32813 ' Name conflicts with existing module, project, or object library
+            Resume Next ' it means we're trying to activate a reference already activated : do not worry
+        Case Else
+            Err.Number = VTK_REFERENCE_ERROR
+    End Select
     GoTo vtkRecreateConfiguration_Error
 
 vtkRecreateConfiguration_Error:
