@@ -135,7 +135,6 @@ Private Sub ITestCase_SetUp(Assert As IAssert)
     ' Create the file
     createTestXML
     
-    
 End Sub
 
 Private Sub ITestCase_TearDown()
@@ -456,6 +455,24 @@ Test_vtkModifyRememberedProject_projectIsModifiedInTheList_Error:
 
 End Sub
 
+
+Public Sub Test_xmlRememberedProjectsFullPathGet()
+' ensure the xmlRememberedProjectsFullPath get property works as intended
+
+    On Error GoTo Test_xmlRememberedProjectsFullPathGet_Error
+
+    mAssert.Equals xmlRememberedProjectsFullPath, xmlFileFullPath, "The get property should return what has been set in the setup."
+
+    On Error GoTo 0
+    Exit Sub
+
+Test_xmlRememberedProjectsFullPathGet_Error:
+    Err.Source = "vtkProjectsTester::Test_xmlRememberedProjectsFullPathGet"
+    mAssert.Should False, "Unexpected Error " & Err.Number & " (" & Err.Description & ") in " & Err.Source
+    Exit Sub
+
+End Sub
+
 Private Function ITest_Suite() As TestSuite
     Set ITest_Suite = New TestSuite
     ITest_Suite.AddTest ITest_Manager.ClassName, "TestProjectIsNotNull"
@@ -470,6 +487,7 @@ Private Function ITest_Suite() As TestSuite
     ITest_Suite.AddTest ITest_Manager.ClassName, "Test_vtkRemoveRememberedProject_projectIsRemovedFromTheList"
     ITest_Suite.AddTest ITest_Manager.ClassName, "Test_vtkModifyRememberedProject_projectIsModifiedInTheCollections"
     ITest_Suite.AddTest ITest_Manager.ClassName, "Test_vtkModifyRememberedProject_projectIsModifiedInTheList"
+    ITest_Suite.AddTest ITest_Manager.ClassName, "Test_xmlRememberedProjectsFullPathGet"
 End Function
 
 Private Sub ITestCase_RunTest()
@@ -486,6 +504,7 @@ Private Sub ITestCase_RunTest()
         Case "Test_vtkRemoveRememberedProject_projectIsRemovedFromTheList": Test_vtkRemoveRememberedProject_projectIsRemovedFromTheList
         Case "Test_vtkModifyRememberedProject_projectIsModifiedInTheCollections": Test_vtkModifyRememberedProject_projectIsModifiedInTheCollections
         Case "Test_vtkModifyRememberedProject_projectIsModifiedInTheList": Test_vtkModifyRememberedProject_projectIsModifiedInTheList
+        Case "Test_xmlRememberedProjectsFullPathGet": Test_xmlRememberedProjectsFullPathGet
         Case Else: mAssert.Should False, "Invalid test name: " & mManager.methodName
     End Select
 End Sub
