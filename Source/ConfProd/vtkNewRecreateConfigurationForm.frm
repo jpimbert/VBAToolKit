@@ -33,6 +33,8 @@ Attribute VB_Exposed = False
 '   limitations under the License.
 '---------------------------------------------------------------------------------------
 
+Option Explicit
+
 Private Const colorOK As Long = &HC000&
 Private Const colorKO As Long = &HFF&
 
@@ -71,7 +73,6 @@ Private Sub UserForm_Initialize()
         ' There was a problem
         ListOfProjectsTextBox.ForeColor = colorKO
     End If
-    
 
     On Error GoTo 0
     Exit Sub
@@ -81,7 +82,6 @@ UserForm_Initialize_Error:
     Debug.Print "Error " & Err.Number & " : " & Err.Description & " in " & Err.Source ' TMP
     Exit Sub
 
-
 End Sub
 
 '---------------------------------------------------------------------------------------
@@ -89,7 +89,7 @@ End Sub
 ' Author    : Lucas Vitorino
 ' Purpose   : Manage what happens when a project is selected in the combobox :
 '               - set fields
-'               -
+'               - reset relevant fields
 '---------------------------------------------------------------------------------------
 '
 Private Sub ListOfProjectsComboBox_Change()
@@ -97,6 +97,11 @@ Private Sub ListOfProjectsComboBox_Change()
     On Error GoTo ListOfProjectsComboBox_Change_Error
 
     currentProjectName = ListOfProjectsComboBox.Value
+    
+    ' Clear all the comboboxes and textboxes about the configuration
+    ConfigurationComboBox.Clear
+    ConfigurationRelPathTextBox.Text = ""
+    ConfigurationTemplatePathTextBox.Text = ""
     
     ' Set the root folder
     ProjectFolderPathTextBox.Text = vtkRootPathForProject(currentProjectName)
@@ -117,13 +122,56 @@ Private Sub ListOfProjectsComboBox_Change()
         ProjectXMLRelPathTextBox.ForeColor = colorKO
     End If
 
+    ' Fill the configuration combobox
+    Set currentCM = vtkConfigurationManagerForProject(currentProjectName)
+    If Not currentCM Is Nothing Then
+        Dim tmpConf As New vtkConfiguration
+        For Each tmpConf In currentCM.configurations
+            ConfigurationComboBox.AddItem tmpConf.name
+        Next
+    End If
 
     On Error GoTo 0
     Exit Sub
 
 ListOfProjectsComboBox_Change_Error:
     Err.Source = "vtkNewRecreateConfigurationForm::ListOfProjectsComboBox_Change"
-    Debug.Print "Error " & Err.Number & " : " & Err.Description & " in " & Err.Source ' TMP
+    
+    Select Case Err.Number
+        Case VTK_SHEET_NOT_VALID
+            ' do nothing as we already know the xml file is not valid
+        Case Else
+            Debug.Print "Error " & Err.Number & " : " & Err.Description & " in " & Err.Source ' TMP
+    End Select
+    
     Exit Sub
 
 End Sub
+
+'---------------------------------------------------------------------------------------
+' Procedure : ConfigurationComboBox_Change
+' Author    : Lucas Vitorino
+' Purpose   : Set fields and variables according to the configuration seleceted in the combobox.
+'---------------------------------------------------------------------------------------
+'
+Private Sub ConfigurationComboBox_Change()
+    
+    On Error GoTo ConfigurationComboBox_Change_Error
+
+    If Not currentCM Is Nothing Then
+        currentConfigurationName = ConfigurationComboBox.Value
+        ConfigurationRelPathTextBox.Text = currentCM.configurations(currentConfigurationName).path
+        ConfigurationTemplatePathTextBox.Text = currentCM.configurations(currentConfigurationName).templatePath
+    End If
+
+    On Error GoTo 0
+    Exit Sub
+
+ConfigurationComboBox_Change_Error:
+    Err.Source = "vtkNewRecreateConfigurationForm::ConfigurationComboBox_Change"
+    Debug.Print "Error " & Err.Number & " : " & Err.Description & " in " & Err.Source
+    Exit Sub
+
+    
+End Sub
+
