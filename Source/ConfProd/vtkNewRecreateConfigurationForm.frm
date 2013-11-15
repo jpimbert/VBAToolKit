@@ -33,7 +33,13 @@ Attribute VB_Exposed = False
 '   limitations under the License.
 '---------------------------------------------------------------------------------------
 
+Private Const colorOK As Long = &HC000&
+Private Const colorKO As Long = &HFF&
+
 Private fso As New FileSystemObject
+Private currentProjectName As String
+Private currentConfigurationName As String
+Private currentCM As New vtkConfigurationManager
 
 '---------------------------------------------------------------------------------------
 ' Procedure : UserForm_Initialize
@@ -42,27 +48,82 @@ Private fso As New FileSystemObject
 '---------------------------------------------------------------------------------------
 '
 Private Sub UserForm_Initialize()
-    
-    Dim dummyDom As New MSXML2.DOMDocument
-    
-    ' Manage the 'list of projects' objects
+
+    On Error GoTo UserForm_Initialize_Error
+
+    ' Display the path of the list of projects and set its color according to the validity
     ListOfProjectsTextBox.Text = xmlRememberedProjectsFullPath
     
     ' Ugly with bool1 and bool2 but the one liner condition does not work in my VM
     Dim bool1 As Boolean: bool1 = fso.FileExists(xmlRememberedProjectsFullPath)
+    Dim dummyDom As New MSXML2.DOMDocument
     Dim bool2 As Boolean: bool2 = dummyDom.Load(xmlRememberedProjectsFullPath)
     If bool1 And bool2 Then
         ' Everything is fine
-        ListOfProjectsTextBox.ForeColor = &HC000&
-        
+        ListOfProjectsTextBox.ForeColor = colorOK
+           
         Dim tmpProj As New vtkProject
         For Each tmpProj In listOfRememberedProjects
             ListOfProjectsComboBox.AddItem tmpProj.projectName
         Next
         
     Else
-        ListOfProjectsTextBox.ForeColor = &HFF&
+        ' There was a problem
+        ListOfProjectsTextBox.ForeColor = colorKO
     End If
     
+
+    On Error GoTo 0
+    Exit Sub
+
+UserForm_Initialize_Error:
+    Err.Source = "vtkNewRecreateConfigurationForm::UserForm_Initialize"
+    Debug.Print "Error " & Err.Number & " : " & Err.Description & " in " & Err.Source ' TMP
+    Exit Sub
+
+
+End Sub
+
+'---------------------------------------------------------------------------------------
+' Procedure : ListOfProjectsComboBox_Change
+' Author    : Lucas Vitorino
+' Purpose   : Manage what happens when a project is selected in the combobox :
+'               - set fields
+'               -
+'---------------------------------------------------------------------------------------
+'
+Private Sub ListOfProjectsComboBox_Change()
+
+    On Error GoTo ListOfProjectsComboBox_Change_Error
+
+    currentProjectName = ListOfProjectsComboBox.Value
+    
+    ' Set the root folder
+    ProjectFolderPathTextBox.Text = vtkRootPathForProject(currentProjectName)
+    If fso.folderExists(vtkRootPathForProject(currentProjectName)) Then
+        ProjectFolderPathTextBox.ForeColor = colorOK
+    Else
+        ProjectFolderPathTextBox.ForeColor = colorKO
+    End If
+    
+    ' Set the XML rel path
+    ProjectXMLRelPathTextBox.Text = vtkXmlRelPathForProject(currentProjectName)
+    Dim bool1 As Boolean: bool1 = fso.FileExists(fso.BuildPath(vtkRootPathForProject(currentProjectName), vtkXmlRelPathForProject(currentProjectName)))
+    Dim dummyDom As New MSXML2.DOMDocument
+    Dim bool2 As Boolean: bool2 = dummyDom.Load(fso.BuildPath(vtkRootPathForProject(currentProjectName), vtkXmlRelPathForProject(currentProjectName)))
+    If bool1 And bool2 Then
+        ProjectXMLRelPathTextBox.ForeColor = colorOK
+    Else
+        ProjectXMLRelPathTextBox.ForeColor = colorKO
+    End If
+
+
+    On Error GoTo 0
+    Exit Sub
+
+ListOfProjectsComboBox_Change_Error:
+    Err.Source = "vtkNewRecreateConfigurationForm::ListOfProjectsComboBox_Change"
+    Debug.Print "Error " & Err.Number & " : " & Err.Description & " in " & Err.Source ' TMP
+    Exit Sub
 
 End Sub

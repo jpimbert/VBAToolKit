@@ -17,4 +17,9 @@
 		<rootFolder>C:\Documents and Settings\Administrator\Desktop\VTK-LUCAS\VBAToolKit</rootFolder>
 		<xmlRelativePath>Project\VBAToolKit.xml</xmlRelativePath>
 	</project>
+	<project>
+		<name>TestProject1</name>
+		<rootFolder>C:\Dummy\Path\TestProject1</rootFolder>
+		<xmlRelativePath>dummy\TestProject1.xml</xmlRelativePath>
+	</project>
 </rememberedProjects>
