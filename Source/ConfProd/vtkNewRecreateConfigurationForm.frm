@@ -163,13 +163,19 @@ Private Sub ConfigurationComboBox_Change()
         ConfigurationRelPathTextBox.Text = currentCM.configurations(currentConfigurationName).path
         ConfigurationTemplatePathTextBox.Text = currentCM.configurations(currentConfigurationName).templatePath
         
-        ' Show the text in red if the template is missing, in green if it is here
-        If fso.FileExists(fso.BuildPath(vtkRootPathForProject(currentProjectName), currentCM.configurations(currentConfigurationName).templatePath)) Then
-            ConfigurationTemplatePathTextBox.ForeColor = colorOK
-        Else
-            ConfigurationTemplatePathTextBox.ForeColore = colorKO
+        ' If there is a template
+        If currentCM.configurations(currentConfigurationName).templatePath <> "" Then
+            ' Show the text in red if the template is missing, in green if it is here
+            If fso.FileExists(fso.BuildPath(vtkRootPathForProject(currentProjectName), currentCM.configurations(currentConfigurationName).templatePath)) Then
+                ConfigurationTemplatePathTextBox.ForeColor = colorOK
+            Else
+                ConfigurationTemplatePathTextBox.ForeColor = colorKO
+                CreateConfigurationButton.Enabled = False
+                Exit Sub
+            End If
         End If
-            
+        
+        CreateConfigurationButton.Enabled = True
         
     End If
 
@@ -188,10 +194,23 @@ End Sub
 '---------------------------------------------------------------------------------------
 ' Procedure : CreateConfigurationButton_Click
 ' Author    : Lucas Vitorino
-' Purpose   :
+' Purpose   : Create the configuration.
+'            TODO : no source files ?
 '---------------------------------------------------------------------------------------
 '
 Private Sub CreateConfigurationButton_Click()
+    On Error GoTo CreateConfigurationButton_Click_Error
+
+    vtkRecreateConfiguration currentProjectName, currentConfigurationName
+
+    On Error GoTo 0
+    Exit Sub
+
+CreateConfigurationButton_Click_Error:
+    Err.Source = "vtkNewRecreateConfigurationForm::CreateConfigurationButton_Click"
+    Debug.Print "Error " & Err.Number & " : " & Err.Description & " in " & Err.Source
+    mAssert.Should False, "Unexpected Error " & Err.Number & " (" & Err.Description & ") in " & Err.Source
+    Exit Sub
 
 End Sub
 
