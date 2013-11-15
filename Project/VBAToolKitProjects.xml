@@ -19,7 +19,7 @@
 	</project>
 	<project>
 		<name>TestProject1</name>
-		<rootFolder>C:\Dummy\Path\TestProject1</rootFolder>
-		<xmlRelativePath>dummy\TestProject1.xml</xmlRelativePath>
+		<rootFolder>C:\Documents and Settings\Administrator\Desktop\VTK-LUCAS\VBAToolKit\Tests\TestProject1</rootFolder>
+		<xmlRelativePath>Project\TestProject1.xml</xmlRelativePath>
 	</project>
 </rememberedProjects>

@@ -1,10 +1,10 @@
 VERSION 5.00
 Begin {C62A69F0-16DC-11CE-9E98-00AA00574A4F} vtkNewRecreateConfigurationForm 
    Caption         =   "VBAToolKit - Recreate Configuration"
-   ClientHeight    =   7155
+   ClientHeight    =   6510
    ClientLeft      =   45
    ClientTop       =   435
-   ClientWidth     =   8835
+   ClientWidth     =   9045
    OleObjectBlob   =   "vtkNewRecreateConfigurationForm.frx":0000
    StartUpPosition =   1  'CenterOwner
 End
@@ -162,6 +162,15 @@ Private Sub ConfigurationComboBox_Change()
         currentConfigurationName = ConfigurationComboBox.Value
         ConfigurationRelPathTextBox.Text = currentCM.configurations(currentConfigurationName).path
         ConfigurationTemplatePathTextBox.Text = currentCM.configurations(currentConfigurationName).templatePath
+        
+        ' Show the text in red if the template is missing, in green if it is here
+        If fso.FileExists(fso.BuildPath(vtkRootPathForProject(currentProjectName), currentCM.configurations(currentConfigurationName).templatePath)) Then
+            ConfigurationTemplatePathTextBox.ForeColor = colorOK
+        Else
+            ConfigurationTemplatePathTextBox.ForeColore = colorKO
+        End If
+            
+        
     End If
 
     On Error GoTo 0
@@ -173,5 +182,16 @@ ConfigurationComboBox_Change_Error:
     Exit Sub
 
     
+End Sub
+
+
+'---------------------------------------------------------------------------------------
+' Procedure : CreateConfigurationButton_Click
+' Author    : Lucas Vitorino
+' Purpose   :
+'---------------------------------------------------------------------------------------
+'
+Private Sub CreateConfigurationButton_Click()
+
 End Sub
 
