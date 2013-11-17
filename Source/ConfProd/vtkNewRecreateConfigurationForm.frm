@@ -44,6 +44,8 @@ Private currentProjectName As String
 Private currentConfigurationName As String
 Private currentCM As New vtkConfigurationManager
 
+
+
 '---------------------------------------------------------------------------------------
 ' Procedure : UserForm_Initialize
 ' Author    : Lucas Vitorino
@@ -261,4 +263,27 @@ enableBrowseButtons_Error:
     Debug.Print "Error " & Err.Number & " : " & Err.Description & " in " & Err.Source
     Exit Sub
 
+End Sub
+
+
+'---------------------------------------------------------------------------------------
+' Procedure : ListOfProjectsBrowseButton_Click
+' Author    : Lucas Vitorino
+' Purpose   : Allows the choice of the path of the file containig the list of projects.
+'---------------------------------------------------------------------------------------
+'
+Private Sub ListOfProjectsBrowseButton_Click()
+    
+    ' Show the window
+    With Application.FileDialog(msoFileDialogFilePicker)
+        .AllowMultiSelect = False
+        .Show
+        If .SelectedItems.Count > 0 Then
+            xmlRememberedProjectsFullPath = .SelectedItems(1)
+        End If
+    End With
+    
+    ' Re initialize the form
+    UserForm_Initialize
+    
 End Sub
