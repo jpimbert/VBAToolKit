@@ -38,7 +38,6 @@ Option Explicit
 Private Const colorOK As Long = &HC000&
 Private Const colorKO As Long = &HFF&
 Private Const colorKOIntermediate As Long = &H80FF&
-'Private Const colorKOIntermediate As Long = &H80C0FF
 
 Private fso As New FileSystemObject
 Private currentProjectName As String
@@ -75,6 +74,9 @@ Private Sub UserForm_Initialize()
         Next
     
     End If
+
+    ' Enable/Disable the browse buttons
+    enableBrowseButtons
 
     On Error GoTo 0
     Exit Sub
@@ -137,6 +139,9 @@ Private Sub ListOfProjectsComboBox_Change()
         Next
     End If
 
+    ' Enable/Disable the browse buttons
+    enableBrowseButtons
+
     On Error GoTo 0
     Exit Sub
 
@@ -184,6 +189,9 @@ Private Sub ConfigurationComboBox_Change()
         CreateConfigurationButton.Enabled = True
         
     End If
+    
+    ' Enable/Disable the browse buttons
+    enableBrowseButtons
 
     On Error GoTo 0
     Exit Sub
@@ -209,13 +217,48 @@ Private Sub CreateConfigurationButton_Click()
 
     vtkRecreateConfiguration currentProjectName, currentConfigurationName
 
+    MsgBox "Recreation successful !", vbOKOnly
+
     On Error GoTo 0
     Exit Sub
 
 CreateConfigurationButton_Click_Error:
     Err.Source = "vtkNewRecreateConfigurationForm::CreateConfigurationButton_Click"
-    Debug.Print "Error " & Err.Number & " : " & Err.Description & " in " & Err.Source
+    MsgBox "Recreation failed : Error " & Err.Number & " : " & Err.Description & " in " & Err.Source, vbOKOnly
     Exit Sub
 
 End Sub
 
+
+'---------------------------------------------------------------------------------------
+' Procedure : enableBrowseButtons
+' Author    : Lucas Vitorino
+' Purpose   : Manage the "enabled" property of the different "browse" buttons.
+'             Typically, a button must be disabled when there is no text in the field it corresponds to.
+'---------------------------------------------------------------------------------------
+'
+Private Sub enableBrowseButtons()
+
+    On Error GoTo enableBrowseButtons_Error
+    
+    ' List of projects
+    ListOfProjectsBrowseButton.Enabled = (ListOfProjectsTextBox.Text <> "")
+    
+    ' Project folder
+    ProjectFolderPathBrowseButton.Enabled = (ProjectFolderPathTextBox.Text <> "")
+    
+    ' Project XML relative path
+    ProjectXMLRelPathBrowseButton.Enabled = (ProjectXMLRelPathTextBox.Text <> "")
+    
+    ' Template path
+    ConfigurationTemplatePathBrowseButton.Enabled = (ConfigurationTemplatePathTextBox.Text <> "")
+
+    On Error GoTo 0
+    Exit Sub
+
+enableBrowseButtons_Error:
+    Err.Source = "vtkNewRecreateConfigurationForm::enableBrowseButtons"
+    Debug.Print "Error " & Err.Number & " : " & Err.Description & " in " & Err.Source
+    Exit Sub
+
+End Sub
