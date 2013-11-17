@@ -37,6 +37,8 @@ Option Explicit
 
 Private Const colorOK As Long = &HC000&
 Private Const colorKO As Long = &HFF&
+Private Const colorKOIntermediate As Long = &H80FF&
+'Private Const colorKOIntermediate As Long = &H80C0FF
 
 Private fso As New FileSystemObject
 Private currentProjectName As String
@@ -56,11 +58,14 @@ Private Sub UserForm_Initialize()
     ' Display the path of the list of projects and set its color according to the validity
     ListOfProjectsTextBox.Text = xmlRememberedProjectsFullPath
     
-    ' Ugly with bool1 and bool2 but the one liner condition does not work in my VM
-    Dim bool1 As Boolean: bool1 = fso.FileExists(xmlRememberedProjectsFullPath)
     Dim dummyDom As New MSXML2.DOMDocument
-    Dim bool2 As Boolean: bool2 = dummyDom.Load(xmlRememberedProjectsFullPath)
-    If bool1 And bool2 Then
+    If Not fso.FileExists(xmlRememberedProjectsFullPath) Then
+        ' File does not exist
+        ListOfProjectsTextBox.ForeColor = colorKO
+    ElseIf Not dummyDom.Load(xmlRememberedProjectsFullPath) Then
+        ' File is not valid
+        ListOfProjectsTextBox.ForeColor = colorKOIntermediate
+    Else
         ' Everything is fine
         ListOfProjectsTextBox.ForeColor = colorOK
            
@@ -68,10 +73,7 @@ Private Sub UserForm_Initialize()
         For Each tmpProj In listOfRememberedProjects
             ListOfProjectsComboBox.AddItem tmpProj.projectName
         Next
-        
-    Else
-        ' There was a problem
-        ListOfProjectsTextBox.ForeColor = colorKO
+    
     End If
 
     On Error GoTo 0
@@ -113,15 +115,19 @@ Private Sub ListOfProjectsComboBox_Change()
     
     ' Set the XML rel path
     ProjectXMLRelPathTextBox.Text = vtkXmlRelPathForProject(currentProjectName)
-    Dim bool1 As Boolean: bool1 = fso.FileExists(fso.BuildPath(vtkRootPathForProject(currentProjectName), vtkXmlRelPathForProject(currentProjectName)))
+    
     Dim dummyDom As New MSXML2.DOMDocument
-    Dim bool2 As Boolean: bool2 = dummyDom.Load(fso.BuildPath(vtkRootPathForProject(currentProjectName), vtkXmlRelPathForProject(currentProjectName)))
-    If bool1 And bool2 Then
-        ProjectXMLRelPathTextBox.ForeColor = colorOK
-    Else
+    If Not fso.FileExists(fso.BuildPath(vtkRootPathForProject(currentProjectName), vtkXmlRelPathForProject(currentProjectName))) Then
+        ' File does not exist
         ProjectXMLRelPathTextBox.ForeColor = colorKO
+    ElseIf Not dummyDom.Load(fso.BuildPath(vtkRootPathForProject(currentProjectName), vtkXmlRelPathForProject(currentProjectName))) Then
+        ' File is not valid
+        ProjectXMLRelPathTextBox.ForeColor = colorKOIntermediate
+    Else
+        ' Everything is fine
+        ProjectXMLRelPathTextBox.ForeColor = colorOK
     End If
-
+    
     ' Fill the configuration combobox
     Set currentCM = vtkConfigurationManagerForProject(currentProjectName)
     If Not currentCM Is Nothing Then
@@ -209,7 +215,6 @@ Private Sub CreateConfigurationButton_Click()
 CreateConfigurationButton_Click_Error:
     Err.Source = "vtkNewRecreateConfigurationForm::CreateConfigurationButton_Click"
     Debug.Print "Error " & Err.Number & " : " & Err.Description & " in " & Err.Source
-    mAssert.Should False, "Unexpected Error " & Err.Number & " (" & Err.Description & ") in " & Err.Source
     Exit Sub
 
 End Sub
