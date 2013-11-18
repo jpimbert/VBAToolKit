@@ -1,10 +1,10 @@
 VERSION 5.00
 Begin {C62A69F0-16DC-11CE-9E98-00AA00574A4F} vtkRecreateConfigurationForm 
-   Caption         =   "Recreate Configuration"
-   ClientHeight    =   3120
+   Caption         =   "VBAToolKit - Recreate Configuration"
+   ClientHeight    =   6510
    ClientLeft      =   45
    ClientTop       =   435
-   ClientWidth     =   4710
+   ClientWidth     =   9045
    OleObjectBlob   =   "vtkRecreateConfigurationForm.frx":0000
    StartUpPosition =   1  'CenterOwner
 End
@@ -13,12 +13,10 @@ Attribute VB_GlobalNameSpace = False
 Attribute VB_Creatable = False
 Attribute VB_PredeclaredId = True
 Attribute VB_Exposed = False
-
-
 '---------------------------------------------------------------------------------------
-' Module    : vtkCreateProjectForm
+' Module    : vtkNewRecreateConfigurationForm
 ' Author    : Lucas Vitorino
-' Purpose   : UserForm for VBAToolKit configuration recreation
+' Purpose   : UserForm for VBAToolKit Recreate Configuration feature
 '
 ' Copyright 2013 Skwal-Soft (http://skwalsoft.com)
 '
@@ -34,180 +32,332 @@ Attribute VB_Exposed = False
 '   See the License for the specific language governing permissions and
 '   limitations under the License.
 '---------------------------------------------------------------------------------------
+
 Option Explicit
 
-Private cm As vtkConfigurationManager
-Private currentConf As vtkConfiguration
+Private Const colorOK As Long = &HC000&
+Private Const colorKO As Long = &HFF&
+Private Const colorKOIntermediate As Long = &H80FF&
+
+Private fso As New FileSystemObject
 Private currentProjectName As String
+Private currentConfigurationName As String
+Private currentCM As New vtkConfigurationManager
+
 
 
 '---------------------------------------------------------------------------------------
 ' Procedure : UserForm_Initialize
 ' Author    : Lucas Vitorino
-' Purpose   : Initializing global variables.
+' Purpose   : Initialize the different objects and variables in the form
 '---------------------------------------------------------------------------------------
 '
 Private Sub UserForm_Initialize()
 
-    ' Get the name of the current DEV workbook
-    currentProjectName = getCurrentProjectName
+    On Error GoTo UserForm_Initialize_Error
 
-    ' Initialize configuration manager
-    Set cm = vtkConfigurationManagerForProject(currentProjectName)
+    ' Start clean
+    resetTextBoxes
+    ListOfProjectsComboBox.Clear
+
+    ' Display the path of the list of projects and set its color according to the validity
+    ListOfProjectsTextBox.Text = xmlRememberedProjectsFullPath
     
-    ' Disable the "Create Configuration" button as no configuration is selected
-    enableCreateConfigurationButton
-
-    ' Initialize the content of the combo box
-    If Not cm Is Nothing Then
-    If cm Is Nothing Then Debug.Print "cm is nothing"
-        Dim conf As vtkConfiguration
-        For Each conf In cm.configurations
-            ConfigurationComboBox.AddItem (conf.name)
+    Dim dummyDOM As New MSXML2.DOMDocument
+    If Not fso.FileExists(xmlRememberedProjectsFullPath) Then
+        ' File does not exist
+        ListOfProjectsTextBox.ForeColor = colorKO
+    ElseIf Not dummyDOM.Load(xmlRememberedProjectsFullPath) Then
+        ' File is not valid
+        ListOfProjectsTextBox.ForeColor = colorKOIntermediate
+    Else
+        ' Everything is fine
+        ListOfProjectsTextBox.ForeColor = colorOK
+           
+        Dim tmpProj As New vtkProject
+        For Each tmpProj In listOfRememberedProjects
+            ListOfProjectsComboBox.AddItem tmpProj.projectName
         Next
-    End If
     
+    End If
+
+    ' Enable/Disable the browse buttons
+    enableBrowseButtons
+
+    On Error GoTo 0
+    Exit Sub
+
+UserForm_Initialize_Error:
+    Err.Source = "vtkNewRecreateConfigurationForm::UserForm_Initialize"
+    Debug.Print "Error " & Err.Number & " : " & Err.Description & " in " & Err.Source ' TMP
+    Exit Sub
+
 End Sub
 
+'---------------------------------------------------------------------------------------
+' Procedure : ListOfProjectsComboBox_Change
+' Author    : Lucas Vitorino
+' Purpose   : Manage what happens when a project is selected in the combobox :
+'               - set fields
+'               - reset relevant fields
+'---------------------------------------------------------------------------------------
+'
+Private Sub ListOfProjectsComboBox_Change()
+
+    On Error GoTo ListOfProjectsComboBox_Change_Error
+
+    currentProjectName = ListOfProjectsComboBox.Value
+    
+    ' Clear all the comboboxes and textboxes about the configuration
+    ConfigurationComboBox.Clear
+    ConfigurationRelPathTextBox.Text = ""
+    ConfigurationTemplatePathTextBox.Text = ""
+    
+    ' Set the root folder
+    ProjectFolderPathTextBox.Text = vtkRootPathForProject(currentProjectName)
+    If fso.folderExists(vtkRootPathForProject(currentProjectName)) Then
+        ProjectFolderPathTextBox.ForeColor = colorOK
+    Else
+        ProjectFolderPathTextBox.ForeColor = colorKO
+    End If
+    
+    ' Set the XML rel path
+    ProjectXMLRelPathTextBox.Text = vtkXmlRelPathForProject(currentProjectName)
+    
+    Dim dummyDOM As New MSXML2.DOMDocument
+    If Not fso.FileExists(fso.BuildPath(vtkRootPathForProject(currentProjectName), vtkXmlRelPathForProject(currentProjectName))) Then
+        ' File does not exist
+        ProjectXMLRelPathTextBox.ForeColor = colorKO
+    ElseIf Not dummyDOM.Load(fso.BuildPath(vtkRootPathForProject(currentProjectName), vtkXmlRelPathForProject(currentProjectName))) Then
+        ' File is not valid
+        ProjectXMLRelPathTextBox.ForeColor = colorKOIntermediate
+    Else
+        ' Everything is fine
+        ProjectXMLRelPathTextBox.ForeColor = colorOK
+    End If
+    
+    ' Fill the configuration combobox
+    Set currentCM = Nothing
+    Set currentCM = vtkConfigurationManagerForProject(currentProjectName)
+    If Not currentCM Is Nothing Then
+        Dim tmpConf As New vtkConfiguration
+        For Each tmpConf In currentCM.configurations
+            ConfigurationComboBox.AddItem tmpConf.name
+        Next
+    End If
+
+    ' Enable/Disable the browse buttons
+    enableBrowseButtons
+
+    On Error GoTo 0
+    Exit Sub
+
+ListOfProjectsComboBox_Change_Error:
+    Err.Source = "vtkNewRecreateConfigurationForm::ListOfProjectsComboBox_Change"
+    
+    Select Case Err.Number
+        Case VTK_SHEET_NOT_VALID
+            ' do nothing as we already know the xml file is not valid
+        Case Else
+            Debug.Print "Error " & Err.Number & " : " & Err.Description & " in " & Err.Source ' TMP
+    End Select
+    
+    Exit Sub
+
+End Sub
 
 '---------------------------------------------------------------------------------------
 ' Procedure : ConfigurationComboBox_Change
 ' Author    : Lucas Vitorino
-' Purpose   : Manage the combo box containing the list of configurations
+' Purpose   : Set fields and variables according to the configuration seleceted in the combobox.
 '---------------------------------------------------------------------------------------
 '
 Private Sub ConfigurationComboBox_Change()
     
     On Error GoTo ConfigurationComboBox_Change_Error
 
-    Set currentConf = cm.configurations(ConfigurationComboBox.Value)
-    
-    If AllConfigurationsExceptThisOneCheckBox.Value = False Then
-        PathTextBox.Text = currentConf.path
+    If Not currentCM Is Nothing Then
+        currentConfigurationName = ConfigurationComboBox.Value
+        ConfigurationRelPathTextBox.Text = currentCM.configurations(currentConfigurationName).path
+        ConfigurationTemplatePathTextBox.Text = currentCM.configurations(currentConfigurationName).templatePath
+        
+        ' If there is a template
+        If currentCM.configurations(currentConfigurationName).templatePath <> "" Then
+            ' Show the text in red if the template is missing, in green if it is here
+            If fso.FileExists(fso.BuildPath(vtkRootPathForProject(currentProjectName), currentCM.configurations(currentConfigurationName).templatePath)) Then
+                ConfigurationTemplatePathTextBox.ForeColor = colorOK
+            Else
+                ConfigurationTemplatePathTextBox.ForeColor = colorKO
+                CreateConfigurationButton.Enabled = False
+                Exit Sub
+            End If
+        End If
+        
+        CreateConfigurationButton.Enabled = True
+        
     End If
     
-    enableCreateConfigurationButton
+    ' Enable/Disable the browse buttons
+    enableBrowseButtons
 
     On Error GoTo 0
     Exit Sub
 
 ConfigurationComboBox_Change_Error:
-    Set currentConf = Nothing
-    Resume Next
-End Sub
+    Err.Source = "vtkNewRecreateConfigurationForm::ConfigurationComboBox_Change"
+    Debug.Print "Error " & Err.Number & " : " & Err.Description & " in " & Err.Source
+    Exit Sub
 
-
-'---------------------------------------------------------------------------------------
-' Procedure : AllConfigurationsExceptThisOneCheckBox_Change
-' Author    : Lucas Vitorino
-' Purpose   : Manage what happens when the checkbox changes.
-'---------------------------------------------------------------------------------------
-'
-Private Sub AllConfigurationsExceptThisOneCheckBox_Change()
-
-    If AllConfigurationsExceptThisOneCheckBox.Value = True Or currentConf Is Nothing Then
-        PathTextBox.Text = ""
-    Else
-        PathTextBox.Text = currentConf.path
-    End If
-
-End Sub
-
-
-'---------------------------------------------------------------------------------------
-' Procedure : CancelButton_Click
-' Author    : Lucas Vitorino
-' Purpose   : Close the form
-'---------------------------------------------------------------------------------------
-'
-Private Sub CancelButton_Click()
-    Unload vtkRecreateConfigurationForm
+    
 End Sub
 
 
 '---------------------------------------------------------------------------------------
 ' Procedure : CreateConfigurationButton_Click
 ' Author    : Lucas Vitorino
-' Purpose   : Call the vtkRecreateConfiguration function with the relevant parameters
+' Purpose   : Create the configuration.
+'            TODO : no source files ?
 '---------------------------------------------------------------------------------------
 '
 Private Sub CreateConfigurationButton_Click()
-    
     On Error GoTo CreateConfigurationButton_Click_Error
-    
-    If AllConfigurationsExceptThisOneCheckBox.Value = False Then
-        vtkRecreateConfiguration currentProjectName, currentConf.name
-    Else
-        Dim conf As vtkConfiguration
-        For Each conf In cm.configurations
-            If Not conf.name Like currentConf.name Then
-                vtkRecreateConfiguration currentProjectName, conf.name
-            End If
-        Next
-    End If
-    
+
+    vtkRecreateConfiguration currentProjectName, currentConfigurationName
+
+    MsgBox "Recreation successful !", vbOKOnly
+
     On Error GoTo 0
     Exit Sub
 
 CreateConfigurationButton_Click_Error:
-    Err.Source = "CreateConfigurationButton_Click of module vtkRecreateConfigurationForm"
-    
-    Select Case Err.Number
-        Case VTK_WORKBOOK_ALREADY_OPEN ' Trying to replace an open workbook while recreating the configuration
-            MsgBox "Error " & Err.Number & " (" & Err.Description & ")"
-            Resume Next
-        Case VTK_NO_SOURCE_FILES ' A source file is missing
-            MsgBox "Error " & Err.Number & " (" & Err.Description & ")"
-            Resume Next
-        Case Else
-            Err.Raise Err.Number, Err.Source, Err.Description
-    End Select
-    
+    Err.Source = "vtkNewRecreateConfigurationForm::CreateConfigurationButton_Click"
+    MsgBox "Recreation failed : Error " & Err.Number & " : " & Err.Description & " in " & Err.Source, vbOKOnly
     Exit Sub
+
 End Sub
 
 
 '---------------------------------------------------------------------------------------
-' Procedure : enableCreateConfigurationButton
+' Procedure : enableBrowseButtons
 ' Author    : Lucas Vitorino
-' Purpose   : Decide if the "Create Configuration" button should be enabled or disabled.
+' Purpose   : Manage the "enabled" property of the different "browse" buttons.
+'             Typically, a button must be disabled when there is no text in the field it corresponds to.
 '---------------------------------------------------------------------------------------
 '
-Private Sub enableCreateConfigurationButton()
-    If currentConf Is Nothing Then
-        CreateConfigurationButton.Enabled = False
-    Else
-        CreateConfigurationButton.Enabled = True
-    End If
-End Sub
+Private Sub enableBrowseButtons()
 
-
-'---------------------------------------------------------------------------------------
-' Procedure : getCurrentProjectName
-' Author    : Lucas Vitorino
-' Purpose   : Gets the project name of the current workbook if it finds it in VTK.
-'---------------------------------------------------------------------------------------
-'
-Private Function getCurrentProjectName() As String
-    Dim tmpProj As vtkProject
-    Dim cm As New vtkConfigurationManager
-    Dim tmpConf As vtkConfiguration
-    Dim fso As New FileSystemObject
+    On Error GoTo enableBrowseButtons_Error
     
-    ' For each project
-    For Each tmpProj In listOfRememberedProjects
-        Set cm = vtkConfigurationManagerForProject(tmpProj.projectName)
-        If Not cm Is Nothing Then
-            ' Check the path of every configuration
-            For Each tmpConf In cm.configurations
-                If fso.GetFileName(tmpConf.path) = fso.GetFileName(ThisWorkbook.FullName) Then
-                    getCurrentProjectName = tmpProj.projectName
-                    Exit Function
-                End If
-            Next
+    ' List of projects
+    ListOfProjectsBrowseButton.Enabled = (ListOfProjectsTextBox.Text <> "")
+    
+    ' Project folder
+    ProjectFolderPathBrowseButton.Enabled = (ProjectFolderPathTextBox.Text <> "")
+    
+    ' Project XML relative path
+    ProjectXMLRelPathBrowseButton.Enabled = (ProjectXMLRelPathTextBox.Text <> "")
+    
+    On Error GoTo 0
+    Exit Sub
+
+enableBrowseButtons_Error:
+    Err.Source = "vtkNewRecreateConfigurationForm::enableBrowseButtons"
+    Debug.Print "Error " & Err.Number & " : " & Err.Description & " in " & Err.Source
+    Exit Sub
+
+End Sub
+
+
+'---------------------------------------------------------------------------------------
+' Procedure : ResetTextBoxes
+' Author    : Lucas Vitorino
+' Purpose   : reset the text boxes
+'---------------------------------------------------------------------------------------
+'
+Private Sub resetTextBoxes()
+    ListOfProjectsTextBox.Text = ""
+    ProjectFolderPathTextBox.Text = ""
+    ProjectXMLRelPathTextBox.Text = ""
+    ConfigurationTemplatePathTextBox.Text = ""
+End Sub
+
+
+'---------------------------------------------------------------------------------------
+' Procedure : ListOfProjectsBrowseButton_Click
+' Author    : Lucas Vitorino
+' Purpose   : Allows the choice of the path of the file containig the list of projects.
+'---------------------------------------------------------------------------------------
+'
+Private Sub ListOfProjectsBrowseButton_Click()
+    
+    ' Show the window
+    With Application.FileDialog(msoFileDialogFilePicker)
+        .AllowMultiSelect = False
+        .Show
+        If .SelectedItems.Count > 0 Then
+            xmlRememberedProjectsFullPath = .SelectedItems(1)
         End If
-    Next
+    End With
     
-    getCurrentProjectName = ""
-        
-End Function
+    ' Re initialize the form
+    UserForm_Initialize
+    
+End Sub
+
+'---------------------------------------------------------------------------------------
+' Procedure : ProjectFolderBrowseButton_Click
+' Author    : Lucas Vitorino
+' Purpose   : Allows the choice of the path of the project folder of a given project.
+'---------------------------------------------------------------------------------------
+'
+Private Sub ProjectFolderPathBrowseButton_Click()
+
+    ' Show the window and modify the xml file
+    With Application.FileDialog(msoFileDialogFolderPicker)
+        .AllowMultiSelect = False
+        .title = "Please select a folder"
+        .Show
+        If .SelectedItems.Count > 0 Then
+            vtkModifyRememberedProject projectName:=currentProjectName, folderPath:=.SelectedItems(1)
+        End If
+    End With
+    
+    ' Reset the configuration managers - otherwise update of the list will not be taken into account
+    vtkResetConfigurationManagers
+    
+    ' Update fields
+    ListOfProjectsComboBox_Change
+
+End Sub
+
+
+'---------------------------------------------------------------------------------------
+' Procedure : ProjectXMLRelPathBrowseButton_Click
+' Author    : Lucas Vitorino
+' Purpose   : Allows the choice of the path of the xml sheet. The path is calculated relatively
+'             to the path of the root folder so it is better to choose the root folder before.
+'---------------------------------------------------------------------------------------
+'
+Private Sub ProjectXMLRelPathBrowseButton_Click()
+
+    ' Show the window and modify the xml file
+    With Application.FileDialog(msoFileDialogFilePicker)
+        .AllowMultiSelect = False
+        .title = "Please select a xml file"
+        .Filters.Clear
+        .Filters.Add "XML files", "*.xml"
+        .Show
+        If .SelectedItems.Count > 0 Then
+            vtkModifyRememberedProject projectName:=currentProjectName, _
+                                        xmlRelPath:=get_relative_path_to(vtkRootPathForProject(currentProjectName), .SelectedItems(1))
+        End If
+    End With
+    
+    ' Reset the configuration managers - otherwise update of the list will not be taken into account
+    vtkResetConfigurationManagers
+    
+    ' Update fields
+    ListOfProjectsComboBox_Change
+    
+End Sub
+
