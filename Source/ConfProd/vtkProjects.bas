@@ -287,8 +287,8 @@ Private Sub saveProjectsInList()
               CStr(Round((99999 - 10000 + 1) * Rnd(), 0)) + 10000 & _
               "." & fso.GetExtensionName(xmlRememberedProjectsFullPath))
 
-    vtkCreateListOfRememberedProjects tmpPath
-
+    createRememberedProjectsXMLSheet tmpPath
+    
     ' Loop in the collection
     Dim tmpProj As vtkProject
     For Each tmpProj In m_projects

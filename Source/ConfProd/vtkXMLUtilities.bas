@@ -247,52 +247,6 @@ vtkWriteXMLDOMToFile_Error:
 End Sub
 
 '---------------------------------------------------------------------------------------
-' Procedure : vtkCreateListOfRememberedProjects
-' Author    : Lucas Vitorino
-' Purpose   : Create the xml file containing the list of the remembered projects.
-' Raises    : - VTK_UNEXPECTED_ERROR
-'             - VTK_DOM_NOT_INITIALIZED
-'             - VTK_WRONG_FILE_PATH
-' Notes     : Useless now
-'---------------------------------------------------------------------------------------
-'
-Public Sub vtkCreateListOfRememberedProjects(filePath As String)
-
-    Dim dom As MSXML2.DOMDocument
-    Dim rootNode As MSXML2.IXMLDOMNode
-
-    On Error GoTo vtkCreateListOfRememberedProjects_Error
-
-    ' Create the processing instruction
-    Set dom = New MSXML2.DOMDocument
-    dom.appendChild dom.createProcessingInstruction("xml", "version=""1.0"" encoding=""ISO-8859-1""")
-
-    ' Create the root node
-    dom.appendChild dom.createElement("rememberedProjects")
-
-    vtkWriteXMLDOMToFile dom, filePath
-
-    On Error GoTo 0
-    Exit Sub
-
-vtkCreateListOfRememberedProjects_Error:
-    Err.Source = "vtkCreateXMLListOfRememberedProjects of module vtkXMLUtilities"
-
-    Select Case Err.Number
-        Case VTK_WRONG_FILE_PATH ' ADODB.Stream.SaveToFile failed because it couldn't find the path
-            ' Do nothing but forward the error
-        Case Else
-            Err.Number = VTK_UNEXPECTED_ERROR
-    End Select
-
-    Err.Raise Err.Number, Err.Source, Err.Description
-
-    Exit Sub
-
-End Sub
-
-
-'---------------------------------------------------------------------------------------
 ' Procedure : vtkAddProjectToListOfRememberedProjects
 ' Author    : Lucas Vitorino
 ' Purpose   : Add a project to a list of remembered projects
@@ -317,14 +271,13 @@ Public Sub vtkAddProjectToListOfRememberedProjects(listPath As String, _
     dom.Load listPath
     
     ' Filter projects with the same name
-    Dim tmpNode As MSXML2.IXMLDOMNode
-    For Each tmpNode In dom.ChildNodes.Item(1).ChildNodes
-        If tmpNode.ChildNodes.Item(0).Text Like projectName Then Err.Raise VTK_PROJECT_ALREADY_IN_LIST
-    Next
+    If dom.SelectNodes("/rememberedProjects/project[name=""" & projectName & """]").Length <> 0 Then
+        Err.Raise VTK_PROJECT_ALREADY_IN_LIST
+    End If
+    
 
-    ' Insert a project node in the root node
-    With dom.ChildNodes.Item(1).appendChild(dom.createElement("project"))
-        
+    With dom.SelectSingleNode("/rememberedProjects[0]").appendChild(dom.createElement("project"))
+
         'Project name
         With .appendChild(dom.createElement("name"))
             .Text = projectName

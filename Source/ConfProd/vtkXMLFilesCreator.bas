@@ -48,7 +48,7 @@ Public Sub createInitializedXMLSheetForProject(sheetPath As String, _
 
     Dim fso As New FileSystemObject
     Dim xmlFile As TextStream
-    Set xmlFile = fso.CreateTextFile(fileName:=sheetpath, Overwrite:=True)
+    Set xmlFile = fso.CreateTextFile(fileName:=sheetPath, Overwrite:=True)
   
     Dim deliveryConfId As String
     Dim devConfId As String
@@ -156,10 +156,10 @@ Public Sub createRememberedProjectsXMLSheet(sheetPath As String, _
 
     Dim fso As New FileSystemObject
     Dim xmlFile As TextStream
-    Set xmlFile = fso.CreateTextFile(fileName:=sheetpath, Overwrite:=True)
+    Set xmlFile = fso.CreateTextFile(fileName:=sheetPath, Overwrite:=True)
 
-    xmlFile.WriteLine Text:="<?xml version=""1.0"" encoding=""ISO-8859-1"" standalone=""no""?>"
-    xmlFile.WriteLine Text:="<!DOCTYPE remeberedProjects ["
+    xmlFile.WriteLine Text:="<?xml version=""1.0"" encoding=""ISO-8859-1"" standalone=""yes""?>"
+    xmlFile.WriteLine Text:="<!DOCTYPE rememberedProjects ["
     xmlFile.WriteLine Text:="<!ELEMENT rememberedProjects (info,project*)>"
     xmlFile.WriteLine Text:="    <!ELEMENT info (version)>"
     xmlFile.WriteLine Text:="        <!ELEMENT version (#PCDATA)>"
@@ -167,7 +167,7 @@ Public Sub createRememberedProjectsXMLSheet(sheetPath As String, _
     xmlFile.WriteLine Text:="        <!ELEMENT name (#PCDATA)>"
     xmlFile.WriteLine Text:="        <!ELEMENT rootFolder (#PCDATA)>"
     xmlFile.WriteLine Text:="        <!ELEMENT xmlRelativePath (#PCDATA)>"
-    xmlFile.WriteLine Text:="]"
+    xmlFile.WriteLine Text:="]>"
     xmlFile.WriteBlankLines Lines:=1
     xmlFile.WriteLine Text:="<rememberedProjects>"
     xmlFile.WriteBlankLines Lines:=1
