@@ -58,6 +58,7 @@ Private Sub UserForm_Initialize()
 
     ' Start clean
     resetTextBoxes
+    ListOfProjectsComboBox.Clear
 
     ' Display the path of the list of projects and set its color according to the validity
     ListOfProjectsTextBox.Text = xmlRememberedProjectsFullPath
@@ -256,9 +257,6 @@ Private Sub enableBrowseButtons()
     ' Project XML relative path
     ProjectXMLRelPathBrowseButton.Enabled = (ProjectXMLRelPathTextBox.Text <> "")
     
-    ' Template path
-    ConfigurationTemplatePathBrowseButton.Enabled = (ConfigurationTemplatePathTextBox.Text <> "")
-
     On Error GoTo 0
     Exit Sub
 
@@ -317,6 +315,7 @@ Private Sub ProjectFolderPathBrowseButton_Click()
     ' Show the window and modify the xml file
     With Application.FileDialog(msoFileDialogFolderPicker)
         .AllowMultiSelect = False
+        .title = "Please select a folder"
         .Show
         If .SelectedItems.Count > 0 Then
             vtkModifyRememberedProject projectName:=currentProjectName, folderPath:=.SelectedItems(1)
@@ -330,3 +329,35 @@ Private Sub ProjectFolderPathBrowseButton_Click()
     ListOfProjectsComboBox_Change
 
 End Sub
+
+
+'---------------------------------------------------------------------------------------
+' Procedure : ProjectXMLRelPathBrowseButton_Click
+' Author    : Lucas Vitorino
+' Purpose   : Allows the choice of the path of the xml sheet. The path is calculated relatively
+'             to the path of the root folder so it is better to choose the root folder before.
+'---------------------------------------------------------------------------------------
+'
+Private Sub ProjectXMLRelPathBrowseButton_Click()
+
+    ' Show the window and modify the xml file
+    With Application.FileDialog(msoFileDialogFilePicker)
+        .AllowMultiSelect = False
+        .title = "Please select a xml file"
+        .Filters.Clear
+        .Filters.Add "XML files", "*.xml"
+        .Show
+        If .SelectedItems.Count > 0 Then
+            vtkModifyRememberedProject projectName:=currentProjectName, _
+                                        xmlRelPath:=get_relative_path_to(vtkRootPathForProject(currentProjectName), .SelectedItems(1))
+        End If
+    End With
+    
+    ' Reset the configuration managers - otherwise update of the list will not be taken into account
+    vtkResetConfigurationManagers
+    
+    ' Update fields
+    ListOfProjectsComboBox_Change
+    
+End Sub
+
