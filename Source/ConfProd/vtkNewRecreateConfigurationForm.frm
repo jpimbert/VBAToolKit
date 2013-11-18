@@ -56,14 +56,17 @@ Private Sub UserForm_Initialize()
 
     On Error GoTo UserForm_Initialize_Error
 
+    ' Start clean
+    resetTextBoxes
+
     ' Display the path of the list of projects and set its color according to the validity
     ListOfProjectsTextBox.Text = xmlRememberedProjectsFullPath
     
-    Dim dummyDom As New MSXML2.DOMDocument
+    Dim dummyDOM As New MSXML2.DOMDocument
     If Not fso.FileExists(xmlRememberedProjectsFullPath) Then
         ' File does not exist
         ListOfProjectsTextBox.ForeColor = colorKO
-    ElseIf Not dummyDom.Load(xmlRememberedProjectsFullPath) Then
+    ElseIf Not dummyDOM.Load(xmlRememberedProjectsFullPath) Then
         ' File is not valid
         ListOfProjectsTextBox.ForeColor = colorKOIntermediate
     Else
@@ -120,11 +123,11 @@ Private Sub ListOfProjectsComboBox_Change()
     ' Set the XML rel path
     ProjectXMLRelPathTextBox.Text = vtkXmlRelPathForProject(currentProjectName)
     
-    Dim dummyDom As New MSXML2.DOMDocument
+    Dim dummyDOM As New MSXML2.DOMDocument
     If Not fso.FileExists(fso.BuildPath(vtkRootPathForProject(currentProjectName), vtkXmlRelPathForProject(currentProjectName))) Then
         ' File does not exist
         ProjectXMLRelPathTextBox.ForeColor = colorKO
-    ElseIf Not dummyDom.Load(fso.BuildPath(vtkRootPathForProject(currentProjectName), vtkXmlRelPathForProject(currentProjectName))) Then
+    ElseIf Not dummyDOM.Load(fso.BuildPath(vtkRootPathForProject(currentProjectName), vtkXmlRelPathForProject(currentProjectName))) Then
         ' File is not valid
         ProjectXMLRelPathTextBox.ForeColor = colorKOIntermediate
     Else
@@ -133,6 +136,7 @@ Private Sub ListOfProjectsComboBox_Change()
     End If
     
     ' Fill the configuration combobox
+    Set currentCM = Nothing
     Set currentCM = vtkConfigurationManagerForProject(currentProjectName)
     If Not currentCM Is Nothing Then
         Dim tmpConf As New vtkConfiguration
@@ -267,6 +271,20 @@ End Sub
 
 
 '---------------------------------------------------------------------------------------
+' Procedure : ResetTextBoxes
+' Author    : Lucas Vitorino
+' Purpose   : reset the text boxes
+'---------------------------------------------------------------------------------------
+'
+Private Sub resetTextBoxes()
+    ListOfProjectsTextBox.Text = ""
+    ProjectFolderPathTextBox.Text = ""
+    ProjectXMLRelPathTextBox.Text = ""
+    ConfigurationTemplatePathTextBox.Text = ""
+End Sub
+
+
+'---------------------------------------------------------------------------------------
 ' Procedure : ListOfProjectsBrowseButton_Click
 ' Author    : Lucas Vitorino
 ' Purpose   : Allows the choice of the path of the file containig the list of projects.
@@ -286,4 +304,29 @@ Private Sub ListOfProjectsBrowseButton_Click()
     ' Re initialize the form
     UserForm_Initialize
     
+End Sub
+
+'---------------------------------------------------------------------------------------
+' Procedure : ProjectFolderBrowseButton_Click
+' Author    : Lucas Vitorino
+' Purpose   : Allows the choice of the path of the project folder of a given project.
+'---------------------------------------------------------------------------------------
+'
+Private Sub ProjectFolderPathBrowseButton_Click()
+
+    ' Show the window and modify the xml file
+    With Application.FileDialog(msoFileDialogFolderPicker)
+        .AllowMultiSelect = False
+        .Show
+        If .SelectedItems.Count > 0 Then
+            vtkModifyRememberedProject projectName:=currentProjectName, folderPath:=.SelectedItems(1)
+        End If
+    End With
+    
+    ' Reset the configuration managers - otherwise update of the list will not be taken into account
+    vtkResetConfigurationManagers
+    
+    ' Update fields
+    ListOfProjectsComboBox_Change
+
 End Sub
