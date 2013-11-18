@@ -455,6 +455,33 @@ Test_vtkModifyRememberedProject_projectIsModifiedInTheList_Error:
 
 End Sub
 
+Public Sub Test_vtkModifyRememberedProject_projectIsModifiedInTheList_oneParameter()
+' vtkModifyRememberedProject should modify the given attribute of a project (folderPath or xmlRelPath, not name) in the list
+
+    On Error GoTo Test_vtkModifyRememberedProject_projectIsModifiedInTheList_oneParameter_Error
+
+    vtkModifyRememberedProject testProject1Name, xmlRelPath:="dummy2"
+
+    ' Load the dom from the updated file
+    Dim dom As New MSXML2.DOMDocument
+    dom.Load xmlFileFullPath
+
+    ' Are these tests enough ?
+    mAssert.Equals dom.getElementsByTagName("project").Length, 2
+    mAssert.Equals dom.getElementsByTagName("rootFolder").Item(0).Text, fso.BuildPath(VBAToolKit.vtkTestPath, testProject1Name)
+    mAssert.Equals dom.getElementsByTagName("xmlRelativePath").Item(0).Text, "dummy2"
+
+    On Error GoTo 0
+    Exit Sub
+
+Test_vtkModifyRememberedProject_projectIsModifiedInTheList_oneParameter_Error:
+    Err.Source = "vtkProjectsTester::Test_vtkModifyRememberedProject_projectIsModifiedInTheList_oneParameter"
+    mAssert.Should False, "Unexpected Error " & Err.Number & " (" & Err.Description & ") in " & Err.Source
+    Exit Sub
+
+
+End Sub
+
 
 Public Sub Test_xmlRememberedProjectsFullPathGet()
 ' ensure the xmlRememberedProjectsFullPath get property works as intended
@@ -473,6 +500,7 @@ Test_xmlRememberedProjectsFullPathGet_Error:
 
 End Sub
 
+
 Private Function ITest_Suite() As TestSuite
     Set ITest_Suite = New TestSuite
     ITest_Suite.AddTest ITest_Manager.ClassName, "TestProjectIsNotNull"
@@ -487,6 +515,7 @@ Private Function ITest_Suite() As TestSuite
     ITest_Suite.AddTest ITest_Manager.ClassName, "Test_vtkRemoveRememberedProject_projectIsRemovedFromTheList"
     ITest_Suite.AddTest ITest_Manager.ClassName, "Test_vtkModifyRememberedProject_projectIsModifiedInTheCollections"
     ITest_Suite.AddTest ITest_Manager.ClassName, "Test_vtkModifyRememberedProject_projectIsModifiedInTheList"
+    ITest_Suite.AddTest ITest_Manager.ClassName, "Test_vtkModifyRememberedProject_projectIsModifiedInTheList_oneParameter"
     ITest_Suite.AddTest ITest_Manager.ClassName, "Test_xmlRememberedProjectsFullPathGet"
 End Function
 
@@ -504,6 +533,7 @@ Private Sub ITestCase_RunTest()
         Case "Test_vtkRemoveRememberedProject_projectIsRemovedFromTheList": Test_vtkRemoveRememberedProject_projectIsRemovedFromTheList
         Case "Test_vtkModifyRememberedProject_projectIsModifiedInTheCollections": Test_vtkModifyRememberedProject_projectIsModifiedInTheCollections
         Case "Test_vtkModifyRememberedProject_projectIsModifiedInTheList": Test_vtkModifyRememberedProject_projectIsModifiedInTheList
+        Case "Test_vtkModifyRememberedProject_projectIsModifiedInTheList_oneParameter": Test_vtkModifyRememberedProject_projectIsModifiedInTheList_oneParameter
         Case "Test_xmlRememberedProjectsFullPathGet": Test_xmlRememberedProjectsFullPathGet
         Case Else: mAssert.Should False, "Invalid test name: " & mManager.methodName
     End Select

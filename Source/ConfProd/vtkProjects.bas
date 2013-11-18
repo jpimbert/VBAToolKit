@@ -412,8 +412,8 @@ End Sub
 '---------------------------------------------------------------------------------------
 '
 Public Sub vtkModifyRememberedProject(projectName As String, _
-                                      Optional folderPath As String, _
-                                      Optional xmlRelPath As String)
+                                      Optional folderPath As String = "", _
+                                      Optional xmlRelPath As String = "")
 
     On Error GoTo vtkModifyRememberedProject_Error
     
@@ -423,12 +423,12 @@ Public Sub vtkModifyRememberedProject(projectName As String, _
     ' Modify the projects in the collection
     ' NB : The "modify" is actually a "remove and add", because the Collection object
     ' doesn't allow modification of items.
-    If Not (IsEmpty(folderPath)) Then
+    If folderPath <> "" Then
         m_rootPathsCol.Remove (projectName)
         m_rootPathsCol.Add Item:=folderPath, Key:=projectName
     End If
     
-    If Not (IsEmpty(xmlRelPath)) Then
+    If xmlRelPath <> "" Then
         m_xmlRelPathsCol.Remove (projectName)
         m_xmlRelPathsCol.Add Item:=xmlRelPath, Key:=projectName
     End If
