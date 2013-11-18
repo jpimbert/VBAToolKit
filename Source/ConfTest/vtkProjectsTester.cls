@@ -104,7 +104,7 @@ Private Sub createTestXML()
 
     End With
     
-    vtkWriteXMLDOMToFile dom, xmlFileFullPath
+    vtkWriteXMLRememberedProjectsDOMToFile dom, xmlFileFullPath
 
     On Error GoTo 0
     Exit Sub

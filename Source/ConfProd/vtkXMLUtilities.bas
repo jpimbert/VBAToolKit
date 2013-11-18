@@ -183,9 +183,9 @@ vtkExportConfigurationsAsXML_Error:
 End Sub
 
 '---------------------------------------------------------------------------------------
-' Procedure : vtkWriteXMLDOMToFile
+' Procedure : vtkWriteXMLRememberedProjectsDOMToFile
 ' Author    : Lucas Vitorino
-' Purpose   : - Write an XML DOM to a xml text file.
+' Purpose   : - Write an XML RememberedProjects DOM to a xml text file.
 '             - The content of the file is nicely indented, to be human-readable.
 '             - Overwrite the output file if it exists.
 ' Raises    : - VTK_DOM_NOT_INITIALIZED
@@ -193,12 +193,15 @@ End Sub
 ' Notes     : Heavily based on code from Baptiste Wicht, http://baptiste-wicht.developpez.com/
 '---------------------------------------------------------------------------------------
 '
-Public Sub vtkWriteXMLDOMToFile(dom As MSXML2.DOMDocument, filePath As String)
-
+Public Sub vtkWriteXMLRememberedProjectsDOMToFile(dom As MSXML2.DOMDocument, filePath As String)
+    
     Dim rdr As MSXML2.SAXXMLReader
     Dim wrt As MSXML2.MXXMLWriter
+    Dim lexh As IVBSAXLexicalHandler
+    Dim dtdh As IVBSAXDTDHandler
+    Dim dech As IVBSAXDeclHandler
     
-    On Error GoTo vtkWriteXMLDOMToFile_Error
+    On Error GoTo vtkWriteXMLRememberedProjectsDOMToFile_Error
     
     ' Check DOM intialization
     If dom Is Nothing Then
@@ -216,19 +219,64 @@ Public Sub vtkWriteXMLDOMToFile(dom As MSXML2.DOMDocument, filePath As String)
     wrt.indent = True
     wrt.Encoding = "ISO-8859-1"
     wrt.output = oStream
+    wrt.standalone = True
+
     Set rdr.contentHandler = wrt
     Set rdr.errorHandler = wrt
+    'Set rdr.dtdHandler = wrt
+    Set lexh = wrt
+    Set dtdh = wrt
+    Set dech = wrt
+
+    ' Build-in the DTD ! We'll think of refactoring the declaration later
+    lexh.startDTD "rememberedProjects", "", ""
+    dech.elementDecl "rememberedProjects", "(info,project*)"
+    dech.elementDecl "info", "(version)"
+    dech.elementDecl "version", "(#PCDATA)"
+    dech.elementDecl "project", "(name,rootFolder,xmlRelativePath)"
+    dech.elementDecl "name", "(#PCDATA)"
+    dech.elementDecl "rootFolder", "(#PCDATA)"
+    dech.elementDecl "xmlRelativePath", "(#PCDATA)"
+    lexh.endDTD
 
     rdr.Parse dom
     wrt.flush
 
     oStream.SaveToFile filePath, adSaveCreateOverWrite
+    ' At this point, the DTD is the first thing in the file, but we must put the processing instruction before
+    
+    ' This type of post processing is ugly but I couldn't find a way to do it before
+    Dim fso As New FileSystemObject
+    ' Filter the processing that bothers us
+    Dim Textfile As TextStream
+    Dim strresult As String
+    Dim buffer As String
+    Dim pi As String
+    Set Textfile = fso.OpenTextFile(filePath, ForReading)
+    'while not end of file
+    Do Until Textfile.AtEndOfStream
+        'read line per line
+        buffer = Textfile.ReadLine
+        If Left(buffer, 5) <> "<?xml" Then
+            strresult = strresult & vbCrLf & buffer
+        Else
+            pi = buffer
+        End If
+    Loop
+    Textfile.Close
+    
+    ' Output
+    Set Textfile = fso.OpenTextFile(filePath, ForWriting)
+    Textfile.WriteLine pi ' write the processing instruction at the beginning of the file
+    Textfile.Write strresult ' write the DTD and the DOM
+    Textfile.Close
+    
 
     On Error GoTo 0
     Exit Sub
 
-vtkWriteXMLDOMToFile_Error:
-    Err.Source = "function vtkWriteXMLDOMToFile of module vtkXMLutilities"
+vtkWriteXMLRememberedProjectsDOMToFile_Error:
+    Err.Source = "function vtkWriteXMLRememberedProjectsDOMToFile of module vtkXMLutilities"
     
     Select Case Err.Number
         Case VTK_DOM_NOT_INITIALIZED
@@ -296,7 +344,7 @@ Public Sub vtkAddProjectToListOfRememberedProjects(listPath As String, _
     End With
     
     ' Save changes to the list
-    vtkWriteXMLDOMToFile dom, listPath
+    vtkWriteXMLRememberedProjectsDOMToFile dom, listPath
 
     On Error GoTo 0
     Exit Sub
@@ -348,7 +396,7 @@ Public Sub vtkModifyProjectInList(listPath As String, _
     ' For all the childnodes of the root node
     Dim projectFound As Boolean: projectFound = False
     Dim tmpNode As MSXML2.IXMLDOMNode
-    For Each tmpNode In dom.ChildNodes.Item(1).ChildNodes
+    For Each tmpNode In dom.SelectSingleNode("/rememberedProjects[0]").ChildNodes
         ' If the name of the node is the one given as a parameter
         If tmpNode.ChildNodes.Item(0).Text Like projectName Then
             projectFound = True
@@ -363,7 +411,7 @@ Public Sub vtkModifyProjectInList(listPath As String, _
     If Not projectFound Then Err.Raise VTK_NO_SUCH_PROJECT
     
     ' Save changes to the list
-    vtkWriteXMLDOMToFile dom, listPath
+    vtkWriteXMLRememberedProjectsDOMToFile dom, listPath
 
     On Error GoTo 0
     Exit Sub
@@ -426,7 +474,7 @@ Public Sub vtkRemoveProjectFromList(listPath As String, projectName As String)
     If Not projectFound Then Err.Raise VTK_NO_SUCH_PROJECT
     
     ' Save changes to the list
-    vtkWriteXMLDOMToFile dom, listPath
+    vtkWriteXMLRememberedProjectsDOMToFile dom, listPath
 
     On Error GoTo 0
     Exit Sub
