@@ -58,6 +58,14 @@ Private Sub initializeList()
     "Tests" & "," & _
     ""
     
+    ' Too many line continuations won't be tolerated by VBA
+    properlyCasedIdentifiersString = properlyCasedIdentifiersString & _
+    "folderPath" & "," & _
+    "wbPath" & "," & _
+    "sheetPath" & "," & _
+    "modulePath" & "," & _
+    ""
+    
     properlyCasedIdentifiersArray = Split(properlyCasedIdentifiersString, ",")
     
 End Sub

@@ -35,7 +35,7 @@ Implements ITestCase
 Private mManager As TestCaseManager
 Private mAssert As IAssert
 
-
+Private testProject As New vtkProject
 Private Const testProjectName As String = "TestProject"
 Private Const testProjectFileName As String = testProjectName & "_DEV.xlsm"
 Private Const testFileName As String = "testFile.xml"
@@ -44,7 +44,9 @@ Private fso As New FileSystemObject
 
 Private testWorkbook As Workbook
 Private cm As vtkConfigurationManager
-Private testFilePath As String
+Private testFilepath As String
+
+Private Const rememberedProjectsSheetName As String = "VBAToolKitRememberedProjects.xml"
 
 Private reloadDom As MSXML2.DOMDocument
 
@@ -63,29 +65,62 @@ End Property
 
 Private Sub ITestCase_SetUp(Assert As IAssert)
 
+    On Error GoTo ITestCase_SetUp_Error
+    
     Set mAssert = Assert
+    
+    Set testProject = vtkProjectForName(testProjectName)
+    
+    ' --- setting up the test environment ---------
+    
+    ' Create the files we'll need for remembering projects
+    createRememberedProjectsXMLSheet sheetPath:=fso.BuildPath(VBAToolKit.vtkTestPath, rememberedProjectsSheetName)
+    
+    ' Add the TestProject to the list of remembered projects
+    xmlRememberedProjectsFullPath = fso.BuildPath(VBAToolKit.vtkTestPath, rememberedProjectsSheetName)
+    
+    ' Copy the xml file describing the project TestProject
+    FileCopy Source:=fso.BuildPath(vtkPathToTemplateFolder, "xmlExport\" & testProject.XMLConfigurationName), _
+             destination:=fso.BuildPath(VBAToolKit.vtkTestPath, testProject.XMLConfigurationName)
+                 
+    'Remember the project
+    vtkAddRememberedProject projectName:=testProject.projectName, _
+                            rootFolder:=VBAToolKit.vtkTestPath, _
+                            xmlRelativePath:=testProject.XMLConfigurationName
+    ' ----------------------------------------------
+    
     
     ' Open the test Project and get the configuration manager for this project
     Set testWorkbook = getTestFileFromTemplate(fileName:=testProjectFileName, openExcel:=True)
     Set cm = vtkConfigurationManagerForProject(testProjectName)
 
     ' Export the test project configuration in XML format
-    testFilePath = VBAToolKit.vtkTestPath & "\" & testFileName
-    vtkExportConfigurationsAsXML projectName:=testProjectName, filePath:=testFilePath
+    testFilepath = VBAToolKit.vtkTestPath & "\" & testFileName
+    vtkExportConfigurationsAsXML projectName:=testProjectName, filePath:=testFilepath
     
     ' Load the configuration as a DOM structure for content testing
     Set reloadDom = New MSXML2.DOMDocument
-    reloadDom.Load testFilePath
+    reloadDom.Load testFilepath
     reloadDom.setProperty "SelectionLanguage", "XPath"  ' for the use of the contains() function of XPath
     If reloadDom.parseError.ErrorCode <> 0 Then
-        Debug.Print "Parse error of " & testFilePath & " in SetUp of vtkXMLExportTester: " & reloadDom.parseError.reason
+        Debug.Print "Parse error of " & testFilepath & " in SetUp of vtkXMLExportTester: " & reloadDom.parseError.reason
     End If
+    
+    On Error GoTo 0
+    Exit Sub
+
+ITestCase_SetUp_Error:
+    Err.Source = "vtkXMLExportTester::ITestCase_SetUp"
+    Debug.Print "Error " & Err.Number & " : " & Err.Description & " in " & Err.Source
+    Exit Sub
+
     
 End Sub
 
 Private Sub ITestCase_TearDown()
     On Error Resume Next
     
+    vtkResetProjects
     vtkResetConfigurationManagers
     vtkCloseAndKillWorkbook Wb:=testWorkbook
     VBAToolKit.resetTestFolder
@@ -96,7 +131,7 @@ Public Sub Test_vtkExportConfigurationsAsXML_correctInfoContent()
 '   info -> correct content
 
     On Error GoTo Test_vtkExportConfigurationsAsXML_correctDomContent_Error
-    
+
     mAssert.Equals reloadDom.SelectSingleNode("/vtkConf/info/projectName").Text, testProjectName, "Expected name of project in info element"
     mAssert.Equals reloadDom.SelectSingleNode("/vtkConf/info/vtkConfigurationsVersion").Text, "1.0", "Expected configuration version in info element"
 
@@ -111,9 +146,9 @@ End Sub
 
 Public Sub Test_vtkExportConfigurationsAsXML_correctConfigurationNumber()
 '   configurations -> correct number of configurations
-    
+
     On Error GoTo Test_vtkExportConfigurationsAsXML_correctConfigurationNumber_Error
-    
+
     mAssert.Equals reloadDom.SelectNodes("/vtkConf/configuration").Length, cm.configurationCount, "Expected number of configuration elements"
 
     On Error GoTo 0
@@ -133,7 +168,7 @@ Public Sub Text_vtkExportConfigurationsAsXML_correctConfigurationContent()
 
     mAssert.Equals reloadDom.SelectSingleNode("/vtkConf/configuration[@cID=""c1""]/name").Text, "TestProject", "Expected name of first configuration"
     mAssert.Equals reloadDom.SelectSingleNode("/vtkConf/configuration[@cID=""c1""]/path").Text, "Project\TestProject.xlsm", "Expected path of first configuration"
-    
+
     mAssert.Equals reloadDom.SelectSingleNode("/vtkConf/configuration[@cID=""c2""]/name").Text, "TestProject_DEV", "Expected name of second configuration"
     mAssert.Equals reloadDom.SelectSingleNode("/vtkConf/configuration[@cID=""c2""]/path").Text, "Project\TestProject_DEV.xlsm", "Expected path of second configuration"
 
@@ -146,11 +181,12 @@ Text_vtkExportConfigurationsAsXML_correctConfigurationContent_Error:
     Exit Sub
 End Sub
 
+
 Public Sub Test_vtkExportConfigurationsAsXML_correctModuleNumber()
 '   modules -> correct number of modules
 
     On Error GoTo Test_vtkExportConfigurationsAsXML_correctModuleNumber_Error
-    
+
     mAssert.Equals reloadDom.SelectNodes("/vtkConf/module").Length, cm.moduleCount, "Expected number of module elements"
 
     On Error GoTo 0
@@ -164,12 +200,12 @@ End Sub
 
 Public Sub Test_vtkExportConfigurationsAsXML_correctModuleContent()
 '   modules -> correct content
-    
+
     On Error GoTo Test_vtkExportConfigurationsAsXML_correctModuleContent_Error
-    
+
     mAssert.Equals reloadDom.SelectSingleNode("/vtkConf/module[@mID=""m1""]/name").Text, "TestModule1", "Expected name of first module"
     mAssert.Equals reloadDom.SelectSingleNode("/vtkConf/module[@mID=""m1""]/modulePath[@confId=""c2""]").Text, "Project\TestModule1.bas", "Expected path of first module for the second configuration"
-    
+
     mAssert.Equals reloadDom.SelectSingleNode("/vtkConf/module[@mID=""m2""]/name").Text, "TestModule2", "Expected name of second module"
     mAssert.Equals reloadDom.SelectSingleNode("/vtkConf/module[@mID=""m2""]/modulePath[@confId=""c2""]").Text, "Project\TestModule2.bas", "Expected path of second module for the second configuration"
 
@@ -186,7 +222,7 @@ Public Sub Test_vtkExportConfigurationsAsXML_correctReferenceNumber()
 '   modules -> correct number of modules
 
     On Error GoTo Test_vtkExportConfigurationsAsXML_correctReferenceNumber_Error
-    
+
     mAssert.Equals reloadDom.SelectNodes("/vtkConf/reference").Length, 10, "Expected number of reference elements"
 
     On Error GoTo 0
@@ -200,9 +236,9 @@ End Sub
 
 Public Sub Test_vtkExportConfigurationsAsXML_correctRefNumByConf()
 '   modules -> correct content
-    
+
     On Error GoTo Test_vtkExportConfigurationsAsXML_correctRefNumByConf_Error
-    
+
     mAssert.Equals reloadDom.SelectNodes("/vtkConf/reference[contains(@confIDs,""c1"")]/name").Length, 9, "Expected number of references for first configuration"
     mAssert.Equals reloadDom.SelectNodes("/vtkConf/reference[contains(@confIDs,""c2"")]/name").Length, 10, "Expected number of references for second configuration"
 
@@ -217,9 +253,9 @@ End Sub
 
 Public Sub Test_vtkExportConfigurationsAsXML_correctRefContent()
 '   modules -> correct content
-    
+
     On Error GoTo Test_vtkExportConfigurationsAsXML_correctRefContent_Error
-    
+
     mAssert.Equals reloadDom.SelectNodes("/vtkConf/reference/name[.=""VBAToolKit""]/../guid").Length, 0, "Expected number of GUID element for VBAToolKit reference"
     mAssert.Equals reloadDom.SelectNodes("/vtkConf/reference/name[.=""MSForms""]/../guid").Length, 1, "Expected number of GUID element for MSXML2 reference"
 
@@ -270,8 +306,8 @@ Public Sub Test_vtkExportConfigurationsAsXML_InexistantFile()
 
    On Error GoTo Test_vtkExportConfigurationsAsXML_InexistantFile_Error
 
-    vtkExportConfigurationsAsXML projectName:=testProjectName, filePath:=testFilePath
-    mAssert.Should fso.FileExists(testFilePath), "The configuration file must be created when exporting a project"
+    vtkExportConfigurationsAsXML projectName:=testProjectName, filePath:=testFilepath
+    mAssert.Should fso.FileExists(testFilepath), "The configuration file must be created when exporting a project"
 
    On Error GoTo 0
    Exit Sub
@@ -287,13 +323,13 @@ Public Sub Test_vtkExportConfigurationsAsXML_ExistantFile()
 
     ' Create an empty file
     Dim f As TextStream
-    Set f = fso.CreateTextFile(testFilePath)
+    Set f = fso.CreateTextFile(testFilepath)
     f.WriteLine ("Unexpected line in a XML file")
     f.Close
-    
-    vtkExportConfigurationsAsXML projectName:=testProjectName, filePath:=testFilePath
+
+    vtkExportConfigurationsAsXML projectName:=testProjectName, filePath:=testFilepath
     ' Verifies the first line
-    Set f = fso.OpenTextFile(testFilePath)
+    Set f = fso.OpenTextFile(testFilepath)
     Dim line As String
     line = f.ReadLine
     f.Close
@@ -310,7 +346,7 @@ Public Sub Test_vtkExportConfigurationsAsXML_fileContentIsValidDom()
 '   load content of the file -> file content is a valid DOM
 
     On Error GoTo Test_vtkExportConfigurationsAsXML_fileContentIsValidDom_Error
-    
+
     mAssert.Equals reloadDom.parseError.ErrorCode, 0, "Dom should be readable without parse error"
 
     On Error GoTo 0

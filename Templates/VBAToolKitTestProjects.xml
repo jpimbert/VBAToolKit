@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="ISO-8859-1" standalone="yes"?>
+<!DOCTYPE rememberedProjects [
+<!ELEMENT rememberedProjects (info,project*)>
+	<!ELEMENT info (version)>
+		<!ELEMENT version (#PCDATA)>
+	<!ELEMENT project (name,rootFolder,xmlRelativePath)>
+		<!ELEMENT name (#PCDATA)>
+		<!ELEMENT rootFolder (#PCDATA)>
+		<!ELEMENT xmlRelativePath (#PCDATA)>
+]>
+<rememberedProjects>
+	<info>
+		<version>1.0</version>
+	</info>
+	<project>
+		<name>TestProject1</name>
+		<rootFolder>C:\Documents and Settings\Administrator\Desktop\VTK-LUCAS\VBAToolKit\Tests\TestProject1</rootFolder>
+		<xmlRelativePath>TestProject1.xml</xmlRelativePath>
+	</project>
+	<project>
+		<name>TestProject2</name>
+		<rootFolder>C:\Documents and Settings\Administrator\Desktop\VTK-LUCAS\VBAToolKit\Tests\TestProject2</rootFolder>
+		<xmlRelativePath>Project/TestProject2.xml</xmlRelativePath>
+	</project>
+</rememberedProjects>

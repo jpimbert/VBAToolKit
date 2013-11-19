@@ -1,0 +1,80 @@
+<?xml version="1.0" encoding="ISO-8859-1" standalone="yes"?>
+<!DOCTYPE vtkConf [
+<!ELEMENT vtkConf (info,configuration*, module*, reference*)>
+
+   <!ELEMENT info (vtkConfigurationsVersion,projectName)>
+       <!ELEMENT vtkConfigurationsVersion (#PCDATA)>
+       <!ELEMENT projectName (#PCDATA)>
+
+   <!ELEMENT configuration (name,path,templatePath?,title?,comment?)>
+    <!ATTLIST configuration cID ID #REQUIRED>
+       <!ELEMENT name (#PCDATA)>
+       <!ELEMENT path (#PCDATA)>
+       <!ELEMENT templatePath (#PCDATA)>
+       <!ELEMENT title (#PCDATA)>
+       <!ELEMENT comment (#PCDATA)>
+
+   <!ELEMENT module (name, modulePath*)>
+    <!ATTLIST module mID ID #REQUIRED>
+       <!ELEMENT modulePath (#PCDATA)>
+       <!ATTLIST modulePath
+           confId IDREF #REQUIRED
+       >
+
+   <!ELEMENT reference (name, (guid|path))>
+    <!ATTLIST reference confIDs IDREFS #REQUIRED>
+       <!ELEMENT guid (#PCDATA)>
+]>
+<vtkConf>
+
+	<info>
+		<vtkConfigurationsVersion>2.0</vtkConfigurationsVersion>
+		<projectName>InitializedProject</projectName>
+	</info>
+
+
+	<configuration cID="c01">
+		<name>InitializedProject_DEV</name>
+		<path>Tests\InitializedProject_DEV.xlsm</path>
+		<templatePath>C:\Dummy\Template.xlsm</templatePath>
+		<title>Title</title>
+		<comment>Comment</comment>
+	</configuration>
+
+
+	<module mID="m01">
+		<name>TestModule</name>
+		<modulePath confId="c01">Tests\TestModule.bas</modulePath>
+	</module>
+
+	<module mID="m02">
+		<name>TestClass</name>
+		<modulePath confId="c01">Tests\TestClass.cls</modulePath>
+	</module>
+
+	<module mID="m03">
+		<name>TestForm</name>
+		<modulePath confId="c01">Tests\TestForm.frm</modulePath>
+	</module>
+
+	<module mID="m04">
+		<name>ThisWorkbook</name>
+		<modulePath confId="c01">Tests\ThisWorkbook.cls</modulePath>
+	</module>
+
+	<reference confIDs="c01">
+		<name>Reference1</name>
+		<guid>GuidReference1</guid>
+	</reference>
+
+	<reference confIDs="c01">
+		<name>Reference2</name>
+		<guid>GuidReference2</guid>
+	</reference>
+
+	<reference confIDs="c01">
+		<name>Reference3</name>
+		<path>PathReference3</path>
+	</reference>
+
+</vtkConf>

@@ -176,6 +176,7 @@ resetTestFolder_Error:
     End Select
 End Sub
 
+
 '---------------------------------------------------------------------------------------
 ' Procedure : insertDummyProcedureInCodeModule
 ' Author    : Lucas Vitorino
@@ -205,4 +206,3 @@ insertDummyProcedureInCodeModule_Error:
     Resume Next
 
 End Sub
-

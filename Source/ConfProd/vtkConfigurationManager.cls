@@ -49,13 +49,19 @@ Private m_workbook As Workbook
 Private m_configurationSheet As Worksheet
 Private m_rootPath As String
 Private Const sheetName As String = "vtkConfigurations"
-Private Const currentVersion As String = "vtkConfigurations v1.0"
+Private Const currentVersion As String = "vtkConfigurations v2.0"
 Private Const nbTitleColumns As Integer = 1
 Private Const nbTitleRows As Integer = 2
+
+Private fso As New FileSystemObject
+Private m_xmlSheetPath As String
+Private m_configurationDom As MSXML2.DOMDocument
 
 Private Sub Class_Terminate()
     Set m_configurationSheet = Nothing
     Set m_workbook = Nothing
+    
+    Set m_configurationDom = Nothing
 End Sub
 
 '---------------------------------------------------------------------------------------
@@ -75,25 +81,16 @@ Attribute projectName.VB_UserMemId = 0
 End Property
 
 Public Property Let projectName(ByVal sprojectName As String)
-    Dim wbName As String
-    wbName = vtkProjectForName(sprojectName).workbookDEVName
-    If m_projectName <> sprojectName And VtkWorkbookIsOpen(wbName) Then
-        m_projectName = sprojectName
-        Set m_workbook = Workbooks(wbName)
-        m_rootPath = ""
-        setConfigurationSheet      ' Reset the configuration sheet when the attached project is changed
-    End If
-End Property
 
-'---------------------------------------------------------------------------------------
-' Property  : workbook as WorkBook - Read Only - Private
-' Author    : Jean-Pierre Imbert
-' Date      : 09/08/2013
-' Purpose   : return the workbook containing the project
-'---------------------------------------------------------------------------------------
-'
-Private Property Get Workbook() As Workbook
-    Set Workbook = m_workbook
+    Dim sheetPath As String
+    sheetPath = fso.BuildPath(vtkRootPathForProject(sprojectName), vtkXmlRelPathForProject(sprojectName))
+    If m_projectName <> sprojectName And fso.FileExists(sheetPath) Then
+        m_projectName = sprojectName
+        m_xmlSheetPath = sheetPath
+        m_rootPath = ""
+        'setConfigurationSheet      ' Reset the configuration sheet when the attached project is changed
+    End If
+    
 End Property
 
 '---------------------------------------------------------------------------------------
@@ -111,86 +108,16 @@ Public Property Get rootPath() As String
         ret = m_rootPath
        Else
         ret = ""
-        If Not Workbook Is Nothing Then
-            ret = Workbook.path
-            If Not ret Like "" Then
-                Dim fso As New FileSystemObject
-                ret = fso.GetParentFolderName(ret)
-                m_rootPath = ret
-            End If
+        ret = vtkRootPathForProject(m_projectName)
+        If Not ret Like "" Then
+            m_rootPath = ret
         End If
     End If
+    
     rootPath = ret
+
 End Property
 
-'---------------------------------------------------------------------------------------
-' Function  : isConfigurationInitializedForWorkbook
-' Author    : Jean-Pierre Imbert
-' Date      : 08/08/2013
-' Purpose   : return True if a configuration sheet is already initialized in the workbook
-'             - the parameter is an Excel Workbook name
-'             - the Excel Workbook must be opened
-' WARNING   : the configuration manager must not be initialized with a project name
-'             because the project name setting implies the configuration sheet initialization
-'---------------------------------------------------------------------------------------
-'
-Public Function isConfigurationInitializedForWorkbook(ExcelName As String) As Boolean
-    Dim ws As Worksheet
-   On Error Resume Next
-    Set ws = Workbooks(ExcelName).Worksheets(sheetName)
-   On Error GoTo 0
-    isConfigurationInitializedForWorkbook = Not (ws Is Nothing)
-End Function
-
-'---------------------------------------------------------------------------------------
-' Procedure : setConfigurationSheet
-' Author    : Jean-Pierre Imbert
-' Date      : 25/05/2013
-' Purpose   : set then configurationSheet property
-'               - Create and initialize the sheet if it doesn't exist in the Project file
-'---------------------------------------------------------------------------------------
-'
-Private Sub setConfigurationSheet()
-    Dim ws As Worksheet
-    On Error Resume Next
-    Set ws = Workbook.Worksheets(sheetName)
-    On Error GoTo 0
-    If ws Is Nothing Then        ' If the Configuration doesn't exist, create one
-        Set ws = Workbook.Worksheets.Add(Type:=xlWorksheet)
-        ws.name = sheetName
-        '   Initialize the configuration sheet
-        initializeConfigurationSheet ws
-        End If
-    ' Verify that the configuration sheet is in last known version
-    If ws.Range("A1") <> currentVersion Then
-        ' Code to convert from previous version will be implemented here
-        End If
-    '   Set the initialized worksheet property
-    Set m_configurationSheet = ws
-End Sub
-
-'---------------------------------------------------------------------------------------
-' Procedure : initializeConfigurationSheet
-' Author    : Jean-Pierre Imbert
-' Date      : 25/05/2013
-' Purpose   : Initialize a new configuration sheet
-'---------------------------------------------------------------------------------------
-'
-Private Sub initializeConfigurationSheet(ws As Worksheet)
-    ws.Range("A1") = currentVersion
-    ws.Range("A2") = "Module Name"
-    ws.Range("B1") = vtkProjectForName(projectName).projectName
-    ws.Range("B2") = vtkProjectForName(projectName).projectStandardRelativePath
-    ws.Range("C1") = vtkProjectForName(projectName).projectDEVName
-    ws.Range("C2") = vtkProjectForName(projectName).projectDEVStandardRelativePath
-    
-    ws.Columns("A:C").ColumnWidth = 22
-    ws.Range("A1").Font.Size = 8
-    ws.Range("A2").HorizontalAlignment = xlCenter
-    ws.Range("A2").Font.Bold = True
-    ws.Range("B1:C2").HorizontalAlignment = xlCenter
-    ws.Range("B1:C1").Font.Bold = True
-End Sub
 
 '---------------------------------------------------------------------------------------
 ' Procedure : configurationSheet as Worksheet - Read only - Public
@@ -203,6 +130,48 @@ Public Property Get configurationSheet() As Worksheet
     Set configurationSheet = m_configurationSheet
 End Property
 
+
+'---------------------------------------------------------------------------------------
+' Procedure : configurationDOM
+' Author    : Lucas Vitorino
+' Purpose   : Return the XML DOM with all the information - used during tests
+'---------------------------------------------------------------------------------------
+'
+Public Property Get configurationDOM() As MSXML2.DOMDocument
+    
+    On Error GoTo configurationDOM_Error
+
+    Dim dom As New MSXML2.DOMDocument
+    dom.async = False
+    dom.validateOnParse = True
+
+    If dom.Load(m_xmlSheetPath) <> True Then
+        Set configurationDOM = Nothing
+        Err.Raise VTK_SHEET_NOT_VALID
+        Exit Property
+    End If
+
+    Set configurationDOM = dom
+    
+    On Error GoTo 0
+    Exit Property
+
+configurationDOM_Error:
+    Err.Source = "vtkConfigurationManager::configurationDOM"
+    
+    Select Case Err.Number
+        Case VTK_SHEET_NOT_VALID
+            Err.Description = "The xml sheet for project " & projectName & " has failed to load."
+        Case Else
+            Err.Number = VTK_UNEXPECTED_ERROR
+    End Select
+        
+    Err.Raise Err.Number, Err.Source, Err.Description
+            
+    Exit Property
+
+End Property
+
 '---------------------------------------------------------------------------------------
 ' Property  : configurationCount as Integer - Read Only - Public
 ' Author    : Jean-Pierre Imbert
@@ -212,7 +181,25 @@ End Property
 '
 Public Property Get configurationCount() As Integer
     ' The number of configurations is the number of used columns minus one
-    configurationCount = configurationSheet.UsedRange.Columns.Count - 1
+    On Error GoTo configurationCount_Error
+
+    configurationCount = configurationDOM.SelectNodes("/vtkConf/configuration").Length
+
+    On Error GoTo 0
+    Exit Property
+
+configurationCount_Error:
+    Err.Source = "vtkConfigurationManager::configurationCount"
+
+    Select Case Err.Number
+        Case VTK_SHEET_NOT_VALID
+            ' do nothing but forward the error
+        Case Else
+            Err.Number = VTK_UNEXPECTED_ERROR
+    End Select
+        
+    Err.Raise Err.Number, Err.Source, Err.Description
+
 End Property
 
 '---------------------------------------------------------------------------------------
@@ -224,43 +211,37 @@ End Property
 '---------------------------------------------------------------------------------------
 '
 Public Function configuration(n As Integer) As String
+    
+    On Error GoTo configuration_Error
+    
     Dim sResult As String
     sResult = ""
+
     If n >= 1 And n <= configurationCount Then
-        sResult = configurationSheet.Cells(1, n + nbTitleColumns)
-       Else
+        sResult = configurationDOM.SelectSingleNode("/vtkConf/configuration[" & n - 1 & "]/name[0]").Text
+    Else
         sResult = ""
     End If
+    
     configuration = sResult
-End Function
 
-'---------------------------------------------------------------------------------------
-' Procedure : addConfiguration
-' Author    : Jean-Pierre Imbert
-' Date      : 28/08/2013
-' Purpose   : Add a configuration to the configuration manager
-'             - optionaly a path may be given for the configuration
-'             - all modules pathes are initialized to Null
-'             - if the configuration already exists, it is not added
-' Return    : the number of the added configuration
-'             - if the configuration already exists, return minus the configuration number
-'---------------------------------------------------------------------------------------
-'
-Public Function addConfiguration(configuration As String, Optional path As String = "") As Integer
-    Dim n As Integer
-    n = getConfigurationNumber(configuration)
-    If n = 0 Then   ' n = 0 means non-existant configuration
-        n = configurationCount + 1                                        ' Set module number
-        configurationSheet.Cells(1, n + nbTitleColumns) = configuration   ' Write module name
-        configurationSheet.Cells(2, n + nbTitleColumns) = path            ' Write module path
-        Dim i As Integer
-        For i = 1 To moduleCount                         ' For each module
-            configurationSheet.Cells(i + nbTitleRows, n + nbTitleColumns) = "-"     ' Set Default path as not initialized
-        Next i
-        addConfiguration = n
-       Else
-        addConfiguration = -n
-    End If
+    On Error GoTo 0
+    Exit Function
+
+configuration_Error:
+    Err.Source = "vtkConfigurationManager::configuration"
+    
+    Select Case Err.Number
+        Case VTK_SHEET_NOT_VALID
+            ' do nothing but froward the error
+        Case Else
+            Err.Number = VTK_UNEXPECTED_ERROR
+    End Select
+        
+    Err.Raise Err.Number, Err.Source, Err.Description
+    
+    Exit Function
+
 End Function
 
 '---------------------------------------------------------------------------------------
@@ -271,13 +252,35 @@ End Function
 '---------------------------------------------------------------------------------------
 '
 Public Function configurations() As Collection
+    
+    On Error GoTo configurations_Error
+
     Dim col As New Collection, i As Integer, c As vtkConfiguration
+    
     For i = 1 To configurationCount
         Set c = New vtkConfiguration
         c.init confManager:=Me, confNumber:=i
-        col.Add Item:=c, Key:=configuration(i)
+        col.Add Item:=C, Key:=configuration(i)
     Next i
     Set configurations = col
+
+    On Error GoTo 0
+    Exit Function
+
+configurations_Error:
+    Err.Source = "vtkConfigurationManager::configurations"
+    
+    Select Case Err.Number
+        Case VTK_SHEET_NOT_VALID
+            ' do nothing but froward the error
+        Case Else
+            Err.Number = VTK_UNEXPECTED_ERROR
+    End Select
+        
+    Err.Raise Err.Number, Err.Source, Err.Description
+    
+    Exit Function
+
 End Function
 
 '---------------------------------------------------------------------------------------
@@ -289,17 +292,37 @@ End Function
 '---------------------------------------------------------------------------------------
 '
 Public Function getConfigurationNumber(configuration As String) As Integer
-    Dim r As Range
-    On Error Resume Next
-    Set r = configurationSheet.Rows(1)      ' Select first column of the sheet
-    Set r = r.Offset(0, nbTitleColumns)     ' Forget the first column
-    Set r = r.Find(what:=configuration, SearchOrder:=xlByRows, LookAt:=xlWhole)
+
+    Dim i As Integer
+    On Error GoTo getConfigurationNumber_Error
+
+    For i = 1 To configurationCount
+        If configurationDOM Is Nothing Then Debug.Print "confDOm is nothing"
+        If configurationDOM.SelectSingleNode("/vtkConf/configuration[" & i - 1 & "]/name[0]").Text = configuration Then
+            getConfigurationNumber = i
+            Exit Function
+        End If
+    Next
+    
+    getConfigurationNumber = 0
+
     On Error GoTo 0
-    If r Is Nothing Then
-        getConfigurationNumber = 0
-       Else
-        getConfigurationNumber = r.Column - nbTitleColumns
-    End If
+    Exit Function
+
+getConfigurationNumber_Error:
+    Err.Source = "vtkConfigurationManager::getConfigurationNumber"
+    Debug.Print Err.Number, Err.Description
+    Select Case Err.Number
+        Case VTK_SHEET_NOT_VALID
+            ' do nothing but froward the error
+        Case Else
+            Err.Number = VTK_UNEXPECTED_ERROR
+    End Select
+        
+    Err.Raise Err.Number, Err.Source, Err.Description
+    
+    Exit Function
+
 End Function
 
 '---------------------------------------------------------------------------------------
@@ -311,29 +334,38 @@ End Function
 '---------------------------------------------------------------------------------------
 '
 Public Function getConfigurationPathWithNumber(n As Integer) As String
+
+    On Error GoTo getConfigurationPathWithNumber_Error
+    
     Dim sResult As String
     sResult = ""
+    
     If n >= 1 And n <= configurationCount Then
-        sResult = configurationSheet.Cells(2, n + nbTitleColumns)
+        sResult = configurationDOM.SelectSingleNode("/vtkConf/configuration[" & n - 1 & "]/path[0]").Text
        Else
         sResult = ""
     End If
+    
     getConfigurationPathWithNumber = sResult
-End Function
 
-'---------------------------------------------------------------------------------------
-' Procedure : setConfigurationPathWithNumber
-' Author    : Jean-Pierre Imbert
-' Date      : 25/05/2013
-' Purpose   : change the n-th relative configuration path of the project, given n as integer
-'               - does nothing if the configuration is inexistant
-'---------------------------------------------------------------------------------------
-'
-Public Sub setConfigurationPathWithNumber(n As Integer, path As String)
-    If n >= 1 And n <= configurationCount Then
-        configurationSheet.Cells(2, n + nbTitleColumns) = path
-    End If
-End Sub
+    On Error GoTo 0
+    Exit Function
+
+getConfigurationPathWithNumber_Error:
+    Err.Source = "vtkConfigurationManager::getConfigurationPathWithNumber"
+    
+    Select Case Err.Number
+        Case VTK_SHEET_NOT_VALID
+            ' do nothing but froward the error
+        Case Else
+            Err.Number = VTK_UNEXPECTED_ERROR
+    End Select
+        
+    Err.Raise Err.Number, Err.Source, Err.Description
+    
+    Exit Function
+
+End Function
 
 '---------------------------------------------------------------------------------------
 ' Function  : getConfigurationPath
@@ -344,19 +376,28 @@ End Sub
 '---------------------------------------------------------------------------------------
 '
 Public Function getConfigurationPath(configuration As String) As String
-    getConfigurationPath = getConfigurationPathWithNumber(getConfigurationNumber(configuration))
-End Function
+    On Error GoTo getConfigurationPath_Error
 
-'---------------------------------------------------------------------------------------
-' Procedure : setConfigurationPath
-' Author    : Jean-Pierre Imbert
-' Date      : 26/05/2013
-' Purpose   : change the path of a configuration given its name
-'---------------------------------------------------------------------------------------
-'
-Public Sub setConfigurationPath(configuration As String, path As String)
-    setConfigurationPathWithNumber n:=getConfigurationNumber(configuration), path:=path
-End Sub
+    getConfigurationPath = getConfigurationPathWithNumber(getConfigurationNumber(configuration))
+
+    On Error GoTo 0
+    Exit Function
+
+getConfigurationPath_Error:
+    Err.Source = "vtkConfigurationManager::getConfigurationPath"
+    
+    Select Case Err.Number
+        Case VTK_SHEET_NOT_VALID
+            ' do nothing but froward the error
+        Case Else
+            Err.Number = VTK_UNEXPECTED_ERROR
+    End Select
+        
+    Err.Raise Err.Number, Err.Source, Err.Description
+    
+    Exit Function
+
+End Function
 
 '---------------------------------------------------------------------------------------
 ' Property  : moduleCount as Integer - Read Only - Public
@@ -367,7 +408,27 @@ End Sub
 '
 Public Property Get moduleCount() As Integer
     ' The number of modules is the number of used rows minus two
-    moduleCount = configurationSheet.UsedRange.Rows.Count - nbTitleRows
+    On Error GoTo moduleCount_Error
+
+    moduleCount = configurationDOM.SelectNodes("/vtkConf/module").Length
+
+    On Error GoTo 0
+    Exit Property
+
+moduleCount_Error:
+    Err.Source = "vtkConfigurationManager::moduleCount"
+    
+    Select Case Err.Number
+        Case VTK_SHEET_NOT_VALID
+            ' do nothing but froward the error
+        Case Else
+            Err.Number = VTK_UNEXPECTED_ERROR
+    End Select
+        
+    Err.Raise Err.Number, Err.Source, Err.Description
+    
+    Exit Property
+
 End Property
 
 '---------------------------------------------------------------------------------------
@@ -378,14 +439,38 @@ End Property
 '---------------------------------------------------------------------------------------
 '
 Public Function modules() As Collection
+
+    On Error GoTo modules_Error
+
     Dim col As New Collection, i As Integer, m As vtkModule
+    
     For i = 1 To moduleCount
         Set m = New vtkModule
         m.init confManager:=Me, modNumber:=i
         col.Add Item:=m, Key:=module(i)
     Next i
+    
     Set modules = col
+
+    On Error GoTo 0
+    Exit Function
+
+modules_Error:
+    Err.Source = "vtkConfigurationManager::modules"
+    
+    Select Case Err.Number
+        Case VTK_SHEET_NOT_VALID
+            ' do nothing but froward the error
+        Case Else
+            Err.Number = VTK_UNEXPECTED_ERROR
+    End Select
+        
+    Err.Raise Err.Number, Err.Source, Err.Description
+    
+    Exit Function
+
 End Function
+
 '---------------------------------------------------------------------------------------
 ' Function  : module
 ' Author    : Jean-Pierre Imbert
@@ -395,14 +480,35 @@ End Function
 '---------------------------------------------------------------------------------------
 '
 Public Function module(n As Integer) As String
+    
+    On Error GoTo module_Error
+    
     Dim sResult As String
     sResult = ""
     If n >= 1 And n <= moduleCount Then
-        sResult = configurationSheet.Cells(n + nbTitleRows, 1)
+        sResult = configurationDOM.SelectSingleNode("/vtkConf/module[" & n - 1 & "]/name[0]").Text
        Else
         sResult = ""
     End If
     module = sResult
+
+    On Error GoTo 0
+    Exit Function
+
+module_Error:
+    Err.Source = "vtkConfigurationManager::module"
+    
+    Select Case Err.Number
+        Case VTK_SHEET_NOT_VALID
+            ' do nothing but froward the error
+        Case Else
+            Err.Number = VTK_UNEXPECTED_ERROR
+    End Select
+        
+    Err.Raise Err.Number, Err.Source, Err.Description
+    
+    Exit Function
+
 End Function
 
 '---------------------------------------------------------------------------------------
@@ -414,43 +520,61 @@ End Function
 '---------------------------------------------------------------------------------------
 '
 Public Function getModuleNumber(module As String) As Integer
-    Dim r As Range
-    On Error Resume Next
-    Set r = configurationSheet.Columns(1)   ' Select first column of the sheet
-    Set r = r.Offset(nbTitleRows, 0)                  ' Forget the two first rows
-    Set r = r.Find(what:=module, SearchOrder:=xlByColumns, LookAt:=xlWhole)
+    
+    On Error GoTo getModuleNumber_Error
+    
+    Dim i As Integer
+    For i = 1 To moduleCount
+        If configurationDOM.SelectSingleNode("/vtkConf/module[" & i - 1 & "]/name[0]").Text = module Then
+            getModuleNumber = i
+            Exit Function
+        End If
+    Next
+    getModuleNumber = 0
+
     On Error GoTo 0
-    If r Is Nothing Then
-        getModuleNumber = 0
-       Else
-        getModuleNumber = r.Row - nbTitleRows
-    End If
+    Exit Function
+
+getModuleNumber_Error:
+    Err.Source = "vtkConfigurationManager::getModuleNumber"
+    
+    Select Case Err.Number
+        Case VTK_SHEET_NOT_VALID
+            ' do nothing but froward the error
+        Case Else
+            Err.Number = VTK_UNEXPECTED_ERROR
+    End Select
+        
+    Err.Raise Err.Number, Err.Source, Err.Description
+    
+    Exit Function
+    
 End Function
 
-'---------------------------------------------------------------------------------------
-' Procedure : addModule
-' Author    : Jean-Pierre Imbert
-' Date      : 26/05/2013
-' Purpose   : Add a new module given its name
-'               - return the number of the added module
-'               - if the module is already existant, return minus the number of the existant module
-'---------------------------------------------------------------------------------------
-'
-Public Function addModule(module As String) As Integer
-    Dim n As Integer
-    n = getModuleNumber(module)
-    If n = 0 Then   ' n = 0 means non-existant module
-        n = moduleCount + 1                                     ' Set module number
-        configurationSheet.Cells(n + nbTitleRows, 1) = module   ' Write module name
-        Dim i As Integer
-        For i = 1 To configurationCount                         ' For each configuration
-            configurationSheet.Cells(n + nbTitleRows, i + nbTitleColumns) = "-"     ' Set Default path as not initialized
-        Next i
-        addModule = n
-       Else
-        addModule = -n
-    End If
-End Function
+'''---------------------------------------------------------------------------------------
+''' Procedure : addModule
+''' Author    : Jean-Pierre Imbert
+''' Date      : 26/05/2013
+''' Purpose   : Add a new module given its name
+'''               - return the number of the added module
+'''               - if the module is already existant, return minus the number of the existant module
+'''---------------------------------------------------------------------------------------
+'''
+''Public Function addModule(module As String) As Integer
+''    Dim n As Integer
+''    n = getModuleNumber(module)
+''    If n = 0 Then   ' n = 0 means non-existant module
+''        n = moduleCount + 1                                     ' Set module number
+''        configurationSheet.Cells(n + nbTitleRows, 1) = module   ' Write module name
+''        Dim i As Integer
+''        For i = 1 To configurationCount                         ' For each configuration
+''            configurationSheet.Cells(n + nbTitleRows, i + nbTitleColumns) = "-"     ' Set Default path as not initialized
+''        Next i
+''        addModule = n
+''       Else
+''        addModule = -n
+''    End If
+''End Function
 
 '---------------------------------------------------------------------------------------
 ' Procedure : getModulePathWithNumber
@@ -462,32 +586,287 @@ End Function
 '---------------------------------------------------------------------------------------
 '
 Public Function getModulePathWithNumber(numModule As Integer, numConfiguration As Integer) As String
+
+    On Error GoTo getModulePathWithNumber_Error
+    
     Dim sResult As String
+    sResult = ""
     If numModule >= 1 And numModule <= moduleCount And numConfiguration >= 1 And numConfiguration <= configurationCount Then
-        sResult = configurationSheet.Cells(numModule + nbTitleRows, numConfiguration + nbTitleColumns)
-        If sResult = "-" Then sResult = ""
+        'sResult = configurationSheet.Cells(numModule + nbTitleRows, numConfiguration + nbTitleColumns)
+        'If sResult = "-" Then sResult = ""
+        On Error Resume Next
+        sResult = configurationDOM.SelectSingleNode("/vtkConf/module[" & numModule - 1 & "]/modulePath[@confId=""" & _
+                    configurationDOM.SelectSingleNode("/vtkConf/configuration[" & numConfiguration - 1 & "]/@cID").Text & _
+                    """]").Text
+        On Error GoTo 0
        Else
         sResult = ""
     End If
     getModulePathWithNumber = sResult
+
+    On Error GoTo 0
+    Exit Function
+
+getModulePathWithNumber_Error:
+    Err.Source = "vtkConfigurationManager::getModulePathWithNumber"
+    
+    Select Case Err.Number
+        Case VTK_SHEET_NOT_VALID
+            ' do nothing but froward the error
+        Case Else
+            Err.Number = VTK_UNEXPECTED_ERROR
+    End Select
+        
+    Err.Raise Err.Number, Err.Source, Err.Description
+    
+    Exit Function
+
+
 End Function
 
+
 '---------------------------------------------------------------------------------------
-' Procedure : setModulePathWithNumber
-' Author    : Jean-Pierre Imbert
-' Date      : 26/05/2013
-' Purpose   : Set a module relative path given its module and configuration numbers
-'               - if the path given is "", it is replaced by "-" in the configuration sheet cell
+' Procedure : refCount
+' Author    : Lucas Vitorino
+' Purpose   : Get the number of references used by all the configurations of a project.
 '---------------------------------------------------------------------------------------
 '
-Public Sub setModulePathWithNumber(path As String, numModule As Integer, numConfiguration As Integer)
-    Dim s As String
-    If numModule >= 1 And numModule <= moduleCount And numConfiguration >= 1 And numConfiguration <= configurationCount Then
-        If path = "" Then
-            s = "-"
-           Else
-            s = path
-        End If
-        configurationSheet.Cells(numModule + nbTitleRows, numConfiguration + nbTitleColumns) = s
+Public Property Get refCount()
+
+    On Error GoTo refCount_Error
+
+    refCount = configurationDOM.SelectNodes("/vtkConf/reference").Length
+
+    On Error GoTo 0
+    Exit Property
+
+refCount_Error:
+    Err.Source = "vtkConfigurationManager::refCount"
+    
+    Select Case Err.Number
+        Case VTK_SHEET_NOT_VALID
+            ' do nothing but froward the error
+        Case Else
+            Err.Number = VTK_UNEXPECTED_ERROR
+    End Select
+        
+    Err.Raise Err.Number, Err.Source, Err.Description
+    
+    Exit Property
+
+End Property
+
+
+'---------------------------------------------------------------------------------------
+' Procedure : getReferencesForConfiguration
+' Author    : Lucas Vitorino
+' Purpose   : Get the collection of references for the n-th configuration.
+' Return    : A collection of vtkReference objects.
+'---------------------------------------------------------------------------------------
+'
+Public Function getReferencesForConfigurationNumber(numConfiguration As Integer) As Collection
+
+    On Error GoTo getReferencesForConfigurationNumber_Error
+
+    Dim tmpDom As New MSXML2.DOMDocument
+    Dim retCol As New Collection
+    Dim tmpNode As MSXML2.IXMLDOMNode
+    Dim tmpRef As New vtkReference
+    Dim confId As String
+
+    ' If this property is set directly in the configurationDOM property, it breaks, so we do it here
+    Set tmpDom = configurationDOM
+    tmpDom.setProperty "SelectionLanguage", "XPath"
+
+    If numConfiguration >= 1 And numConfiguration <= configurationCount Then
+        ' The line below is incorrect because of XPath. Setting the selection language of the DOM to XPath makes
+        ' the default index change from 0 to 1
+        'confId = tmpDom.SelectSingleNode("/vtkConf/configuration[" & numConfiguration - 1 & "]/@cID").Text
+        
+        confId = tmpDom.SelectSingleNode("/vtkConf/configuration[" & numConfiguration & "]/@cID").Text
+
+        For Each tmpNode In tmpDom.SelectNodes("/vtkConf/reference[@confIDs[contains(.,""" & confId & """)]]")
+            ' The first child is the name (DTD)
+            tmpRef.name = tmpNode.FirstChild.Text
+
+            ' The DTD ensures both the fields will not be filled
+            If tmpNode.ChildNodes.Item(1).BaseName Like "guid" Then
+                tmpRef.guid = tmpNode.ChildNodes.Item(1).Text
+            ElseIf tmpNode.ChildNodes.Item(1).BaseName Like "path" Then
+                tmpRef.path = tmpNode.ChildNodes.Item(1).Text
+            End If
+            
+            retCol.Add Item:=tmpRef, Key:=tmpRef.name
+
+            ' Reinitialize the reference object
+            Set tmpRef = Nothing
+            Set tmpRef = New vtkReference
+
+        Next
+
     End If
-End Sub
+
+    On Error GoTo 0
+    Set getReferencesForConfigurationNumber = retCol
+    Exit Function
+
+getReferencesForConfigurationNumber_Error:
+    Err.Source = "vtkConfigurationManager::getReferencesForConfigurationNumber"
+
+    Select Case Err.Number
+        Case VTK_SHEET_NOT_VALID
+            ' do nothing but froward the error
+        Case Else
+            Err.Number = VTK_UNEXPECTED_ERROR
+    End Select
+
+    Err.Raise Err.Number, Err.Source, Err.Description
+
+    Exit Function
+
+End Function
+
+
+'---------------------------------------------------------------------------------------
+' Procedure : getReferencesForConfiguration
+' Author    : Lucas Vitorino
+' Purpose   : Get the collection of references for the configuration of the given name.
+' Return    : - A collection of vtkReference objects if the configuration exists
+'             - Nothing if it does not
+'---------------------------------------------------------------------------------------
+'
+Public Function getReferencesForConfiguration(confName As String) As Collection
+    On Error GoTo getReferencesForConfiguration_Error
+
+    If getConfigurationNumber(confName) <> 0 Then
+        Set getReferencesForConfiguration = getReferencesForConfigurationNumber(getConfigurationNumber(confName))
+    Else
+        Set getReferencesForConfiguration = Nothing
+    End If
+
+    On Error GoTo 0
+    Exit Function
+
+getReferencesForConfiguration_Error:
+    Err.Source = "vtkConfigurationManager::getReferencesForConfiguration"
+    
+    Select Case Err.Number
+        Case VTK_SHEET_NOT_VALID
+            ' do nothing but froward the error
+        Case Else
+            Err.Number = VTK_UNEXPECTED_ERROR
+    End Select
+
+    Err.Raise Err.Number, Err.Source, Err.Description
+
+    Exit Function
+
+End Function
+
+
+'---------------------------------------------------------------------------------------
+' Procedure : getConfigurationTitle
+' Author    : Lucas Vitorino
+' Purpose   : Get the title of the configuration as it is described in the sheet.
+' Notes     : If this function returns "", it can mean that  the configuration does not exist or
+'             that the configuration has no title.
+'---------------------------------------------------------------------------------------
+'
+Public Function getConfigurationTitle(confName As String) As String
+    On Error GoTo getConfigurationTitle_Error
+
+    If getConfigurationNumber(confName) <> 0 And configurationDOM.SelectNodes("/vtkConf/configuration[name=""" & confName & """]/title").Length > 0 Then
+        getConfigurationTitle = configurationDOM.SelectSingleNode("/vtkConf/configuration[name=""" & confName & """]/title[0]").Text
+    Else
+        getConfigurationTitle = ""
+    End If
+
+    On Error GoTo 0
+    Exit Function
+
+getConfigurationTitle_Error:
+    Err.Source = "vtkConfigurationManager::getConfigurationTitle"
+    
+    Select Case Err.Number
+        Case VTK_SHEET_NOT_VALID
+            ' do nothing but froward the error
+        Case Else
+            Err.Number = VTK_UNEXPECTED_ERROR
+    End Select
+
+    Err.Raise Err.Number, Err.Source, Err.Description
+
+    Exit Function
+End Function
+
+
+'---------------------------------------------------------------------------------------
+' Procedure : getConfigurationComment
+' Author    : Lucas Vitorino
+' Purpose   : Get the comment of the configuration as it is described in the sheet.
+' Notes     : If this function returns "", it can mean that  the configuration does not exist or
+'             that the configuration has no comment.
+'---------------------------------------------------------------------------------------
+'
+Public Function getConfigurationComment(confName As String) As String
+    On Error GoTo getConfigurationComment_Error
+
+    If getConfigurationNumber(confName) <> 0 And configurationDOM.SelectNodes("/vtkConf/configuration[name=""" & confName & """]/comment").Length > 0 Then
+        getConfigurationComment = configurationDOM.SelectSingleNode("/vtkConf/configuration[name=""" & confName & """]/comment[0]").Text
+    Else
+        getConfigurationComment = ""
+    End If
+
+    On Error GoTo 0
+    Exit Function
+
+getConfigurationComment_Error:
+    Err.Source = "vtkConfigurationManager::getConfigurationComment"
+    
+    Select Case Err.Number
+        Case VTK_SHEET_NOT_VALID
+            ' do nothing but froward the error
+        Case Else
+            Err.Number = VTK_UNEXPECTED_ERROR
+    End Select
+
+    Err.Raise Err.Number, Err.Source, Err.Description
+
+    Exit Function
+End Function
+
+
+'---------------------------------------------------------------------------------------
+' Procedure : getConfigurationTemplatePath
+' Author    : Lucas Vitorino
+' Purpose   : Get the template of the configuration as it is described in the sheet.
+' Notes     : If this function returns "", it can mean that  the configuration does not exist or
+'             that the configuration has no comment.
+'---------------------------------------------------------------------------------------
+'
+Public Function getConfigurationTemplatePath(confName As String) As String
+    On Error GoTo getConfigurationTemplatePath_Error
+    
+    If getConfigurationNumber(confName) <> 0 And configurationDOM.SelectNodes("/vtkConf/configuration[name=""" & confName & """]/templatePath").Length > 0 Then
+        getConfigurationTemplatePath = configurationDOM.SelectSingleNode("/vtkConf/configuration[name=""" & confName & """]/templatePath[0]").Text
+    Else
+        getConfigurationTemplatePath = ""
+    End If
+
+    On Error GoTo 0
+    Exit Function
+
+getConfigurationTemplatePath_Error:
+    Err.Source = "vtkConfigurationManager::getConfigurationTemplatePath"
+    
+    Select Case Err.Number
+        Case VTK_SHEET_NOT_VALID
+            ' do nothing but froward the error
+        Case Else
+            Err.Number = VTK_UNEXPECTED_ERROR
+    End Select
+
+    Err.Raise Err.Number, Err.Source, Err.Description
+
+    Exit Function
+End Function

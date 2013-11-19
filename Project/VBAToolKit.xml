@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="ISO-8859-1" standalone="yes"?>
-<!DOCTYPE vtkConf SYSTEM [
+<!DOCTYPE vtkConf [
 <!ELEMENT vtkConf (info,configuration*, module*, reference*)>
         <!ELEMENT info (vtkConfigurationsVersion,projectName)>
                 <!ELEMENT vtkConfigurationsVersion (#PCDATA)>
@@ -217,164 +217,176 @@
         <modulePath confId="c2">Source\ConfTest\vtkProjectTester.cls</modulePath>
     </module>
     <module mID="m32">
-        <name>vtkInitializeVbaUnitTester</name>
-        <modulePath confId="c2">Source\ConfTest\vtkInitializeVbaUnitTester.cls</modulePath>
-    </module>
-    <module mID="m33">
         <name>vtkExcelUtilities</name>
         <modulePath confId="c1">Source\ConfProd\vtkExcelUtilities.bas</modulePath>
         <modulePath confId="c2">Source\ConfProd\vtkExcelUtilities.bas</modulePath>
         <modulePath confId="c3">Source\ConfProd\vtkExcelUtilities.bas</modulePath>
     </module>
-    <module mID="m34">
+    <module mID="m33">
         <name>vtkProjectCreationUtilities</name>
         <modulePath confId="c1">Source\ConfProd\vtkProjectCreationUtilities.bas</modulePath>
         <modulePath confId="c2">Source\ConfProd\vtkProjectCreationUtilities.bas</modulePath>
         <modulePath confId="c3">Source\ConfProd\vtkProjectCreationUtilities.bas</modulePath>
     </module>
-    <module mID="m35">
+    <module mID="m34">
         <name>vtkMainFunctions</name>
         <modulePath confId="c1">Source\ConfProd\vtkMainFunctions.bas</modulePath>
         <modulePath confId="c2">Source\ConfProd\vtkMainFunctions.bas</modulePath>
         <modulePath confId="c3">Source\ConfProd\vtkMainFunctions.bas</modulePath>
     </module>
-    <module mID="m36">
+    <module mID="m35">
         <name>vtkCreateTreeFolderTester</name>
         <modulePath confId="c2">Source\ConfTest\vtkCreateTreeFolderTester.cls</modulePath>
     </module>
-    <module mID="m37">
+    <module mID="m36">
         <name>vtkImportExportUtilitiesTester</name>
         <modulePath confId="c2">Source\ConfTest\vtkImportExportUtilitiesTester.cls</modulePath>
     </module>
-    <module mID="m38">
+    <module mID="m37">
         <name>vtKPathUtilities</name>
         <modulePath confId="c1">Source\ConfProd\vtKPathUtilities.bas</modulePath>
         <modulePath confId="c2">Source\ConfProd\vtKPathUtilities.bas</modulePath>
         <modulePath confId="c3">Source\ConfProd\vtKPathUtilities.bas</modulePath>
     </module>
-    <module mID="m39">
+    <module mID="m38">
         <name>vtkEventHandler</name>
         <modulePath confId="c1">Source\ConfProd\vtkEventHandler.cls</modulePath>
         <modulePath confId="c2">Source\ConfProd\vtkEventHandler.cls</modulePath>
         <modulePath confId="c3">Source\ConfProd\vtkEventHandler.cls</modulePath>
     </module>
-    <module mID="m40">
+    <module mID="m39">
         <name>vtkToolBars</name>
         <modulePath confId="c1">Source\ConfProd\vtkToolBars.bas</modulePath>
         <modulePath confId="c2">Source\ConfProd\vtkToolBars.bas</modulePath>
         <modulePath confId="c3">Source\ConfProd\vtkToolBars.bas</modulePath>
     </module>
-    <module mID="m41">
+    <module mID="m40">
         <name>vtkToolBarsTester</name>
         <modulePath confId="c2">Source\ConfTest\vtkToolBarsTester.cls</modulePath>
     </module>
-    <module mID="m42">
+    <module mID="m41">
         <name>ThisWorkbook</name>
         <modulePath confId="c1">Source\ConfProd\ThisWorkbook.cls</modulePath>
         <modulePath confId="c2">Source\ConfTest\ThisWorkbook.cls</modulePath>
         <modulePath confId="c3">Source\ConfProd\ThisWorkbook.cls</modulePath>
     </module>
-    <module mID="m43">
+    <module mID="m42">
         <name>vtkCreateProjectForm</name>
         <modulePath confId="c1">Source\ConfProd\vtkCreateProjectForm.frm</modulePath>
         <modulePath confId="c2">Source\ConfProd\vtkCreateProjectForm.frm</modulePath>
         <modulePath confId="c3">Source\ConfProd\vtkCreateProjectForm.frm</modulePath>
     </module>
-    <module mID="m44">
+    <module mID="m43">
         <name>vtkExportOneModuleTester</name>
         <modulePath confId="c2">Source\ConfTest\vtkExportOneModuleTester.cls</modulePath>
     </module>
-    <module mID="m45">
+    <module mID="m44">
         <name>vtkGitFunctions</name>
         <modulePath confId="c1">Source\ConfProd\vtkGitFunctions.bas</modulePath>
         <modulePath confId="c2">Source\ConfProd\vtkGitFunctions.bas</modulePath>
         <modulePath confId="c3">Source\ConfProd\vtkGitFunctions.bas</modulePath>
     </module>
-    <module mID="m46">
+    <module mID="m45">
         <name>vtkGitFunctionsTester</name>
         <modulePath confId="c2">Source\ConfTest\vtkGitFunctionsTester.cls</modulePath>
     </module>
-    <module mID="m47">
+    <module mID="m46">
         <name>vtkFileSystemUtilities</name>
         <modulePath confId="c1">Source\ConfProd\vtkFileSystemUtilities.bas</modulePath>
         <modulePath confId="c2">Source\ConfProd\vtkFileSystemUtilities.bas</modulePath>
         <modulePath confId="c3">Source\ConfProd\vtkFileSystemUtilities.bas</modulePath>
     </module>
-    <module mID="m48">
+    <module mID="m47">
         <name>vtkFileSystemUtilitiesTester</name>
         <modulePath confId="c2">Source\ConfTest\vtkFileSystemUtilitiesTester.cls</modulePath>
     </module>
-    <module mID="m49">
+    <module mID="m48">
         <name>vtkShellAndWait</name>
         <modulePath confId="c1">Source\ConfProd\vtkShellAndWait.bas</modulePath>
         <modulePath confId="c2">Source\ConfProd\vtkShellAndWait.bas</modulePath>
         <modulePath confId="c3">Source\ConfProd\vtkShellAndWait.bas</modulePath>
     </module>
-    <module mID="m50">
+    <module mID="m49">
         <name>vtkConfiguration</name>
         <modulePath confId="c1">Source\ConfProd\vtkConfiguration.cls</modulePath>
         <modulePath confId="c2">Source\ConfProd\vtkConfiguration.cls</modulePath>
         <modulePath confId="c3">Source\ConfProd\vtkConfiguration.cls</modulePath>
     </module>
-    <module mID="m51">
+    <module mID="m50">
         <name>vtkConfigurationTester</name>
         <modulePath confId="c2">Source\ConfTest\vtkConfigurationTester.cls</modulePath>
     </module>
-    <module mID="m52">
+    <module mID="m51">
         <name>vtkModule</name>
         <modulePath confId="c1">Source\ConfProd\vtkModule.cls</modulePath>
         <modulePath confId="c2">Source\ConfProd\vtkModule.cls</modulePath>
         <modulePath confId="c3">Source\ConfProd\vtkModule.cls</modulePath>
     </module>
-    <module mID="m53">
+    <module mID="m52">
         <name>vtkModuleTester</name>
         <modulePath confId="c2">Source\ConfTest\vtkModuleTester.cls</modulePath>
     </module>
-    <module mID="m54">
+    <module mID="m53">
         <name>vtkTestUtilities</name>
         <modulePath confId="c1">Source\ConfTest\vtkTestUtilities.bas</modulePath>
         <modulePath confId="c2">Source\ConfTest\vtkTestUtilities.bas</modulePath>
         <modulePath confId="c3">Source\ConfTest\vtkTestUtilities.bas</modulePath>
     </module>
-    <module mID="m55">
+    <module mID="m54">
         <name>vtkExportConfigurationTester</name>
         <modulePath confId="c2">Source\ConfTest\vtkExportConfigurationTester.cls</modulePath>
     </module>
-    <module mID="m56">
+    <module mID="m55">
         <name>vtkNormalize</name>
         <modulePath confId="c1">Source\ConfProd\vtkNormalize.bas</modulePath>
         <modulePath confId="c2">Source\ConfProd\vtkNormalize.bas</modulePath>
         <modulePath confId="c3">Source\ConfProd\vtkNormalize.bas</modulePath>
     </module>
-    <module mID="m57">
+    <module mID="m56">
         <name>vtkNormalizeTester</name>
         <modulePath confId="c2">Source\ConfTest\vtkNormalizeTester.cls</modulePath>
     </module>
-    <module mID="m58">
+    <module mID="m57">
         <name>vtkTestUtilitiesTester</name>
         <modulePath confId="c2">Source\ConfTest\vtkTestUtilitiesTester.cls</modulePath>
     </module>
-    <module mID="m59">
+    <module mID="m58">
         <name>vtkXMLUtilities</name>
         <modulePath confId="c1">Source\ConfProd\vtkXMLUtilities.bas</modulePath>
         <modulePath confId="c2">Source\ConfProd\vtkXMLUtilities.bas</modulePath>
         <modulePath confId="c3">Source\ConfProd\vtkXMLUtilities.bas</modulePath>
     </module>
-    <module mID="m60">
+    <module mID="m59">
         <name>vtkXMLExportTester</name>
         <modulePath confId="c2">Source\ConfTest\vtkXMLExportTester.cls</modulePath>
     </module>
-    <module mID="m61">
+    <module mID="m60">
         <name>vtkRecreateConfigurationTester</name>
         <modulePath confId="c2">Source\ConfTest\vtkRecreateConfigurationTester.cls</modulePath>
     </module>
-    <module mID="m62">
+    <module mID="m61">
         <name>vtkRecreateConfigurationForm</name>
         <modulePath confId="c1">Source\ConfProd\vtkRecreateConfigurationForm.frm</modulePath>
         <modulePath confId="c2">Source\ConfProd\vtkRecreateConfigurationForm.frm</modulePath>
         <modulePath confId="c3">Source\ConfProd\vtkRecreateConfigurationForm.frm</modulePath>
     </module>
+    <module mID="m62">
+        <name>vtkXMLFilesCreator</name>
+        <modulePath confId="c1">Source\ConfProd\vtkXMLFilesCreator.bas</modulePath>
+        <modulePath confId="c2">Source\ConfProd\vtkXMLFilesCreator.bas</modulePath>
+        <modulePath confId="c3">Source\ConfProd\vtkXMLFilesCreator.bas</modulePath>
+    </module>
     <module mID="m63">
+        <name>vtkReference</name>
+        <modulePath confId="c1">Source\ConfProd\vtkReference.cls</modulePath>
+        <modulePath confId="c2">Source\ConfProd\vtkReference.cls</modulePath>
+        <modulePath confId="c3">Source\ConfProd\vtkReference.cls</modulePath>
+    </module>
+    <module mID="m64">
+        <name>vtkReferenceTester</name>
+        <modulePath confId="c2">Source\ConfTest\vtkReferenceTester.cls</modulePath>
+    </module>
+    <module mID="m65">
         <name>vtkExcelUtilitiesTester</name>
         <modulePath confId="c2">Source\ConfTest\vtkExcelUtilitiesTester.cls</modulePath>
     </module>
@@ -414,8 +426,12 @@
         <name>MSXML2</name>
         <guid>{F5078F18-C551-11D3-89B9-0000F81FE221}</guid>
     </reference>
+    <reference confIDs="c1 c2 c3">
+        <name>ADODB</name>
+        <guid>{00000206-0000-0010-8000-00AA006D2EA4}</guid>
+    </reference>
     <reference confIDs="c2">
         <name>VBAToolKit</name>
-        <path>C:\Documents and Settings\Demonn\Application Data\Microsoft\AddIns\VBAToolKit.xlam</path>
+        <path>C:\Documents and Settings\Administrator\Application Data\Microsoft\AddIns\VBAToolKit.xlam</path>
     </reference>
 </vtkConf>

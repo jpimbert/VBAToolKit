@@ -80,7 +80,7 @@ Private Sub CancelButton_Click()
     Unload VBAToolKit.vtkCreateProjectForm
 End Sub
 
-Private Sub ProjectPathTextBox_Change()
+Private Sub ProjectpathTextBox_Change()
     enableCreateButton
 End Sub
 

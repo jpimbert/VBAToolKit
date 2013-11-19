@@ -120,10 +120,6 @@ Property Get path() As String
     path = m_parent.getConfigurationPathWithNumber(m_number)
 End Property
 
-Property Let path(newPath As String)
-    m_parent.setConfigurationPathWithNumber m_number, newPath
-End Property
-
 '---------------------------------------------------------------------------------------
 ' Property  : modules as collection (Read Only)
 ' Author    : Jean-Pierre Imbert
@@ -142,4 +138,45 @@ Property Get modules() As Collection
         End If
     Next i
     Set modules = col
+End Property
+
+'---------------------------------------------------------------------------------------
+' Procedure : references
+' Author    : Lucas Vitorino
+' Purpose   : The collection of references attached to the configuration
+'---------------------------------------------------------------------------------------
+'
+Property Get references() As Collection
+    Set references = m_parent.getReferencesForConfiguration(name)
+End Property
+
+'---------------------------------------------------------------------------------------
+' Procedure : title
+' Author    : Lucas Vitorino
+' Purpose   : The title of the configuration
+'---------------------------------------------------------------------------------------
+'
+Property Get title() As String
+    title = m_parent.getConfigurationTitle(name)
+End Property
+
+'---------------------------------------------------------------------------------------
+' Procedure : comment
+' Author    : Lucas Vitorino
+' Purpose   : The comment of the configuration
+'---------------------------------------------------------------------------------------
+'
+Property Get comment() As String
+    comment = m_parent.getConfigurationComment(name)
+End Property
+
+
+'---------------------------------------------------------------------------------------
+' Procedure : templatePath
+' Author    : Lucas Vitorino
+' Purpose   : The templatePath of the configuration
+'---------------------------------------------------------------------------------------
+'
+Property Get templatePath() As String
+    templatePath = m_parent.getConfigurationTemplatePath(name)
 End Property
