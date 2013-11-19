@@ -158,7 +158,9 @@ Public Sub vtkRecreateConfiguration(projectName As String, configurationName As 
     Set conf = cm.configurations(configurationName)
     For Each mo In conf.modules
         If fso.FileExists(rootPath & "\" & mo.getPathForConfiguration(configurationName)) = False Then
-            Err.Raise VTK_NO_SOURCE_FILES
+            Err.Raise VTK_NO_SOURCE_FILES, , "First missing module : " & vbCrLf & _
+                                             "Name : " & mo.name & vbCrLf & _
+                                             "Path : " & rootPath & "\" & mo.getPathForConfiguration(configurationName)
         End If
     Next
     
@@ -247,8 +249,8 @@ vtkRecreateConfiguration_Error:
                               "Please close it before recreating the configuration."
         Case VTK_NO_SOURCE_FILES
             Err.Number = VTK_NO_SOURCE_FILES
-            Err.Description = "The configuration you're trying to create (" & configurationName & ") is missing one or several source files." & _
-                              "Please export the modules in their relevant path before recreating the configuration."
+            Err.Description = "The configuration you're trying to create (" & configurationName & ") is missing one or several source files." & vbCrLf & _
+                              vbCrLf & Err.Description
         Case VTK_WRONG_FILE_PATH
             Err.Number = VTK_WRONG_FILE_PATH
             Err.Description = "The configuration you're trying to create (" & configurationName & ") has a invalid path." & _

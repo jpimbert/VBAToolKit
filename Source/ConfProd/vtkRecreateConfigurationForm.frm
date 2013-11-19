@@ -13,6 +13,7 @@ Attribute VB_GlobalNameSpace = False
 Attribute VB_Creatable = False
 Attribute VB_PredeclaredId = True
 Attribute VB_Exposed = False
+
 '---------------------------------------------------------------------------------------
 ' Module    : vtkNewRecreateConfigurationForm
 ' Author    : Lucas Vitorino
@@ -216,7 +217,6 @@ End Sub
 ' Procedure : CreateConfigurationButton_Click
 ' Author    : Lucas Vitorino
 ' Purpose   : Create the configuration.
-'            TODO : no source files ?
 '---------------------------------------------------------------------------------------
 '
 Private Sub CreateConfigurationButton_Click()
@@ -231,7 +231,7 @@ Private Sub CreateConfigurationButton_Click()
 
 CreateConfigurationButton_Click_Error:
     Err.Source = "vtkNewRecreateConfigurationForm::CreateConfigurationButton_Click"
-    MsgBox "Recreation failed : Error " & Err.Number & " : " & Err.Description & " in " & Err.Source, vbOKOnly
+    MsgBox "Recreation failed : Error " & Err.Number & " : " & Err.Description, vbExclamation
     Exit Sub
 
 End Sub
