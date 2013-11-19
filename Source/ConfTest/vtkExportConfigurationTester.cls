@@ -186,14 +186,14 @@ End Sub
 
 Public Sub Test_vtkExportConfiguration_filesNotYetCreatedTrue()
 ' Source files are not yet created, onlyModified = True => expected : all modules are exported
-    
+
     Dim retVal As Integer
-    
+
     On Error GoTo Test_vtkExportConfiguration_filesNotYetCreatedTrue_Error
 
     retVal = vtkExportConfiguration(testWorkbook.VBProject, testProjectName, testConf.name, onlyModified:=True)
     mAssert.Equals retVal, totalNumberOfModules, totalNumberOfModules & " should be exported as files do not yet exist."
-    
+
     mAssert.Should fso.FileExists(projectDir & testModule1FileName), testModule1FileName & " should have been created."
     mAssert.Should fso.FileExists(projectDir & testModule2FileName), testModule2FileName & " should have been created."
 
@@ -203,7 +203,7 @@ Public Sub Test_vtkExportConfiguration_filesNotYetCreatedTrue()
 Test_vtkExportConfiguration_filesNotYetCreatedTrue_Error:
     mAssert.Should False, "Unexpected error " & Err.Number & " (" & Err.Description & ") in procedure Test_vtkExportConfiguration_filesNotYetCreatedTrue of Class Module vtkExportConfigurationTester"
     Exit Sub
-    
+
 End Sub
 
 Public Sub Test_vtkExportConfiguration_filesNotYetCreatedFalse()

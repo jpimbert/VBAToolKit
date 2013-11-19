@@ -176,6 +176,7 @@ resetTestFolder_Error:
     End Select
 End Sub
 
+
 '---------------------------------------------------------------------------------------
 ' Procedure : insertDummyProcedureInCodeModule
 ' Author    : Lucas Vitorino
