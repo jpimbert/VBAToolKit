@@ -216,22 +216,44 @@ End Sub
 '---------------------------------------------------------------------------------------
 ' Procedure : CreateConfigurationButton_Click
 ' Author    : Lucas Vitorino
-' Purpose   : Create the configuration.
+' Purpose   : Create the configuration selected if the checkbox is not checked.
+'             If the checkbox is checked, create all the cofnigurations except the one selected.
 '---------------------------------------------------------------------------------------
 '
 Private Sub CreateConfigurationButton_Click()
     On Error GoTo CreateConfigurationButton_Click_Error
 
-    vtkRecreateConfiguration currentProjectName, currentConfigurationName
+    Dim successConfList As String: successConfList = ""
 
-    MsgBox "Recreation successful !", vbOKOnly
+    If AllExceptThisOneCheckBox.Value = False Then
+        vtkRecreateConfiguration currentProjectName, currentConfigurationName
+        successConfList = currentConfigurationName & " : " & currentCM.configurations(currentConfigurationName).path & vbCrLf
+    Else
+        Dim tmpConf As vtkConfiguration
+        For Each tmpConf In currentCM.configurations
+            If tmpConf.name <> currentConfigurationName Then
+                vtkRecreateConfiguration currentProjectName, tmpConf.name
+                successConfList = successConfList & tmpConf.name & " : " & tmpConf.path & vbCrLf
+            End If
+        Next
+    End If
+
+    MsgBox "Recreation successful !" & vbCrLf & vbCrLf & successConfList, vbInformation
 
     On Error GoTo 0
     Exit Sub
 
 CreateConfigurationButton_Click_Error:
     Err.Source = "vtkNewRecreateConfigurationForm::CreateConfigurationButton_Click"
-    MsgBox "Recreation failed : Error " & Err.Number & " : " & Err.Description, vbExclamation
+    
+    ' When configurations have been successfully created before an error occured
+    Dim errorMessage As String
+    errorMessage = "Recreation failed ! " & vbCrLf & vbCrLf & "Error " & Err.Number & " : " & Err.Description
+    If AllExceptThisOneCheckBox.Value Then
+        errorMessage = errorMessage & vbCrLf & vbCrLf & vbCrLf & "Configurations successfully recreated : " & vbCrLf & successConfList
+    End If
+    MsgBox errorMessage, vbExclamation
+    
     Exit Sub
 
 End Sub
