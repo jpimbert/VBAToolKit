@@ -629,6 +629,37 @@ Test_vtkResetTestFolder_PopulatedFolder_Error:
     
 End Sub
 
+'---------------------------------------------------------------------------------------
+' Procedure : Test_vtkResetTestFolder_PopulatedFoldersAndFiles
+' Author    : Imbert
+' Date      : 24/12/2013
+' Purpose   : remove the Test folder contains files and populated folders
+'---------------------------------------------------------------------------------------
+Public Sub Test_vtkResetTestFolder_PopulatedFoldersAndFiles()
+    Dim fso As New FileSystemObject, fileObject As File
+
+   On Error GoTo Test_vtkResetTestFolder_PopulatedFoldersAndFiles_Error
+    
+    getTestFolderFromTemplate folderName:="Folder", destinationName:="FirstFolder"
+    getTestFolderFromTemplate folderName:="Folder", destinationName:="SecondFolder"
+    fso.CreateTextFile (VBAToolKit.vtkTestPath & "\" & "FirstFile.bat")
+    Set fileObject = fso.GetFile(VBAToolKit.vtkTestPath & "\" & "FirstFile.bat")
+    fileObject.Attributes = fileObject.Attributes Or 1  '   Set The Read Only attribute
+    fso.CreateTextFile (VBAToolKit.vtkTestPath & "\" & "SecondFile.bas")
+
+    resetTestFolder
+    
+    assertTestFolderIsEmpty mAssert:=mAssert
+
+    On Error GoTo 0
+    Exit Sub
+
+Test_vtkResetTestFolder_PopulatedFoldersAndFiles_Error:
+    mAssert.Should False, "Unexpected error " & Err.Number & " (" & Err.Description & ") in procedure Test_vtkResetTestFolderContainsFiles of Class Module vtkTestUtilitiesTester"
+    Resume Next
+    
+End Sub
+
 Private Function ITest_Suite() As TestSuite
     Set ITest_Suite = New TestSuite
     ITest_Suite.AddTest ITest_Manager.ClassName, "Test_vtkTestPath"
@@ -652,6 +683,7 @@ Private Function ITest_Suite() As TestSuite
     ITest_Suite.AddTest ITest_Manager.ClassName, "Test_vtkResetTestFolder_FileOpen"
     ITest_Suite.AddTest ITest_Manager.ClassName, "Test_vtkResetTestFolder_EmptyFolder"
     ITest_Suite.AddTest ITest_Manager.ClassName, "Test_vtkResetTestFolder_PopulatedFolder"
+    ITest_Suite.AddTest ITest_Manager.ClassName, "Test_vtkResetTestFolder_PopulatedFoldersAndFiles"
 End Function
 
 Private Sub ITestCase_RunTest()
@@ -677,6 +709,7 @@ Private Sub ITestCase_RunTest()
         Case "Test_vtkResetTestFolder_FileOpen": Test_vtkResetTestFolder_FileOpen
         Case "Test_vtkResetTestFolder_EmptyFolder": Test_vtkResetTestFolder_EmptyFolder
         Case "Test_vtkResetTestFolder_PopulatedFolder": Test_vtkResetTestFolder_PopulatedFolder
+        Case "Test_vtkResetTestFolder_PopulatedFoldersAndFiles": Test_vtkResetTestFolder_PopulatedFoldersAndFiles
         Case Else: mAssert.Should False, "Invalid test name: " & mManager.methodName
     End Select
 End Sub
