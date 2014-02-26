@@ -161,8 +161,8 @@ Public Sub resetTestFolder()
     Dim fso As New FileSystemObject
    On Error GoTo resetTestFolder_Error
 
-    fso.DeleteFolder VBAToolKit.vtkTestPath & "\*"
-    fso.DeleteFile VBAToolKit.vtkTestPath & "\*.*"
+    fso.DeleteFolder VBAToolKit.vtkTestPath & "\*", True
+    fso.DeleteFile VBAToolKit.vtkTestPath & "\*.*", True
 
    On Error GoTo 0
    Exit Sub

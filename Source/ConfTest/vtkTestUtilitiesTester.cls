@@ -629,6 +629,62 @@ Test_vtkResetTestFolder_PopulatedFolder_Error:
     
 End Sub
 
+'---------------------------------------------------------------------------------------
+' Procedure : Test_vtkResetTestFolder_FileReadOnly
+' Author    : Champonnois
+' Date      : 25/09/2013
+' Purpose   : remove the file ReadOnly in Test folder
+'---------------------------------------------------------------------------------------
+Public Sub Test_vtkResetTestFolder_FileReadOnly()
+    Dim fso As New FileSystemObject
+
+    On Error GoTo Test_vtkResetTestFolder_FileReadOnly_Error
+    
+    fso.CreateTextFile fileName:=VBAToolKit.vtkTestPath & "\" & "FildeReadOnly.xlsm"
+    
+    SetAttr PathName:=VBAToolKit.vtkTestPath & "\" & "FildeReadOnly.xlsm", Attributes:=vbReadOnly
+    
+    resetTestFolder
+    
+    assertTestFolderIsEmpty mAssert:=mAssert
+
+    On Error GoTo 0
+    Exit Sub
+
+Test_vtkResetTestFolder_FileReadOnly_Error:
+    mAssert.Should False, "Unexpected error " & Err.Number & " (" & Err.Description & ") in procedure Test_vtkResetTestFolder_FileReadOnly of Class Module vtkTestUtilitiesTester"
+    Resume Next
+    
+End Sub
+
+'---------------------------------------------------------------------------------------
+' Procedure : Test_vtkResetTestFolder_FolderReadOnly
+' Author    : Champonnois
+' Date      : 25/09/2013
+' Purpose   : remove the folder ReadOnly in Test folder
+'---------------------------------------------------------------------------------------
+Public Sub Test_vtkResetTestFolder_FolderReadOnly()
+    Dim fso As New FileSystemObject
+    
+    On Error GoTo Test_vtkResetTestFolder_FolderReadOnly_Error
+    
+    fso.CreateFolder path:=VBAToolKit.vtkTestPath & "\" & "FolderReadOnly"
+    
+    SetAttr PathName:=VBAToolKit.vtkTestPath & "\" & "FolderReadOnly", Attributes:=vbReadOnly
+    
+    resetTestFolder
+    
+    assertTestFolderIsEmpty mAssert:=mAssert
+
+    On Error GoTo 0
+    Exit Sub
+
+Test_vtkResetTestFolder_FolderReadOnly_Error:
+    mAssert.Should False, "Unexpected error " & Err.Number & " (" & Err.Description & ") in procedure Test_vtkResetTestFolder_FolderReadOnly of Class Module vtkTestUtilitiesTester"
+    Resume Next
+    
+End Sub
+
 Private Function ITest_Suite() As TestSuite
     Set ITest_Suite = New TestSuite
     ITest_Suite.AddTest ITest_Manager.ClassName, "Test_vtkTestPath"
@@ -652,6 +708,8 @@ Private Function ITest_Suite() As TestSuite
     ITest_Suite.AddTest ITest_Manager.ClassName, "Test_vtkResetTestFolder_FileOpen"
     ITest_Suite.AddTest ITest_Manager.ClassName, "Test_vtkResetTestFolder_EmptyFolder"
     ITest_Suite.AddTest ITest_Manager.ClassName, "Test_vtkResetTestFolder_PopulatedFolder"
+    ITest_Suite.AddTest ITest_Manager.ClassName, "Test_vtkResetTestFolder_FileReadOnly"
+    ITest_Suite.AddTest ITest_Manager.ClassName, "Test_vtkResetTestFolder_FolderReadOnly"
 End Function
 
 Private Sub ITestCase_RunTest()
@@ -677,6 +735,8 @@ Private Sub ITestCase_RunTest()
         Case "Test_vtkResetTestFolder_FileOpen": Test_vtkResetTestFolder_FileOpen
         Case "Test_vtkResetTestFolder_EmptyFolder": Test_vtkResetTestFolder_EmptyFolder
         Case "Test_vtkResetTestFolder_PopulatedFolder": Test_vtkResetTestFolder_PopulatedFolder
+        Case "Test_vtkResetTestFolder_FileReadOnly": Test_vtkResetTestFolder_FileReadOnly
+        Case "Test_vtkResetTestFolder_FolderReadOnly": Test_vtkResetTestFolder_FolderReadOnly
         Case Else: mAssert.Should False, "Invalid test name: " & mManager.methodName
     End Select
 End Sub
