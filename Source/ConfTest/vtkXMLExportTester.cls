@@ -65,9 +65,6 @@ Private Sub ITestCase_SetUp(Assert As IAssert)
 
     Set mAssert = Assert
     
-    ' Copy the DTD in the Test Folder
-    getTestFileFromTemplate fileName:="vtkConfigurationsDTD.dtd", openExcel:=False
-    
     ' Open the test Project and get the configuration manager for this project
     Set testWorkbook = getTestFileFromTemplate(fileName:=testProjectFileName, openExcel:=True)
     Set cm = vtkConfigurationManagerForProject(testProjectName)
@@ -300,7 +297,7 @@ Public Sub Test_vtkExportConfigurationsAsXML_ExistantFile()
     Dim line As String
     line = f.ReadLine
     f.Close
-    mAssert.Equals line, "<?xml version=""1.0"" encoding=""ISO-8859-1"" standalone=""no""?>", "First line of the configuration file"
+    mAssert.Equals line, "<?xml version=""1.0"" encoding=""ISO-8859-1"" standalone=""yes""?>", "First line of the configuration file"
 
    On Error GoTo 0
    Exit Sub

@@ -425,6 +425,7 @@ Public Sub vtkRecreateConfiguration(projectName As String, configurationName As 
     vtkCreateFolderPath tmpPath
     
     ' Save the new workbook with the correct extension
+    Wb.IsAddin = vtkDefaultIsAddIn(wbPath)
     Wb.SaveAs fileName:=tmpPath, FileFormat:=vtkDefaultFileFormat(wbPath)
     Wb.Close saveChanges:=False
     
