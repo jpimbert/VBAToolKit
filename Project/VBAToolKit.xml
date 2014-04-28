@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="ISO-8859-1" standalone="yes"?>
-<!DOCTYPE vtkConf SYSTEM [
+<!DOCTYPE vtkConf [
 <!ELEMENT vtkConf (info,configuration*, module*, reference*)>
         <!ELEMENT info (vtkConfigurationsVersion,projectName)>
                 <!ELEMENT vtkConfigurationsVersion (#PCDATA)>
@@ -414,8 +414,8 @@
         <name>MSXML2</name>
         <guid>{F5078F18-C551-11D3-89B9-0000F81FE221}</guid>
     </reference>
-    <reference confIDs="c2">
+    <reference confIDs="c3">
         <name>VBAToolKit</name>
-        <path>C:\Documents and Settings\Demonn\Application Data\Microsoft\AddIns\VBAToolKit.xlam</path>
+        <path>C:\Documents and Settings\Demonn\Application Data\Microsoft\AddIns\VBAToolKit.xla</path>
     </reference>
 </vtkConf>
