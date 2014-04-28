@@ -626,7 +626,6 @@ vtkExportConfiguration_notModifiedModulesAreNotNormalizedOMTrue_Error:
     Resume Next
 End Sub
 
-
 Public Sub Test_vtkExportConfiguration_notModifiedModulesAreNormalizedOMFalse()
 ' - Source files are exported, no module is modified, onlyModified = False
 '    - expected : all modules are exported, already existing modules are normalized
@@ -671,6 +670,43 @@ vtkExportConfiguration_notModifiedModulesAreNormalizedOMFalse:
     Resume Next
 End Sub
 
+'---------------------------------------------------------------------------------------
+' Procedure : Test_vtkExportConfiguration_nonexistantModuleInFileExcel
+' Author    : Mathieu CHAMPONNOIS
+' Date      : 28/04/2014
+' Purpose   : Test case: nonexistent module in the Excel file
+'---------------------------------------------------------------------------------------
+'
+Public Sub Test_vtkExportConfiguration_nonexistantModuleInFileExcel()
+    Dim i As Integer
+    
+    On Error GoTo Test_vtkExportConfiguration_nonexistantModuleInFileExcel_Error
+
+    'Delete module TestModule2 for the Excel
+    For i = 1 To testWorkbook.VBProject.VBComponents.Count
+        If testWorkbook.VBProject.VBComponents.Item(i).name = testModule2Name Then
+            testWorkbook.VBProject.VBComponents.Remove testWorkbook.VBProject.VBComponents.Item(i)
+            Exit For
+        End If
+    Next i
+    
+    testWorkbook.Save
+    
+    On Error Resume Next
+
+    ' Export all the modified modules
+    vtkExportConfiguration testWorkbook.VBProject, testProjectName, testConf.name, onlyModified:=False
+    
+    mAssert.Equals Err.Number, VTK_NONEXISTENT_MODULE_FILE_EXCEL, "the expected error is not 'the module doesn't exist in the Excel configuration'"
+    
+    On Error GoTo 0
+    Exit Sub
+
+Test_vtkExportConfiguration_nonexistantModuleInFileExcel_Error:
+    mAssert.Should False, "Unexpected error " & Err.Number & " (" & Err.Description & ") in procedure Test_vtkExportConfiguration_nonexistantModuleInFileExcel of Class Module vtkExportConfigurationTester"
+    Resume Next
+End Sub
+
 Private Function ITest_Suite() As TestSuite
     Set ITest_Suite = New TestSuite
     ITest_Suite.AddTest ITest_Manager.ClassName, "Test_vtkExportConfiguration_filesNotYetCreatedTrue"
@@ -687,6 +723,7 @@ Private Function ITest_Suite() As TestSuite
     ITest_Suite.AddTest ITest_Manager.ClassName, "Test_vtkExportConfiguration_modifiedModuleIsNormalizedOMTrue"
     ITest_Suite.AddTest ITest_Manager.ClassName, "Test_vtkExportConfiguration_notModifiedModulesAreNotNormalizedOMTrue"
     ITest_Suite.AddTest ITest_Manager.ClassName, "Test_vtkExportConfiguration_notModifiedModulesAreNormalizedOMFalse"
+    ITest_Suite.AddTest ITest_Manager.ClassName, "Test_vtkExportConfiguration_nonexistantModuleInFileExcel"
 End Function
 
 Private Sub ITestCase_RunTest()
@@ -705,6 +742,7 @@ Private Sub ITestCase_RunTest()
         Case "Test_vtkExportConfiguration_modifiedModuleIsNormalizedOMTrue": Test_vtkExportConfiguration_modifiedModuleIsNormalizedOMTrue
         Case "Test_vtkExportConfiguration_notModifiedModulesAreNotNormalizedOMTrue": Test_vtkExportConfiguration_notModifiedModulesAreNotNormalizedOMTrue
         Case "Test_vtkExportConfiguration_notModifiedModulesAreNormalizedOMFalse": Test_vtkExportConfiguration_notModifiedModulesAreNormalizedOMFalse
+        Case "Test_vtkExportConfiguration_nonexistantModuleInFileExcel": Test_vtkExportConfiguration_nonexistantModuleInFileExcel
         Case Else: mAssert.Should False, "Invalid test name: " & mManager.methodName
     End Select
 End Sub

@@ -499,10 +499,14 @@ Public Function vtkExportConfiguration(projectWithModules As VBProject, projectN
         Dim modulePath As String
         modulePath = cm.rootPath & "\" & mo.path
                    
+        'Verify if module exist in workbook Excel
+        If mo.VBAModule Is Nothing Then Err.Raise VTK_NONEXISTENT_MODULE_FILE_EXCEL
+                   
         ' The conditon to export could be simplified in
         '   If Not (onlyModified And fso.FileExists(modulePath) And mo.VBAModule) Then <export>
         ' but it doesn't seem to work, so we stick to this code.
         If onlyModified And fso.FileExists(modulePath) Then
+            
             If mo.VBAModule.Saved = False Then
                 vtkExportOneModule projectWithModules, mo.name, modulePath
                 exportedModulesCount = exportedModulesCount + 1
@@ -519,7 +523,11 @@ Public Function vtkExportConfiguration(projectWithModules As VBProject, projectN
     Exit Function
 
 vtkExportConfiguration_Error:
-    Err.Raise Err.Number, "procedure vtkExportConfiguration of Module vtkImportExportUtilities", Err.Description
+    If Err.Number = VTK_NONEXISTENT_MODULE_FILE_EXCEL Then
+        Err.Raise Number:=VTK_NONEXISTENT_MODULE_FILE_EXCEL, Source:="vtkExportConfiguration", Description:="Module to export doesn't exist in file Excel : " & mo.name
+    Else
+        Err.Raise Err.Number, "procedure vtkExportConfiguration of Module vtkImportExportUtilities", Err.Description
+    End If
     Resume Next
 
 End Function
