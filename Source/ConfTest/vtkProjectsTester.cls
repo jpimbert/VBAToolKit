@@ -122,6 +122,54 @@ Test_xmlRememberedProjectsFullPath_GetDefaultFileXmlNonexistent_Error:
     Resume Next
 End Sub
 
+'---------------------------------------------------------------------------------------
+' Procedure : Test_isXmlSheetValid_FileXmlExistent
+' Author    : Champonnois
+' Date      : 06/05/2014
+' Purpose   : verify the load file xml VBAToolKitProjects in folder add-in
+'---------------------------------------------------------------------------------------
+Public Sub Test_isXmlSheetValid_FileXmlExistent()
+    Dim fso As New FileSystemObject
+    
+    On Error GoTo Test_isXmlSheetValid_FileXmlExistent_Error
+    
+    mAssert.Equals isXmlSheetValid, True, "Xml file not valid or nonexistent"
+
+    On Error GoTo 0
+
+    Exit Sub
+
+Test_isXmlSheetValid_FileXmlExistent_Error:
+    mAssert.Should False, "Unexpected error " & Err.Number & " (" & Err.Description & ") in procedure Test_isXmlSheetValid_FileXmlExistent of Class Module vtkProjectsTester"
+    Resume Next
+End Sub
+
+'---------------------------------------------------------------------------------------
+' Procedure : Test_isXmlSheetValid_FileXmlNonexistent
+' Author    : Champonnois
+' Date      : 06/05/2014
+' Purpose   : verify the nonexistence load file xml VBAToolKitProjects in folder add-in
+'---------------------------------------------------------------------------------------
+Public Sub Test_isXmlSheetValid_FileXmlNonexistent()
+    Dim fso As New FileSystemObject
+    
+    On Error GoTo Test_isXmlSheetValid_FileXmlNonexistent_Error
+    
+    fso.MoveFile xmlRememberedProjectsFullPath, vtkTestPath & "\" & "VBAToolKitProjects.xml"
+    
+    mAssert.Equals isXmlSheetValid, False, "Xml file is valid and present"
+    
+    fso.MoveFile vtkTestPath & "\" & "VBAToolKitProjects.xml", xmlRememberedProjectsFullPath
+
+    On Error GoTo 0
+
+    Exit Sub
+
+Test_isXmlSheetValid_FileXmlNonexistent_Error:
+    mAssert.Should False, "Unexpected error " & Err.Number & " (" & Err.Description & ") in procedure Test_isXmlSheetValid_FileXmlNonexistent of Class Module vtkProjectsTester"
+    Resume Next
+End Sub
+
 Private Function ITest_Suite() As TestSuite
     Set ITest_Suite = New TestSuite
     ITest_Suite.AddTest ITest_Manager.ClassName, "TestProjectIsNotNull"
@@ -129,6 +177,8 @@ Private Function ITest_Suite() As TestSuite
     ITest_Suite.AddTest ITest_Manager.ClassName, "TestProjectIsInvariant"
     ITest_Suite.AddTest ITest_Manager.ClassName, "Test_xmlRememberedProjectsFullPath_GetDefault"
     ITest_Suite.AddTest ITest_Manager.ClassName, "Test_xmlRememberedProjectsFullPath_GetDefaultFileXmlNonexistent"
+    ITest_Suite.AddTest ITest_Manager.ClassName, "Test_isXmlSheetValid_FileXmlExistent"
+    ITest_Suite.AddTest ITest_Manager.ClassName, "Test_isXmlSheetValid_FileXmlNonexistent"
 End Function
 
 Private Sub ITestCase_RunTest()
@@ -138,6 +188,8 @@ Private Sub ITestCase_RunTest()
         Case "TestProjectIsInvariant": TestProjectIsInvariant
         Case "Test_xmlRememberedProjectsFullPath_GetDefault": Test_xmlRememberedProjectsFullPath_GetDefault
         Case "Test_xmlRememberedProjectsFullPath_GetDefaultFileXmlNonexistent": Test_xmlRememberedProjectsFullPath_GetDefaultFileXmlNonexistent
+        Case "Test_isXmlSheetValid_FileXmlExistent": Test_isXmlSheetValid_FileXmlExistent
+        Case "Test_isXmlSheetValid_FileXmlNonexistent": Test_isXmlSheetValid_FileXmlNonexistent
         Case Else: mAssert.Should False, "Invalid test name: " & mManager.methodName
     End Select
 End Sub

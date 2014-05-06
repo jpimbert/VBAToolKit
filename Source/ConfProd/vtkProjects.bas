@@ -44,6 +44,33 @@ Public Property Get xmlRememberedProjectsFullPath() As String
 End Property
 
 '---------------------------------------------------------------------------------------
+' Procedure : isXmlSheetValid
+' Author    : Lucas Vitorino
+' Purpose   : Check the validity of the xml sheet containing all the projects.
+' Notes     : It uses a DTD.
+'---------------------------------------------------------------------------------------
+'
+Public Function isXmlSheetValid() As Boolean
+
+    Dim xDoc As New MSXML2.DOMDocument
+    xDoc.async = False
+    xDoc.validateOnParse = True
+
+    isXmlSheetValid = xDoc.Load(xmlRememberedProjectsFullPath)
+
+    On Error GoTo 0
+    Exit Function
+
+isXmlSheetValid_Error:
+    Err.Source = "Function isXmlSheetValid in module vtkProjects"
+
+    Err.Raise Err.Number, Err.Source, Err.Description
+
+    Exit Function
+
+End Function
+
+'---------------------------------------------------------------------------------------
 ' Procedure : vtkProjectForName
 ' Author    : Jean-Pierre Imbert
 ' Date      : 04/06/2013
@@ -65,7 +92,7 @@ Public Function vtkProjectForName(projectName As String) As vtkProject
         Set cm = New vtkProject
         cm.projectName = projectName
         projects.Add Item:=cm, Key:=projectName
-	 End If
+         End If
     On Error GoTo 0
     ' return the configuration manager
     Set vtkProjectForName = cm
