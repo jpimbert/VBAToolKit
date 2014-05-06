@@ -74,11 +74,61 @@ Public Sub TestProjectIsInvariant()
     mAssert.Should vtkProjectForName(projectName) Is cm, "The project for a project name must be always the same"
 End Sub
 
+'---------------------------------------------------------------------------------------
+' Procedure : Test_xmlRememberedProjectsFullPath_GetDefault
+' Author    : Champonnois
+' Date      : 06/05/2014
+' Purpose   : verify the existance file xml VBAToolKitProjects in folder add-in
+'---------------------------------------------------------------------------------------
+Public Sub Test_xmlRememberedProjectsFullPath_GetDefault()
+    Dim fso As New FileSystemObject
+    
+    On Error GoTo Test_xmlRememberedProjectsFullPath_GetDefault_Error
+    
+    mAssert.Equals fso.FileExists(xmlRememberedProjectsFullPath), True, "Xml file recover default folder add-ins not present"
+
+    On Error GoTo 0
+
+    Exit Sub
+
+Test_xmlRememberedProjectsFullPath_GetDefault_Error:
+    mAssert.Should False, "Unexpected error " & Err.Number & " (" & Err.Description & ") in procedure Test_xmlRememberedProjectsFullPath_GetDefault_Error of Class Module vtkProjectsTester"
+    Resume Next
+End Sub
+
+'---------------------------------------------------------------------------------------
+' Procedure : Test_xmlRememberedProjectsFullPath_GetDefaultFileXmlNonexistent
+' Author    : Champonnois
+' Date      : 06/05/2014
+' Purpose   : verify the nonexistence file xml VBAToolKitProjects in folder add-in
+'---------------------------------------------------------------------------------------
+Public Sub Test_xmlRememberedProjectsFullPath_GetDefaultFileXmlNonexistent()
+    Dim fso As New FileSystemObject
+    
+    On Error GoTo Test_xmlRememberedProjectsFullPath_GetDefaultFileXmlNonexistent_Error
+    
+    fso.MoveFile xmlRememberedProjectsFullPath, vtkTestPath & "\" & "VBAToolKitProjects.xml"
+    
+    mAssert.Equals fso.FileExists(xmlRememberedProjectsFullPath), False, "Xml file recover default add-in is present"
+
+    fso.MoveFile vtkTestPath & "\" & "VBAToolKitProjects.xml", xmlRememberedProjectsFullPath
+
+    On Error GoTo 0
+
+    Exit Sub
+
+Test_xmlRememberedProjectsFullPath_GetDefaultFileXmlNonexistent_Error:
+    mAssert.Should False, "Unexpected error " & Err.Number & " (" & Err.Description & ") in procedure Test_xmlRememberedProjectsFullPath_GetDefaultFileXmlNonexistent of Class Module vtkProjectsTester"
+    Resume Next
+End Sub
+
 Private Function ITest_Suite() As TestSuite
     Set ITest_Suite = New TestSuite
     ITest_Suite.AddTest ITest_Manager.ClassName, "TestProjectIsNotNull"
     ITest_Suite.AddTest ITest_Manager.ClassName, "TestProjectsAreDifferentForTwoNames"
     ITest_Suite.AddTest ITest_Manager.ClassName, "TestProjectIsInvariant"
+    ITest_Suite.AddTest ITest_Manager.ClassName, "Test_xmlRememberedProjectsFullPath_GetDefault"
+    ITest_Suite.AddTest ITest_Manager.ClassName, "Test_xmlRememberedProjectsFullPath_GetDefaultFileXmlNonexistent"
 End Function
 
 Private Sub ITestCase_RunTest()
@@ -86,6 +136,8 @@ Private Sub ITestCase_RunTest()
         Case "TestProjectIsNotNull": TestProjectIsNotNull
         Case "TestProjectsAreDifferentForTwoNames": TestProjectsAreDifferentForTwoNames
         Case "TestProjectIsInvariant": TestProjectIsInvariant
+        Case "Test_xmlRememberedProjectsFullPath_GetDefault": Test_xmlRememberedProjectsFullPath_GetDefault
+        Case "Test_xmlRememberedProjectsFullPath_GetDefaultFileXmlNonexistent": Test_xmlRememberedProjectsFullPath_GetDefaultFileXmlNonexistent
         Case Else: mAssert.Should False, "Invalid test name: " & mManager.methodName
     End Select
 End Sub

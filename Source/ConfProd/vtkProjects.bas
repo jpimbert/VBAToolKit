@@ -29,6 +29,20 @@ Option Explicit
 '   collection of instances indexed by project names
 Private projects As Collection
 
+Private Const m_xmlFileDefaultName As String = "VBAToolKitProjects.xml"
+Private fso As New FileSystemObject
+
+'---------------------------------------------------------------------------------------
+' Procedure : xmlRememberedProjectsFullPath
+' Author    : Lucas Vitorino
+' Purpose   : Returns the full path of the list of the projects remembered by VBAToolKit.
+'             - it will be located in the same folder as the current workbook.
+'---------------------------------------------------------------------------------------
+'
+Public Property Get xmlRememberedProjectsFullPath() As String
+    xmlRememberedProjectsFullPath = fso.BuildPath(VBAToolKit.ThisWorkbook.path, m_xmlFileDefaultName)
+End Property
+
 '---------------------------------------------------------------------------------------
 ' Procedure : vtkProjectForName
 ' Author    : Jean-Pierre Imbert
@@ -51,7 +65,7 @@ Public Function vtkProjectForName(projectName As String) As vtkProject
         Set cm = New vtkProject
         cm.projectName = projectName
         projects.Add Item:=cm, Key:=projectName
-        End If
+	 End If
     On Error GoTo 0
     ' return the configuration manager
     Set vtkProjectForName = cm
