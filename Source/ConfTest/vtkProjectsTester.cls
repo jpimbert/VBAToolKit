@@ -170,6 +170,34 @@ Test_isXmlSheetValid_FileXmlNonexistent_Error:
     Resume Next
 End Sub
 
+'---------------------------------------------------------------------------------------
+' Procedure : Test_isXmlSheetValid_FileXmlInvalid
+' Author    : Champonnois
+' Date      : 06/05/2014
+' Purpose   : verify the invalid load file txt VBAToolKitProjects in folder add-in
+'---------------------------------------------------------------------------------------
+Public Sub Test_isXmlSheetValid_FileXmlInvalid()
+    Dim fso As New FileSystemObject
+    
+    On Error GoTo Test_isXmlSheetValid_FileXmlInvalid_Error
+    
+    fso.MoveFile xmlRememberedProjectsFullPath, vtkTestPath & "\" & "VBAToolKitProjects.xml"
+    fso.CreateTextFile (fso.GetParentFolderName(xmlRememberedProjectsFullPath) & "\" & "VBAToolKitProjects.pdf")
+    
+    mAssert.Equals isXmlSheetValid, False, "Xml file is valid, but it shouldn't"
+    
+    fso.DeleteFile (fso.GetParentFolderName(xmlRememberedProjectsFullPath) & "\" & "VBAToolKitProjects.pdf")
+    fso.MoveFile vtkTestPath & "\" & "VBAToolKitProjects.xml", xmlRememberedProjectsFullPath
+
+    On Error GoTo 0
+
+    Exit Sub
+
+Test_isXmlSheetValid_FileXmlInvalid_Error:
+    mAssert.Should False, "Unexpected error " & Err.Number & " (" & Err.Description & ") in procedure Test_isXmlSheetValid_FileXmlInvalid of Class Module vtkProjectsTester"
+    Resume Next
+End Sub
+
 Private Function ITest_Suite() As TestSuite
     Set ITest_Suite = New TestSuite
     ITest_Suite.AddTest ITest_Manager.ClassName, "TestProjectIsNotNull"
@@ -179,6 +207,7 @@ Private Function ITest_Suite() As TestSuite
     ITest_Suite.AddTest ITest_Manager.ClassName, "Test_xmlRememberedProjectsFullPath_GetDefaultFileXmlNonexistent"
     ITest_Suite.AddTest ITest_Manager.ClassName, "Test_isXmlSheetValid_FileXmlExistent"
     ITest_Suite.AddTest ITest_Manager.ClassName, "Test_isXmlSheetValid_FileXmlNonexistent"
+    ITest_Suite.AddTest ITest_Manager.ClassName, "Test_isXmlSheetValid_FileXmlInvalid"
 End Function
 
 Private Sub ITestCase_RunTest()
@@ -190,6 +219,7 @@ Private Sub ITestCase_RunTest()
         Case "Test_xmlRememberedProjectsFullPath_GetDefaultFileXmlNonexistent": Test_xmlRememberedProjectsFullPath_GetDefaultFileXmlNonexistent
         Case "Test_isXmlSheetValid_FileXmlExistent": Test_isXmlSheetValid_FileXmlExistent
         Case "Test_isXmlSheetValid_FileXmlNonexistent": Test_isXmlSheetValid_FileXmlNonexistent
+        Case "Test_isXmlSheetValid_FileXmlInvalid": Test_isXmlSheetValid_FileXmlInvalid
         Case Else: mAssert.Should False, "Invalid test name: " & mManager.methodName
     End Select
 End Sub
