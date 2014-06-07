@@ -65,7 +65,7 @@ End Sub
 '
 Private Sub CreateButton_Click()
     VBAToolKit.vtkCreateProject path:=ProjectPathTextBox.Text, name:=ProjectNameTextBox.Text
-    Unload VBAToolKit.vtkCreateProjectForm
+    Unload Me
 End Sub
 
 '---------------------------------------------------------------------------------------
@@ -77,7 +77,7 @@ End Sub
 '
 Private Sub CancelButton_Click()
 ' don''t use End , because it stop debugger
-    Unload VBAToolKit.vtkCreateProjectForm
+    Unload Me
 End Sub
 
 Private Sub ProjectPathTextBox_Change()

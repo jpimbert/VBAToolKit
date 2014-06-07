@@ -28,6 +28,12 @@ Option Explicit
 '   collection of instances indexed by project names
 Private configurationManagers As Collection
 
+'   Combo type instead of completing the vtkConfiguration class
+Public Type ConfWB
+    conf As vtkConfiguration
+    Wb As Workbook
+    wasOpened As Boolean
+End Type
 
 '---------------------------------------------------------------------------------------
 ' Procedure : vtkConfigurationManagerForProject
@@ -77,18 +83,20 @@ End Sub
 ' Author    : Jean-Pierre Imbert
 ' Date      : 07/08/2013
 '
-' WARNING   : for now used only with manual run to convert a VBA project for VBAToolkit
+' WARNING 1 : for now used only with manual run to convert a VBA project for VBAToolkit
+' WARNING 2 : A beforeSave event handler is added even if one is already existing
 '
 ' Purpose   : Create and Initialize a vtkConfiguration sheet for the active workbook
 '             - does nothing if the active workbook already contains a vtkConfiguration worksheet
 '             - initialize the worksheet with all VBA modules contained in the workbook
+'             - a BeforeSave event handler is added to the new ActiveWorkbook
 '             - manage VBAUnit, Tester class and standard modules appropriately
 '             - the suffix "_DEV" is appended to the project name
 '             - the Excel workbook is saved as a new file with DEV appended to the name
 '             - the Delivery version is described in configuration but not created
 '---------------------------------------------------------------------------------------
 '
-Public Sub vtkInitializeConfigurationForActiveWorkBook()
+Public Sub vtkInitializeConfigurationForActiveWorkBook(Optional withBeforeSaveHandler As Boolean = False)
     ' If a configuration sheet exists, does nothing
     Dim cm As New vtkConfigurationManager
     If cm.isConfigurationInitializedForWorkbook(ExcelName:=ActiveWorkbook.name) Then Exit Sub
@@ -122,7 +130,125 @@ Public Sub vtkInitializeConfigurationForActiveWorkBook()
         End If
     Next
     
+    ' Add a BeforeSave event handler for the workbook
+    If withBeforeSaveHandler Then vtkAddBeforeSaveHandlerInDEVWorkbook Wb:=ActiveWorkbook, projectName:=project.projectName, confName:=project.projectDEVName
+    
     ' Save the new workbook
     ActiveWorkbook.Save
     
+End Sub
+
+'---------------------------------------------------------------------------------------
+' Procedure : vtkVerifyConfigurations
+' Author    : Jean-Pierre IMBERT
+' Date      : 13/11/2013
+' Purpose   : Verify the coherence of the configurations description and the real
+'             configuration workbooks and source modules
+'             The verifications performed are :
+'             - All configuration pathes are reachable
+'             - All modules listed in a configuration description are existing in the configuration
+'             - All modules really present in a configuration are described in the description with non null path
+'             - All modules pathes are reachable
+'   To be implemented perhaps (?)
+'             - Each code module implemented in a configuration is the same as the source code module
+'   To be implemented later (with XML configuration files)
+'             - All references listed in a configuration description are existing in the configuration
+'             - All references really present in a configuration are described in the description
+'---------------------------------------------------------------------------------------
+'
+Sub vtkVerifyConfigurations()
+    ' Init project and configuration manager
+    Dim prj As vtkProject
+    Set prj = vtkProjectForName(getCurrentProjectName)
+    Dim cm As vtkConfigurationManager
+    Set cm = vtkConfigurationManagerForProject(prj.projectName)
+    
+    ' Declare variables
+    Dim c As vtkConfiguration, s As String, fso As New FileSystemObject
+    Dim cwb() As ConfWB
+    ReDim cwb(1 To cm.configurationCount) As ConfWB
+    Debug.Print "----------------------------------------------------"
+    Debug.Print "  Start verification of " & getCurrentProjectName & " project configurations"
+    Debug.Print "----------------------------------------------------"
+   
+    ' Verify configuration pathes
+    Dim nbConf As Integer
+    nbConf = 0
+    For Each c In cm.configurations
+        s = cm.rootPath & "\" & c.path
+        If fso.FileExists(s) Then
+            nbConf = nbConf + 1
+            Set cwb(nbConf).conf = c
+           On Error Resume Next
+            Set cwb(nbConf).Wb = Workbooks(fso.GetFileName(s))
+           On Error GoTo 0
+            cwb(nbConf).wasOpened = Not (cwb(nbConf).Wb Is Nothing)
+            If Not cwb(nbConf).wasOpened Then Set cwb(nbConf).Wb = Workbooks.Open(fileName:=s, ReadOnly:=True)
+           Else
+            Debug.Print "Path of configuration " & c.name & " unreachable (" & s & ")."
+        End If
+    Next
+    
+    ' Verify that all modules in a configuration are in the description
+    Dim i As Integer, mods As Collection, vbc As VBIDE.VBComponent, md As vtkModule
+    For i = 1 To nbConf
+        Set mods = cwb(i).conf.modules
+        For Each vbc In cwb(i).Wb.VBProject.VBComponents
+           On Error Resume Next
+            Set md = mods(vbc.name)
+            If Err.Number <> 0 Then
+                Debug.Print "Module " & vbc.name & " is in configuration workbook " & cwb(i).conf.name & " but not in description of configuration."
+            End If
+           On Error GoTo 0
+        Next
+    Next i
+    
+    ' Verify that all modules in a description are in the configuration
+    For i = 1 To nbConf
+        For Each md In cwb(i).conf.modules
+           On Error Resume Next
+            Set vbc = cwb(i).Wb.VBProject.VBComponents(md.name)
+            If Err.Number <> 0 Then
+                Debug.Print "Module " & md.name & " is in the configuration description of " & cwb(i).conf.name & " but not in the workbook."
+            End If
+           On Error GoTo 0
+        Next
+    Next i
+    
+    ' Verify that all modules pathes are reachable
+    For i = 1 To nbConf
+        For Each md In cwb(i).conf.modules
+            s = cm.rootPath & "\" & md.path
+            If Not fso.FileExists(s) Then
+                Debug.Print "Module " & md.name & " path (" & md.path & " is not reachable for the configuration " & cwb(i).conf.name & "."
+            End If
+        Next
+    Next i
+    
+    ' Verify that all modules content of all configuration are equal to source modules content
+    ' - Create a project folder tree structure in the test folder of the cirrent project
+    ' - For each configuration
+    '   - Export each module in the test tree folder (to perform a comparaison on normalized export)
+    '   - compare the content of the each file in the tree folder to the one in the source folder
+    ' - Delete the files and folders in the test folder
+    Dim testPath As String, s1 As String
+    testPath = vtkPathToTestFolder(ActiveWorkbook) & "\Temporary"
+    vtkCreateTreeFolder testPath
+    For i = 1 To nbConf
+        For Each md In cwb(i).conf.modules
+            s = cm.rootPath & "\" & md.path
+            s1 = testPath & "\" & md.path
+            vtkExportOneModule cwb(i).Wb.VBProject, md.name, s1
+            If Not compareFiles(s, s1, True) Then
+                Debug.Print "Module " & md.name & " content of source path (" & md.path & " is different from module in the configuration " & cwb(i).conf.name & "."
+            End If
+        Next
+    Next i
+    vtkDeleteFolder testPath
+    
+    ' Close all Worbooks opened during this verification
+    For i = 1 To nbConf
+        If Not cwb(i).wasOpened Then cwb(i).Wb.Close saveChanges:=False
+    Next i
+    Debug.Print "----------------------------------------------------"
 End Sub

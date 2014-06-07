@@ -51,8 +51,6 @@ Public Sub vtkExportConfigurationsAsXML(projectName As String, filePath As Strin
 
     ' Create the XML preamble
     xmlFile.WriteLine Text:="<?xml version=""1.0"" encoding=""ISO-8859-1"" standalone=""yes""?>"
-'    xmlFile.WriteLine Text:="<?xml version=""1.0"" encoding=""ISO-8859-1"" standalone=""no""?>"
-'    xmlFile.WriteLine Text:="<!DOCTYPE vtkConf SYSTEM ""vtkConfigurationsDTD.dtd"">"
     xmlFile.WriteLine Text:="<!DOCTYPE vtkConf ["
     xmlFile.WriteLine Text:="    <!ELEMENT vtkConf (info,configuration*, module*, reference*)>"
     xmlFile.WriteLine Text:="        <!ELEMENT info (vtkConfigurationsVersion,projectName)>"
