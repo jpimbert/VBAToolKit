@@ -125,6 +125,21 @@ Property Let path(newPath As String)
 End Property
 
 '---------------------------------------------------------------------------------------
+' Property  : projectName as string (wrapper on the parent vtkConfigurationManager)
+' Author    : Jean-Pierre Imbert
+' Date      : 28/08/2013
+' Purpose   : The project name (title) for the configuration
+'---------------------------------------------------------------------------------------
+'
+Property Get projectName() As String
+    projectName = m_parent.getConfigurationProjectNameWithNumber(m_number)
+End Property
+
+Property Let projectName(newProjectName As String)
+    m_parent.setConfigurationProjectNameWithNumber m_number, newProjectName
+End Property
+
+'---------------------------------------------------------------------------------------
 ' Property  : modules as collection (Read Only)
 ' Author    : Jean-Pierre Imbert
 ' Date      : 28/08/2013

@@ -384,6 +384,43 @@ Public Sub setConfigurationPath(configuration As String, path As String)
 End Sub
 
 '---------------------------------------------------------------------------------------
+' Procedure : getConfigurationProjectNameWithNumber
+' Author    : Jean-Pierre Imbert
+' Date      : 08/06/2014
+' Purpose   : return the n-th configuration project name of the project, given n as integer
+'               - return "" if the configuration is inexistant
+'               - return the default project name if
+'                   - it is not initialized in the configuration sheet v1.1
+'                   - the configuration sheet is v1.0, so there is no project name field
+'---------------------------------------------------------------------------------------
+'
+Public Function getConfigurationProjectNameWithNumber(n As Integer) As String
+    Dim sResult As String
+    sResult = ""
+    If n >= 1 And n <= configurationCount Then
+        sResult = configurationSheet.Cells(3, n + nbTitleColumns)
+       Else
+        sResult = ""
+    End If
+    getConfigurationProjectNameWithNumber = sResult
+End Function
+
+'---------------------------------------------------------------------------------------
+' Procedure : setConfigurationProjectNameWithNumber
+' Author    : Jean-Pierre Imbert
+' Date      : 08/06/2013
+' Purpose   : change the n-th relative configuration path of the project, given n as integer
+'               - does nothing if the configuration is inexistant
+'               - does nothing and return an error if the configuration sheet is v1.0
+'---------------------------------------------------------------------------------------
+'
+Public Sub setConfigurationProjectNameWithNumber(n As Integer, projectName As String)
+    If n >= 1 And n <= configurationCount Then
+        configurationSheet.Cells(3, n + nbTitleColumns) = projectName
+    End If
+End Sub
+
+'---------------------------------------------------------------------------------------
 ' Property  : moduleCount as Integer - Read Only - Public
 ' Author    : Jean-Pierre Imbert
 ' Date      : 25/05/2013

@@ -159,6 +159,22 @@ M_Error:
     mAssert.Should False, "Unexpected Error (" & Err.Number & "): " & Err.Description
 End Sub
 
+Public Sub Test_ConfigurationGetProjectName()
+    ' This test verifies the projectName of each vtkConfiguration object
+    ' collection just initialized from an Excel worlbook
+    
+   On Error GoTo M_Error
+
+    mAssert.Equals confManager.configurations(1).projectName, "InitializedProjectName", "Project Name (Title) got by number of the configuration in the Test workbook"
+    mAssert.Equals confManager.configurations("InitializedProject_DEV").projectName, "InitializedProjectName", "Project Name (Title) got by name of the configuration in the Test workbook"
+
+   On Error GoTo 0
+   Exit Sub
+
+M_Error:
+    mAssert.Should False, "Unexpected Error (" & Err.Number & "): " & Err.Description
+End Sub
+
 Public Sub Test_ConfigurationIsDEV_True()
     ' This test verifies the property isDEV of vtkConfiguration object
     ' collection just initialized from an Excel worlbook
@@ -271,6 +287,7 @@ Private Function ITest_Suite() As TestSuite
     ITest_Suite.AddTest ITest_Manager.ClassName, "Test_AddedConfigurationCollection_isDEV"
     ITest_Suite.AddTest ITest_Manager.ClassName, "Test_AddedConfigurationCollection_ID"
     ITest_Suite.AddTest ITest_Manager.ClassName, "Test_ConfigurationGetName"
+    ITest_Suite.AddTest ITest_Manager.ClassName, "Test_ConfigurationGetProjectName"
     ITest_Suite.AddTest ITest_Manager.ClassName, "Test_ConfigurationIsDEV_True"
     ITest_Suite.AddTest ITest_Manager.ClassName, "Test_ConfigurationGetPath"
     ITest_Suite.AddTest ITest_Manager.ClassName, "Test_ConfigurationSetPath"
@@ -291,6 +308,7 @@ Private Sub ITestCase_RunTest()
         Case "Test_AddedConfigurationCollection_isDEV": Test_AddedConfigurationCollection_isDEV
         Case "Test_AddedConfigurationCollection_ID": Test_AddedConfigurationCollection_ID
         Case "Test_ConfigurationGetName": Test_ConfigurationGetName
+        Case "Test_ConfigurationGetProjectName": Test_ConfigurationGetProjectName
         Case "Test_ConfigurationIsDEV_True": Test_ConfigurationIsDEV_True
         Case "Test_ConfigurationGetPath": Test_ConfigurationGetPath
         Case "Test_ConfigurationSetPath": Test_ConfigurationSetPath
