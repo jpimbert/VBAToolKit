@@ -398,8 +398,12 @@ Public Function getConfigurationProjectNameWithNumber(n As Integer) As String
     Dim sResult As String
     sResult = ""
     If n >= 1 And n <= configurationCount Then
-        sResult = configurationSheet.Cells(3, n + nbTitleColumns)
-        If sResult = "" Then sResult = configuration(n)
+        If m_sheetVersion = currentVersion Then
+            sResult = configurationSheet.Cells(3, n + nbTitleColumns)
+            If sResult = "" Then sResult = configuration(n)
+           Else
+            sResult = configuration(n)
+            End If
        Else
         sResult = ""
     End If
@@ -436,8 +440,12 @@ Public Function getConfigurationCommentWithNumber(n As Integer) As String
     Dim sResult As String
     sResult = ""
     If n >= 1 And n <= configurationCount Then
-        sResult = configurationSheet.Cells(4, n + nbTitleColumns)
-        If sResult = "" Then sResult = "Project " & configuration(n)
+        If m_sheetVersion = currentVersion Then
+            sResult = configurationSheet.Cells(4, n + nbTitleColumns)
+            If sResult = "" Then sResult = "Project " & configuration(n)
+           Else
+            sResult = "Project " & configuration(n)
+            End If
        Else
         sResult = ""
     End If
