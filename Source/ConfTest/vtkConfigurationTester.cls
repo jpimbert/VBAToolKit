@@ -176,7 +176,7 @@ M_Error:
 End Sub
 
 Public Sub Test_ConfigurationGetInitializedCommentFromVersion11()
-    ' This test verifies the projectName of a vtkConfiguration object
+    ' This test verifies the comment of a vtkConfiguration object
     ' collection just initialized from an Excel workbook
     
    On Error GoTo M_Error
@@ -232,6 +232,42 @@ Public Sub Test_ConfigurationSetPath()
     mAssert.Equals confManager.configurations(1).path, "NewPath", "Path of the vtkConfiguration object by index"
     mAssert.Equals confManager.configurations("InitializedProject_DEV").path, "NewPath", "Path of the vtkConfiguration object by name"
     mAssert.Equals confManager.getConfigurationPathWithNumber(1), "NewPath", "Path of the modified configuration in the configuration manager"
+
+   On Error GoTo 0
+   Exit Sub
+
+M_Error:
+    mAssert.Should False, "Unexpected Error (" & Err.Number & "): " & Err.Description
+End Sub
+
+Public Sub Test_ConfigurationSetProjectNameInVersion11()
+    ' This test verifies the setting of projectName in a vtkConfiguration object
+    ' collection just initialized from an Excel workbook
+    
+   On Error GoTo M_Error
+
+    confManager.configurations(1).projectName = "NewProjectName"
+    mAssert.Equals confManager.configurations(1).projectName, "NewProjectName", "Set project name (title) of the vtkConfiguration object by index"
+    mAssert.Equals confManager.configurations("InitializedProject_DEV").projectName, "NewProjectName", "Set project name (title) of the vtkConfiguration object by name"
+    mAssert.Equals confManager.getConfigurationProjectNameWithNumber(1), "NewProjectName", "Set project name (title) of the modified configuration in the configuration manager"
+
+   On Error GoTo 0
+   Exit Sub
+
+M_Error:
+    mAssert.Should False, "Unexpected Error (" & Err.Number & "): " & Err.Description
+End Sub
+
+Public Sub Test_ConfigurationSetCommentInVersion11()
+    ' This test verifies the setting of comment in a vtkConfiguration object
+    ' collection just initialized from an Excel workbook
+    
+   On Error GoTo M_Error
+
+    confManager.configurations(1).comment = "New comment of project"
+    mAssert.Equals confManager.configurations(1).comment, "New comment of project", "Set comment of the vtkConfiguration object by index"
+    mAssert.Equals confManager.configurations("InitializedProject_DEV").comment, "New comment of project", "Set comment of the vtkConfiguration object by name"
+    mAssert.Equals confManager.getConfigurationCommentWithNumber(1), "New comment of project", "Set comment of the modified configuration in the configuration manager"
 
    On Error GoTo 0
    Exit Sub
@@ -308,6 +344,8 @@ Private Function ITest_Suite() As TestSuite
     ITest_Suite.AddTest ITest_Manager.ClassName, "Test_ConfigurationIsDEV_True"
     ITest_Suite.AddTest ITest_Manager.ClassName, "Test_ConfigurationGetPath"
     ITest_Suite.AddTest ITest_Manager.ClassName, "Test_ConfigurationSetPath"
+    ITest_Suite.AddTest ITest_Manager.ClassName, "Test_ConfigurationSetProjectNameInVersion11"
+    ITest_Suite.AddTest ITest_Manager.ClassName, "Test_ConfigurationSetCommentInVersion11"
     ITest_Suite.AddTest ITest_Manager.ClassName, "Test_ConfigurationModules_Initialized"
     ITest_Suite.AddTest ITest_Manager.ClassName, "Test_ConfigurationModules_NewEmpty"
     ITest_Suite.AddTest ITest_Manager.ClassName, "Test_ConfigurationModules_NewNotEmpty"
@@ -330,6 +368,8 @@ Private Sub ITestCase_RunTest()
         Case "Test_ConfigurationIsDEV_True": Test_ConfigurationIsDEV_True
         Case "Test_ConfigurationGetPath": Test_ConfigurationGetPath
         Case "Test_ConfigurationSetPath": Test_ConfigurationSetPath
+        Case "Test_ConfigurationSetProjectNameInVersion11": Test_ConfigurationSetProjectNameInVersion11
+        Case "Test_ConfigurationSetCommentInVersion11": Test_ConfigurationSetCommentInVersion11
         Case "Test_ConfigurationModules_Initialized": Test_ConfigurationModules_Initialized
         Case "Test_ConfigurationModules_NewEmpty": Test_ConfigurationModules_NewEmpty
         Case "Test_ConfigurationModules_NewNotEmpty": Test_ConfigurationModules_NewNotEmpty
