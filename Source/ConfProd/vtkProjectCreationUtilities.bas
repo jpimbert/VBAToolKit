@@ -115,7 +115,7 @@ Public Sub vtkAddBeforeSaveHandlerInDEVWorkbook(Wb As Workbook, projectName As S
     "Private Sub Workbook_BeforeSave(ByVal SaveAsUI As Boolean, Cancel As Boolean)" & vbNewLine & _
     "   " & wbVTKName & ".vtkExportConfiguration projectWithModules:=ThisWorkbook.VBProject, projectName:=" & """" & projectName & """" & _
                                                                     " , confName:=" & """" & confName & """" & _
-                                                                    " , onlyModified:=False" & _
+                                                                    " , onlyModified:=True" & _
                                                                     vbNewLine & _
                                                                     vbNewLine & _
     "   " & wbVTKName & ".vtkExportConfigurationsAsXML projectName:=""" & projectName & """, filePath:=" & _
