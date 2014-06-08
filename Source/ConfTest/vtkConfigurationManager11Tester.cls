@@ -151,11 +151,17 @@ Public Sub TestConfigurationSheetFormatForNewProjet()
     Dim ws As Worksheet
     Set ws = newConfManager.configurationSheet
     mAssert.Equals ws.Range("A1"), "vtkConfigurations v1.1", "Expected identification of the configuration sheet"
-    mAssert.Equals ws.Range("A2"), "Module Name", "Expected Title for Modules column"
+    mAssert.Equals ws.Range("A2"), "", "Expected Title for Modules column"
+    mAssert.Equals ws.Range("A3"), "Path, name and comment", "Expected Title for Configurations columns"
+    mAssert.Equals ws.Range("A4"), "Module Name", "Expected Title for Modules column"
     mAssert.Equals ws.Range("B1"), newProjectName, "Expected Title for main project column"
     mAssert.Equals ws.Range("B2"), "Delivery\" & newProjectName & ".xlsm", "Expected related Path for new main workbook"
+    mAssert.Equals ws.Range("B3"), "", "Expected Project name for new workbook"
+    mAssert.Equals ws.Range("B4"), "", "Expected Comment for new workbook"
     mAssert.Equals ws.Range("C1"), newProjectName & "_DEV", "Expected Title for development project column"
     mAssert.Equals ws.Range("C2"), "Project\" & newWorkbookName, "Expected related Path for new development workbook"
+    mAssert.Equals ws.Range("C3"), "", "Expected Project name for new workbook"
+    mAssert.Equals ws.Range("C4"), "", "Expected Comment for new workbook"
 End Sub
 
 Public Sub TestConfigurationSheetFormatForExistingProjet()
@@ -163,11 +169,17 @@ Public Sub TestConfigurationSheetFormatForExistingProjet()
     Dim ws As Worksheet
     Set ws = existingConfManager.configurationSheet
     mAssert.Equals ws.Range("A1"), "vtkConfigurations v1.1", "Expected identification of the configuration sheet"
-    mAssert.Equals ws.Range("A2"), "Module Name", "Expected Title for Modules column"
+    mAssert.Equals ws.Range("A2"), "", "Expected empty cell"
+    mAssert.Equals ws.Range("A3"), "Path, name and comment", "Expected Title for Configurations columns"
+    mAssert.Equals ws.Range("A4"), "Module Name", "Expected Title for Modules column"
     mAssert.Equals ws.Range("B1"), existingProjectName, "Expected Title for main project column"
     mAssert.Equals ws.Range("B2"), "Delivery\ExistingProject.xlsm", "Expected related Path for main workbook"
+    mAssert.Equals ws.Range("B3"), "ExistingProjectName", "Expected Project name for main workbook"
+    mAssert.Equals ws.Range("B4"), "Existing project for various tests of VBAToolKit", "Expected Comment for main workbook"
     mAssert.Equals ws.Range("C1"), existingProjectName & "_DEV", "Expected Title for development project column"
     mAssert.Equals ws.Range("C2"), "Project\ExistingProject_DEV.xlsm", "Expected related Path for development workbook"
+    mAssert.Equals ws.Range("C3"), "", "Expected empty projectName for development workbook"
+    mAssert.Equals ws.Range("C4"), "Existing project for development for various tests of VBAToolKit", "Expected Comment for development workbook"
 End Sub
 
 Public Sub TestGetConfigurationsFromNewProject()
@@ -214,17 +226,25 @@ Public Sub Test_AddConfigurationInExistingProject_Cells()
 '       Verify the cells of the configuration sheet
     Dim ws As Worksheet
     Dim n As Integer
-    n = existingConfManager.addConfiguration("NewConfiguration", "ConfigurationPath")
+    n = existingConfManager.addConfiguration("NewConfiguration", "ConfigurationPath", Comment:="New comment")
     
     Set ws = existingConfManager.configurationSheet
     mAssert.Equals ws.Range("A1"), "vtkConfigurations v1.1", "Expected identification of the configuration sheet"
-    mAssert.Equals ws.Range("A2"), "Module Name", "Expected Title for Modules column"
+    mAssert.Equals ws.Range("A2"), "", "Expected Title for Modules column"
+    mAssert.Equals ws.Range("A3"), "Path, name and comment", "Expected Title for Configurations columns"
+    mAssert.Equals ws.Range("A4"), "Module Name", "Expected Title for Modules column"
     mAssert.Equals ws.Range("B1"), existingProjectName, "Expected Title for main project column"
     mAssert.Equals ws.Range("B2"), "Delivery\ExistingProject.xlsm", "Expected related Path for new main workbook"
+    mAssert.Equals ws.Range("B3"), "ExistingProjectName", "Expected Project name for main workbook"
+    mAssert.Equals ws.Range("B4"), "Existing project for various tests of VBAToolKit", "Expected Comment for main workbook"
     mAssert.Equals ws.Range("C1"), existingProjectName & "_DEV", "Expected Title for development project column"
     mAssert.Equals ws.Range("C2"), "Project\ExistingProject_DEV.xlsm", "Expected related Path for new development workbook"
+    mAssert.Equals ws.Range("C3"), "", "Expected empty projectName for development workbook"
+    mAssert.Equals ws.Range("C4"), "Existing project for development for various tests of VBAToolKit", "Expected Comment for development workbook"
     mAssert.Equals ws.Range("D1"), "NewConfiguration", "Expected Title for new configuration column"
     mAssert.Equals ws.Range("D2"), "ConfigurationPath", "Expected related Path for new configuration"
+    mAssert.Equals ws.Range("D3"), "", "Expected empty projectName for new configuration"
+    mAssert.Equals ws.Range("D4"), "New comment", "Expected Comment for new configuration"
 End Sub
 
 Public Sub Test_AddConfigurationInExistingProject_NullPathes()

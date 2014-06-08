@@ -53,7 +53,6 @@ Private Const currentVersion As String = "vtkConfigurations v1.1"
 Private Const version10 As String = "vtkConfigurations v1.0"
 Private m_sheetVersion As String
 Private Const nbTitleColumns As Integer = 1
-Private Const nbTitleRows As Integer = 2
 
 Private Sub Class_Terminate()
     Set m_configurationSheet = Nothing
@@ -72,11 +71,11 @@ End Sub
 '---------------------------------------------------------------------------------------
 '
 Public Property Get projectName() As String
-Attribute projectName.VB_UserMemId = 0
     projectName = m_projectName
 End Property
 
 Public Property Let projectName(ByVal sprojectName As String)
+Attribute projectName.VB_UserMemId = 0
     Dim wbName As String
     wbName = vtkProjectForName(sprojectName).workbookDEVName
     If m_projectName <> sprojectName And VtkWorkbookIsOpen(wbName) Then
@@ -145,6 +144,19 @@ Public Function isConfigurationInitializedForWorkbook(ExcelName As String) As Bo
 End Function
 
 '---------------------------------------------------------------------------------------
+' Function  : nbTitleRows
+' Author    : Jean-Pierre Imbert
+' Date      : 08/06/2014
+' Purpose   : return the number of Title rows in the configuration sheet depend on its version
+'             - 2 for v1.0, 4 for 1.1
+'---------------------------------------------------------------------------------------
+'
+Private Function nbTitleRows() As Integer
+    If m_sheetVersion = version10 Then nbTitleRows = 2
+    If m_sheetVersion = currentVersion Then nbTitleRows = 4
+End Function
+
+'---------------------------------------------------------------------------------------
 ' Procedure : setConfigurationSheet
 ' Author    : Jean-Pierre Imbert
 ' Date      : 25/05/2013
@@ -186,7 +198,9 @@ End Sub
 '
 Private Sub initializeConfigurationSheet(ws As Worksheet)
     ws.Range("A1") = currentVersion
-    ws.Range("A2") = "Module Name"
+    ws.Range("A2") = ""
+    ws.Range("A3") = "Path, name and comment"
+    ws.Range("A4") = "Module Name"
     ws.Range("B1") = vtkProjectForName(projectName).projectName
     ws.Range("B2") = vtkProjectForName(projectName).projectStandardRelativePath
     ws.Range("C1") = vtkProjectForName(projectName).projectDEVName
@@ -194,8 +208,9 @@ Private Sub initializeConfigurationSheet(ws As Worksheet)
     
     ws.Columns("A:C").ColumnWidth = 22
     ws.Range("A1").Font.Size = 8
-    ws.Range("A2").HorizontalAlignment = xlCenter
-    ws.Range("A2").Font.Bold = True
+    ws.Range("A3").HorizontalAlignment = xlCenter
+    ws.Range("A3").HorizontalAlignment = xlCenter
+    ws.Range("A4").Font.Bold = True
     ws.Range("B1:C2").HorizontalAlignment = xlCenter
     ws.Range("B1:C1").Font.Bold = True
 End Sub
@@ -247,20 +262,22 @@ End Function
 ' Author    : Jean-Pierre Imbert
 ' Date      : 28/08/2013
 ' Purpose   : Add a configuration to the configuration manager
-'             - optionaly a path may be given for the configuration
+'             - optionaly a Path, a projectName and a Comment may be given for the configuration
 '             - all modules pathes are initialized to Null
 '             - if the configuration already exists, it is not added
 ' Return    : the number of the added configuration
 '             - if the configuration already exists, return minus the configuration number
 '---------------------------------------------------------------------------------------
 '
-Public Function addConfiguration(configuration As String, Optional path As String = "") As Integer
+Public Function addConfiguration(configuration As String, Optional path As String = "", Optional projectName As String = "", Optional Comment As String = "") As Integer
     Dim n As Integer
     n = getConfigurationNumber(configuration)
     If n = 0 Then   ' n = 0 means non-existant configuration
-        n = configurationCount + 1                                        ' Set module number
-        configurationSheet.Cells(1, n + nbTitleColumns) = configuration   ' Write module name
-        configurationSheet.Cells(2, n + nbTitleColumns) = path            ' Write module path
+        n = configurationCount + 1                                        ' Set configuration number
+        configurationSheet.Cells(1, n + nbTitleColumns) = configuration   ' Write configuration name
+        configurationSheet.Cells(2, n + nbTitleColumns) = path            ' Write configuration path
+        configurationSheet.Cells(3, n + nbTitleColumns) = projectName     ' Write configuration projectName
+        configurationSheet.Cells(4, n + nbTitleColumns) = Comment         ' Write configuration Comment
         Dim i As Integer
         For i = 1 To moduleCount                         ' For each module
             configurationSheet.Cells(i + nbTitleRows, n + nbTitleColumns) = "-"     ' Set Default path as not initialized
