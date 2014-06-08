@@ -127,7 +127,7 @@ End Property
 '---------------------------------------------------------------------------------------
 ' Property  : projectName as string (wrapper on the parent vtkConfigurationManager)
 ' Author    : Jean-Pierre Imbert
-' Date      : 28/08/2013
+' Date      : 08/06/2014
 ' Purpose   : The project name (title) for the configuration
 '---------------------------------------------------------------------------------------
 '
@@ -137,6 +137,21 @@ End Property
 
 Property Let projectName(newProjectName As String)
     m_parent.setConfigurationProjectNameWithNumber m_number, newProjectName
+End Property
+
+'---------------------------------------------------------------------------------------
+' Property  : comment as string (wrapper on the parent vtkConfigurationManager)
+' Author    : Jean-Pierre Imbert
+' Date      : 08/06/2014
+' Purpose   : The comment for the configuration
+'---------------------------------------------------------------------------------------
+'
+Property Get comment() As String
+    comment = m_parent.getConfigurationCommentWithNumber(m_number)
+End Property
+
+Property Let comment(newComment As String)
+    m_parent.setConfigurationCommentWithNumber m_number, newComment
 End Property
 
 '---------------------------------------------------------------------------------------

@@ -226,7 +226,7 @@ Public Sub Test_AddConfigurationInExistingProject_Cells()
 '       Verify the cells of the configuration sheet
     Dim ws As Worksheet
     Dim n As Integer
-    n = existingConfManager.addConfiguration("NewConfiguration", "ConfigurationPath", Comment:="New comment")
+    n = existingConfManager.addConfiguration("NewConfiguration", "ConfigurationPath", comment:="New comment")
     
     Set ws = existingConfManager.configurationSheet
     mAssert.Equals ws.Range("A1"), "vtkConfigurations v1.1", "Expected identification of the configuration sheet"

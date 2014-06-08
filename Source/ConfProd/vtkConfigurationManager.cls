@@ -269,7 +269,7 @@ End Function
 '             - if the configuration already exists, return minus the configuration number
 '---------------------------------------------------------------------------------------
 '
-Public Function addConfiguration(configuration As String, Optional path As String = "", Optional projectName As String = "", Optional Comment As String = "") As Integer
+Public Function addConfiguration(configuration As String, Optional path As String = "", Optional projectName As String = "", Optional comment As String = "") As Integer
     Dim n As Integer
     n = getConfigurationNumber(configuration)
     If n = 0 Then   ' n = 0 means non-existant configuration
@@ -277,7 +277,7 @@ Public Function addConfiguration(configuration As String, Optional path As Strin
         configurationSheet.Cells(1, n + nbTitleColumns) = configuration   ' Write configuration name
         configurationSheet.Cells(2, n + nbTitleColumns) = path            ' Write configuration path
         configurationSheet.Cells(3, n + nbTitleColumns) = projectName     ' Write configuration projectName
-        configurationSheet.Cells(4, n + nbTitleColumns) = Comment         ' Write configuration Comment
+        configurationSheet.Cells(4, n + nbTitleColumns) = comment         ' Write configuration Comment
         Dim i As Integer
         For i = 1 To moduleCount                         ' For each module
             configurationSheet.Cells(i + nbTitleRows, n + nbTitleColumns) = "-"     ' Set Default path as not initialized
@@ -409,7 +409,7 @@ End Function
 ' Procedure : setConfigurationProjectNameWithNumber
 ' Author    : Jean-Pierre Imbert
 ' Date      : 08/06/2013
-' Purpose   : change the n-th relative configuration path of the project, given n as integer
+' Purpose   : change the n-th configuration project name of the project, given n as integer
 '               - does nothing if the configuration is inexistant
 '               - does nothing and return an error if the configuration sheet is v1.0
 '---------------------------------------------------------------------------------------
@@ -417,6 +417,43 @@ End Function
 Public Sub setConfigurationProjectNameWithNumber(n As Integer, projectName As String)
     If n >= 1 And n <= configurationCount Then
         configurationSheet.Cells(3, n + nbTitleColumns) = projectName
+    End If
+End Sub
+
+'---------------------------------------------------------------------------------------
+' Procedure : getConfigurationCommentWithNumber
+' Author    : Jean-Pierre Imbert
+' Date      : 08/06/2014
+' Purpose   : return the n-th configuration comment of the project, given n as integer
+'               - return "" if the configuration is inexistant
+'               - return the default comment if
+'                   - it is not initialized in the configuration sheet v1.1
+'                   - the configuration sheet is v1.0, so there is no comment field
+'---------------------------------------------------------------------------------------
+'
+Public Function getConfigurationCommentWithNumber(n As Integer) As String
+    Dim sResult As String
+    sResult = ""
+    If n >= 1 And n <= configurationCount Then
+        sResult = configurationSheet.Cells(4, n + nbTitleColumns)
+       Else
+        sResult = ""
+    End If
+    getConfigurationCommentWithNumber = sResult
+End Function
+
+'---------------------------------------------------------------------------------------
+' Procedure : setConfigurationCommentWithNumber
+' Author    : Jean-Pierre Imbert
+' Date      : 08/06/2013
+' Purpose   : change the n-th configuration comment of the project, given n as integer
+'               - does nothing if the configuration is inexistant
+'               - does nothing and return an error if the configuration sheet is v1.0
+'---------------------------------------------------------------------------------------
+'
+Public Sub setConfigurationCommentWithNumber(n As Integer, comment As String)
+    If n >= 1 And n <= configurationCount Then
+        configurationSheet.Cells(4, n + nbTitleColumns) = comment
     End If
 End Sub
 
