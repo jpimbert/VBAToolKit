@@ -98,6 +98,28 @@ Private Property Get Workbook() As Workbook
 End Property
 
 '---------------------------------------------------------------------------------------
+' Function  : defaultProjectNameWithNumber as String - Read Only - Private
+' Author    : Jean-Pierre Imbert
+' Date      : 08/06/2014
+' Purpose   : return the default projectName of a configuration given its number
+'---------------------------------------------------------------------------------------
+'
+Private Function defaultProjectNameWithNumber(n As Integer) As String
+    defaultProjectNameWithNumber = Me.configuration(n)
+End Function
+
+'---------------------------------------------------------------------------------------
+' Function  : defaultCommentWithNumber as String - Read Only - Private
+' Author    : Jean-Pierre Imbert
+' Date      : 08/06/2014
+' Purpose   : return the default comment of a configuration given its number
+'---------------------------------------------------------------------------------------
+'
+Private Function defaultCommentWithNumber(n As Integer) As String
+    defaultCommentWithNumber = "Project " & Me.configuration(n)
+End Function
+
+'---------------------------------------------------------------------------------------
 ' Property  : rootPath as String - Read Only - Public
 ' Author    : Jean-Pierre Imbert
 ' Date      : 09/08/2013
@@ -235,7 +257,7 @@ End Property
 '
 Public Property Get configurationCount() As Integer
     ' The number of configurations is the number of used columns minus one
-    configurationCount = configurationSheet.UsedRange.Columns.Count - 1
+    configurationCount = configurationSheet.UsedRange.Columns.count - 1
 End Property
 
 '---------------------------------------------------------------------------------------
@@ -400,9 +422,9 @@ Public Function getConfigurationProjectNameWithNumber(n As Integer) As String
     If n >= 1 And n <= configurationCount Then
         If m_sheetVersion = currentVersion Then
             sResult = configurationSheet.Cells(3, n + nbTitleColumns)
-            If sResult = "" Then sResult = configuration(n)
+            If sResult = "" Then sResult = defaultProjectNameWithNumber(n)
            Else
-            sResult = configuration(n)
+            sResult = defaultProjectNameWithNumber(n)
             End If
        Else
         sResult = ""
@@ -447,9 +469,9 @@ Public Function getConfigurationCommentWithNumber(n As Integer) As String
     If n >= 1 And n <= configurationCount Then
         If m_sheetVersion = currentVersion Then
             sResult = configurationSheet.Cells(4, n + nbTitleColumns)
-            If sResult = "" Then sResult = "Project " & configuration(n)
+            If sResult = "" Then sResult = defaultCommentWithNumber(n)
            Else
-            sResult = "Project " & configuration(n)
+            sResult = defaultCommentWithNumber(n)
             End If
        Else
         sResult = ""
@@ -487,7 +509,7 @@ End Sub
 '
 Public Property Get moduleCount() As Integer
     ' The number of modules is the number of used rows minus two
-    moduleCount = configurationSheet.UsedRange.Rows.Count - nbTitleRows
+    moduleCount = configurationSheet.UsedRange.Rows.count - nbTitleRows
 End Property
 
 '---------------------------------------------------------------------------------------
