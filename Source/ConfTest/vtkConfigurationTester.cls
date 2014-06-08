@@ -296,6 +296,60 @@ M_Error:
     mAssert.Should False, "Unexpected Error (" & Err.Number & "): " & Err.Description
 End Sub
 
+Public Sub Test_ConfigurationSetProjectNameInVersion10()
+    ' This test verifies the error on setting of projectName in a v1.0 vtkConfiguration object
+    ' collection just initialized from an Excel workbook
+    Dim workbookV10 As Workbook, confManagerV10 As vtkConfigurationManager
+    
+   On Error GoTo M_Error
+
+    Set workbookV10 = getTestFileFromTemplate(fileName:=workbookNameWithConfigurationV10, destinationName:="ProjectV10_DEV.xlsm", openExcel:=True)
+    Set confManagerV10 = vtkConfigurationManagerForProject("ProjectV10")
+    
+   On Error GoTo 0
+    confManagerV10.configurations(1).projectName = "NewProjectName"
+    mAssert.Equals Err.Number, VTK_OBSOLETE_CONFIGURATION_SHEET, "expected error when modifying a v1.0 project name configuration"
+   On Error GoTo M_Error
+    
+    mAssert.Equals confManagerV10.configurations(1).projectName, "ExistingProject", "Set project name (title) of the vtkConfiguration object by index"
+    mAssert.Equals confManagerV10.configurations("ExistingProject").projectName, "ExistingProject", "Set project name (title) of the vtkConfiguration object by name"
+    mAssert.Equals confManagerV10.getConfigurationProjectNameWithNumber(1), "ExistingProject", "Set project name (title) of the modified configuration in the configuration manager"
+
+   On Error GoTo 0
+    vtkCloseAndKillWorkbook Wb:=workbookV10 ' close the V10 Excel project
+   Exit Sub
+
+M_Error:
+    mAssert.Should False, "Unexpected Error (" & Err.Number & "): " & Err.Description
+End Sub
+
+Public Sub Test_ConfigurationSetCommentInVersion10()
+    ' This test verifies the error on setting of comment in a v1.0 vtkConfiguration object
+    ' collection just initialized from an Excel workbook
+    Dim workbookV10 As Workbook, confManagerV10 As vtkConfigurationManager
+    
+   On Error GoTo M_Error
+
+    Set workbookV10 = getTestFileFromTemplate(fileName:=workbookNameWithConfigurationV10, destinationName:="ProjectV10_DEV.xlsm", openExcel:=True)
+    Set confManagerV10 = vtkConfigurationManagerForProject("ProjectV10")
+    
+   On Error GoTo 0
+    confManagerV10.configurations(1).comment = "New comment for project ExistingProject"
+    mAssert.Equals Err.Number, VTK_OBSOLETE_CONFIGURATION_SHEET, "expected error when modifying a v1.0 project name configuration"
+   On Error GoTo M_Error
+    
+    mAssert.Equals confManagerV10.configurations(1).comment, "Project ExistingProject", "Set comment of the vtkConfiguration object by index"
+    mAssert.Equals confManagerV10.configurations("ExistingProject").comment, "Project ExistingProject", "Set comment of the vtkConfiguration object by name"
+    mAssert.Equals confManagerV10.getConfigurationCommentWithNumber(1), "Project ExistingProject", "Set comment of the modified configuration in the configuration manager"
+
+   On Error GoTo 0
+    vtkCloseAndKillWorkbook Wb:=workbookV10 ' close the V10 Excel project
+   Exit Sub
+
+M_Error:
+    mAssert.Should False, "Unexpected Error (" & Err.Number & "): " & Err.Description
+End Sub
+
 Public Sub Test_ConfigurationSetCommentInVersion11()
     ' This test verifies the setting of comment in a vtkConfiguration object
     ' collection just initialized from an Excel workbook
@@ -429,6 +483,8 @@ Private Function ITest_Suite() As TestSuite
     ITest_Suite.AddTest ITest_Manager.ClassName, "Test_ConfigurationGetPath"
     ITest_Suite.AddTest ITest_Manager.ClassName, "Test_ConfigurationSetPath"
     ITest_Suite.AddTest ITest_Manager.ClassName, "Test_ConfigurationSetProjectNameInVersion11"
+    ITest_Suite.AddTest ITest_Manager.ClassName, "Test_ConfigurationSetProjectNameInVersion10"
+    ITest_Suite.AddTest ITest_Manager.ClassName, "Test_ConfigurationSetCommentInVersion10"
     ITest_Suite.AddTest ITest_Manager.ClassName, "Test_ConfigurationSetCommentInVersion11"
     ITest_Suite.AddTest ITest_Manager.ClassName, "Test_ConfigurationGetDefaultProjectNameFromVersion10"
     ITest_Suite.AddTest ITest_Manager.ClassName, "Test_ConfigurationGetDefaultCommentFromVersion10"
@@ -457,6 +513,8 @@ Private Sub ITestCase_RunTest()
         Case "Test_ConfigurationGetPath": Test_ConfigurationGetPath
         Case "Test_ConfigurationSetPath": Test_ConfigurationSetPath
         Case "Test_ConfigurationSetProjectNameInVersion11": Test_ConfigurationSetProjectNameInVersion11
+        Case "Test_ConfigurationSetProjectNameInVersion10": Test_ConfigurationSetProjectNameInVersion10
+        Case "Test_ConfigurationSetCommentInVersion10": Test_ConfigurationSetCommentInVersion10
         Case "Test_ConfigurationSetCommentInVersion11": Test_ConfigurationSetCommentInVersion11
         Case "Test_ConfigurationGetDefaultProjectNameFromVersion10": Test_ConfigurationGetDefaultProjectNameFromVersion10
         Case "Test_ConfigurationGetDefaultCommentFromVersion10": Test_ConfigurationGetDefaultCommentFromVersion10

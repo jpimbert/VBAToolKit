@@ -136,6 +136,7 @@ Property Get projectName() As String
 End Property
 
 Property Let projectName(newProjectName As String)
+   On Error Resume Next
     m_parent.setConfigurationProjectNameWithNumber m_number, newProjectName
 End Property
 
@@ -151,6 +152,7 @@ Property Get comment() As String
 End Property
 
 Property Let comment(newComment As String)
+   On Error Resume Next
     m_parent.setConfigurationCommentWithNumber m_number, newComment
 End Property
 

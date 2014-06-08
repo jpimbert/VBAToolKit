@@ -421,7 +421,12 @@ End Function
 '
 Public Sub setConfigurationProjectNameWithNumber(n As Integer, projectName As String)
     If n >= 1 And n <= configurationCount Then
-        configurationSheet.Cells(3, n + nbTitleColumns) = projectName
+        If m_sheetVersion = currentVersion Then
+            configurationSheet.Cells(3, n + nbTitleColumns) = projectName
+           Else
+            Err.Raise VTK_OBSOLETE_CONFIGURATION_SHEET, "vtkConfigurationManager:setConfigurationProjectNameWithNumber", _
+            "Impossible to set a configuration projectName with this configuration sheet version (project=" & m_projectName & ", " & m_sheetVersion & ")"
+        End If
     End If
 End Sub
 
@@ -463,6 +468,12 @@ End Function
 '
 Public Sub setConfigurationCommentWithNumber(n As Integer, comment As String)
     If n >= 1 And n <= configurationCount Then
+        If m_sheetVersion = currentVersion Then
+            configurationSheet.Cells(4, n + nbTitleColumns) = comment
+           Else
+            Err.Raise VTK_OBSOLETE_CONFIGURATION_SHEET, "vtkConfigurationManager:setConfigurationCommentWithNumber", _
+            "Impossible to set a configuration comment with this configuration sheet version (project=" & m_projectName & ", " & m_sheetVersion & ")"
+        End If
         configurationSheet.Cells(4, n + nbTitleColumns) = comment
     End If
 End Sub
