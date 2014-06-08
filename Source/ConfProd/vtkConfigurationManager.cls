@@ -49,7 +49,9 @@ Private m_workbook As Workbook
 Private m_configurationSheet As Worksheet
 Private m_rootPath As String
 Private Const sheetName As String = "vtkConfigurations"
-Private Const currentVersion As String = "vtkConfigurations v1.0"
+Private Const currentVersion As String = "vtkConfigurations v1.1"
+Private Const version10 As String = "vtkConfigurations v1.0"
+Private m_sheetVersion As String
 Private Const nbTitleColumns As Integer = 1
 Private Const nbTitleRows As Integer = 2
 
@@ -163,7 +165,13 @@ Private Sub setConfigurationSheet()
         End If
     ' Verify that the configuration sheet is in last known version
     If ws.Range("A1") <> currentVersion Then
-        ' Code to convert from previous version will be implemented here
+        If ws.Range("A1") <> version10 Then
+        ' Code to convert from previous version will be implemented here or in a specific method
+            Else
+            m_sheetVersion = version10
+            End If
+        Else
+        m_sheetVersion = currentVersion
         End If
     '   Set the initialized worksheet property
     Set m_configurationSheet = ws
@@ -275,7 +283,7 @@ Public Function configurations() As Collection
     For i = 1 To configurationCount
         Set c = New vtkConfiguration
         c.init confManager:=Me, confNumber:=i
-        col.Add Item:=C, Key:=configuration(i)
+        col.Add Item:=c, Key:=configuration(i)
     Next i
     Set configurations = col
 End Function

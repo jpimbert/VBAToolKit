@@ -38,7 +38,7 @@ Public Function vtkInitializeVbaUnitNamesAndPathes(project As String) As Boolean
     nc = cm.getConfigurationNumber(vtkProjectForName(project).projectDEVName)
     ret = (nc > 0)
     
-    For i = 1 To vtkVBAUnitModulesList.count
+    For i = 1 To vtkVBAUnitModulesList.Count
         moduleName = vtkVBAUnitModulesList.Item(i)
         Set module = ThisWorkbook.VBProject.VBComponents(moduleName)
         
