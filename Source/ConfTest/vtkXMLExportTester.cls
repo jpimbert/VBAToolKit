@@ -126,21 +126,25 @@ Test_vtkExportConfigurationsAsXML_correctConfigurationNumber_Error:
 End Sub
 
 
-Public Sub Text_vtkExportConfigurationsAsXML_correctConfigurationContent()
+Public Sub Test_vtkExportConfigurationsAsXML_correctConfigurationContent()
 '   configurations -> correct content
 
-    On Error GoTo Text_vtkExportConfigurationsAsXML_correctConfigurationContent_Error
+    On Error GoTo Test_vtkExportConfigurationsAsXML_correctConfigurationContent_Error
 
     mAssert.Equals reloadDom.SelectSingleNode("/vtkConf/configuration[@cID=""c1""]/name").Text, "TestProject", "Expected name of first configuration"
     mAssert.Equals reloadDom.SelectSingleNode("/vtkConf/configuration[@cID=""c1""]/path").Text, "Project\TestProject.xlsm", "Expected path of first configuration"
+    mAssert.Equals reloadDom.SelectSingleNode("/vtkConf/configuration[@cID=""c1""]/title").Text, "TestProjectName", "Expected title of first configuration"
+    mAssert.Equals reloadDom.SelectSingleNode("/vtkConf/configuration[@cID=""c1""]/comment").Text, "Existing project for various tests of VBAToolKit", "Expected comment of first configuration"
     
     mAssert.Equals reloadDom.SelectSingleNode("/vtkConf/configuration[@cID=""c2""]/name").Text, "TestProject_DEV", "Expected name of second configuration"
     mAssert.Equals reloadDom.SelectSingleNode("/vtkConf/configuration[@cID=""c2""]/path").Text, "Project\TestProject_DEV.xlsm", "Expected path of second configuration"
+    mAssert.Equals reloadDom.SelectSingleNode("/vtkConf/configuration[@cID=""c2""]/title").Text, "TestProject_DEV", "Expected title of second configuration"
+    mAssert.Equals reloadDom.SelectSingleNode("/vtkConf/configuration[@cID=""c2""]/comment").Text, "Existing project for development for various tests of VBAToolKit", "Expected comment of second configuration"
 
     On Error GoTo 0
     Exit Sub
 
-Text_vtkExportConfigurationsAsXML_correctConfigurationContent_Error:
+Test_vtkExportConfigurationsAsXML_correctConfigurationContent_Error:
     Err.Source = "Text_vtkExportConfigurationsAsXML_correctConfigurationContent of module vtkXMLExportTester"
     mAssert.Should False, "Unexpected error " & Err.Number & " (" & Err.Description & ") in " & Err.Source
     Exit Sub
@@ -330,6 +334,7 @@ Private Function ITest_Suite() As TestSuite
     Set ITest_Suite = New TestSuite
     ITest_Suite.AddTest ITest_Manager.ClassName, "Test_vtkExportConfigurationsAsXML_correctInfoContent"
     ITest_Suite.AddTest ITest_Manager.ClassName, "Test_vtkExportConfigurationsAsXML_correctConfigurationNumber"
+    ITest_Suite.AddTest ITest_Manager.ClassName, "Test_vtkExportConfigurationsAsXML_correctConfigurationContent"
     ITest_Suite.AddTest ITest_Manager.ClassName, "Test_vtkExportConfigurationsAsXML_correctModuleNumber"
     ITest_Suite.AddTest ITest_Manager.ClassName, "Test_vtkExportConfigurationsAsXML_correctModuleContent"
     ITest_Suite.AddTest ITest_Manager.ClassName, "Test_vtkExportConfigurationsAsXML_correctReferenceNumber"
@@ -346,6 +351,7 @@ Private Sub ITestCase_RunTest()
     Select Case mManager.methodName
         Case "Test_vtkExportConfigurationsAsXML_correctInfoContent": Test_vtkExportConfigurationsAsXML_correctInfoContent
         Case "Test_vtkExportConfigurationsAsXML_correctConfigurationNumber": Test_vtkExportConfigurationsAsXML_correctConfigurationNumber
+        Case "Test_vtkExportConfigurationsAsXML_correctConfigurationContent": Test_vtkExportConfigurationsAsXML_correctConfigurationContent
         Case "Test_vtkExportConfigurationsAsXML_correctModuleNumber": Test_vtkExportConfigurationsAsXML_correctModuleNumber
         Case "Test_vtkExportConfigurationsAsXML_correctModuleContent": Test_vtkExportConfigurationsAsXML_correctModuleContent
         Case "Test_vtkExportConfigurationsAsXML_correctReferenceNumber": Test_vtkExportConfigurationsAsXML_correctReferenceNumber
