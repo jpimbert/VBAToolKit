@@ -231,10 +231,41 @@ Private Sub initializeConfigurationSheet(ws As Worksheet)
     ws.Columns("A:C").ColumnWidth = 22
     ws.Range("A1").Font.Size = 8
     ws.Range("A3").HorizontalAlignment = xlCenter
-    ws.Range("A3").HorizontalAlignment = xlCenter
+    ws.Range("A4").HorizontalAlignment = xlCenter
     ws.Range("A4").Font.Bold = True
     ws.Range("B1:C2").HorizontalAlignment = xlCenter
     ws.Range("B1:C1").Font.Bold = True
+End Sub
+
+'---------------------------------------------------------------------------------------
+' Procedure : updateConfigurationSheetFormat
+' Author    : Jean-Pierre Imbert
+' Date      : 08/06/2014
+' Purpose   : Update the configuration sheet to the current version
+'---------------------------------------------------------------------------------------
+'
+Public Sub updateConfigurationSheetFormat()
+    Dim ws As Worksheet
+    
+    If m_sheetVersion = version10 Then
+        Set ws = configurationSheet
+         
+        ws.Rows("3:4").EntireRow.Insert     ' Insert new lines for the new format
+        
+        ws.Range("A1") = currentVersion
+        ws.Range("A2") = ""
+        ws.Range("A3") = "Path, name and comment"
+        ws.Range("A4") = "Module Name"
+    
+        ws.Range("A2").Font.Bold = False
+        ws.Range("A3").Font.Bold = False
+        ws.Range("A3").HorizontalAlignment = xlCenter
+        ws.Range("A4").HorizontalAlignment = xlCenter
+        ws.Range("A4").Font.Bold = True
+        
+        m_sheetVersion = currentVersion     ' Set the sheetVersion for correct behavior after conversion
+    End If
+
 End Sub
 
 '---------------------------------------------------------------------------------------
@@ -257,7 +288,7 @@ End Property
 '
 Public Property Get configurationCount() As Integer
     ' The number of configurations is the number of used columns minus one
-    configurationCount = configurationSheet.UsedRange.Columns.count - 1
+    configurationCount = configurationSheet.UsedRange.Columns.Count - 1
 End Property
 
 '---------------------------------------------------------------------------------------
@@ -509,7 +540,7 @@ End Sub
 '
 Public Property Get moduleCount() As Integer
     ' The number of modules is the number of used rows minus two
-    moduleCount = configurationSheet.UsedRange.Rows.count - nbTitleRows
+    moduleCount = configurationSheet.UsedRange.Rows.Count - nbTitleRows
 End Property
 
 '---------------------------------------------------------------------------------------
