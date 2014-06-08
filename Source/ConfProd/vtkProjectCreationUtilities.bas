@@ -38,7 +38,7 @@ Public Function vtkInitializeVbaUnitNamesAndPathes(project As String) As Boolean
     nc = cm.getConfigurationNumber(vtkProjectForName(project).projectDEVName)
     ret = (nc > 0)
     
-    For i = 1 To vtkVBAUnitModulesList.Count
+    For i = 1 To vtkVBAUnitModulesList.count
         moduleName = vtkVBAUnitModulesList.Item(i)
         Set module = ThisWorkbook.VBProject.VBComponents(moduleName)
         
@@ -115,7 +115,7 @@ Public Sub vtkAddBeforeSaveHandlerInDEVWorkbook(Wb As Workbook, projectName As S
     "Private Sub Workbook_BeforeSave(ByVal SaveAsUI As Boolean, Cancel As Boolean)" & vbNewLine & _
     "   " & wbVTKName & ".vtkExportConfiguration projectWithModules:=ThisWorkbook.VBProject, projectName:=" & """" & projectName & """" & _
                                                                     " , confName:=" & """" & confName & """" & _
-                                                                    " , onlyModified:=True" & _
+                                                                    " , onlyModified:=False" & _
                                                                     vbNewLine & _
                                                                     vbNewLine & _
     "   " & wbVTKName & ".vtkExportConfigurationsAsXML projectName:=""" & projectName & """, filePath:=" & _
