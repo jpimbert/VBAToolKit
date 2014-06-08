@@ -191,6 +191,42 @@ M_Error:
     mAssert.Should False, "Unexpected Error (" & Err.Number & "): " & Err.Description
 End Sub
 
+Public Sub Test_ConfigurationGetDefaultProjectNameFromVersion11()
+    ' This test verifies the default projectName of a vtkConfiguration object
+    ' Added configuration to the initialized from an Excel worlbook
+    
+    confManager.addConfiguration ("NewConfiguration")
+    
+   On Error GoTo M_Error
+
+    mAssert.Equals confManager.configurations(2).projectName, "NewConfiguration", "Project Name (Title) got by number of the configuration in the Test workbook"
+    mAssert.Equals confManager.configurations("NewConfiguration").projectName, "NewConfiguration", "Project Name (Title) got by name of the configuration in the Test workbook"
+
+   On Error GoTo 0
+   Exit Sub
+
+M_Error:
+    mAssert.Should False, "Unexpected Error (" & Err.Number & "): " & Err.Description
+End Sub
+
+Public Sub Test_ConfigurationGetDefaultCommentFromVersion11()
+    ' This test verifies the default comment of a vtkConfiguration object
+    ' Added configuration to the initialized from an Excel worlbook
+    
+    confManager.addConfiguration ("NewConfiguration")
+    
+   On Error GoTo M_Error
+
+    mAssert.Equals confManager.configurations(2).comment, "Project NewConfiguration", "comment got by number of the configuration in the Test workbook"
+    mAssert.Equals confManager.configurations("NewConfiguration").comment, "Project NewConfiguration", "comment got by name of the configuration in the Test workbook"
+
+   On Error GoTo 0
+   Exit Sub
+
+M_Error:
+    mAssert.Should False, "Unexpected Error (" & Err.Number & "): " & Err.Description
+End Sub
+
 Public Sub Test_ConfigurationIsDEV_True()
     ' This test verifies the property isDEV of vtkConfiguration object
     ' collection just initialized from an Excel worlbook
@@ -341,6 +377,7 @@ Private Function ITest_Suite() As TestSuite
     ITest_Suite.AddTest ITest_Manager.ClassName, "Test_ConfigurationGetName"
     ITest_Suite.AddTest ITest_Manager.ClassName, "Test_ConfigurationGetInitializedProjectNameFromVersion11"
     ITest_Suite.AddTest ITest_Manager.ClassName, "Test_ConfigurationGetInitializedCommentFromVersion11"
+    ITest_Suite.AddTest ITest_Manager.ClassName, "Test_ConfigurationGetDefaultProjectNameFromVersion11"
     ITest_Suite.AddTest ITest_Manager.ClassName, "Test_ConfigurationIsDEV_True"
     ITest_Suite.AddTest ITest_Manager.ClassName, "Test_ConfigurationGetPath"
     ITest_Suite.AddTest ITest_Manager.ClassName, "Test_ConfigurationSetPath"
@@ -365,6 +402,7 @@ Private Sub ITestCase_RunTest()
         Case "Test_ConfigurationGetName": Test_ConfigurationGetName
         Case "Test_ConfigurationGetInitializedProjectNameFromVersion11": Test_ConfigurationGetInitializedProjectNameFromVersion11
         Case "Test_ConfigurationGetInitializedCommentFromVersion11": Test_ConfigurationGetInitializedCommentFromVersion11
+        Case "Test_ConfigurationGetDefaultProjectNameFromVersion11": Test_ConfigurationGetDefaultProjectNameFromVersion11
         Case "Test_ConfigurationIsDEV_True": Test_ConfigurationIsDEV_True
         Case "Test_ConfigurationGetPath": Test_ConfigurationGetPath
         Case "Test_ConfigurationSetPath": Test_ConfigurationSetPath
