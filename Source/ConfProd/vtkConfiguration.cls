@@ -125,6 +125,38 @@ Property Let path(newPath As String)
 End Property
 
 '---------------------------------------------------------------------------------------
+' Property  : projectName as string (wrapper on the parent vtkConfigurationManager)
+' Author    : Jean-Pierre Imbert
+' Date      : 08/06/2014
+' Purpose   : The project name (title) for the configuration
+'---------------------------------------------------------------------------------------
+'
+Property Get projectName() As String
+    projectName = m_parent.getConfigurationProjectNameWithNumber(m_number)
+End Property
+
+Property Let projectName(newProjectName As String)
+   On Error Resume Next
+    m_parent.setConfigurationProjectNameWithNumber m_number, newProjectName
+End Property
+
+'---------------------------------------------------------------------------------------
+' Property  : comment as string (wrapper on the parent vtkConfigurationManager)
+' Author    : Jean-Pierre Imbert
+' Date      : 08/06/2014
+' Purpose   : The comment for the configuration
+'---------------------------------------------------------------------------------------
+'
+Property Get comment() As String
+    comment = m_parent.getConfigurationCommentWithNumber(m_number)
+End Property
+
+Property Let comment(newComment As String)
+   On Error Resume Next
+    m_parent.setConfigurationCommentWithNumber m_number, newComment
+End Property
+
+'---------------------------------------------------------------------------------------
 ' Property  : modules as collection (Read Only)
 ' Author    : Jean-Pierre Imbert
 ' Date      : 28/08/2013

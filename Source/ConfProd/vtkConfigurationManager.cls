@@ -49,9 +49,10 @@ Private m_workbook As Workbook
 Private m_configurationSheet As Worksheet
 Private m_rootPath As String
 Private Const sheetName As String = "vtkConfigurations"
-Private Const currentVersion As String = "vtkConfigurations v1.0"
+Private Const currentVersion As String = "vtkConfigurations v1.1"
+Private Const version10 As String = "vtkConfigurations v1.0"
+Private m_sheetVersion As String
 Private Const nbTitleColumns As Integer = 1
-Private Const nbTitleRows As Integer = 2
 
 Private Sub Class_Terminate()
     Set m_configurationSheet = Nothing
@@ -70,11 +71,11 @@ End Sub
 '---------------------------------------------------------------------------------------
 '
 Public Property Get projectName() As String
-Attribute projectName.VB_UserMemId = 0
     projectName = m_projectName
 End Property
 
 Public Property Let projectName(ByVal sprojectName As String)
+Attribute projectName.VB_UserMemId = 0
     Dim wbName As String
     wbName = vtkProjectForName(sprojectName).workbookDEVName
     If m_projectName <> sprojectName And VtkWorkbookIsOpen(wbName) Then
@@ -95,6 +96,28 @@ End Property
 Private Property Get Workbook() As Workbook
     Set Workbook = m_workbook
 End Property
+
+'---------------------------------------------------------------------------------------
+' Function  : defaultProjectNameWithNumber as String - Read Only - Private
+' Author    : Jean-Pierre Imbert
+' Date      : 08/06/2014
+' Purpose   : return the default projectName of a configuration given its number
+'---------------------------------------------------------------------------------------
+'
+Private Function defaultProjectNameWithNumber(n As Integer) As String
+    defaultProjectNameWithNumber = Me.configuration(n)
+End Function
+
+'---------------------------------------------------------------------------------------
+' Function  : defaultCommentWithNumber as String - Read Only - Private
+' Author    : Jean-Pierre Imbert
+' Date      : 08/06/2014
+' Purpose   : return the default comment of a configuration given its number
+'---------------------------------------------------------------------------------------
+'
+Private Function defaultCommentWithNumber(n As Integer) As String
+    defaultCommentWithNumber = "Project " & Me.configuration(n)
+End Function
 
 '---------------------------------------------------------------------------------------
 ' Property  : rootPath as String - Read Only - Public
@@ -143,6 +166,19 @@ Public Function isConfigurationInitializedForWorkbook(ExcelName As String) As Bo
 End Function
 
 '---------------------------------------------------------------------------------------
+' Function  : nbTitleRows
+' Author    : Jean-Pierre Imbert
+' Date      : 08/06/2014
+' Purpose   : return the number of Title rows in the configuration sheet depend on its version
+'             - 2 for v1.0, 4 for 1.1
+'---------------------------------------------------------------------------------------
+'
+Private Function nbTitleRows() As Integer
+    If m_sheetVersion = version10 Then nbTitleRows = 2
+    If m_sheetVersion = currentVersion Then nbTitleRows = 4
+End Function
+
+'---------------------------------------------------------------------------------------
 ' Procedure : setConfigurationSheet
 ' Author    : Jean-Pierre Imbert
 ' Date      : 25/05/2013
@@ -163,7 +199,13 @@ Private Sub setConfigurationSheet()
         End If
     ' Verify that the configuration sheet is in last known version
     If ws.Range("A1") <> currentVersion Then
-        ' Code to convert from previous version will be implemented here
+        If ws.Range("A1") <> version10 Then
+        ' Code to convert from previous version will be implemented here or in a specific method
+            Else
+            m_sheetVersion = version10
+            End If
+        Else
+        m_sheetVersion = currentVersion
         End If
     '   Set the initialized worksheet property
     Set m_configurationSheet = ws
@@ -178,7 +220,9 @@ End Sub
 '
 Private Sub initializeConfigurationSheet(ws As Worksheet)
     ws.Range("A1") = currentVersion
-    ws.Range("A2") = "Module Name"
+    ws.Range("A2") = ""
+    ws.Range("A3") = "Path, name and comment"
+    ws.Range("A4") = "Module Name"
     ws.Range("B1") = vtkProjectForName(projectName).projectName
     ws.Range("B2") = vtkProjectForName(projectName).projectStandardRelativePath
     ws.Range("C1") = vtkProjectForName(projectName).projectDEVName
@@ -186,10 +230,42 @@ Private Sub initializeConfigurationSheet(ws As Worksheet)
     
     ws.Columns("A:C").ColumnWidth = 22
     ws.Range("A1").Font.Size = 8
-    ws.Range("A2").HorizontalAlignment = xlCenter
-    ws.Range("A2").Font.Bold = True
+    ws.Range("A3").HorizontalAlignment = xlCenter
+    ws.Range("A4").HorizontalAlignment = xlCenter
+    ws.Range("A4").Font.Bold = True
     ws.Range("B1:C2").HorizontalAlignment = xlCenter
     ws.Range("B1:C1").Font.Bold = True
+End Sub
+
+'---------------------------------------------------------------------------------------
+' Procedure : updateConfigurationSheetFormat
+' Author    : Jean-Pierre Imbert
+' Date      : 08/06/2014
+' Purpose   : Update the configuration sheet to the current version
+'---------------------------------------------------------------------------------------
+'
+Public Sub updateConfigurationSheetFormat()
+    Dim ws As Worksheet
+    
+    If m_sheetVersion = version10 Then
+        Set ws = configurationSheet
+         
+        ws.Rows("3:4").EntireRow.Insert     ' Insert new lines for the new format
+        
+        ws.Range("A1") = currentVersion
+        ws.Range("A2") = ""
+        ws.Range("A3") = "Path, name and comment"
+        ws.Range("A4") = "Module Name"
+    
+        ws.Range("A2").Font.Bold = False
+        ws.Range("A3").Font.Bold = False
+        ws.Range("A3").HorizontalAlignment = xlCenter
+        ws.Range("A4").HorizontalAlignment = xlCenter
+        ws.Range("A4").Font.Bold = True
+        
+        m_sheetVersion = currentVersion     ' Set the sheetVersion for correct behavior after conversion
+    End If
+
 End Sub
 
 '---------------------------------------------------------------------------------------
@@ -239,20 +315,22 @@ End Function
 ' Author    : Jean-Pierre Imbert
 ' Date      : 28/08/2013
 ' Purpose   : Add a configuration to the configuration manager
-'             - optionaly a path may be given for the configuration
+'             - optionaly a Path, a projectName and a Comment may be given for the configuration
 '             - all modules pathes are initialized to Null
 '             - if the configuration already exists, it is not added
 ' Return    : the number of the added configuration
 '             - if the configuration already exists, return minus the configuration number
 '---------------------------------------------------------------------------------------
 '
-Public Function addConfiguration(configuration As String, Optional path As String = "") As Integer
+Public Function addConfiguration(configuration As String, Optional path As String = "", Optional projectName As String = "", Optional comment As String = "") As Integer
     Dim n As Integer
     n = getConfigurationNumber(configuration)
     If n = 0 Then   ' n = 0 means non-existant configuration
-        n = configurationCount + 1                                        ' Set module number
-        configurationSheet.Cells(1, n + nbTitleColumns) = configuration   ' Write module name
-        configurationSheet.Cells(2, n + nbTitleColumns) = path            ' Write module path
+        n = configurationCount + 1                                        ' Set configuration number
+        configurationSheet.Cells(1, n + nbTitleColumns) = configuration   ' Write configuration name
+        configurationSheet.Cells(2, n + nbTitleColumns) = path            ' Write configuration path
+        configurationSheet.Cells(3, n + nbTitleColumns) = projectName     ' Write configuration projectName
+        configurationSheet.Cells(4, n + nbTitleColumns) = comment         ' Write configuration Comment
         Dim i As Integer
         For i = 1 To moduleCount                         ' For each module
             configurationSheet.Cells(i + nbTitleRows, n + nbTitleColumns) = "-"     ' Set Default path as not initialized
@@ -356,6 +434,101 @@ End Function
 '
 Public Sub setConfigurationPath(configuration As String, path As String)
     setConfigurationPathWithNumber n:=getConfigurationNumber(configuration), path:=path
+End Sub
+
+'---------------------------------------------------------------------------------------
+' Procedure : getConfigurationProjectNameWithNumber
+' Author    : Jean-Pierre Imbert
+' Date      : 08/06/2014
+' Purpose   : return the n-th configuration project name of the project, given n as integer
+'               - return "" if the configuration is inexistant
+'               - return the default project name if
+'                   - it is not initialized in the configuration sheet v1.1
+'                   - the configuration sheet is v1.0, so there is no project name field
+'---------------------------------------------------------------------------------------
+'
+Public Function getConfigurationProjectNameWithNumber(n As Integer) As String
+    Dim sResult As String
+    sResult = ""
+    If n >= 1 And n <= configurationCount Then
+        If m_sheetVersion = currentVersion Then
+            sResult = configurationSheet.Cells(3, n + nbTitleColumns)
+            If sResult = "" Then sResult = defaultProjectNameWithNumber(n)
+           Else
+            sResult = defaultProjectNameWithNumber(n)
+            End If
+       Else
+        sResult = ""
+    End If
+    getConfigurationProjectNameWithNumber = sResult
+End Function
+
+'---------------------------------------------------------------------------------------
+' Procedure : setConfigurationProjectNameWithNumber
+' Author    : Jean-Pierre Imbert
+' Date      : 08/06/2013
+' Purpose   : change the n-th configuration project name of the project, given n as integer
+'               - does nothing if the configuration is inexistant
+'               - does nothing and return an error if the configuration sheet is v1.0
+'---------------------------------------------------------------------------------------
+'
+Public Sub setConfigurationProjectNameWithNumber(n As Integer, projectName As String)
+    If n >= 1 And n <= configurationCount Then
+        If m_sheetVersion = currentVersion Then
+            configurationSheet.Cells(3, n + nbTitleColumns) = projectName
+           Else
+            Err.Raise VTK_OBSOLETE_CONFIGURATION_SHEET, "vtkConfigurationManager:setConfigurationProjectNameWithNumber", _
+            "Impossible to set a configuration projectName with this configuration sheet version (project=" & m_projectName & ", " & m_sheetVersion & ")"
+        End If
+    End If
+End Sub
+
+'---------------------------------------------------------------------------------------
+' Procedure : getConfigurationCommentWithNumber
+' Author    : Jean-Pierre Imbert
+' Date      : 08/06/2014
+' Purpose   : return the n-th configuration comment of the project, given n as integer
+'               - return "" if the configuration is inexistant
+'               - return the default comment if
+'                   - it is not initialized in the configuration sheet v1.1
+'                   - the configuration sheet is v1.0, so there is no comment field
+'---------------------------------------------------------------------------------------
+'
+Public Function getConfigurationCommentWithNumber(n As Integer) As String
+    Dim sResult As String
+    sResult = ""
+    If n >= 1 And n <= configurationCount Then
+        If m_sheetVersion = currentVersion Then
+            sResult = configurationSheet.Cells(4, n + nbTitleColumns)
+            If sResult = "" Then sResult = defaultCommentWithNumber(n)
+           Else
+            sResult = defaultCommentWithNumber(n)
+            End If
+       Else
+        sResult = ""
+    End If
+    getConfigurationCommentWithNumber = sResult
+End Function
+
+'---------------------------------------------------------------------------------------
+' Procedure : setConfigurationCommentWithNumber
+' Author    : Jean-Pierre Imbert
+' Date      : 08/06/2013
+' Purpose   : change the n-th configuration comment of the project, given n as integer
+'               - does nothing if the configuration is inexistant
+'               - does nothing and return an error if the configuration sheet is v1.0
+'---------------------------------------------------------------------------------------
+'
+Public Sub setConfigurationCommentWithNumber(n As Integer, comment As String)
+    If n >= 1 And n <= configurationCount Then
+        If m_sheetVersion = currentVersion Then
+            configurationSheet.Cells(4, n + nbTitleColumns) = comment
+           Else
+            Err.Raise VTK_OBSOLETE_CONFIGURATION_SHEET, "vtkConfigurationManager:setConfigurationCommentWithNumber", _
+            "Impossible to set a configuration comment with this configuration sheet version (project=" & m_projectName & ", " & m_sheetVersion & ")"
+        End If
+        configurationSheet.Cells(4, n + nbTitleColumns) = comment
+    End If
 End Sub
 
 '---------------------------------------------------------------------------------------

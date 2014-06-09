@@ -122,3 +122,37 @@ vtkCreateProject_ErrorGit:
     If displayError Then MsgBox "Error " & Err.Number & " (" & Err.Description & ") in procedure vtkCreateProject of Module MainFunctions"
 
 End Function
+
+'---------------------------------------------------------------------------------------
+' Procedure  : vtkRecreateConfigurations
+' Author     : Jean-Pierre Imbert
+' Date       : 08/06/2014
+' Purpose    : recreate one or several configurations
+' Parameters :
+'             - projectName, string containing the name of the project whose configurations has to be recreate
+'             - confName, string containing the name of configuration
+'             - AllExceptSelected, boolean true if all configurations but confName have to be recreated
+'
+'---------------------------------------------------------------------------------------
+'
+Public Sub vtkRecreateConfigurations(projectName As String, confName As String, Optional AllExceptSelected As Boolean = False)
+    On Error GoTo vtkRecreateConfigurations_Error
+    
+    If Not AllExceptSelected Then
+        vtkRecreateConfiguration projectName, confName
+    Else
+        Dim conf As vtkConfiguration, cm As vtkConfigurationManager
+        Set cm = vtkConfigurationManagerForProject(projectName)
+        For Each conf In cm.configurations
+            If Not conf.name Like confName Then
+                vtkRecreateConfiguration projectName, conf.name
+            End If
+        Next
+    End If
+    
+    On Error GoTo 0
+    Exit Sub
+
+vtkRecreateConfigurations_Error:
+    Err.Raise Err.Number, Err.Source, Err.Description
+End Sub

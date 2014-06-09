@@ -146,11 +146,14 @@ End Sub
 '             configuration workbooks and source modules
 '             The verifications performed are :
 '             - All configuration pathes are reachable
+'             - All configuration projectName property is the same as the project name of the configuration
+'             - All configuration projectName property is the same as the title property of the configuration
+'             - All configuration comment property is the same as the comment property of the configuration
 '             - All modules listed in a configuration description are existing in the configuration
 '             - All modules really present in a configuration are described in the description with non null path
 '             - All modules pathes are reachable
-'   To be implemented perhaps (?)
 '             - Each code module implemented in a configuration is the same as the source code module
+'
 '   To be implemented later (with XML configuration files)
 '             - All references listed in a configuration description are existing in the configuration
 '             - All references really present in a configuration are described in the description
@@ -184,6 +187,26 @@ Sub vtkVerifyConfigurations()
            On Error GoTo 0
             cwb(nbConf).wasOpened = Not (cwb(nbConf).Wb Is Nothing)
             If Not cwb(nbConf).wasOpened Then Set cwb(nbConf).Wb = Workbooks.Open(fileName:=s, ReadOnly:=True)
+            If Not (cwb(nbConf).Wb Is Nothing) Then
+
+    ' Verify projects name
+                If Not (c.projectName = cwb(nbConf).Wb.VBProject.name) Then
+                    Debug.Print "For configuration " & c.name & ", the projectName property (" & c.projectName & ") is different of the project name (" & cwb(nbConf).Wb.VBProject.name & ")."
+                End If
+
+    ' Verify workbooks title
+                If Not (c.projectName = cwb(nbConf).Wb.BuiltinDocumentProperties("Title").Value) Then
+                    Debug.Print "For configuration " & c.name & ", the projectName property (" & c.projectName & ") is different of the workbook title (" & cwb(nbConf).Wb.BuiltinDocumentProperties("Title").Value & ")."
+                End If
+
+    ' Verify workbooks comment
+                If Not (c.comment = cwb(nbConf).Wb.BuiltinDocumentProperties("Comments").Value) Then
+                    Debug.Print "For configuration " & c.name & ", the comment property (" & c.comment & ") is different of the workbook comment (" & cwb(nbConf).Wb.BuiltinDocumentProperties("Comments").Value & ")."
+                End If
+
+               Else
+                Debug.Print "Impossible to open Workbook for configuration " & c.name & " (" & s & ")."
+            End If
            Else
             Debug.Print "Path of configuration " & c.name & " unreachable (" & s & ")."
         End If

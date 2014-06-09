@@ -14,11 +14,11 @@ Private mClassName
 
 Private Function ITestManager_CountTestCases(test As ITest) As Long
     Dim Count As Long
-    Dim TestSuite As TestSuite, TESTS As Collection
+    Dim TestSuite As TestSuite, Tests As Collection
     Dim SubTest As ITest
     Set TestSuite = test
-    Set TESTS = TestSuite.TESTS()
-    For Each SubTest In TESTS
+    Set Tests = TestSuite.Tests()
+    For Each SubTest In Tests
         Count = Count + SubTest.Manager.CountTestCases(SubTest)
     Next
     ITestManager_CountTestCases = Count
@@ -33,12 +33,12 @@ Private Property Get ITestManager_ClassName() As String
 End Property
 
 Private Function ITestManager_Run(test As ITest, Optional RunManager As IRunManager) As IRunManager
-    Dim TestSuite As TestSuite, TESTS As Collection
+    Dim TestSuite As TestSuite, Tests As Collection
     Dim SubTest As ITest
     Set TestSuite = test
-    Set TESTS = TestSuite.TESTS()
+    Set Tests = TestSuite.Tests()
     If RunManager Is Nothing Then Set RunManager = New RunManager
-    For Each SubTest In TestSuite.TESTS()
+    For Each SubTest In TestSuite.Tests()
         SubTest.Manager.Run SubTest, RunManager
     Next
     Set ITestManager_Run = RunManager
