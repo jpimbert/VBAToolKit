@@ -14,6 +14,7 @@ Attribute VB_Creatable = False
 Attribute VB_PredeclaredId = True
 Attribute VB_Exposed = False
 
+
 '---------------------------------------------------------------------------------------
 ' Module    : vtkCreateProjectForm
 ' Author    : Lucas Vitorino
@@ -125,42 +126,11 @@ End Sub
 '---------------------------------------------------------------------------------------
 ' Procedure : CreateConfigurationButton_Click
 ' Author    : Lucas Vitorino
-' Purpose   : Call the vtkRecreateConfiguration function with the relevant parameters
+' Purpose   : Call the vtkRecreateConfigurations Sub with the relevant parameters
 '---------------------------------------------------------------------------------------
 '
 Private Sub CreateConfigurationButton_Click()
-    
-    On Error GoTo CreateConfigurationButton_Click_Error
-    
-    If AllConfigurationsExceptThisOneCheckBox.Value = False Then
-        vtkRecreateConfiguration currentProjectName, currentConf.name
-    Else
-        Dim conf As vtkConfiguration
-        For Each conf In cm.configurations
-            If Not conf.name Like currentConf.name Then
-                vtkRecreateConfiguration currentProjectName, conf.name
-            End If
-        Next
-    End If
-    
-    On Error GoTo 0
-    Exit Sub
-
-CreateConfigurationButton_Click_Error:
-    Err.Source = "CreateConfigurationButton_Click of module vtkRecreateConfigurationForm"
-    
-    Select Case Err.Number
-        Case VTK_WORKBOOK_ALREADY_OPEN ' Trying to replace an open workbook while recreating the configuration
-            MsgBox "Error " & Err.Number & " (" & Err.Description & ")"
-            Resume Next
-        Case VTK_NO_SOURCE_FILES ' A source file is missing
-            MsgBox "Error " & Err.Number & " (" & Err.Description & ")"
-            Resume Next
-        Case Else
-            Err.Raise Err.Number, Err.Source, Err.Description
-    End Select
-    
-    Exit Sub
+    vtkRecreateConfigurations projectName:=currentProjectName, confName:=currentConf.name, AllExceptSelected:=AllConfigurationsExceptThisOneCheckBox.Value
 End Sub
 
 

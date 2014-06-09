@@ -403,7 +403,11 @@ Public Sub vtkRecreateConfiguration(projectName As String, configurationName As 
     Set Wb = vtkCreateExcelWorkbook()
     
     ' Set the projectName
-    Wb.VBProject.name = configurationName
+    Wb.VBProject.name = conf.projectName
+    
+    ' Set the Workbook properties
+    Wb.BuiltinDocumentProperties("Title").Value = conf.projectName
+    Wb.BuiltinDocumentProperties("Comments").Value = conf.comment
     
     ' Import all modules for this configuration from the source directory
     vtkImportModulesInAnotherProject projectForModules:=Wb.VBProject, projectName:=projectName, confName:=configurationName
@@ -420,7 +424,7 @@ Public Sub vtkRecreateConfiguration(projectName As String, configurationName As 
               CStr(Round((99999 - 10000 + 1) * Rnd(), 0)) + 10000 & _
               "." & fso.GetExtensionName(wbPath))
     
-    ' Create the the folder containing the workbook if a 1-level or less deep folder structure
+    ' Create the folder containing the workbook if a 1-level or less deep folder structure
     ' is specified in the configuration path.
     vtkCreateFolderPath tmpPath
     

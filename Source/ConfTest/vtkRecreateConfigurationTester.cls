@@ -173,12 +173,15 @@ Private Sub exportModulesAndRecreateWb(Wb As Workbook, testProject As vtkProject
 
 exportModulesAndRecreateWb_Error:
     Err.Source = "exportModulesAndRecreateWb of module vtkRecreateConfigurationTester"
-    Debug.Print "Unexpected error " & Err.Number & " (" & Err.Description & ") in " & Err.Source
     Err.Raise Err.Number, Err.Source, Err.Description
     Exit Sub
 End Sub
 
-
+Private Sub verifyV11Properties(Wb As Workbook, confNumber As Integer)
+    mAssert.Equals Wb.VBProject.name, "ProjectName" & confNumber, "Expected project name"
+    mAssert.Equals Wb.BuiltinDocumentProperties("Title").Value, "ProjectName" & confNumber, "Expected Workbook title"
+    mAssert.Equals Wb.BuiltinDocumentProperties("Comments").Value, "Comment for Workbook #" & confNumber, "Expected Workbook comment"
+End Sub
 
 ' --------------------------------------------------------
 '                       TESTS
@@ -195,7 +198,8 @@ Public Sub Test_vtkRecreateConfiguration_workbookIsCreatedInTheGoodPath_normalCo
 
     mAssert.Should fso.FileExists(VBAToolKit.vtkTestPath & "\" & testProject.projectName & "\" & testedConf.path), _
                    "The configuration should have been created in the designated path."
-
+    verifyV11Properties recreatedWb, testedConf.Number
+    
     On Error GoTo 0
     Exit Sub
 
@@ -205,7 +209,28 @@ Test_vtkRecreateConfiguration_workbookIsCreatedInTheGoodPath_normalConf_Error:
     Exit Sub
 End Sub
 
+Public Sub Test_vtkRecreateConfigurations_normalConf()
+' Same test than previous one but call of main function instead of utility function
 
+    On Error GoTo Test_vtkRecreateConfiguration_normalConf_Error
+
+    Set testedConf = normalConf
+
+    vtkExportConfiguration Wb.VBProject, testProject.projectName, testedConf.name
+    vtkRecreateConfigurations testProject.projectName, testedConf.name
+    Set recreatedWb = Workbooks.Open(VBAToolKit.vtkTestPath & "\" & testProject.projectName & "\" & testedConf.path)
+
+    mAssert.Should fso.FileExists(VBAToolKit.vtkTestPath & "\" & testProject.projectName & "\" & testedConf.path), _
+                   "The configuration should have been created in the designated path."
+
+    On Error GoTo 0
+    Exit Sub
+
+Test_vtkRecreateConfiguration_normalConf_Error:
+    Err.Source = "Test_vtkRecreateConfiguration_workbookIsCreatedInTheGoodPath_normalConf of module vtkRecreateConfigurationTester"
+    mAssert.Should False, "Unexpected error " & Err.Number & " (" & Err.Description & ") in " & Err.Source
+    Exit Sub
+End Sub
 
 Public Sub Test_vtkRecreateConfiguration_workbookIsCreatedInTheGoodPath_emptyConf()
 ' workbook is created in the good path
@@ -241,6 +266,7 @@ Public Sub Test_vtkRecreateConfiguration_workbookIsCreatedInTheGoodPath_multityp
 
     mAssert.Should fso.FileExists(VBAToolKit.vtkTestPath & "\" & testProject.projectName & "\" & testedConf.path), _
                    "The configuration should have been created in the designated path."
+    verifyV11Properties recreatedWb, testedConf.Number
 
     On Error GoTo 0
     Exit Sub
@@ -293,6 +319,7 @@ Public Sub Test_vtkRecreateConfiguration_modulesNotYetExported_emptyConf()
 
     mAssert.Should fso.FileExists(VBAToolKit.vtkTestPath & "\" & testProject.projectName & "\" & testedConf.path), _
                    "The file shoud have been created normally as configuration is empty."
+    verifyV11Properties recreatedWb, testedConf.Number
 
     On Error GoTo 0
     Exit Sub
@@ -319,6 +346,7 @@ Public Sub Test_vtkRecreateConfiguration_pathDoesNotExistYet1()
 
     mAssert.Should fso.FileExists(VBAToolKit.vtkTestPath & "\" & testProject.projectName & "\" & testedConf.path), _
                    "The file shoud have been created normally."
+    verifyV11Properties recreatedWb, testedConf.Number
 
     On Error GoTo 0
     Exit Sub
@@ -345,6 +373,7 @@ Public Sub Test_vtkRecreateConfiguration_pathDoesNotExistYet2()
 
     mAssert.Should fso.FileExists(VBAToolKit.vtkTestPath & "\" & testProject.projectName & "\" & testedConf.path), _
                    "The file shoud have been created normally."
+    verifyV11Properties recreatedWb, testedConf.Number
     On Error GoTo 0
     Exit Sub
 
@@ -483,7 +512,7 @@ Public Sub Test_vtkRecreateConfiguration_nameOfTheVBProjectIsCorrect()
     ' Set recreatedWb and open it
     exportModulesAndRecreateWb Wb, testProject, testedConf
 
-    mAssert.Equals recreatedWb.VBProject.name, testedConf.name, _
+    mAssert.Equals recreatedWb.VBProject.name, "ProjectName" & testedConf.Number, _
                    "The created project should have the same name as the recreated configuration."
 
     On Error GoTo 0
@@ -533,6 +562,7 @@ Public Sub Test_vtkRecreateConfiguration_formatLikeExtension_XLAM()
     mAssert.Equals recreatedWb.FileFormat, _
                    xlOpenXMLAddIn, _
                    "File format is wrong."
+    verifyV11Properties recreatedWb, testedConf.Number
 
     On Error GoTo 0
     Exit Sub
@@ -557,6 +587,7 @@ Public Sub Test_vtkRecreateConfiguration_formatLikeExtension_XLS()
     mAssert.Equals recreatedWb.FileFormat, _
                    xlExcel8, _
                    "File format is wrong."
+    verifyV11Properties recreatedWb, testedConf.Number
 
     On Error GoTo 0
     Exit Sub
@@ -579,6 +610,7 @@ Public Sub Test_vtkRecreateConfiguration_formatLikeExtension_XLA()
     mAssert.Equals recreatedWb.FileFormat, _
                    xlAddIn, _
                    "File format is wrong."
+    verifyV11Properties recreatedWb, testedConf.Number
 
     On Error GoTo 0
     Exit Sub
@@ -739,6 +771,7 @@ End Sub
 Private Function ITest_Suite() As TestSuite
     Set ITest_Suite = New TestSuite
     ITest_Suite.AddTest ITest_Manager.ClassName, "Test_vtkRecreateConfiguration_workbookIsCreatedInTheGoodPath_normalConf"
+    ITest_Suite.AddTest ITest_Manager.ClassName, "Test_vtkRecreateConfigurations_normalConf"
     ITest_Suite.AddTest ITest_Manager.ClassName, "Test_vtkRecreateConfiguration_workbookIsCreatedInTheGoodPath_emptyConf"
     ITest_Suite.AddTest ITest_Manager.ClassName, "Test_vtkRecreateConfiguration_workbookIsCreatedInTheGoodPath_multitypeConf"
     ITest_Suite.AddTest ITest_Manager.ClassName, "Test_vtkRecreateConfiguration_modulesNotYetExported_normalConf"
@@ -763,6 +796,7 @@ End Function
 Private Sub ITestCase_RunTest()
     Select Case mManager.methodName
         Case "Test_vtkRecreateConfiguration_workbookIsCreatedInTheGoodPath_normalConf": Test_vtkRecreateConfiguration_workbookIsCreatedInTheGoodPath_normalConf
+        Case "Test_vtkRecreateConfigurations_normalConf": Test_vtkRecreateConfigurations_normalConf
         Case "Test_vtkRecreateConfiguration_workbookIsCreatedInTheGoodPath_emptyConf": Test_vtkRecreateConfiguration_workbookIsCreatedInTheGoodPath_emptyConf
         Case "Test_vtkRecreateConfiguration_workbookIsCreatedInTheGoodPath_multitypeConf": Test_vtkRecreateConfiguration_workbookIsCreatedInTheGoodPath_multitypeConf
         Case "Test_vtkRecreateConfiguration_modulesNotYetExported_normalConf": Test_vtkRecreateConfiguration_modulesNotYetExported_normalConf
