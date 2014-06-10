@@ -30,19 +30,19 @@
         <name>VBAToolKit</name>
         <path>Delivery\VBAToolKit.xlam</path>
         <title>VBAToolKit</title>
-        <comment>Toolkit improving IDE for VBA projects</comment>
+        <comment>Project VBAToolKit</comment>
     </configuration>
     <configuration cID="c2">
         <name>VBAToolKit_DEV</name>
         <path>Project\VBAToolKit_DEV.xlsm</path>
-        <title>VBAToolKit</title>
-        <comment>Toolkit improving IDE for VBA projects</comment>
+        <title>VBAToolKit_DEV</title>
+        <comment>Project VBAToolKit_DEV</comment>
     </configuration>
     <configuration cID="c3">
         <name>VBAToolKit_2003</name>
         <path>Delivery\VBAToolKit.xla</path>
-        <title>VBAToolKit</title>
-        <comment>Toolkit improving IDE for VBA projects</comment>
+        <title>VBAToolKit_2003</title>
+        <comment>Project VBAToolKit_2003</comment>
     </configuration>
     <module mID="m1">
         <name>vtkImportExportUtilities</name>
@@ -381,6 +381,16 @@
     <module mID="m64">
         <name>vtkExcelUtilitiesTester</name>
         <modulePath confId="c2">Source\ConfTest\vtkExcelUtilitiesTester.cls</modulePath>
+    </module>
+    <module mID="m65">
+        <name>vtkReferenceManager</name>
+        <modulePath confId="c1">Source\ConfProd\vtkReferenceManager.cls</modulePath>
+        <modulePath confId="c2">Source\ConfProd\vtkReferenceManager.cls</modulePath>
+        <modulePath confId="c3">Source\ConfProd\vtkReferenceManager.cls</modulePath>
+    </module>
+    <module mID="m66">
+        <name>vtkReferenceManagerTester</name>
+        <modulePath confId="c2">Source\ConfTest\vtkReferenceManagerTester.cls</modulePath>
     </module>
     <reference confIDs="c1 c2 c3">
         <name>VBA</name>
