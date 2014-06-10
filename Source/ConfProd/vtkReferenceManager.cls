@@ -67,13 +67,6 @@ Private Const currentVersion As String = "vtkReferences v1.0"
 Private Const nbTitleColumns As Integer = 3
 Private Const nbTitleRows As Integer = 1
 
-'   Combo type instead of defining a vtkReference class
-Public Type vtkReference
-    name As String  ' Mandatory for each reference
-    guid As String  ' guid and path are exclusive each other
-    path As String
-End Type
-
 Private Sub Class_Terminate()
     Set m_referenceSheet = Nothing
     Set m_workbook = Nothing
@@ -87,8 +80,8 @@ End Sub
 '---------------------------------------------------------------------------------------
 '
 Public Sub init(Wb As Workbook, confCount As Integer)
-    If Not m_workbook Is sWorkbook Then
-        Set m_workbook = sWorkbook
+    If Not m_workbook Is Wb Then
+        Set m_workbook = Wb
         If Not m_workbook Is Nothing Then setReferenceSheet (confCount)     ' Reset the reference sheet when the attached workbook is changed
     End If
 End Sub
@@ -119,7 +112,22 @@ End Property
 '---------------------------------------------------------------------------------------
 '
 Private Sub setReferenceSheet(confCount As Integer)
-
+    Dim ws As Worksheet
+    On Error Resume Next
+    Set ws = m_workbook.Worksheets(sheetName)
+    On Error GoTo 0
+    If ws Is Nothing Then        ' If the Configuration doesn't exist, create one
+        Set ws = m_workbook.Worksheets.Add(Type:=xlWorksheet)
+        ws.name = sheetName
+        '   Initialize the configuration sheet
+'        initializeReferenceSheet ws
+        End If
+    ' Verify that the configuration sheet is in last known version
+    If ws.Range("A1") <> currentVersion Then
+        ' Code to convert from previous version will be implemented here or in a specific method
+        End If
+    '   Set the initialized worksheet property
+    Set m_referenceSheet = ws
 End Sub
 
 '---------------------------------------------------------------------------------------

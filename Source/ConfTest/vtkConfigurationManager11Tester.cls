@@ -118,7 +118,7 @@ Public Sub TestConfigurationSheetExistsInExistingWorkbook()
 End Sub
 
 Public Sub TestConfigurationSheetDoesntExistInNewWorkbook()
-    '   Verify that the configuration sheet missing is detected in new workbook
+    '   Verify that the configuration sheet missing is created in new workbook
     '   using a fresh configuration Manager (with no default sheet initialized)
     Dim cm As New vtkConfigurationManager, Wb As Workbook, wbFullName As String
     Set Wb = vtkCreateExcelWorkbookForTestWithProjectName("NewWorkbook")    ' create a fresh new Excel workbook

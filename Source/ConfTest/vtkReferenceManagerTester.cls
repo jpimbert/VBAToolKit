@@ -70,16 +70,18 @@ Private Property Get ITest_Manager() As ITestManager
 End Property
 
 Private Sub ITestCase_SetUp(Assert As IAssert)
+    Dim newConfManager As vtkConfigurationManager
 
     Set mAssert = Assert
     
     Set newWorkBook = vtkCreateExcelWorkbookForTestWithProjectName("NewProject")    ' create an Excel project for tests
+    Set newConfManager = vtkConfigurationManagerForProject(newWorkBook.VBProject.name) ' For vtkConfigurations sheet initialization
     Set newRefManager = New vtkReferenceManager
-    Set newRefManager.Workbook = newWorkBook
+    newRefManager.init Wb:=newWorkBook, confCount:=2
     
-    Set existingWorkbook = getTestFileFromTemplate(fileName:=existingWorkbookNameForTest, destinationName:=existingProjectName & "_DEV.xlsm", openExcel:=True)
+    Set existingWorkbook = getTestFileFromTemplate(fileName:=existingWorkbookNameForTest, destinationName:="ExistingProject_DEV.xlsm", openExcel:=True)
     Set existingRefManager = New vtkReferenceManager
-    Set existingRefManager.Workbook = existingWorkbook
+    existingRefManager.init Wb:=existingWorkbook, confCount:=2
 End Sub
 
 Private Sub ITestCase_TearDown()
@@ -89,9 +91,24 @@ Private Sub ITestCase_TearDown()
     Set existingRefManager = Nothing
 End Sub
 
+Public Sub TestReferenceSheetCreationForNewProject()
+'       Verify that a Configuration Sheet is created in a new project
+    Dim ws As Worksheet
+    On Error Resume Next
+    Set ws = newWorkBook.Sheets("vtkReferences")
+    mAssert.Equals Err, 0, "Error number : A reference manager must create a Reference sheet"
+    mAssert.Should newWorkBook.Sheets("vtkReferences") Is newRefManager.referenceSheet, "The referenceSheet property of the ref manager must be equal to the reference sheet of the workbook"
+    On Error GoTo 0
+End Sub
+
+Private Function ITest_Suite() As TestSuite
+    Set ITest_Suite = New TestSuite
+    ITest_Suite.AddTest ITest_Manager.ClassName, "TestReferenceSheetCreationForNewProject"
+End Function
+
 Private Sub ITestCase_RunTest()
     Select Case mManager.methodName
-        Case "TestConfigurationSheetExistsInExistingWorkbook": TestConfigurationSheetExistsInExistingWorkbook
+        Case "TestReferenceSheetCreationForNewProject": TestReferenceSheetCreationForNewProject
         Case Else: mAssert.Should False, "Invalid test name: " & mManager.methodName
     End Select
 End Sub

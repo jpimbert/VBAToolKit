@@ -392,6 +392,12 @@
         <name>vtkReferenceManagerTester</name>
         <modulePath confId="c2">Source\ConfTest\vtkReferenceManagerTester.cls</modulePath>
     </module>
+    <module mID="m67">
+        <name>vtkTypes</name>
+        <modulePath confId="c1">Source\ConfProd\vtkTypes.bas</modulePath>
+        <modulePath confId="c2">Source\ConfProd\vtkTypes.bas</modulePath>
+        <modulePath confId="c3">Source\ConfProd\vtkTypes.bas</modulePath>
+    </module>
     <reference confIDs="c1 c2 c3">
         <name>VBA</name>
         <guid>{000204EF-0000-0000-C000-000000000046}</guid>
