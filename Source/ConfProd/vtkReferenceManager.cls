@@ -41,6 +41,9 @@ Option Explicit
 '   - references(confNumber) gives the collection of references attached to the configuration
 '       - A reference is communicated with the vtkReference type
 '
+' Note:
+'   - References path are absolute or relative to the App Data user's folder (Environ("AppData"))
+'
 ' To implement later
 '   - automatic recognition of the references sheet version, and proposal to the user to convert to the last version
 '       cell $A$1 contains the version identification of the sheet version like "vtkReferences v1.0"
@@ -94,7 +97,7 @@ End Sub
 '---------------------------------------------------------------------------------------
 '
 Public Property Get referenceSheet() As Worksheet
-    referenceSheet = m_referenceSheet
+    Set referenceSheet = m_referenceSheet
 End Property
 
 '---------------------------------------------------------------------------------------
@@ -119,8 +122,8 @@ Private Sub setReferenceSheet(confCount As Integer)
     If ws Is Nothing Then        ' If the Configuration doesn't exist, create one
         Set ws = m_workbook.Worksheets.Add(Type:=xlWorksheet)
         ws.name = sheetName
-        '   Initialize the configuration sheet
-'        initializeReferenceSheet ws
+        '   Initialize the reference sheet
+        initializeReferenceSheet ws, confCount
         End If
     ' Verify that the configuration sheet is in last known version
     If ws.Range("A1") <> currentVersion Then
@@ -128,6 +131,30 @@ Private Sub setReferenceSheet(confCount As Integer)
         End If
     '   Set the initialized worksheet property
     Set m_referenceSheet = ws
+    '   Update the configurations in the reference sheet
+    '   Update the references list in the reference sheet
+End Sub
+
+'---------------------------------------------------------------------------------------
+' Procedure : initializeReferenceSheet
+' Author    : Jean-Pierre Imbert
+' Date      : 11/06/2014
+' Purpose   : Initialize a new reference sheet
+'---------------------------------------------------------------------------------------
+'
+Private Sub initializeReferenceSheet(ws As Worksheet, confCount As Integer)
+    ws.Range("A1") = currentVersion
+    ws.Range("A1").Font.Size = 8
+    ws.Range("B1") = ""
+    ws.Range("C1") = ""
+    ws.Columns("A:C").ColumnWidth = 22
+    Dim i As Integer
+    For i = 1 To confCount
+        ws.Columns(nbTitleColumns + i).ColumnWidth = 22
+        ws.Columns(nbTitleColumns + i).HorizontalAlignment = xlCenter
+        ws.Cells(1, nbTitleColumns + i).FormulaLocal = "=INDIRECT(ADRESSE(1;" & i + 1 & ";4;1;""vtkConfigurations""))"
+        ws.Cells(1, nbTitleColumns + i).Font.Bold = True
+    Next i
 End Sub
 
 '---------------------------------------------------------------------------------------

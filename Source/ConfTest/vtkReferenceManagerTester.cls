@@ -87,12 +87,13 @@ End Sub
 Private Sub ITestCase_TearDown()
     vtkCloseAndKillWorkbook Wb:=newWorkBook     ' close the new Excel project
     vtkCloseAndKillWorkbook Wb:=existingWorkbook ' close the existing Excel project
-    Set newRefManager = Nothing             ' reset all reference managers
+    vtkResetConfigurationManagers             ' reset all configuration managers
+    Set newRefManager = Nothing
     Set existingRefManager = Nothing
 End Sub
 
 Public Sub TestReferenceSheetCreationForNewProject()
-'       Verify that a Configuration Sheet is created in a new project
+'       Verify that a Reference Sheet is created in a new project
     Dim ws As Worksheet
     On Error Resume Next
     Set ws = newWorkBook.Sheets("vtkReferences")
@@ -102,7 +103,7 @@ Public Sub TestReferenceSheetCreationForNewProject()
 End Sub
 
 Public Sub TestReferenceSheetRetrievalInExistingProject()
-'       Verify that a Configuration Sheet is created in a new project
+'       Verify that the Reference Sheet of existing project is retrieved
     Dim ws As Worksheet
     On Error Resume Next
     Set ws = existingWorkbook.Sheets("vtkReferences")
@@ -111,14 +112,42 @@ Public Sub TestReferenceSheetRetrievalInExistingProject()
     On Error GoTo 0
 End Sub
 
+Public Sub TestReferenceSheetFormatForNewProjet()
+'       Verify the newly created Reference sheet format of a new project
+    Dim ws As Worksheet
+    Set ws = newRefManager.referenceSheet
+    mAssert.Equals ws.Range("A1"), "vtkReferences v1.0", "Expected identification of the reference sheet"
+    mAssert.Equals ws.Range("B1"), "", "Expected Title for GUID column"
+    mAssert.Equals ws.Range("C1"), "", "Expected Title for FullPath column"
+    mAssert.Equals ws.Range("D1"), newWorkBook.VBProject.name, "Expected Title for main project column"
+    mAssert.Equals ws.Range("E1"), newWorkBook.VBProject.name & "_DEV", "Expected Title for DEV project column"
+End Sub
+
+Public Sub TestReferenceSheetFormatForExistingProjet()
+'       Verify the retrieved Reference sheet format of an existing project
+    Dim ws As Worksheet
+    Set ws = existingRefManager.referenceSheet
+    mAssert.Equals ws.Range("A1"), "vtkReferences v1.0", "Expected identification of the reference sheet"
+    mAssert.Equals ws.Range("B1"), "", "Expected Title for GUID column"
+    mAssert.Equals ws.Range("C1"), "", "Expected Title for FullPath column"
+    mAssert.Equals ws.Range("D1"), existingWorkbook.VBProject.name, "Expected Title for main project column"
+    mAssert.Equals ws.Range("E1"), existingWorkbook.VBProject.name & "_DEV", "Expected Title for DEV project column"
+End Sub
+
 Private Function ITest_Suite() As TestSuite
     Set ITest_Suite = New TestSuite
     ITest_Suite.AddTest ITest_Manager.ClassName, "TestReferenceSheetCreationForNewProject"
+    ITest_Suite.AddTest ITest_Manager.ClassName, "TestReferenceSheetRetrievalInExistingProject"
+    ITest_Suite.AddTest ITest_Manager.ClassName, "TestReferenceSheetFormatForNewProjet"
+    ITest_Suite.AddTest ITest_Manager.ClassName, "TestReferenceSheetFormatForExistingProjet"
 End Function
 
 Private Sub ITestCase_RunTest()
     Select Case mManager.methodName
         Case "TestReferenceSheetCreationForNewProject": TestReferenceSheetCreationForNewProject
+        Case "TestReferenceSheetRetrievalInExistingProject": TestReferenceSheetRetrievalInExistingProject
+        Case "TestReferenceSheetFormatForNewProjet": TestReferenceSheetFormatForNewProjet
+        Case "TestReferenceSheetFormatForExistingProjet": TestReferenceSheetFormatForExistingProjet
         Case Else: mAssert.Should False, "Invalid test name: " & mManager.methodName
     End Select
 End Sub
