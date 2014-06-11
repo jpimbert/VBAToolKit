@@ -91,7 +91,11 @@ Public Sub init(Wb As Workbook, confCount As Integer, nbTitleColumnsInConfSheet 
     If Not m_workbook Is Wb Then
         Set m_workbook = Wb
         m_nbTitleColumnsInConfSheet = nbTitleColumnsInConfSheet
-        If Not m_workbook Is Nothing Then setReferenceSheet (confCount)     ' Reset the reference sheet when the attached workbook is changed
+        If Not m_workbook Is Nothing Then
+            setReferenceSheet (confCount)     ' Reset the reference sheet when the attached workbook is changed
+           Else
+            Set m_referenceSheet = Nothing
+        End If
     End If
 End Sub
 
@@ -199,11 +203,13 @@ End Function
 Public Sub addConfiguration()
     Dim newColumn As Integer
     If Not m_referenceSheet Is Nothing Then
-    newColumn = m_referenceSheet.UsedRange.Columns.Count + 1
+        newColumn = m_referenceSheet.UsedRange.Columns.Count + 1
         m_referenceSheet.Columns(newColumn).ColumnWidth = 22
         m_referenceSheet.Columns(newColumn).HorizontalAlignment = xlCenter
         m_referenceSheet.Cells(1, newColumn).FormulaLocal = "=INDIRECT(ADRESSE(1;" & newColumn - nbTitleColumns + m_nbTitleColumnsInConfSheet & ";4;1;""vtkConfigurations""))"
         m_referenceSheet.Cells(1, newColumn).Font.Bold = True
+       Else
+        Err.Raise Number:=VTK_NOTINITIALIZED, Source:="vtkReferenceManager:addConfiguration", Description:="Impossible to add a configuration to the reference sheet of a null workbook."
     End If
 End Sub
 
@@ -217,5 +223,9 @@ End Sub
 '---------------------------------------------------------------------------------------
 '
 Public Function references(confNumber As Integer) As Collection
-
+    If Not m_referenceSheet Is Nothing Then
+        ' The code to set the reference collection will be placed here
+       Else
+        Err.Raise Number:=VTK_NOTINITIALIZED, Source:="vtkReferenceManager:addConfiguration", Description:="Impossible to add a configuration to the reference sheet of a null workbook."
+    End If
 End Function

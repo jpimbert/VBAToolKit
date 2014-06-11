@@ -82,6 +82,7 @@ Private Sub ITestCase_SetUp(Assert As IAssert)
     Set existingWorkbook = getTestFileFromTemplate(fileName:=existingWorkbookNameForTest, destinationName:="ExistingProject_DEV.xlsm", openExcel:=True)
     Set existingRefManager = New vtkReferenceManager
     existingRefManager.init Wb:=existingWorkbook, confCount:=2, nbTitleColumnsInConfSheet:=1
+
 End Sub
 
 Private Sub ITestCase_TearDown()
@@ -115,23 +116,39 @@ End Sub
 Public Sub TestReferenceSheetFormatForNewProjet()
 '       Verify the newly created Reference sheet format of a new project
     Dim ws As Worksheet
+   On Error GoTo TestReferenceSheetFormatForNewProjet_Error
+
     Set ws = newRefManager.referenceSheet
     mAssert.Equals ws.Range("A1"), "vtkReferences v1.0", "Expected identification of the reference sheet"
     mAssert.Equals ws.Range("B1"), "", "Expected Title for GUID column"
     mAssert.Equals ws.Range("C1"), "-", "Expected Title for FullPath column"
     mAssert.Equals ws.Range("D1"), newWorkBook.VBProject.name, "Expected Title for main project column"
     mAssert.Equals ws.Range("E1"), newWorkBook.VBProject.name & "_DEV", "Expected Title for DEV project column"
+
+   On Error GoTo 0
+   Exit Sub
+
+TestReferenceSheetFormatForNewProjet_Error:
+    mAssert.Should False, "Unexpected error (" & Err.Number & ") : " & Err.Description & "."
 End Sub
 
 Public Sub TestReferenceSheetFormatForExistingProjet()
 '       Verify the retrieved Reference sheet format of an existing project
     Dim ws As Worksheet
+   On Error GoTo TestReferenceSheetFormatForExistingProjet_Error
+
     Set ws = existingRefManager.referenceSheet
     mAssert.Equals ws.Range("A1"), "vtkReferences v1.0", "Expected identification of the reference sheet"
     mAssert.Equals ws.Range("B1"), "", "Expected Title for GUID column"
     mAssert.Equals ws.Range("C1"), "-", "Expected Title for FullPath column"
     mAssert.Equals ws.Range("D1"), existingWorkbook.VBProject.name, "Expected Title for main project column"
     mAssert.Equals ws.Range("E1"), existingWorkbook.VBProject.name & "_DEV", "Expected Title for DEV project column"
+
+   On Error GoTo 0
+   Exit Sub
+
+TestReferenceSheetFormatForExistingProjet_Error:
+    mAssert.Should False, "Unexpected error (" & Err.Number & ") : " & Err.Description & "."
 End Sub
 
 Public Sub TestAlignColumnCount()
@@ -139,6 +156,8 @@ Public Sub TestAlignColumnCount()
     Dim ws As Worksheet, confManager As vtkConfigurationManager
     
     ' Add a new configuration in the existing project
+   On Error GoTo TestAlignColumnCount_Error
+
     Set confManager = vtkConfigurationManagerForProject("ExistingProject")
     confManager.addConfiguration "NewConfiguration"
     
@@ -155,10 +174,74 @@ Public Sub TestAlignColumnCount()
     mAssert.Equals ws.Range("F1"), "NewConfiguration", "Expected Title for the new configuration column"
     
     Set confManager = Nothing
+
+   On Error GoTo 0
+   Exit Sub
+
+TestAlignColumnCount_Error:
+    mAssert.Should False, "Unexpected error (" & Err.Number & ") : " & Err.Description & "."
+End Sub
+
+Public Sub TestAddConfigurationNotInitialized()
+'       Verify that addConfiguration method send an error when called while the instance is not initialized
+    
+    ' Reinit the reference manager
+    existingRefManager.init Nothing, 0, nbTitleColumnsInConfSheet:=1
+    
+   On Error Resume Next
+    existingRefManager.addConfiguration
+    mAssert.Equals Err.Number, VTK_NOTINITIALIZED, "Error sent by addConfiguration"
+   On Error GoTo 0
+   
+End Sub
+
+Public Sub TestAddConfiguration()
+'       Verify the addConfiguration method in nominal case
+    Dim ws As Worksheet, confManager As vtkConfigurationManager
+    
+    ' Add a new configuration in the existing project
+   On Error GoTo TestAddConfiguration_Error
+
+    Set confManager = vtkConfigurationManagerForProject("ExistingProject")
+    confManager.addConfiguration "NewConfiguration"
+    
+    ' add the configuration to the reference sheet (this call will be implied in a future release of cofManager
+    existingRefManager.addConfiguration
+    
+    Set ws = existingRefManager.referenceSheet
+    mAssert.Equals ws.Range("A1"), "vtkReferences v1.0", "Expected identification of the reference sheet"
+    mAssert.Equals ws.Range("B1"), "", "Expected Title for GUID column"
+    mAssert.Equals ws.Range("C1"), "-", "Expected Title for FullPath column"
+    mAssert.Equals ws.Range("D1"), existingWorkbook.VBProject.name, "Expected Title for main project column"
+    mAssert.Equals ws.Range("E1"), existingWorkbook.VBProject.name & "_DEV", "Expected Title for DEV project column"
+    mAssert.Equals ws.Range("F1"), "NewConfiguration", "Expected Title for the new configuration column"
+    
+    Set confManager = Nothing
+
+   On Error GoTo 0
+   Exit Sub
+
+TestAddConfiguration_Error:
+    mAssert.Should False, "Unexpected error (" & Err.Number & ") : " & Err.Description & "."
+End Sub
+
+Public Sub TestReferencesNotInitialized()
+'       Verify that references method send an error when called while the instance is not initialized
+    Dim c As Collection
+    
+    ' Reinit the reference manager
+    existingRefManager.init Nothing, 0, nbTitleColumnsInConfSheet:=1
+    
+   On Error Resume Next
+    Set c = existingRefManager.references(1)
+    mAssert.Equals Err.Number, VTK_NOTINITIALIZED, "Error sent by addConfiguration"
+   On Error GoTo 0
+   
 End Sub
 
 ' a tester AddConfiguration sur un refManager non initialisé (doit remonter une erreur ??)
-' idem sur references
+
+' tester l'appel à references alors que l'instance n'est pas initialisée (VTK_NOTINITIALIZED)
 
 Private Function ITest_Suite() As TestSuite
     Set ITest_Suite = New TestSuite
@@ -167,6 +250,9 @@ Private Function ITest_Suite() As TestSuite
     ITest_Suite.AddTest ITest_Manager.ClassName, "TestReferenceSheetFormatForNewProjet"
     ITest_Suite.AddTest ITest_Manager.ClassName, "TestReferenceSheetFormatForExistingProjet"
     ITest_Suite.AddTest ITest_Manager.ClassName, "TestAlignColumnCount"
+    ITest_Suite.AddTest ITest_Manager.ClassName, "TestAddConfigurationNotInitialized"
+    ITest_Suite.AddTest ITest_Manager.ClassName, "TestAddConfiguration"
+    ITest_Suite.AddTest ITest_Manager.ClassName, "TestReferencesNotInitialized"
 End Function
 
 Private Sub ITestCase_RunTest()
@@ -176,6 +262,9 @@ Private Sub ITestCase_RunTest()
         Case "TestReferenceSheetFormatForNewProjet": TestReferenceSheetFormatForNewProjet
         Case "TestReferenceSheetFormatForExistingProjet": TestReferenceSheetFormatForExistingProjet
         Case "TestAlignColumnCount": TestAlignColumnCount
+        Case "TestAddConfigurationNotInitialized": TestAddConfigurationNotInitialized
+        Case "TestAddConfiguration": TestAddConfiguration
+        Case "TestReferencesNotInitialized": TestReferencesNotInitialized
         Case Else: mAssert.Should False, "Invalid test name: " & mManager.methodName
     End Select
 End Sub
