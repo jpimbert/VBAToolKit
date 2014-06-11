@@ -97,7 +97,17 @@ Public Sub TestReferenceSheetCreationForNewProject()
     On Error Resume Next
     Set ws = newWorkBook.Sheets("vtkReferences")
     mAssert.Equals Err, 0, "Error number : A reference manager must create a Reference sheet"
-    mAssert.Should newWorkBook.Sheets("vtkReferences") Is newRefManager.referenceSheet, "The referenceSheet property of the ref manager must be equal to the reference sheet of the workbook"
+    mAssert.Should ws Is newRefManager.referenceSheet, "The referenceSheet property of the ref manager must be equal to the reference sheet of the workbook"
+    On Error GoTo 0
+End Sub
+
+Public Sub TestReferenceSheetRetrievalInExistingProject()
+'       Verify that a Configuration Sheet is created in a new project
+    Dim ws As Worksheet
+    On Error Resume Next
+    Set ws = existingWorkbook.Sheets("vtkReferences")
+    mAssert.Equals Err, 0, "Error number : A reference sheet must exist in the existing workbook"
+    mAssert.Should ws Is existingRefManager.referenceSheet, "The referenceSheet property of the ref manager must be equal to the reference sheet of the workbook"
     On Error GoTo 0
 End Sub
 
