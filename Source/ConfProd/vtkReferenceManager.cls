@@ -65,6 +65,8 @@ Option Explicit
 
 Private m_workbook As Workbook
 Private m_referenceSheet As Worksheet
+Private m_nbTitleColumnsInConfSheet As Integer
+
 Private Const sheetName As String = "vtkReferences"
 Private Const currentVersion As String = "vtkReferences v1.0"
 Private Const nbTitleColumns As Integer = 3
@@ -79,12 +81,16 @@ End Sub
 ' Subroutine  : init
 ' Author      : Jean-Pierre Imbert
 ' Date        : 10/06/2014
-' Purpose     : Set the workbook
+' Purpose     : Initialize the reference manager. called by the configuration manager
+' Parameters  : - Workbook of the DEV configuration for the project, will contain the reference sheet
+'               - Configuration count in the configuration sheet
+'               - Title columns count in the configuration sheet
 '---------------------------------------------------------------------------------------
 '
-Public Sub init(Wb As Workbook, confCount As Integer)
+Public Sub init(Wb As Workbook, confCount As Integer, nbTitleColumnsInConfSheet As Integer)
     If Not m_workbook Is Wb Then
         Set m_workbook = Wb
+        m_nbTitleColumnsInConfSheet = nbTitleColumnsInConfSheet
         If Not m_workbook Is Nothing Then setReferenceSheet (confCount)     ' Reset the reference sheet when the attached workbook is changed
     End If
 End Sub
@@ -115,23 +121,22 @@ End Property
 '---------------------------------------------------------------------------------------
 '
 Private Sub setReferenceSheet(confCount As Integer)
-    Dim ws As Worksheet
     On Error Resume Next
-    Set ws = m_workbook.Worksheets(sheetName)
+    Set m_referenceSheet = m_workbook.Worksheets(sheetName)
     On Error GoTo 0
-    If ws Is Nothing Then        ' If the Configuration doesn't exist, create one
-        Set ws = m_workbook.Worksheets.Add(Type:=xlWorksheet)
-        ws.name = sheetName
+    If m_referenceSheet Is Nothing Then        ' If the Configuration doesn't exist, create one
+        '   Set the initialized worksheet property
+        Set m_referenceSheet = m_workbook.Worksheets.Add(Type:=xlWorksheet)
+        m_referenceSheet.name = sheetName
         '   Initialize the reference sheet
-        initializeReferenceSheet ws, confCount
+        initializeReferenceSheet confCount
         End If
     ' Verify that the configuration sheet is in last known version
-    If ws.Range("A1") <> currentVersion Then
+    If m_referenceSheet.Range("A1") <> currentVersion Then
         ' Code to convert from previous version will be implemented here or in a specific method
         End If
-    '   Set the initialized worksheet property
-    Set m_referenceSheet = ws
     '   Update the configurations in the reference sheet
+    alignConfigurationCount confCount
     '   Update the references list in the reference sheet
 End Sub
 
@@ -142,30 +147,64 @@ End Sub
 ' Purpose   : Initialize a new reference sheet
 '---------------------------------------------------------------------------------------
 '
-Private Sub initializeReferenceSheet(ws As Worksheet, confCount As Integer)
-    ws.Range("A1") = currentVersion
-    ws.Range("A1").Font.Size = 8
-    ws.Range("B1") = ""
-    ws.Range("C1") = ""
-    ws.Columns("A:C").ColumnWidth = 22
+Private Sub initializeReferenceSheet(confCount As Integer)
+    m_referenceSheet.Range("A1") = currentVersion
+    m_referenceSheet.Range("A1").Font.Size = 8
+    m_referenceSheet.Range("B1") = ""
+    m_referenceSheet.Range("C1") = "-"      ' addConfiguration works with the usedRange property
+    m_referenceSheet.Columns("A:C").ColumnWidth = 22
     Dim i As Integer
     For i = 1 To confCount
-        ws.Columns(nbTitleColumns + i).ColumnWidth = 22
-        ws.Columns(nbTitleColumns + i).HorizontalAlignment = xlCenter
-        ws.Cells(1, nbTitleColumns + i).FormulaLocal = "=INDIRECT(ADRESSE(1;" & i + 1 & ";4;1;""vtkConfigurations""))"
-        ws.Cells(1, nbTitleColumns + i).Font.Bold = True
+        addConfiguration
     Next i
 End Sub
+
+'---------------------------------------------------------------------------------------
+' Procedure : alignConfigurationCount
+' Author    : Jean-Pierre Imbert
+' Date      : 11/06/2014
+' Purpose   : align the reference sheet with the configuration Count
+'             - add Columns if necesary
+'---------------------------------------------------------------------------------------
+'
+Private Sub alignConfigurationCount(confCount As Integer)
+    If confCount > configurationCount Then  ' we have to add columns
+        Dim i As Integer
+        For i = configurationCount + 1 To confCount
+            addConfiguration
+        Next i
+    End If
+End Sub
+
+'---------------------------------------------------------------------------------------
+' Function  : configurationCount
+' Author    : Jean-Pierre Imbert
+' Date      : 11/06/2014
+' Purpose   : Configuration count of the references sheet
+'---------------------------------------------------------------------------------------
+'
+Private Function configurationCount() As Integer
+    configurationCount = m_referenceSheet.UsedRange.Columns.Count - nbTitleColumns
+End Function
 
 '---------------------------------------------------------------------------------------
 ' Subroutine  : addConfiguration
 ' Author      : Jean-Pierre Imbert
 ' Date        : 10/06/2014
 ' Purpose     : Add a Configuration
+'               - doesn't add references to the new configuration
+'               - exit silently if called with a refManager not initialized
 '---------------------------------------------------------------------------------------
 '
 Public Sub addConfiguration()
-
+    Dim newColumn As Integer
+    If Not m_referenceSheet Is Nothing Then
+    newColumn = m_referenceSheet.UsedRange.Columns.Count + 1
+        m_referenceSheet.Columns(newColumn).ColumnWidth = 22
+        m_referenceSheet.Columns(newColumn).HorizontalAlignment = xlCenter
+        m_referenceSheet.Cells(1, newColumn).FormulaLocal = "=INDIRECT(ADRESSE(1;" & newColumn - nbTitleColumns + m_nbTitleColumnsInConfSheet & ";4;1;""vtkConfigurations""))"
+        m_referenceSheet.Cells(1, newColumn).Font.Bold = True
+    End If
 End Sub
 
 '---------------------------------------------------------------------------------------

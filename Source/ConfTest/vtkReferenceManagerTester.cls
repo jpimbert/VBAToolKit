@@ -77,11 +77,11 @@ Private Sub ITestCase_SetUp(Assert As IAssert)
     Set newWorkBook = vtkCreateExcelWorkbookForTestWithProjectName("NewProject")    ' create an Excel project for tests
     Set newConfManager = vtkConfigurationManagerForProject(newWorkBook.VBProject.name) ' For vtkConfigurations sheet initialization
     Set newRefManager = New vtkReferenceManager
-    newRefManager.init Wb:=newWorkBook, confCount:=2
+    newRefManager.init Wb:=newWorkBook, confCount:=2, nbTitleColumnsInConfSheet:=1
     
     Set existingWorkbook = getTestFileFromTemplate(fileName:=existingWorkbookNameForTest, destinationName:="ExistingProject_DEV.xlsm", openExcel:=True)
     Set existingRefManager = New vtkReferenceManager
-    existingRefManager.init Wb:=existingWorkbook, confCount:=2
+    existingRefManager.init Wb:=existingWorkbook, confCount:=2, nbTitleColumnsInConfSheet:=1
 End Sub
 
 Private Sub ITestCase_TearDown()
@@ -118,7 +118,7 @@ Public Sub TestReferenceSheetFormatForNewProjet()
     Set ws = newRefManager.referenceSheet
     mAssert.Equals ws.Range("A1"), "vtkReferences v1.0", "Expected identification of the reference sheet"
     mAssert.Equals ws.Range("B1"), "", "Expected Title for GUID column"
-    mAssert.Equals ws.Range("C1"), "", "Expected Title for FullPath column"
+    mAssert.Equals ws.Range("C1"), "-", "Expected Title for FullPath column"
     mAssert.Equals ws.Range("D1"), newWorkBook.VBProject.name, "Expected Title for main project column"
     mAssert.Equals ws.Range("E1"), newWorkBook.VBProject.name & "_DEV", "Expected Title for DEV project column"
 End Sub
@@ -129,10 +129,36 @@ Public Sub TestReferenceSheetFormatForExistingProjet()
     Set ws = existingRefManager.referenceSheet
     mAssert.Equals ws.Range("A1"), "vtkReferences v1.0", "Expected identification of the reference sheet"
     mAssert.Equals ws.Range("B1"), "", "Expected Title for GUID column"
-    mAssert.Equals ws.Range("C1"), "", "Expected Title for FullPath column"
+    mAssert.Equals ws.Range("C1"), "-", "Expected Title for FullPath column"
     mAssert.Equals ws.Range("D1"), existingWorkbook.VBProject.name, "Expected Title for main project column"
     mAssert.Equals ws.Range("E1"), existingWorkbook.VBProject.name & "_DEV", "Expected Title for DEV project column"
 End Sub
+
+Public Sub TestAlignColumnCount()
+'       Verify that the retrieved Reference sheet is incremented with new configurations if necessary
+    Dim ws As Worksheet, confManager As vtkConfigurationManager
+    
+    ' Add a new configuration in the existing project
+    Set confManager = vtkConfigurationManagerForProject("ExistingProject")
+    confManager.addConfiguration "NewConfiguration"
+    
+    ' Reinitialize the referenceManager
+    existingRefManager.init Nothing, 0, nbTitleColumnsInConfSheet:=1
+    existingRefManager.init existingWorkbook, 3, nbTitleColumnsInConfSheet:=1
+    
+    Set ws = existingRefManager.referenceSheet
+    mAssert.Equals ws.Range("A1"), "vtkReferences v1.0", "Expected identification of the reference sheet"
+    mAssert.Equals ws.Range("B1"), "", "Expected Title for GUID column"
+    mAssert.Equals ws.Range("C1"), "-", "Expected Title for FullPath column"
+    mAssert.Equals ws.Range("D1"), existingWorkbook.VBProject.name, "Expected Title for main project column"
+    mAssert.Equals ws.Range("E1"), existingWorkbook.VBProject.name & "_DEV", "Expected Title for DEV project column"
+    mAssert.Equals ws.Range("F1"), "NewConfiguration", "Expected Title for the new configuration column"
+    
+    Set confManager = Nothing
+End Sub
+
+' a tester AddConfiguration sur un refManager non initialisé (doit remonter une erreur ??)
+' idem sur references
 
 Private Function ITest_Suite() As TestSuite
     Set ITest_Suite = New TestSuite
@@ -140,6 +166,7 @@ Private Function ITest_Suite() As TestSuite
     ITest_Suite.AddTest ITest_Manager.ClassName, "TestReferenceSheetRetrievalInExistingProject"
     ITest_Suite.AddTest ITest_Manager.ClassName, "TestReferenceSheetFormatForNewProjet"
     ITest_Suite.AddTest ITest_Manager.ClassName, "TestReferenceSheetFormatForExistingProjet"
+    ITest_Suite.AddTest ITest_Manager.ClassName, "TestAlignColumnCount"
 End Function
 
 Private Sub ITestCase_RunTest()
@@ -148,6 +175,7 @@ Private Sub ITestCase_RunTest()
         Case "TestReferenceSheetRetrievalInExistingProject": TestReferenceSheetRetrievalInExistingProject
         Case "TestReferenceSheetFormatForNewProjet": TestReferenceSheetFormatForNewProjet
         Case "TestReferenceSheetFormatForExistingProjet": TestReferenceSheetFormatForExistingProjet
+        Case "TestAlignColumnCount": TestAlignColumnCount
         Case Else: mAssert.Should False, "Invalid test name: " & mManager.methodName
     End Select
 End Sub
