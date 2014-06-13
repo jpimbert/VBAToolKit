@@ -239,9 +239,29 @@ Public Sub TestReferencesNotInitialized()
    
 End Sub
 
-' a tester AddConfiguration sur un refManager non initialisé (doit remonter une erreur ??)
+Public Sub TestInitializeStandardRefs()
+'       Verify that standard references are added to the reference sheet at initialization
+    Dim ws As Worksheet, r As Range
+    Dim refNames(), i As Integer
+    refNames = Array("Scripting", "VBIDE", "Shell32", "MSXML2", "ADODB", "VBAToolKit")
+        
+   On Error GoTo M_Error
+    Set ws = newWorkBook.Sheets("vtkReferences")
+    For i = LBound(refNames) To UBound(refNames)
+        Set r = ws.Columns("A:A").Find(refNames(i), , xlValues, xlWhole)
+        mAssert.Should Not r Is Nothing, "The reference named " & refNames(i) & " is not included in the reference sheet"
+    Next i
+   On Error GoTo 0
+    Exit Sub
+    
+M_Error:
+    mAssert.Should False, "Unexpected error (" & Err.Number & ") : " & Err.Description & "."
+End Sub
 
-' tester l'appel à references alors que l'instance n'est pas initialisée (VTK_NOTINITIALIZED)
+' Reste à tester :
+'   grille d'affectation à l'initialisation
+'   ajout de référence dans existant
+'   récup des références (tester GUID et constitution du path absou/relatif
 
 Private Function ITest_Suite() As TestSuite
     Set ITest_Suite = New TestSuite
@@ -253,6 +273,7 @@ Private Function ITest_Suite() As TestSuite
     ITest_Suite.AddTest ITest_Manager.ClassName, "TestAddConfigurationNotInitialized"
     ITest_Suite.AddTest ITest_Manager.ClassName, "TestAddConfiguration"
     ITest_Suite.AddTest ITest_Manager.ClassName, "TestReferencesNotInitialized"
+    ITest_Suite.AddTest ITest_Manager.ClassName, "TestInitializeStandardRefs"
 End Function
 
 Private Sub ITestCase_RunTest()
@@ -265,6 +286,7 @@ Private Sub ITestCase_RunTest()
         Case "TestAddConfigurationNotInitialized": TestAddConfigurationNotInitialized
         Case "TestAddConfiguration": TestAddConfiguration
         Case "TestReferencesNotInitialized": TestReferencesNotInitialized
+        Case "TestInitializeStandardRefs": TestInitializeStandardRefs
         Case Else: mAssert.Should False, "Invalid test name: " & mManager.methodName
     End Select
 End Sub

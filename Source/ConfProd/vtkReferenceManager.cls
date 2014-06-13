@@ -161,6 +161,28 @@ Private Sub initializeReferenceSheet(confCount As Integer)
     For i = 1 To confCount
         addConfiguration
     Next i
+    m_referenceSheet.Range("A2") = "VBA"
+    m_referenceSheet.Range("B2") = "{000204EF-0000-0000-C000-000000000046}"
+    m_referenceSheet.Range("A3") = "Excel"
+    m_referenceSheet.Range("B3") = "{00020813-0000-0000-C000-000000000046}"
+    m_referenceSheet.Range("A4") = "stdole"
+    m_referenceSheet.Range("B4") = "{00020430-0000-0000-C000-000000000046}"
+    m_referenceSheet.Range("A5") = "Office"
+    m_referenceSheet.Range("B5") = "{2DF8D04C-5BFA-101B-BDE5-00AA0044DE52}"
+    m_referenceSheet.Range("A6") = "MSForms"
+    m_referenceSheet.Range("B6") = "{0D452EE1-E08F-101A-852E-02608C4D0BB4}"
+    m_referenceSheet.Range("A7") = "Scripting"
+    m_referenceSheet.Range("B7") = "{420B2830-E718-11CF-893D-00A0C9054228}"
+    m_referenceSheet.Range("A8") = "VBIDE"
+    m_referenceSheet.Range("B8") = "{0002E157-0000-0000-C000-000000000046}"
+    m_referenceSheet.Range("A9") = "Shell32"
+    m_referenceSheet.Range("B9") = "{50A7E9B0-70EF-11D1-B75A-00A0C90564FE}"
+    m_referenceSheet.Range("A10") = "MSXML2"
+    m_referenceSheet.Range("B10") = "{F5078F18-C551-11D3-89B9-0000F81FE221}"
+    m_referenceSheet.Range("A11") = "ADODB"
+    m_referenceSheet.Range("B11") = "{00000206-0000-0010-8000-00AA006D2EA4}"
+    m_referenceSheet.Range("A12") = "VBAToolKit"
+    m_referenceSheet.Range("C12") = "Microsoft\AddIns\VBAToolKit.xlam"
 End Sub
 
 '---------------------------------------------------------------------------------------
