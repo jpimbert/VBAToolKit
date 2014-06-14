@@ -393,10 +393,10 @@
         <modulePath confId="c2">Source\ConfTest\vtkReferenceManagerTester.cls</modulePath>
     </module>
     <module mID="m67">
-        <name>vtkTypes</name>
-        <modulePath confId="c1">Source\ConfProd\vtkTypes.bas</modulePath>
-        <modulePath confId="c2">Source\ConfProd\vtkTypes.bas</modulePath>
-        <modulePath confId="c3">Source\ConfProd\vtkTypes.bas</modulePath>
+        <name>vtkReference</name>
+        <modulePath confId="c1">Source\ConfProd\vtkReference.cls</modulePath>
+        <modulePath confId="c2">Source\ConfProd\vtkReference.cls</modulePath>
+        <modulePath confId="c3">Source\ConfProd\vtkReference.cls</modulePath>
     </module>
     <reference confIDs="c1 c2 c3">
         <name>VBA</name>

@@ -234,7 +234,9 @@ Public Sub TestReferencesNotInitialized()
     
    On Error Resume Next
     Set c = existingRefManager.references(1)
-    mAssert.Equals Err.Number, VTK_NOTINITIALIZED, "Error sent by addConfiguration"
+    mAssert.Equals Err.Number, VTK_NOTINITIALIZED, "Error sent by references"
+    Set c = existingRefManager.allReferences
+    mAssert.Equals Err.Number, VTK_NOTINITIALIZED, "Error sent by allReferences"
    On Error GoTo 0
    
 End Sub
@@ -292,8 +294,56 @@ M_Error:
     mAssert.Should False, "Unexpected error (" & Err.Number & ") : " & Err.Description & "."
 End Sub
 
+Public Sub TestGetAllReferencesFromNewWorkbook()
+'       Verify that all references are listed with good values
+    Dim ws As Worksheet, r As Range, c As Collection, ref As vtkReference, i As Integer
+        
+   On Error GoTo M_Error
+    Set ws = newWorkBook.Sheets("vtkReferences")
+    Set c = newRefManager.allReferences
+    For i = 1 To c.Count
+        Set ref = c(i)
+        mAssert.Equals ref.id, "r" & i, "ID of the reference number " & i
+        Set r = ws.Columns("A:A").Find(ref.name, , xlValues, xlWhole)
+        mAssert.Equals ws.Cells(r.Row, 1), ref.name, "name of the reference number " & i
+        mAssert.Equals ws.Cells(r.Row, 2), ref.GUID, "Guid of the reference number " & i
+        If ref.GUID Like "" Then
+            mAssert.Equals ws.Cells(r.Row, 3), ref.relPath, "Relative Path of the reference number " & i
+        End If
+    Next i
+   On Error GoTo 0
+    Exit Sub
+    
+M_Error:
+    mAssert.Should False, "Unexpected error (" & Err.Number & ") : " & Err.Description & "."
+End Sub
+
+Public Sub TestGetAllReferencesFromExistingWorkbook()
+'       Verify that all references are listed with good values
+    Dim ws As Worksheet, r As Range, c As Collection, ref As vtkReference, i As Integer
+        
+   On Error GoTo M_Error
+    Set ws = existingWorkbook.Sheets("vtkReferences")
+    Set c = existingRefManager.allReferences
+    For i = 1 To c.Count
+        Set ref = c(i)
+        mAssert.Equals ref.id, "r" & i, "ID of the reference number " & i
+        Set r = ws.Columns("A:A").Find(ref.name, , xlValues, xlWhole)
+        mAssert.Equals ws.Cells(r.Row, 1), ref.name, "name of the reference number " & i
+        mAssert.Equals ws.Cells(r.Row, 2), ref.GUID, "Guid of the reference number " & i
+        If ref.GUID Like "" Then
+            mAssert.Equals ws.Cells(r.Row, 3), ref.relPath, "Relative Path of the reference number " & i
+        End If
+    Next i
+   On Error GoTo 0
+    Exit Sub
+    
+M_Error:
+    mAssert.Should False, "Unexpected error (" & Err.Number & ") : " & Err.Description & "."
+End Sub
+
 ' Reste à tester :
-'   addition d'un chemin relatif (test sur VBAToolKit, à enlever du fichier de test donc)
+'   récup de toutes les références et de leur paramètre (new et existing)
 '   récup des références (tester GUID et constitution du path absolu/relatif, new workbook et existing workbook)
 
 Private Function ITest_Suite() As TestSuite
@@ -309,6 +359,8 @@ Private Function ITest_Suite() As TestSuite
     ITest_Suite.AddTest ITest_Manager.ClassName, "TestInitializeStandardRefs"
     ITest_Suite.AddTest ITest_Manager.ClassName, "TestAddNewRefs"
     ITest_Suite.AddTest ITest_Manager.ClassName, "TestAddNewRefWithRelativePath"
+    ITest_Suite.AddTest ITest_Manager.ClassName, "TestGetAllReferencesFromNewWorkbook"
+    ITest_Suite.AddTest ITest_Manager.ClassName, "TestGetAllReferencesFromExistingWorkbook"
 End Function
 
 Private Sub ITestCase_RunTest()
@@ -324,6 +376,8 @@ Private Sub ITestCase_RunTest()
         Case "TestInitializeStandardRefs": TestInitializeStandardRefs
         Case "TestAddNewRefs": TestAddNewRefs
         Case "TestAddNewRefWithRelativePath": TestAddNewRefWithRelativePath
+        Case "TestGetAllReferencesFromNewWorkbook": TestGetAllReferencesFromNewWorkbook
+        Case "TestGetAllReferencesFromExistingWorkbook": TestGetAllReferencesFromExistingWorkbook
         Case Else: mAssert.Should False, "Invalid test name: " & mManager.methodName
     End Select
 End Sub

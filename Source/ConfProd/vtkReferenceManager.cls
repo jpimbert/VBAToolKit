@@ -38,6 +38,8 @@ Option Explicit
 '   - init(Wb,confCount) initialize or re-initialize the refManager instance
 '   - referenceSheet, readonly property for test usage
 '   - addConfiguration add a column at the end of the sheet
+'   - allReferences() gives the collection of all references attached to a configuration or not
+'       - A reference is communicated with the vtkReference type
 '   - references(confNumber) gives the collection of references attached to the configuration
 '       - A reference is communicated with the vtkReference type
 '
@@ -258,20 +260,46 @@ End Sub
 '---------------------------------------------------------------------------------------
 '
 Private Sub addReferences()
-    Dim ref As Reference, ra As Range, newRow As Integer
+    Dim ref As Reference, ra As Range, newRow As Integer, vtkRef As New vtkReference
     For Each ref In m_workbook.VBProject.references
         Set ra = m_referenceSheet.Columns("A:A").Find(ref.name, , xlValues, xlWhole)
         If ra Is Nothing Then
+            vtkRef.initWithVBAReference ref
             newRow = m_referenceSheet.UsedRange.Rows.Count + 1
-            m_referenceSheet.Cells(newRow, 1) = ref.name
-            If ref.guid Like "" Then
-                m_referenceSheet.Cells(newRow, 3) = Replace(ref.fullPath, Environ("AppData") & "\", "")
+            m_referenceSheet.Cells(newRow, 1) = vtkRef.name
+            If ref.GUID Like "" Then
+                m_referenceSheet.Cells(newRow, 3) = vtkRef.relPath
                Else
-                m_referenceSheet.Cells(newRow, 2) = ref.guid
+                m_referenceSheet.Cells(newRow, 2) = vtkRef.GUID
             End If
         End If
     Next
 End Sub
+
+'---------------------------------------------------------------------------------------
+' Function  : allReferences as collection
+' Author    : Jean-Pierre Imbert
+' Date      : 14/06/2014
+' Purpose   : Get all the references attached to a configuration or not
+' Return    : a collection of vtkReference type
+'---------------------------------------------------------------------------------------
+'
+Public Function allReferences() As Collection
+    If Not m_referenceSheet Is Nothing Then
+        Dim c As New Collection, i As Integer, r As vtkReference
+        For i = 1 To referenceCount
+            Set r = New vtkReference
+            r.id = "r" & i
+            r.name = m_referenceSheet.Cells(nbTitleRows + i, 1)
+            r.GUID = m_referenceSheet.Cells(nbTitleRows + i, 2)
+            r.relPath = m_referenceSheet.Cells(nbTitleRows + i, 3)
+            c.Add Item:=r, Key:=r.id
+        Next i
+        Set allReferences = c
+       Else
+        Err.Raise Number:=VTK_NOTINITIALIZED, Source:="vtkReferenceManager:allReferences", Description:="Impossible to get references from a sheet of a null workbook."
+    End If
+End Function
 
 '---------------------------------------------------------------------------------------
 ' Function  : references as collection
@@ -286,6 +314,6 @@ Public Function references(confNumber As Integer) As Collection
     If Not m_referenceSheet Is Nothing Then
         ' The code to set the reference collection will be placed here
        Else
-        Err.Raise Number:=VTK_NOTINITIALIZED, Source:="vtkReferenceManager:addConfiguration", Description:="Impossible to add a configuration to the reference sheet of a null workbook."
+        Err.Raise Number:=VTK_NOTINITIALIZED, Source:="vtkReferenceManager:references", Description:="Impossible to get references from a sheet of a null workbook."
     End If
 End Function
