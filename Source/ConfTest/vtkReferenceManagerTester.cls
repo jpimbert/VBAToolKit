@@ -258,10 +258,43 @@ M_Error:
     mAssert.Should False, "Unexpected error (" & Err.Number & ") : " & Err.Description & "."
 End Sub
 
+Public Sub TestAddNewRefs()
+'       Verify that new references are added to the reference sheet at initialization
+    Dim ws As Worksheet, r As Range
+    Dim refNames(), i As Integer
+    refNames = Array("Scripting", "VBIDE", "Shell32", "MSXML2", "VBAToolKit", "EventSystemLib")
+        
+   On Error GoTo M_Error
+    Set ws = existingWorkbook.Sheets("vtkReferences")
+    For i = LBound(refNames) To UBound(refNames)
+        Set r = ws.Columns("A:A").Find(refNames(i), , xlValues, xlWhole)
+        mAssert.Should Not r Is Nothing, "The reference named " & refNames(i) & " is not included in the reference sheet"
+    Next i
+   On Error GoTo 0
+    Exit Sub
+    
+M_Error:
+    mAssert.Should False, "Unexpected error (" & Err.Number & ") : " & Err.Description & "."
+End Sub
+
+Public Sub TestAddNewRefWithRelativePath()
+'       Verify that new references are added to the reference sheet at initialization
+    Dim ws As Worksheet, r As Range
+        
+   On Error GoTo M_Error
+    Set ws = existingWorkbook.Sheets("vtkReferences")
+    Set r = ws.Columns("A:A").Find("VBAToolKit", , xlValues, xlWhole)
+    mAssert.Equals ws.Cells(r.Row, 3), "Microsoft\AddIns\VBAToolKit.xlam", "The reference named VBAToolKit must be included with relative path in the reference sheet"
+   On Error GoTo 0
+    Exit Sub
+    
+M_Error:
+    mAssert.Should False, "Unexpected error (" & Err.Number & ") : " & Err.Description & "."
+End Sub
+
 ' Reste à tester :
-'   grille d'affectation à l'initialisation
-'   ajout de référence dans existant
-'   récup des références (tester GUID et constitution du path absou/relatif
+'   addition d'un chemin relatif (test sur VBAToolKit, à enlever du fichier de test donc)
+'   récup des références (tester GUID et constitution du path absolu/relatif, new workbook et existing workbook)
 
 Private Function ITest_Suite() As TestSuite
     Set ITest_Suite = New TestSuite
@@ -274,6 +307,8 @@ Private Function ITest_Suite() As TestSuite
     ITest_Suite.AddTest ITest_Manager.ClassName, "TestAddConfiguration"
     ITest_Suite.AddTest ITest_Manager.ClassName, "TestReferencesNotInitialized"
     ITest_Suite.AddTest ITest_Manager.ClassName, "TestInitializeStandardRefs"
+    ITest_Suite.AddTest ITest_Manager.ClassName, "TestAddNewRefs"
+    ITest_Suite.AddTest ITest_Manager.ClassName, "TestAddNewRefWithRelativePath"
 End Function
 
 Private Sub ITestCase_RunTest()
@@ -287,6 +322,8 @@ Private Sub ITestCase_RunTest()
         Case "TestAddConfiguration": TestAddConfiguration
         Case "TestReferencesNotInitialized": TestReferencesNotInitialized
         Case "TestInitializeStandardRefs": TestInitializeStandardRefs
+        Case "TestAddNewRefs": TestAddNewRefs
+        Case "TestAddNewRefWithRelativePath": TestAddNewRefWithRelativePath
         Case Else: mAssert.Should False, "Invalid test name: " & mManager.methodName
     End Select
 End Sub

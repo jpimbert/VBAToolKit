@@ -142,6 +142,7 @@ Private Sub setReferenceSheet(confCount As Integer)
     '   Update the configurations in the reference sheet
     alignConfigurationCount confCount
     '   Update the references list in the reference sheet
+    addReferences
 End Sub
 
 '---------------------------------------------------------------------------------------
@@ -152,15 +153,18 @@ End Sub
 '---------------------------------------------------------------------------------------
 '
 Private Sub initializeReferenceSheet(confCount As Integer)
+    ' Init titles
     m_referenceSheet.Range("A1") = currentVersion
     m_referenceSheet.Range("A1").Font.Size = 8
     m_referenceSheet.Range("B1") = ""
     m_referenceSheet.Range("C1") = "-"      ' addConfiguration works with the usedRange property
     m_referenceSheet.Columns("A:C").ColumnWidth = 22
+    ' Init configuration titles
     Dim i As Integer
     For i = 1 To confCount
         addConfiguration
     Next i
+    ' Init standard references
     m_referenceSheet.Range("A2") = "VBA"
     m_referenceSheet.Range("B2") = "{000204EF-0000-0000-C000-000000000046}"
     m_referenceSheet.Range("A3") = "Excel"
@@ -214,6 +218,17 @@ Private Function configurationCount() As Integer
 End Function
 
 '---------------------------------------------------------------------------------------
+' Function  : referenceCount
+' Author    : Jean-Pierre Imbert
+' Date      : 14/06/2014
+' Purpose   : Reference count of the references sheet
+'---------------------------------------------------------------------------------------
+'
+Private Function referenceCount() As Integer
+    referenceCount = m_referenceSheet.UsedRange.Rows.Count - nbTitleRows
+End Function
+
+'---------------------------------------------------------------------------------------
 ' Subroutine  : addConfiguration
 ' Author      : Jean-Pierre Imbert
 ' Date        : 10/06/2014
@@ -233,6 +248,29 @@ Public Sub addConfiguration()
        Else
         Err.Raise Number:=VTK_NOTINITIALIZED, Source:="vtkReferenceManager:addConfiguration", Description:="Impossible to add a configuration to the reference sheet of a null workbook."
     End If
+End Sub
+
+'---------------------------------------------------------------------------------------
+' Subroutine  : addReferences
+' Author      : Jean-Pierre Imbert
+' Date        : 14/06/2014
+' Purpose     : Add references contained in the attached workbook to the reference sheet
+'---------------------------------------------------------------------------------------
+'
+Private Sub addReferences()
+    Dim ref As Reference, ra As Range, newRow As Integer
+    For Each ref In m_workbook.VBProject.references
+        Set ra = m_referenceSheet.Columns("A:A").Find(ref.name, , xlValues, xlWhole)
+        If ra Is Nothing Then
+            newRow = m_referenceSheet.UsedRange.Rows.Count + 1
+            m_referenceSheet.Cells(newRow, 1) = ref.name
+            If ref.guid Like "" Then
+                m_referenceSheet.Cells(newRow, 3) = Replace(ref.fullPath, Environ("AppData") & "\", "")
+               Else
+                m_referenceSheet.Cells(newRow, 2) = ref.guid
+            End If
+        End If
+    Next
 End Sub
 
 '---------------------------------------------------------------------------------------
