@@ -285,20 +285,7 @@ End Sub
 '---------------------------------------------------------------------------------------
 '
 Public Function allReferences() As Collection
-    If Not m_referenceSheet Is Nothing Then
-        Dim c As New Collection, i As Integer, r As vtkReference
-        For i = 1 To referenceCount
-            Set r = New vtkReference
-            r.id = "r" & i
-            r.name = m_referenceSheet.Cells(nbTitleRows + i, 1)
-            r.GUID = m_referenceSheet.Cells(nbTitleRows + i, 2)
-            r.relPath = m_referenceSheet.Cells(nbTitleRows + i, 3)
-            c.Add Item:=r, Key:=r.id
-        Next i
-        Set allReferences = c
-       Else
-        Err.Raise Number:=VTK_NOTINITIALIZED, Source:="vtkReferenceManager:allReferences", Description:="Impossible to get references from a sheet of a null workbook."
-    End If
+    Set allReferences = references(0)
 End Function
 
 '---------------------------------------------------------------------------------------
@@ -308,12 +295,44 @@ End Function
 ' Purpose   : Get the references attached to a configuration
 ' Return    : a collection of vtkReference type
 ' Parameter : - confNumber, the number of the configuration from which to get the references collection
+'               if confNumber = 0, allReferences are returned
+'               if confNumber > conf count, VTK_FORBIDDEN_PARAMETER Error is returned
 '---------------------------------------------------------------------------------------
 '
 Public Function references(confNumber As Integer) As Collection
     If Not m_referenceSheet Is Nothing Then
-        ' The code to set the reference collection will be placed here
+        If Not (confNumber < 0 Or confNumber > configurationCount) Then
+            Dim c As New Collection, i As Integer, r As vtkReference, s As String, b As Boolean
+            ' Loop for each reference
+            For i = 1 To referenceCount
+                ' Create a new vtkReference instance
+                Set r = New vtkReference
+                r.id = "r" & i
+                r.name = m_referenceSheet.Cells(nbTitleRows + i, 1)
+                r.GUID = m_referenceSheet.Cells(nbTitleRows + i, 2)
+                r.relPath = m_referenceSheet.Cells(nbTitleRows + i, 3)
+                ' Evaluate b as True if the erference must be added to the collection
+                If confNumber = 0 Then
+                    b = True
+                   Else
+                    s = m_referenceSheet.Cells(nbTitleRows + i, nbTitleColumns + confNumber)
+                    Select Case s
+                       Case "X"
+                        b = True
+                       Case ""
+                        b = False
+                       Case Else
+                        Err.Raise Number:=VTK_INVALID_FIELD, Source:="vtkReferenceManager:references", Description:="Field (" & s & ") must be blank or X in the reference sheet (ref=" & r.name & ", conf=" & m_referenceSheet.Cells(1, nbTitleColumns + confNumber) & ") for the workbook " & m_workbook.name
+                    End Select
+                End If
+                ' Add the reference to the collection
+                If b Then c.Add Item:=r, Key:=r.id
+            Next i
+            Set references = c
+           Else
+            Err.Raise Number:=VTK_FORBIDDEN_PARAMETER, Source:="vtkReferenceManager:references", Description:="confNumber (" & confNumber & ") is out of bound (0," & configurationCount & ") for the workbook " & m_workbook.name
+        End If
        Else
-        Err.Raise Number:=VTK_NOTINITIALIZED, Source:="vtkReferenceManager:references", Description:="Impossible to get references from a sheet of a null workbook."
+        Err.Raise Number:=VTK_NOTINITIALIZED, Source:="vtkReferenceManager:references", Description:="Impossible to get references from a sheet of a null workbook"
     End If
 End Function

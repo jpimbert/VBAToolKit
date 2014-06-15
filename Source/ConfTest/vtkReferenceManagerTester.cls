@@ -342,8 +342,50 @@ M_Error:
     mAssert.Should False, "Unexpected error (" & Err.Number & ") : " & Err.Description & "."
 End Sub
 
+Public Sub TestGetReferencesFromNewWorkbook()
+'       Verify that all references are listed with good values
+    Dim ws As Worksheet, r As Range, c As Collection, ref As vtkReference, i As Integer
+        
+   On Error GoTo M_Error
+    Set ws = newWorkBook.Sheets("vtkReferences")
+    
+    ' Test references for the main configuration (#1)
+    Set c = newRefManager.references(1)
+    mAssert.Equals c.count, 10, "Reference count for the main configuration"
+    mAssert.Equals c(1), "VBA", "Reference for the main configuration"
+    mAssert.Equals c(2), "Excel", "Reference for the main configuration"
+    mAssert.Equals c(3), "stdole", "Reference for the main configuration"
+    mAssert.Equals c(4), "Office", "Reference for the main configuration"
+    mAssert.Equals c(5), "MSForms", "Reference for the main configuration"
+    mAssert.Equals c(6), "Scripting", "Reference for the main configuration"
+    mAssert.Equals c(7), "VBIDE", "Reference for the main configuration"
+    mAssert.Equals c(8), "Shell32", "Reference for the main configuration"
+    mAssert.Equals c(9), "MSXML2", "Reference for the main configuration"
+    mAssert.Equals c(10), "ADODB", "Reference for the main configuration"
+    
+    ' Test references for the development configuration (#2)
+    Set c = newRefManager.references(2)
+    mAssert.Equals c.count, 11, "Reference count for the development configuration"
+    mAssert.Equals c(1), "VBA", "Reference for the development configuration"
+    mAssert.Equals c(2), "Excel", "Reference for the development configuration"
+    mAssert.Equals c(3), "stdole", "Reference for the development configuration"
+    mAssert.Equals c(4), "Office", "Reference for the development configuration"
+    mAssert.Equals c(5), "MSForms", "Reference for the development configuration"
+    mAssert.Equals c(6), "Scripting", "Reference for the development configuration"
+    mAssert.Equals c(7), "VBIDE", "Reference for the development configuration"
+    mAssert.Equals c(8), "Shell32", "Reference for the development configuration"
+    mAssert.Equals c(9), "MSXML2", "Reference for the development configuration"
+    mAssert.Equals c(10), "ADODB", "Reference for the development configuration"
+    mAssert.Equals c(11), "VBAToolKit", "Reference for the development configuration"
+    
+   On Error GoTo 0
+    Exit Sub
+   
+M_Error:
+    mAssert.Should False, "Unexpected error (" & Err.Number & ") : " & Err.Description & "."
+End Sub
+
 ' Reste à tester :
-'   récup de toutes les références et de leur paramètre (new et existing)
 '   récup des références (tester GUID et constitution du path absolu/relatif, new workbook et existing workbook)
 
 Private Function ITest_Suite() As TestSuite
@@ -361,6 +403,7 @@ Private Function ITest_Suite() As TestSuite
     ITest_Suite.AddTest ITest_Manager.ClassName, "TestAddNewRefWithRelativePath"
     ITest_Suite.AddTest ITest_Manager.ClassName, "TestGetAllReferencesFromNewWorkbook"
     ITest_Suite.AddTest ITest_Manager.ClassName, "TestGetAllReferencesFromExistingWorkbook"
+    ITest_Suite.AddTest ITest_Manager.ClassName, "TestGetReferencesFromNewWorkbook"
 End Function
 
 Private Sub ITestCase_RunTest()
@@ -378,6 +421,7 @@ Private Sub ITestCase_RunTest()
         Case "TestAddNewRefWithRelativePath": TestAddNewRefWithRelativePath
         Case "TestGetAllReferencesFromNewWorkbook": TestGetAllReferencesFromNewWorkbook
         Case "TestGetAllReferencesFromExistingWorkbook": TestGetAllReferencesFromExistingWorkbook
+        Case "TestGetReferencesFromNewWorkbook": TestGetReferencesFromNewWorkbook
         Case Else: mAssert.Should False, "Invalid test name: " & mManager.methodName
     End Select
 End Sub
