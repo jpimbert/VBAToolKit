@@ -46,11 +46,6 @@ Private Sub SaveThenReOpenNewWorkbook()
 ' Utility Function for saving then re-open the new workbook and re-initialize the reference manager
     Dim savedNewWorkbookPath As String
     savedNewWorkbookPath = newWorkBook.FullName
-'    If newWorkbook.path = "" Then
-'        newWorkbook.Close SaveChanges:=True, Filename:=savedNewWorkbookPath
-'       Else
-'        newWorkbook.Close SaveChanges:=True
-'    End If
     newWorkBook.Close saveChanges:=True
     Set newWorkBook = Workbooks.Open(fileName:=savedNewWorkbookPath)
     Set newRefManager = New vtkReferenceManager
@@ -77,7 +72,7 @@ Private Sub ITestCase_SetUp(Assert As IAssert)
     Set newWorkBook = vtkCreateExcelWorkbookForTestWithProjectName("NewProject")    ' create an Excel project for tests
     Set newConfManager = vtkConfigurationManagerForProject(newWorkBook.VBProject.name) ' For vtkConfigurations sheet initialization
     Set newRefManager = New vtkReferenceManager
-    newRefManager.init Wb:=newWorkBook, confCount:=2, nbTitleColumnsInConfSheet:=1
+    newRefManager.init Wb:=newWorkBook, confCount:=2, nbTitleColumnsInConfSheet:=1, devConf:=2
     
     Set existingWorkbook = getTestFileFromTemplate(fileName:=existingWorkbookNameForTest, destinationName:="ExistingProject_DEV.xlsm", openExcel:=True)
     Set existingRefManager = New vtkReferenceManager
@@ -197,6 +192,8 @@ End Sub
 
 Public Sub TestAddConfiguration()
 '       Verify the addConfiguration method in nominal case
+'       - check the format of the reference sheet
+'       - check that the new configuration has no attached reference
     Dim ws As Worksheet, confManager As vtkConfigurationManager
     
     ' Add a new configuration in the existing project
@@ -215,6 +212,8 @@ Public Sub TestAddConfiguration()
     mAssert.Equals ws.Range("D1"), existingWorkbook.VBProject.name, "Expected Title for main project column"
     mAssert.Equals ws.Range("E1"), existingWorkbook.VBProject.name & "_DEV", "Expected Title for DEV project column"
     mAssert.Equals ws.Range("F1"), "NewConfiguration", "Expected Title for the new configuration column"
+    
+    mAssert.Equals existingRefManager.references(3).count, 0, "Number of references attached to the new configuration"
     
     Set confManager = Nothing
 
@@ -261,7 +260,7 @@ M_Error:
 End Sub
 
 Public Sub TestAddNewRefs()
-'       Verify that new references are added to the reference sheet at initialization
+'       Verify that new reference with Guid are added to the reference sheet at initialization
     Dim ws As Worksheet, r As Range
     Dim refNames(), i As Integer
     refNames = Array("Scripting", "VBIDE", "Shell32", "MSXML2", "VBAToolKit", "EventSystemLib")
@@ -280,7 +279,7 @@ M_Error:
 End Sub
 
 Public Sub TestAddNewRefWithRelativePath()
-'       Verify that new references are added to the reference sheet at initialization
+'       Verify that new reference with path are added to the reference sheet at initialization
     Dim ws As Worksheet, r As Range
         
    On Error GoTo M_Error
@@ -344,39 +343,38 @@ End Sub
 
 Public Sub TestGetReferencesFromNewWorkbook()
 '       Verify that all references are listed with good values
-    Dim ws As Worksheet, r As Range, c As Collection, ref As vtkReference, i As Integer
+    Dim c As Collection
         
    On Error GoTo M_Error
-    Set ws = newWorkBook.Sheets("vtkReferences")
     
     ' Test references for the main configuration (#1)
     Set c = newRefManager.references(1)
     mAssert.Equals c.count, 10, "Reference count for the main configuration"
-    mAssert.Equals c(1), "VBA", "Reference for the main configuration"
-    mAssert.Equals c(2), "Excel", "Reference for the main configuration"
-    mAssert.Equals c(3), "stdole", "Reference for the main configuration"
-    mAssert.Equals c(4), "Office", "Reference for the main configuration"
-    mAssert.Equals c(5), "MSForms", "Reference for the main configuration"
-    mAssert.Equals c(6), "Scripting", "Reference for the main configuration"
-    mAssert.Equals c(7), "VBIDE", "Reference for the main configuration"
-    mAssert.Equals c(8), "Shell32", "Reference for the main configuration"
-    mAssert.Equals c(9), "MSXML2", "Reference for the main configuration"
-    mAssert.Equals c(10), "ADODB", "Reference for the main configuration"
+    mAssert.Equals c(1).name, "VBA", "Reference for the main configuration"
+    mAssert.Equals c(2).name, "Excel", "Reference for the main configuration"
+    mAssert.Equals c(3).name, "stdole", "Reference for the main configuration"
+    mAssert.Equals c(4).name, "Office", "Reference for the main configuration"
+    mAssert.Equals c(5).name, "MSForms", "Reference for the main configuration"
+    mAssert.Equals c(6).name, "Scripting", "Reference for the main configuration"
+    mAssert.Equals c(7).name, "VBIDE", "Reference for the main configuration"
+    mAssert.Equals c(8).name, "Shell32", "Reference for the main configuration"
+    mAssert.Equals c(9).name, "MSXML2", "Reference for the main configuration"
+    mAssert.Equals c(10).name, "ADODB", "Reference for the main configuration"
     
     ' Test references for the development configuration (#2)
     Set c = newRefManager.references(2)
     mAssert.Equals c.count, 11, "Reference count for the development configuration"
-    mAssert.Equals c(1), "VBA", "Reference for the development configuration"
-    mAssert.Equals c(2), "Excel", "Reference for the development configuration"
-    mAssert.Equals c(3), "stdole", "Reference for the development configuration"
-    mAssert.Equals c(4), "Office", "Reference for the development configuration"
-    mAssert.Equals c(5), "MSForms", "Reference for the development configuration"
-    mAssert.Equals c(6), "Scripting", "Reference for the development configuration"
-    mAssert.Equals c(7), "VBIDE", "Reference for the development configuration"
-    mAssert.Equals c(8), "Shell32", "Reference for the development configuration"
-    mAssert.Equals c(9), "MSXML2", "Reference for the development configuration"
-    mAssert.Equals c(10), "ADODB", "Reference for the development configuration"
-    mAssert.Equals c(11), "VBAToolKit", "Reference for the development configuration"
+    mAssert.Equals c(1).name, "VBA", "Reference for the development configuration"
+    mAssert.Equals c(2).name, "Excel", "Reference for the development configuration"
+    mAssert.Equals c(3).name, "stdole", "Reference for the development configuration"
+    mAssert.Equals c(4).name, "Office", "Reference for the development configuration"
+    mAssert.Equals c(5).name, "MSForms", "Reference for the development configuration"
+    mAssert.Equals c(6).name, "Scripting", "Reference for the development configuration"
+    mAssert.Equals c(7).name, "VBIDE", "Reference for the development configuration"
+    mAssert.Equals c(8).name, "Shell32", "Reference for the development configuration"
+    mAssert.Equals c(9).name, "MSXML2", "Reference for the development configuration"
+    mAssert.Equals c(10).name, "ADODB", "Reference for the development configuration"
+    mAssert.Equals c(11).name, "VBAToolKit", "Reference for the development configuration"
     
    On Error GoTo 0
     Exit Sub
@@ -385,8 +383,92 @@ M_Error:
     mAssert.Should False, "Unexpected error (" & Err.Number & ") : " & Err.Description & "."
 End Sub
 
-' Reste à tester :
-'   récup des références (tester GUID et constitution du path absolu/relatif, new workbook et existing workbook)
+Public Sub TestInvalidField()
+'       Verify that an invalid field error is raised when relevant
+    Dim c As Collection, ws As Worksheet
+        
+    Set ws = newRefManager.referenceSheet
+    
+    ' Set an invalid field in the main configuration
+    ws.Cells(5, 4) = "x"    ' lowercase "x" instead of uppercase
+    
+   On Error Resume Next
+    Set c = newRefManager.references(1)
+    mAssert.Equals Err.Number, VTK_INVALID_FIELD, "Error returned by references method"
+   On Error GoTo 0
+End Sub
+
+Public Sub TestGetReferencesWithNullDevConf()
+'       Verify that VBAToolKit reference is not attached to any configuration
+    Dim c As Collection
+      
+    Set newRefManager = Nothing
+    newWorkBook.Sheets("vtkReferences").name = "oldOne"
+    Set newRefManager = New vtkReferenceManager
+    newRefManager.init Wb:=newWorkBook, confCount:=2, nbTitleColumnsInConfSheet:=1, devConf:=0
+      
+   On Error GoTo M_Error
+    
+    ' Test references for the main configuration (#1)
+    Set c = newRefManager.references(1)
+    mAssert.Equals c.count, 10, "Reference count for the main configuration"
+    mAssert.Equals c(1).name, "VBA", "Reference for the main configuration"
+    mAssert.Equals c(2).name, "Excel", "Reference for the main configuration"
+    mAssert.Equals c(3).name, "stdole", "Reference for the main configuration"
+    mAssert.Equals c(4).name, "Office", "Reference for the main configuration"
+    mAssert.Equals c(5).name, "MSForms", "Reference for the main configuration"
+    mAssert.Equals c(6).name, "Scripting", "Reference for the main configuration"
+    mAssert.Equals c(7).name, "VBIDE", "Reference for the main configuration"
+    mAssert.Equals c(8).name, "Shell32", "Reference for the main configuration"
+    mAssert.Equals c(9).name, "MSXML2", "Reference for the main configuration"
+    mAssert.Equals c(10).name, "ADODB", "Reference for the main configuration"
+    
+    ' Test references for the development configuration (#2)
+    Set c = newRefManager.references(2)
+    mAssert.Equals c.count, 10, "Reference count for the development configuration"
+    mAssert.Equals c(1).name, "VBA", "Reference for the development configuration"
+    mAssert.Equals c(2).name, "Excel", "Reference for the development configuration"
+    mAssert.Equals c(3).name, "stdole", "Reference for the development configuration"
+    mAssert.Equals c(4).name, "Office", "Reference for the development configuration"
+    mAssert.Equals c(5).name, "MSForms", "Reference for the development configuration"
+    mAssert.Equals c(6).name, "Scripting", "Reference for the development configuration"
+    mAssert.Equals c(7).name, "VBIDE", "Reference for the development configuration"
+    mAssert.Equals c(8).name, "Shell32", "Reference for the development configuration"
+    mAssert.Equals c(9).name, "MSXML2", "Reference for the development configuration"
+    mAssert.Equals c(10).name, "ADODB", "Reference for the development configuration"
+    
+   On Error GoTo 0
+    Exit Sub
+   
+M_Error:
+    mAssert.Should False, "Unexpected error (" & Err.Number & ") : " & Err.Description & "."
+End Sub
+
+Public Sub TestGetReferencesWithNoDevConf()
+'       Verify that VBAToolKit reference is not attached to any configuration
+    Dim c As Collection
+      
+    Set newRefManager = Nothing
+    newWorkBook.Sheets("vtkReferences").name = "oldOne"
+    Set newRefManager = New vtkReferenceManager
+    newRefManager.init Wb:=newWorkBook, confCount:=2, nbTitleColumnsInConfSheet:=1
+      
+   On Error GoTo M_Error
+    
+    ' Test references for the main configuration (#1)
+    Set c = newRefManager.references(1)
+    mAssert.Equals c.count, 0, "Reference count for the main configuration"
+    
+    ' Test references for the development configuration (#2)
+    Set c = newRefManager.references(2)
+    mAssert.Equals c.count, 0, "Reference count for the development configuration"
+    
+   On Error GoTo 0
+    Exit Sub
+   
+M_Error:
+    mAssert.Should False, "Unexpected error (" & Err.Number & ") : " & Err.Description & "."
+End Sub
 
 Private Function ITest_Suite() As TestSuite
     Set ITest_Suite = New TestSuite
@@ -404,6 +486,9 @@ Private Function ITest_Suite() As TestSuite
     ITest_Suite.AddTest ITest_Manager.ClassName, "TestGetAllReferencesFromNewWorkbook"
     ITest_Suite.AddTest ITest_Manager.ClassName, "TestGetAllReferencesFromExistingWorkbook"
     ITest_Suite.AddTest ITest_Manager.ClassName, "TestGetReferencesFromNewWorkbook"
+    ITest_Suite.AddTest ITest_Manager.ClassName, "TestInvalidField"
+    ITest_Suite.AddTest ITest_Manager.ClassName, "TestGetReferencesWithNullDevConf"
+    ITest_Suite.AddTest ITest_Manager.ClassName, "TestGetReferencesWithNoDevConf"
 End Function
 
 Private Sub ITestCase_RunTest()
@@ -422,6 +507,9 @@ Private Sub ITestCase_RunTest()
         Case "TestGetAllReferencesFromNewWorkbook": TestGetAllReferencesFromNewWorkbook
         Case "TestGetAllReferencesFromExistingWorkbook": TestGetAllReferencesFromExistingWorkbook
         Case "TestGetReferencesFromNewWorkbook": TestGetReferencesFromNewWorkbook
+        Case "TestInvalidField": TestInvalidField
+        Case "TestGetReferencesWithNullDevConf": TestGetReferencesWithNullDevConf
+        Case "TestGetReferencesWithNoDevConf": TestGetReferencesWithNoDevConf
         Case Else: mAssert.Should False, "Invalid test name: " & mManager.methodName
     End Select
 End Sub

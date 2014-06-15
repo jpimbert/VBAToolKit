@@ -87,14 +87,18 @@ End Sub
 ' Parameters  : - Workbook of the DEV configuration for the project, will contain the reference sheet
 '               - Configuration count in the configuration sheet
 '               - Title columns count in the configuration sheet
+'               - optional devConf number
+'                   the devConf is attached to VBAToolKit reference when the reference sheet is created
+'                   if devConf = 0, there is no devConf, and VBAToolKit is not attached, but included
+'                   if devConf is <0 or >confCount, no attachment is performed
 '---------------------------------------------------------------------------------------
 '
-Public Sub init(Wb As Workbook, confCount As Integer, nbTitleColumnsInConfSheet As Integer)
+Public Sub init(Wb As Workbook, confCount As Integer, nbTitleColumnsInConfSheet As Integer, Optional devConf As Integer = -1)
     If Not m_workbook Is Wb Then
         Set m_workbook = Wb
         m_nbTitleColumnsInConfSheet = nbTitleColumnsInConfSheet
         If Not m_workbook Is Nothing Then
-            setReferenceSheet (confCount)     ' Reset the reference sheet when the attached workbook is changed
+            setReferenceSheet confCount, devConf    ' Reset the reference sheet when the attached workbook is changed
            Else
             Set m_referenceSheet = Nothing
         End If
@@ -123,10 +127,14 @@ End Property
 '                 - and fix it if inconsistent
 '               - Verify that all references in the workbook are listed in the vtkReferences sheet
 '                 - and fix it if inconsistent
-' Parameter   : - confCount as Integer, number of configurations
+' Parameter   : - confCount as Integer, count of configurations
+'               - devConf as integer, number of the development configuration
+'                   the devConf is attached to VBAToolKit reference when the reference sheet is created
+'                   if devConf = 0, there is no devConf, and VBAToolKit is not attached, but included
+'                   if devConf is <0 or >confCount, no attachment is performed
 '---------------------------------------------------------------------------------------
 '
-Private Sub setReferenceSheet(confCount As Integer)
+Private Sub setReferenceSheet(confCount As Integer, devConf As Integer)
     On Error Resume Next
     Set m_referenceSheet = m_workbook.Worksheets(sheetName)
     On Error GoTo 0
@@ -135,7 +143,7 @@ Private Sub setReferenceSheet(confCount As Integer)
         Set m_referenceSheet = m_workbook.Worksheets.Add(Type:=xlWorksheet)
         m_referenceSheet.name = sheetName
         '   Initialize the reference sheet
-        initializeReferenceSheet confCount
+        initializeReferenceSheet confCount, devConf
         End If
     ' Verify that the configuration sheet is in last known version
     If m_referenceSheet.Range("A1") <> currentVersion Then
@@ -152,20 +160,21 @@ End Sub
 ' Author    : Jean-Pierre Imbert
 ' Date      : 11/06/2014
 ' Purpose   : Initialize a new reference sheet
+'             Attach the standard references to all configuration (except VBAToolKit, attached to the Dev Conf)
+' Parameter : - confCount as Integer, count of configurations
+'             - devConf as integer, number of the development configuration
+'                   the devConf is attached to VBAToolKit reference when the reference sheet is created
+'                   if devConf = 0, there is no devConf, and VBAToolKit is not attached, but included
+'                   if devConf is <0 or >confCount, no attachment is performed
 '---------------------------------------------------------------------------------------
 '
-Private Sub initializeReferenceSheet(confCount As Integer)
+Private Sub initializeReferenceSheet(confCount As Integer, devConf As Integer)
     ' Init titles
     m_referenceSheet.Range("A1") = currentVersion
     m_referenceSheet.Range("A1").Font.Size = 8
     m_referenceSheet.Range("B1") = ""
     m_referenceSheet.Range("C1") = "-"      ' addConfiguration works with the usedRange property
     m_referenceSheet.Columns("A:C").ColumnWidth = 22
-    ' Init configuration titles
-    Dim i As Integer
-    For i = 1 To confCount
-        addConfiguration
-    Next i
     ' Init standard references
     m_referenceSheet.Range("A2") = "VBA"
     m_referenceSheet.Range("B2") = "{000204EF-0000-0000-C000-000000000046}"
@@ -189,6 +198,16 @@ Private Sub initializeReferenceSheet(confCount As Integer)
     m_referenceSheet.Range("B11") = "{00000206-0000-0010-8000-00AA006D2EA4}"
     m_referenceSheet.Range("A12") = "VBAToolKit"
     m_referenceSheet.Range("C12") = "Microsoft\AddIns\VBAToolKit.xlam"
+    ' Init configuration titles
+    Dim i As Integer
+    For i = 1 To confCount
+        addConfiguration
+        Dim j As Integer
+        For j = 1 To referenceCount
+            If devConf >= 0 And devConf <= confCount Then m_referenceSheet.Cells(nbTitleRows + j, nbTitleColumns + i) = "X"
+            If m_referenceSheet.Cells(nbTitleRows + j, 1) = "VBAToolKit" And i <> devConf Then m_referenceSheet.Cells(nbTitleRows + j, nbTitleColumns + i) = ""
+        Next j
+    Next i
 End Sub
 
 '---------------------------------------------------------------------------------------
