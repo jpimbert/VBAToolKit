@@ -504,6 +504,49 @@ Public Sub TestConfigurationSheetFormatUpToDateConversion()
     
 End Sub
 
+
+Public Sub TestGetAllReferencesFromNewWorkbook()
+'       Verify that all standard references are listed
+    Dim refNames(), i As Integer, c1 As Collection, c2 As Collection, r As vtkReference
+    refNames = Array("Scripting", "VBIDE", "Shell32", "MSXML2", "ADODB", "VBAToolKit", "VBA", "Excel", "stdole", "Office", "MSForms")
+
+   On Error Resume Next
+    Set c1 = newConfManager.references
+    ' Rearrange the collection by name
+    Set c2 = New Collection
+    For Each r In c1
+        c2.Add r, r.name
+    Next
+    mAssert.Equals c2.count, UBound(refNames) - LBound(refNames) + 1, "Count of all references of a new workbook"
+    ' il faut boucler sur le tableau et rechercher dans la collection (si pas trouvé = erreur)
+    For i = LBound(refNames) To UBound(refNames)
+        Set r = c2(refNames(i))
+        mAssert.Equals Err.Number, 0, "Error when getting " & refNames(i) & " reference"
+    Next i
+   On Error GoTo 0
+End Sub
+
+Public Sub TestGetAllReferencesFromExistingWorkbook()
+'       Verify that all references are listed from existing workbook
+    Dim refNames(), i As Integer, c1 As Collection, c2 As Collection, r As vtkReference
+    refNames = Array("VBA", "Excel", "stdole", "Office", "MSForms", "Scripting", "VBIDE", "Shell32", "MSXML2", "VBAToolKit", "EventSystemLib")
+
+   On Error Resume Next
+    Set c1 = existingConfManager.references
+    ' Rearrange the collection by name
+    Set c2 = New Collection
+    For Each r In c1
+        c2.Add r, r.name
+    Next
+    mAssert.Equals c2.count, UBound(refNames) - LBound(refNames) + 1, "Count of all references of a new workbook"
+    ' il faut boucler sur le tableau et rechercher dans la collection (si pas trouvé = erreur)
+    For i = LBound(refNames) To UBound(refNames)
+        Set r = c2(refNames(i))
+        mAssert.Equals Err.Number, 0, "Error when getting " & refNames(i) & " reference"
+    Next i
+   On Error GoTo 0
+End Sub
+
 Private Function ITest_Suite() As TestSuite
     Set ITest_Suite = New TestSuite
     ITest_Suite.AddTest ITest_Manager.ClassName, "Test_PropertyName_DefaultGet"
@@ -537,6 +580,8 @@ Private Function ITest_Suite() As TestSuite
     ITest_Suite.AddTest ITest_Manager.ClassName, "TestRootPathForExistingProject"
     ITest_Suite.AddTest ITest_Manager.ClassName, "TestConfigurationSheetFormatAfterConversion"
     ITest_Suite.AddTest ITest_Manager.ClassName, "TestConfigurationSheetFormatUpToDateConversion"
+    ITest_Suite.AddTest ITest_Manager.ClassName, "TestGetAllReferencesFromNewWorkbook"
+    ITest_Suite.AddTest ITest_Manager.ClassName, "TestGetAllReferencesFromExistingWorkbook"
 End Function
 
 Private Sub ITestCase_RunTest()
@@ -572,6 +617,8 @@ Private Sub ITestCase_RunTest()
         Case "TestRootPathForExistingProject": TestRootPathForExistingProject
         Case "TestConfigurationSheetFormatAfterConversion": TestConfigurationSheetFormatAfterConversion
         Case "TestConfigurationSheetFormatUpToDateConversion": TestConfigurationSheetFormatUpToDateConversion
+        Case "TestGetAllReferencesFromNewWorkbook": TestGetAllReferencesFromNewWorkbook
+        Case "TestGetAllReferencesFromExistingWorkbook": TestGetAllReferencesFromExistingWorkbook
         Case Else: mAssert.Should False, "Invalid test name: " & mManager.methodName
     End Select
 End Sub

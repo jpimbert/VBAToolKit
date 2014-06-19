@@ -48,6 +48,7 @@ Private m_projectName As String             ' The configuration of a project is 
 Private m_workbook As Workbook
 Private m_configurationSheet As Worksheet
 Private m_rootPath As String
+Private m_refManager As vtkReferenceManager
 Private Const sheetName As String = "vtkConfigurations"
 Private Const currentVersion As String = "vtkConfigurations v1.1"
 Private Const version10 As String = "vtkConfigurations v1.0"
@@ -57,6 +58,7 @@ Private Const nbTitleColumns As Integer = 1
 Private Sub Class_Terminate()
     Set m_configurationSheet = Nothing
     Set m_workbook = Nothing
+    Set m_refManager = Nothing
 End Sub
 
 '---------------------------------------------------------------------------------------
@@ -664,3 +666,32 @@ Public Sub setModulePathWithNumber(path As String, numModule As Integer, numConf
         configurationSheet.Cells(numModule + nbTitleRows, numConfiguration + nbTitleColumns) = s
     End If
 End Sub
+
+'---------------------------------------------------------------------------------------
+' Procedure : referenceManager, private
+' Author    : Jean-Pierre Imbert
+' Date      : 19/06/2014
+' Purpose   : Return the reference manager associated with the configuration manager
+'---------------------------------------------------------------------------------------
+'
+Private Function referenceManager() As vtkReferenceManager
+    If m_refManager Is Nothing Then
+        Set m_refManager = New vtkReferenceManager
+        m_refManager.init Wb:=Me.Workbook, confCount:=Me.configurationCount, nbTitleColumnsInConfSheet:=nbTitleColumns
+    End If
+    Set referenceManager = m_refManager
+End Function
+
+'---------------------------------------------------------------------------------------
+' Procedure : references
+' Author    : Jean-Pierre Imbert
+' Date      : 19/06/2014
+' Purpose   : Return a collection of all vtkReferences objects
+'---------------------------------------------------------------------------------------
+'
+Public Function references() As Collection
+    Set references = referenceManager.allReferences
+End Function
+
+' Il faut implémenter une propriété DevConf à -1 par défaut
+
