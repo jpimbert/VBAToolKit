@@ -49,11 +49,16 @@ Private m_workbook As Workbook
 Private m_configurationSheet As Worksheet
 Private m_rootPath As String
 Private m_refManager As vtkReferenceManager
+Private m_devConfiguration As Integer
 Private Const sheetName As String = "vtkConfigurations"
 Private Const currentVersion As String = "vtkConfigurations v1.1"
 Private Const version10 As String = "vtkConfigurations v1.0"
 Private m_sheetVersion As String
 Private Const nbTitleColumns As Integer = 1
+
+Private Sub Class_Initialize()
+    m_devConfiguration = -1
+End Sub
 
 Private Sub Class_Terminate()
     Set m_configurationSheet = Nothing
@@ -230,7 +235,7 @@ Private Sub initializeConfigurationSheet(ws As Worksheet)
     ws.Range("C1") = vtkProjectForName(projectName).projectDEVName
     ws.Range("C2") = vtkProjectForName(projectName).projectDEVStandardRelativePath
     
-    ' C'est ici qu'il faut initialiser La propriété DevConf à 2
+    m_devConfiguration = 2
     
     ws.Columns("A:C").ColumnWidth = 22
     ws.Range("A1").Font.Size = 8
@@ -690,7 +695,7 @@ End Sub
 Private Function referenceManager() As vtkReferenceManager
     If m_refManager Is Nothing Then
         Set m_refManager = New vtkReferenceManager
-        m_refManager.init Wb:=Workbook, confCount:=Me.configurationCount, nbTitleColumnsInConfSheet:=nbTitleColumns
+        m_refManager.init Wb:=Workbook, confCount:=Me.configurationCount, nbTitleColumnsInConfSheet:=nbTitleColumns, devConf:=m_devConfiguration
     End If
     Set referenceManager = m_refManager
 End Function

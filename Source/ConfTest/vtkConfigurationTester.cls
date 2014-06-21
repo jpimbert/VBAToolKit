@@ -39,6 +39,7 @@ Private confManager As vtkConfigurationManager   ' Configuration Manager for the
 Private Const initializedProjectName As String = "InitializedProject"
 
 Private Const workbookNameWithConfigurationV10 As String = "WorkBookForConfigurationsTests10.xlsm"
+Private Const workbookNameWithConfigurationV11 As String = "WorkBookForConfigurationsTests.xlsm"
 
 Private mManager As TestCaseManager
 Private mAssert As IAssert
@@ -480,31 +481,70 @@ M_Error:
     mAssert.Should False, "Unexpected Error (" & Err.Number & "): " & Err.Description
 End Sub
 
-'Public Sub Test_ConfigurationReferences_WithReferenceSheet()
-'    ' This test verifies the references property of a vtkConfiguration object
-'    ' collection just initialized from an Excel workbook
-'
-'    Dim refNames(), i As Integer, c1 As Collection, c2 As Collection, r As vtkReference
-'    refNames = Array("VBA", "Excel", "stdole", "Office", "MSForms", "Scripting", "VBIDE", "Shell32", "MSXML2", "VBAToolKit", "EventSystemLib")
-'
-'   On Error Resume Next
-'    Set c1 = confManager.configurations(1).references
-'    ' Rearrange the collection by name
-'    Set c2 = New Collection
-'    For Each r In c1
-'        c2.Add r, r.name
-'    Next
-'    mAssert.Equals c2.count, UBound(refNames) - LBound(refNames) + 1, "Count of all references of a new workbook"
-'    ' il faut boucler sur le tableau et rechercher dans la collection (si pas trouvé = erreur)
-'    For i = LBound(refNames) To UBound(refNames)
-'        Set r = c2(refNames(i))
-'        mAssert.Equals Err.Number, 0, "Error when getting " & refNames(i) & " reference"
-'    Next i
-'   On Error GoTo 0
-'End Sub
+Public Sub Test_ConfigurationReferences_WithReferenceSheet()
+    ' This test verifies the references property of a vtkConfiguration object
+    ' collection just initialized from an Excel workbook
 
-' Ajouter un test pour un classeur avec une feuille de références
-' Ajouter un test pour un nouveau classeur ; les références de développement doivent être correctes.
+    Dim refNames(), i As Integer, c1 As Collection, c2 As Collection, r As vtkReference
+    Dim Wb As Workbook, cf As vtkConfigurationManager
+    refNames = Array("VBA", "Excel", "stdole", "Office", "MSForms", "Scripting", "VBIDE", "Shell32", "MSXML2")
+       
+    Set Wb = getTestFileFromTemplate(fileName:=workbookNameWithConfigurationV11, destinationName:="ProjectV11_DEV.xlsm", openExcel:=True)
+    Set cf = vtkConfigurationManagerForProject("ProjectV11")
+
+   On Error Resume Next
+    ' Test for the main configuration
+    Set c1 = cf.configurations(1).references
+    ' Rearrange the collection by name
+    Set c2 = New Collection
+    For Each r In c1
+        c2.Add r, r.name
+    Next
+    mAssert.Equals c2.count, UBound(refNames) - LBound(refNames) + 1, "Count of all references of a new workbook"
+    ' il faut boucler sur le tableau et rechercher dans la collection (si pas trouvé = erreur)
+    For i = LBound(refNames) To UBound(refNames)
+        Set r = c2(refNames(i))
+        mAssert.Equals Err.Number, 0, "Error when getting " & refNames(i) & " reference"
+    Next i
+    
+    ' Test for the Development configuration
+    Set c1 = cf.configurations(2).references
+    ' Rearrange the collection by name
+    Set c2 = New Collection
+    For Each r In c1
+        c2.Add r, r.name
+    Next
+    mAssert.Equals c2.count, UBound(refNames) - LBound(refNames) + 1, "Count of all references of a new workbook"
+    ' il faut boucler sur le tableau et rechercher dans la collection (si pas trouvé = erreur)
+    For i = LBound(refNames) To UBound(refNames)
+        Set r = c2(refNames(i))
+        mAssert.Equals Err.Number, 0, "Error when getting " & refNames(i) & " reference"
+    Next i
+   On Error GoTo 0
+    vtkCloseAndKillWorkbook Wb:=Wb ' close the existing Excel project
+
+End Sub
+
+Public Sub Test_ConfigurationReferences_NewWorkbook()
+    ' This test verifies the references property of a vtkConfiguration object
+    ' references are initialized when creating a new workbook
+
+    Dim newWorkbook As Workbook, newConfManager As vtkConfigurationManager
+    
+    Set newWorkbook = vtkCreateExcelWorkbookForTestWithProjectName("NewProject")    ' create an Excel project for tests
+    Set newConfManager = vtkConfigurationManagerForProject(newWorkbook.VBProject.name)
+
+   On Error GoTo M_Error
+    mAssert.Equals newConfManager.configurations(1).references.count, 10, "Count of references of the main configuration"
+    mAssert.Equals newConfManager.configurations(2).references.count, 11, "Count of references of the development configuration"
+   
+   On Error GoTo 0
+    vtkCloseAndKillWorkbook Wb:=newWorkbook     ' close the new Excel project
+    Exit Sub
+
+M_Error:
+    mAssert.Should False, "Unexpected Error (" & Err.Number & "): " & Err.Description
+End Sub
 
 Private Function ITest_Suite() As TestSuite
     Set ITest_Suite = New TestSuite
@@ -535,6 +575,8 @@ Private Function ITest_Suite() As TestSuite
     ITest_Suite.AddTest ITest_Manager.ClassName, "Test_ConfigurationModules_NewEmpty"
     ITest_Suite.AddTest ITest_Manager.ClassName, "Test_ConfigurationModules_NewNotEmpty"
     ITest_Suite.AddTest ITest_Manager.ClassName, "Test_ConfigurationReferences_NoReferenceSheet"
+    ITest_Suite.AddTest ITest_Manager.ClassName, "Test_ConfigurationReferences_WithReferenceSheet"
+    ITest_Suite.AddTest ITest_Manager.ClassName, "Test_ConfigurationReferences_NewWorkbook"
 End Function
 
 Private Sub ITestCase_RunTest()
@@ -566,6 +608,8 @@ Private Sub ITestCase_RunTest()
         Case "Test_ConfigurationModules_NewEmpty": Test_ConfigurationModules_NewEmpty
         Case "Test_ConfigurationModules_NewNotEmpty": Test_ConfigurationModules_NewNotEmpty
         Case "Test_ConfigurationReferences_NoReferenceSheet": Test_ConfigurationReferences_NoReferenceSheet
+        Case "Test_ConfigurationReferences_WithReferenceSheet": Test_ConfigurationReferences_WithReferenceSheet
+        Case "Test_ConfigurationReferences_NewWorkbook": Test_ConfigurationReferences_NewWorkbook
         Case Else: mAssert.Should False, "Invalid test name: " & mManager.methodName
     End Select
 End Sub
