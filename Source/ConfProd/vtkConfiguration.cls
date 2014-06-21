@@ -82,8 +82,8 @@ End Property
 ' Purpose   : The ID of the configuration for XML exportation
 '---------------------------------------------------------------------------------------
 '
-Property Get ID() As String
-    ID = "c" & m_number
+Property Get id() As String
+    id = "c" & m_number
 End Property
 
 '---------------------------------------------------------------------------------------
@@ -175,3 +175,15 @@ Property Get modules() As Collection
     Next i
     Set modules = col
 End Property
+
+'---------------------------------------------------------------------------------------
+' Property  : references as collection (Read Only)
+' Author    : Jean-Pierre Imbert
+' Date      : 21/06/2014
+' Purpose   : All references of this configuration are included in the collection
+'---------------------------------------------------------------------------------------
+'
+Property Get references() As Collection
+    Set references = m_parent.getConfigurationReferencesWithNumber(m_number)
+End Property
+

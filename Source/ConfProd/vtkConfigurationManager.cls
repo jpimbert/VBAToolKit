@@ -230,6 +230,8 @@ Private Sub initializeConfigurationSheet(ws As Worksheet)
     ws.Range("C1") = vtkProjectForName(projectName).projectDEVName
     ws.Range("C2") = vtkProjectForName(projectName).projectDEVStandardRelativePath
     
+    ' C'est ici qu'il faut initialiser La propriété DevConf à 2
+    
     ws.Columns("A:C").ColumnWidth = 22
     ws.Range("A1").Font.Size = 8
     ws.Range("A3").HorizontalAlignment = xlCenter
@@ -534,6 +536,17 @@ Public Sub setConfigurationCommentWithNumber(n As Integer, comment As String)
 End Sub
 
 '---------------------------------------------------------------------------------------
+' Procedure : getConfigurationReferencesWithNumber
+' Author    : Jean-Pierre Imbert
+' Date      : 08/06/2014
+' Purpose   : return the n-th configuration references collection of the project, given n as integer
+'---------------------------------------------------------------------------------------
+'
+Public Function getConfigurationReferencesWithNumber(n As Integer) As Collection
+    Set getConfigurationReferencesWithNumber = referenceManager.references(n)
+End Function
+
+'---------------------------------------------------------------------------------------
 ' Property  : moduleCount as Integer - Read Only - Public
 ' Author    : Jean-Pierre Imbert
 ' Date      : 25/05/2013
@@ -677,7 +690,7 @@ End Sub
 Private Function referenceManager() As vtkReferenceManager
     If m_refManager Is Nothing Then
         Set m_refManager = New vtkReferenceManager
-        m_refManager.init Wb:=Me.Workbook, confCount:=Me.configurationCount, nbTitleColumnsInConfSheet:=nbTitleColumns
+        m_refManager.init Wb:=Workbook, confCount:=Me.configurationCount, nbTitleColumnsInConfSheet:=nbTitleColumns
     End If
     Set referenceManager = m_refManager
 End Function
