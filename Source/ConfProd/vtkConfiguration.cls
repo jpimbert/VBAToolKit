@@ -187,3 +187,18 @@ Property Get references() As Collection
     Set references = m_parent.getConfigurationReferencesWithNumber(m_number)
 End Property
 
+'---------------------------------------------------------------------------------------
+' Subroutine  : addReferencesToWorkbook as collection
+' Author      : Jean-Pierre Imbert
+' Date        : 22/06/2014
+' Purpose     : Add all references of this configuration to the workbook given as a parameter
+'---------------------------------------------------------------------------------------
+'
+Public Sub addReferencesToWorkbook(Wb As Workbook)
+    Dim ref As vtkReference
+    For Each ref In Me.references
+        ref.addToWorkbook Wb
+    Next
+End Sub
+
+
