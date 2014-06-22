@@ -98,7 +98,7 @@ Public Sub Test_vtkExportConfigurationsAsXML_correctInfoContent()
     On Error GoTo Test_vtkExportConfigurationsAsXML_correctDomContent_Error
     
     mAssert.Equals reloadDom.SelectSingleNode("/vtkConf/info/projectName").Text, testProjectName, "Expected name of project in info element"
-    mAssert.Equals reloadDom.SelectSingleNode("/vtkConf/info/vtkConfigurationsVersion").Text, "1.0", "Expected configuration version in info element"
+    mAssert.Equals reloadDom.SelectSingleNode("/vtkConf/info/vtkConfigurationsVersion").Text, "2.0", "Expected configuration version in info element"
 
     On Error GoTo 0
     Exit Sub
@@ -191,7 +191,7 @@ Public Sub Test_vtkExportConfigurationsAsXML_correctReferenceNumber()
 
     On Error GoTo Test_vtkExportConfigurationsAsXML_correctReferenceNumber_Error
     
-    mAssert.Equals reloadDom.SelectNodes("/vtkConf/reference").Length, 10, "Expected number of reference elements"
+    mAssert.Equals reloadDom.SelectNodes("/vtkConf/reference").Length, 11, "Expected number of reference elements"
 
     On Error GoTo 0
     Exit Sub
@@ -204,11 +204,14 @@ End Sub
 
 Public Sub Test_vtkExportConfigurationsAsXML_correctRefNumByConf()
 '   modules -> correct content
+    Dim refIDs() As String
     
     On Error GoTo Test_vtkExportConfigurationsAsXML_correctRefNumByConf_Error
     
-    mAssert.Equals reloadDom.SelectNodes("/vtkConf/reference[contains(@confIDs,""c1"")]/name").Length, 9, "Expected number of references for first configuration"
-    mAssert.Equals reloadDom.SelectNodes("/vtkConf/reference[contains(@confIDs,""c2"")]/name").Length, 10, "Expected number of references for second configuration"
+    refIDs = Split(reloadDom.SelectSingleNode("/vtkConf/configuration[@cID=""c1""]").Attributes.getNamedItem("refIDs").Text, " ")
+    mAssert.Equals UBound(refIDs) - LBound(refIDs) + 1, 10, "Expected number of references for first configuration"
+    refIDs = Split(reloadDom.SelectSingleNode("/vtkConf/configuration[@cID=""c2""]").Attributes.getNamedItem("refIDs").Text, " ")
+    mAssert.Equals UBound(refIDs) - LBound(refIDs) + 1, 11, "Expected number of references for second configuration"
 
     On Error GoTo 0
     Exit Sub
