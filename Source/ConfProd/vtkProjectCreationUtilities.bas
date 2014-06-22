@@ -101,7 +101,11 @@ End Sub
 Public Sub vtkAddBeforeSaveHandlerInDEVWorkbook(Wb As Workbook, projectName As String, confName As String)
     
     On Error GoTo vtkAddBeforeSaveHandlerInDEVWorkbook_Error
-          
+    
+    ' Force the vtkReferences sheet for the BeforeSave Handler to work in eac case
+    Dim c As Collection
+    Set c = vtkConfigurationManagerForProject(projectName).references
+    
     Dim wbVTKName As String
     wbVTKName = ThisWorkbook.VBProject.name ' Get the name of the Running project (VBAToolKit)
     

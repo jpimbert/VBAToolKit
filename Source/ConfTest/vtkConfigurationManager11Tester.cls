@@ -36,7 +36,7 @@ Implements ITestCase
 Private mManager As TestCaseManager
 Private mAssert As IAssert
 
-Private newWorkBook As Workbook         ' New Workbook created for each test
+Private newWorkbook As Workbook         ' New Workbook created for each test
 Private newWorkbookName As String
 Private newConfManager As vtkConfigurationManager   ' Configuration Manager for the new workbook
 Private newProjectName As String
@@ -52,15 +52,15 @@ Private Const workbookNameWithConfigurationV10 As String = "WorkBookForConfigura
 Private Sub SaveThenReOpenNewWorkbook()
 ' Utility Function for saving then re-open the new workbook and re-initialize the configuration managers
     Dim savedNewWorkbookPath As String
-    savedNewWorkbookPath = newWorkBook.FullName
+    savedNewWorkbookPath = newWorkbook.FullName
 '    If newWorkbook.path = "" Then
 '        newWorkbook.Close SaveChanges:=True, Filename:=savedNewWorkbookPath
 '       Else
 '        newWorkbook.Close SaveChanges:=True
 '    End If
-    newWorkBook.Close saveChanges:=True
+    newWorkbook.Close saveChanges:=True
     vtkResetConfigurationManagers           ' reset all configuration managers
-    Set newWorkBook = Workbooks.Open(fileName:=savedNewWorkbookPath)
+    Set newWorkbook = Workbooks.Open(fileName:=savedNewWorkbookPath)
     Set newConfManager = vtkConfigurationManagerForProject("NewProject")
 End Sub
 
@@ -79,9 +79,9 @@ End Property
 Private Sub ITestCase_SetUp(Assert As IAssert)
 
     Set mAssert = Assert
-    Set newWorkBook = vtkCreateExcelWorkbookForTestWithProjectName("NewProject")    ' create an Excel project for tests
-    newWorkbookName = newWorkBook.name
-    newProjectName = newWorkBook.VBProject.name
+    Set newWorkbook = vtkCreateExcelWorkbookForTestWithProjectName("NewProject")    ' create an Excel project for tests
+    newWorkbookName = newWorkbook.name
+    newProjectName = newWorkbook.VBProject.name
     Set newConfManager = vtkConfigurationManagerForProject(newProjectName)
     
     Set existingWorkbook = getTestFileFromTemplate(fileName:=existingWorkbookNameForTest, destinationName:=existingProjectName & "_DEV.xlsm", openExcel:=True)
@@ -90,7 +90,7 @@ Private Sub ITestCase_SetUp(Assert As IAssert)
 End Sub
 
 Private Sub ITestCase_TearDown()
-    vtkCloseAndKillWorkbook Wb:=newWorkBook     ' close the new Excel project
+    vtkCloseAndKillWorkbook Wb:=newWorkbook     ' close the new Excel project
     vtkCloseAndKillWorkbook Wb:=existingWorkbook ' close the existing Excel project
     vtkResetConfigurationManagers             ' reset all configuration managers
 End Sub
@@ -132,10 +132,10 @@ Public Sub TestConfigurationSheetCreationForNewProject()
 '       Verify that a Configuration Sheet is created in a new project
     Dim ws As Worksheet
     On Error Resume Next
-    Set ws = newWorkBook.Sheets("vtkConfigurations")
+    Set ws = newWorkbook.Sheets("vtkConfigurations")
     mAssert.Equals Err, 0, "A configuration manager must create a Configuration sheet"
     On Error GoTo 0
-    mAssert.Should newWorkBook.Sheets("vtkConfigurations") Is newConfManager.configurationSheet, "The configurationSheet property of the conf manager must be equal to the configuration sheet of the workbook"
+    mAssert.Should newWorkbook.Sheets("vtkConfigurations") Is newConfManager.configurationSheet, "The configurationSheet property of the conf manager must be equal to the configuration sheet of the workbook"
 End Sub
 
 Public Sub TestConfigurationSheetRetrievalForExistingProject()
@@ -508,7 +508,7 @@ End Sub
 Public Sub TestGetAllReferencesFromNewWorkbook()
 '       Verify that all standard references are listed
     Dim refNames(), i As Integer, c1 As Collection, c2 As Collection, r As vtkReference
-    refNames = Array("Scripting", "VBIDE", "Shell32", "MSXML2", "ADODB", "VBAToolKit", "VBA", "Excel", "stdole", "Office", "MSForms")
+    refNames = Array("Scripting", "VBIDE", "Shell32", "MSXML2", "ADODB", "VBAToolKit_DEV", "VBA", "Excel", "stdole", "Office", "MSForms")
 
    On Error Resume Next
     Set c1 = newConfManager.references
