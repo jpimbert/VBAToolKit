@@ -1,11 +1,12 @@
 <?xml version="1.0" encoding="ISO-8859-1" standalone="yes"?>
 <!DOCTYPE vtkConf [
-    <!ELEMENT vtkConf (info,configuration*, module*, reference*)>
+    <!ELEMENT vtkConf (info, reference*, configuration*, module*)>
         <!ELEMENT info (vtkConfigurationsVersion,projectName)>
                 <!ELEMENT vtkConfigurationsVersion (#PCDATA)>
                 <!ELEMENT projectName (#PCDATA)>
         <!ELEMENT configuration (name,path,templatePath?,title?,comment?)>
          <!ATTLIST configuration cID ID #REQUIRED>
+         <!ATTLIST configuration refIDs IDREFS #IMPLIED>
                 <!ELEMENT name (#PCDATA)>
                 <!ELEMENT path (#PCDATA)>
                 <!ELEMENT templatePath (#PCDATA)>
@@ -16,29 +17,73 @@
                 <!ELEMENT modulePath (#PCDATA)>
                 <!ATTLIST modulePath confId IDREF #REQUIRED>
         <!ELEMENT reference (name, (guid|path))>
-         <!ATTLIST reference confIDs IDREFS #REQUIRED>
+         <!ATTLIST reference refID ID #REQUIRED>
                 <!ELEMENT guid (#PCDATA)>
 ]>
 <vtkConf>
 
     <info>
-        <vtkConfigurationsVersion>1.0</vtkConfigurationsVersion>
+        <vtkConfigurationsVersion>2.0</vtkConfigurationsVersion>
         <projectName>VBAToolKit</projectName>
     </info>
 
-    <configuration cID="c1">
+    <reference refID="r1">
+        <name>VBA</name>
+        <guid>{000204EF-0000-0000-C000-000000000046}</guid>
+    </reference>
+    <reference refID="r2">
+        <name>Excel</name>
+        <guid>{00020813-0000-0000-C000-000000000046}</guid>
+    </reference>
+    <reference refID="r3">
+        <name>stdole</name>
+        <guid>{00020430-0000-0000-C000-000000000046}</guid>
+    </reference>
+    <reference refID="r4">
+        <name>Office</name>
+        <guid>{2DF8D04C-5BFA-101B-BDE5-00AA0044DE52}</guid>
+    </reference>
+    <reference refID="r5">
+        <name>MSForms</name>
+        <guid>{0D452EE1-E08F-101A-852E-02608C4D0BB4}</guid>
+    </reference>
+    <reference refID="r6">
+        <name>Scripting</name>
+        <guid>{420B2830-E718-11CF-893D-00A0C9054228}</guid>
+    </reference>
+    <reference refID="r7">
+        <name>VBIDE</name>
+        <guid>{0002E157-0000-0000-C000-000000000046}</guid>
+    </reference>
+    <reference refID="r8">
+        <name>Shell32</name>
+        <guid>{50A7E9B0-70EF-11D1-B75A-00A0C90564FE}</guid>
+    </reference>
+    <reference refID="r9">
+        <name>MSXML2</name>
+        <guid>{F5078F18-C551-11D3-89B9-0000F81FE221}</guid>
+    </reference>
+    <reference refID="r10">
+        <name>ADODB</name>
+        <guid>{00000206-0000-0010-8000-00AA006D2EA4}</guid>
+    </reference>
+    <reference refID="r11">
+        <name>VBAToolKit</name>
+        <path>C:\Documents and Settings\Demonn\Application Data\Microsoft\AddIns\VBAToolKit.xlam</path>
+    </reference>
+    <configuration cID="c1" refIDs="r1 r2 r3 r4 r5 r6 r7 r8 r9 ">
         <name>VBAToolKit</name>
         <path>Delivery\VBAToolKit.xlam</path>
         <title>VBAToolKit</title>
         <comment>Project VBAToolKit</comment>
     </configuration>
-    <configuration cID="c2">
+    <configuration cID="c2" refIDs="r1 r2 r3 r4 r5 r6 r7 r8 r9 r11 ">
         <name>VBAToolKit_DEV</name>
         <path>Project\VBAToolKit_DEV.xlsm</path>
         <title>VBAToolKit_DEV</title>
         <comment>Project VBAToolKit_DEV</comment>
     </configuration>
-    <configuration cID="c3">
+    <configuration cID="c3" refIDs="r1 r2 r3 r4 r5 r6 r7 r8 r9 ">
         <name>VBAToolKit_2003</name>
         <path>Delivery\VBAToolKit.xla</path>
         <title>VBAToolKit_2003</title>
@@ -398,44 +443,4 @@
         <modulePath confId="c2">Source\ConfProd\vtkReference.cls</modulePath>
         <modulePath confId="c3">Source\ConfProd\vtkReference.cls</modulePath>
     </module>
-    <reference confIDs="c1 c2 c3">
-        <name>VBA</name>
-        <guid>{000204EF-0000-0000-C000-000000000046}</guid>
-    </reference>
-    <reference confIDs="c1 c2 c3">
-        <name>Excel</name>
-        <guid>{00020813-0000-0000-C000-000000000046}</guid>
-    </reference>
-    <reference confIDs="c1 c2 c3">
-        <name>stdole</name>
-        <guid>{00020430-0000-0000-C000-000000000046}</guid>
-    </reference>
-    <reference confIDs="c1 c2 c3">
-        <name>Office</name>
-        <guid>{2DF8D04C-5BFA-101B-BDE5-00AA0044DE52}</guid>
-    </reference>
-    <reference confIDs="c1 c2 c3">
-        <name>MSForms</name>
-        <guid>{0D452EE1-E08F-101A-852E-02608C4D0BB4}</guid>
-    </reference>
-    <reference confIDs="c1 c2 c3">
-        <name>Scripting</name>
-        <guid>{420B2830-E718-11CF-893D-00A0C9054228}</guid>
-    </reference>
-    <reference confIDs="c1 c2 c3">
-        <name>VBIDE</name>
-        <guid>{0002E157-0000-0000-C000-000000000046}</guid>
-    </reference>
-    <reference confIDs="c1 c2 c3">
-        <name>Shell32</name>
-        <guid>{50A7E9B0-70EF-11D1-B75A-00A0C90564FE}</guid>
-    </reference>
-    <reference confIDs="c1 c2 c3">
-        <name>MSXML2</name>
-        <guid>{F5078F18-C551-11D3-89B9-0000F81FE221}</guid>
-    </reference>
-    <reference confIDs="c2">
-        <name>VBAToolKit</name>
-        <path>C:\Documents and Settings\Demonn\Application Data\Microsoft\AddIns\VBAToolKit.xlam</path>
-    </reference>
 </vtkConf>

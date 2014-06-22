@@ -101,7 +101,8 @@ Public Sub vtkExportConfigurationsAsXML(projectName As String, filePath As Strin
         ' create the configuration element
         refList = ""
         For Each ref In cf.references
-            refList = refList & ref.id & " "
+            If refList <> "" Then refList = refList & " "
+            refList = refList & ref.id
         Next
         If refList = "" Then
             xmlFile.WriteLine Text:="    <configuration cID=""" & cf.id & """>"

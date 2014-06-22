@@ -35,7 +35,7 @@ Implements ITestCase
 Private mManager As TestCaseManager
 Private mAssert As IAssert
 
-Private newWorkBook As Workbook         ' New Workbook created for each test
+Private newWorkbook As Workbook         ' New Workbook created for each test
 Private newRefManager As vtkReferenceManager   ' Reference Manager for the new workbook
 
 Private existingWorkbook As Workbook    ' Existing Workbook opened for each test
@@ -45,11 +45,11 @@ Private existingRefManager As vtkReferenceManager   ' Reference Manager for the 
 Private Sub SaveThenReOpenNewWorkbook()
 ' Utility Function for saving then re-open the new workbook and re-initialize the reference manager
     Dim savedNewWorkbookPath As String
-    savedNewWorkbookPath = newWorkBook.FullName
-    newWorkBook.Close saveChanges:=True
-    Set newWorkBook = Workbooks.Open(fileName:=savedNewWorkbookPath)
+    savedNewWorkbookPath = newWorkbook.FullName
+    newWorkbook.Close saveChanges:=True
+    Set newWorkbook = Workbooks.Open(fileName:=savedNewWorkbookPath)
     Set newRefManager = New vtkReferenceManager
-    Set newRefManager.Workbook = newWorkBook
+    Set newRefManager.Workbook = newWorkbook
 End Sub
 
 Private Sub Class_Initialize()
@@ -69,10 +69,10 @@ Private Sub ITestCase_SetUp(Assert As IAssert)
 
     Set mAssert = Assert
     
-    Set newWorkBook = vtkCreateExcelWorkbookForTestWithProjectName("NewProject")    ' create an Excel project for tests
-    Set newConfManager = vtkConfigurationManagerForProject(newWorkBook.VBProject.name) ' For vtkConfigurations sheet initialization
+    Set newWorkbook = vtkCreateExcelWorkbookForTestWithProjectName("NewProject")    ' create an Excel project for tests
+    Set newConfManager = vtkConfigurationManagerForProject(newWorkbook.VBProject.name) ' For vtkConfigurations sheet initialization
     Set newRefManager = New vtkReferenceManager
-    newRefManager.init Wb:=newWorkBook, confCount:=2, nbTitleColumnsInConfSheet:=1, devConf:=2
+    newRefManager.init Wb:=newWorkbook, confCount:=2, nbTitleColumnsInConfSheet:=1, devConf:=2
     
     Set existingWorkbook = getTestFileFromTemplate(fileName:=existingWorkbookNameForTest, destinationName:="ExistingProject_DEV.xlsm", openExcel:=True)
     Set existingRefManager = New vtkReferenceManager
@@ -81,7 +81,7 @@ Private Sub ITestCase_SetUp(Assert As IAssert)
 End Sub
 
 Private Sub ITestCase_TearDown()
-    vtkCloseAndKillWorkbook Wb:=newWorkBook     ' close the new Excel project
+    vtkCloseAndKillWorkbook Wb:=newWorkbook     ' close the new Excel project
     vtkCloseAndKillWorkbook Wb:=existingWorkbook ' close the existing Excel project
     vtkResetConfigurationManagers             ' reset all configuration managers
     Set newRefManager = Nothing
@@ -92,7 +92,7 @@ Public Sub TestReferenceSheetCreationForNewProject()
 '       Verify that a Reference Sheet is created in a new project
     Dim ws As Worksheet
     On Error Resume Next
-    Set ws = newWorkBook.Sheets("vtkReferences")
+    Set ws = newWorkbook.Sheets("vtkReferences")
     mAssert.Equals Err, 0, "Error number : A reference manager must create a Reference sheet"
     mAssert.Should ws Is newRefManager.referenceSheet, "The referenceSheet property of the ref manager must be equal to the reference sheet of the workbook"
     On Error GoTo 0
@@ -117,8 +117,8 @@ Public Sub TestReferenceSheetFormatForNewProjet()
     mAssert.Equals ws.Range("A1"), "vtkReferences v1.0", "Expected identification of the reference sheet"
     mAssert.Equals ws.Range("B1"), "", "Expected Title for GUID column"
     mAssert.Equals ws.Range("C1"), "-", "Expected Title for FullPath column"
-    mAssert.Equals ws.Range("D1"), newWorkBook.VBProject.name, "Expected Title for main project column"
-    mAssert.Equals ws.Range("E1"), newWorkBook.VBProject.name & "_DEV", "Expected Title for DEV project column"
+    mAssert.Equals ws.Range("D1"), newWorkbook.VBProject.name, "Expected Title for main project column"
+    mAssert.Equals ws.Range("E1"), newWorkbook.VBProject.name & "_DEV", "Expected Title for DEV project column"
 
    On Error GoTo 0
    Exit Sub
@@ -244,10 +244,10 @@ Public Sub TestInitializeStandardRefs()
 '       Verify that standard references are added to the reference sheet at initialization
     Dim ws As Worksheet, r As Range
     Dim refNames(), i As Integer
-    refNames = Array("Scripting", "VBIDE", "Shell32", "MSXML2", "ADODB", "VBAToolKit")
+    refNames = Array("Scripting", "VBIDE", "Shell32", "MSXML2", "ADODB", "VBAToolKit_DEV")
         
    On Error GoTo M_Error
-    Set ws = newWorkBook.Sheets("vtkReferences")
+    Set ws = newWorkbook.Sheets("vtkReferences")
     For i = LBound(refNames) To UBound(refNames)
         Set r = ws.Columns("A:A").Find(refNames(i), , xlValues, xlWhole)
         mAssert.Should Not r Is Nothing, "The reference named " & refNames(i) & " is not included in the reference sheet"
@@ -298,7 +298,7 @@ Public Sub TestGetAllReferencesFromNewWorkbook()
     Dim ws As Worksheet, r As Range, c As Collection, ref As vtkReference, i As Integer
         
    On Error GoTo M_Error
-    Set ws = newWorkBook.Sheets("vtkReferences")
+    Set ws = newWorkbook.Sheets("vtkReferences")
     Set c = newRefManager.allReferences
     For i = 1 To c.Count
         Set ref = c(i)
@@ -374,7 +374,7 @@ Public Sub TestGetReferencesFromNewWorkbook()
     mAssert.Equals c(8).name, "Shell32", "Reference for the development configuration"
     mAssert.Equals c(9).name, "MSXML2", "Reference for the development configuration"
     mAssert.Equals c(10).name, "ADODB", "Reference for the development configuration"
-    mAssert.Equals c(11).name, "VBAToolKit", "Reference for the development configuration"
+    mAssert.Equals c(11).name, "VBAToolKit_DEV", "Reference for the development configuration"
     
    On Error GoTo 0
     Exit Sub
@@ -403,9 +403,9 @@ Public Sub TestGetReferencesWithNullDevConf()
     Dim c As Collection
       
     Set newRefManager = Nothing
-    newWorkBook.Sheets("vtkReferences").name = "oldOne"
+    newWorkbook.Sheets("vtkReferences").name = "oldOne"
     Set newRefManager = New vtkReferenceManager
-    newRefManager.init Wb:=newWorkBook, confCount:=2, nbTitleColumnsInConfSheet:=1, devConf:=0
+    newRefManager.init Wb:=newWorkbook, confCount:=2, nbTitleColumnsInConfSheet:=1, devConf:=0
       
    On Error GoTo M_Error
     
@@ -449,9 +449,9 @@ Public Sub TestGetReferencesWithNoDevConf()
     Dim c As Collection
       
     Set newRefManager = Nothing
-    newWorkBook.Sheets("vtkReferences").name = "oldOne"
+    newWorkbook.Sheets("vtkReferences").name = "oldOne"
     Set newRefManager = New vtkReferenceManager
-    newRefManager.init Wb:=newWorkBook, confCount:=2, nbTitleColumnsInConfSheet:=1
+    newRefManager.init Wb:=newWorkbook, confCount:=2, nbTitleColumnsInConfSheet:=1
       
    On Error GoTo M_Error
     

@@ -156,6 +156,22 @@ Private Sub setReferenceSheet(confCount As Integer, devConf As Integer)
 End Sub
 
 '---------------------------------------------------------------------------------------
+' Function  : selfReference
+' Author    : Jean-Pierre Imbert
+' Date      : 22/06/2014
+' Purpose   : Return a vtkReference with a reference to the executing project
+'             - The executing project is normally VBAToolKit
+'             - The executing project is VBAToolKit_DEV for tests
+'---------------------------------------------------------------------------------------
+'
+Private Function selfReference() As vtkReference
+    Dim ref As New vtkReference
+    ref.name = ThisWorkbook.VBProject.name
+    ref.fullPath = ThisWorkbook.FullName
+    Set selfReference = ref
+End Function
+
+'---------------------------------------------------------------------------------------
 ' Procedure : initializeReferenceSheet
 ' Author    : Jean-Pierre Imbert
 ' Date      : 11/06/2014
@@ -196,8 +212,12 @@ Private Sub initializeReferenceSheet(confCount As Integer, devConf As Integer)
     m_referenceSheet.Range("B10") = "{F5078F18-C551-11D3-89B9-0000F81FE221}"
     m_referenceSheet.Range("A11") = "ADODB"
     m_referenceSheet.Range("B11") = "{00000206-0000-0010-8000-00AA006D2EA4}"
-    m_referenceSheet.Range("A12") = "VBAToolKit"
-    m_referenceSheet.Range("C12") = "Microsoft\AddIns\VBAToolKit.xlam"
+    
+    Dim ref As vtkReference
+    Set ref = selfReference()
+    m_referenceSheet.Range("A12") = ref.name
+    m_referenceSheet.Range("C12") = ref.relPath
+    
     ' Init configuration titles
     Dim i As Integer
     For i = 1 To confCount
@@ -205,7 +225,7 @@ Private Sub initializeReferenceSheet(confCount As Integer, devConf As Integer)
         Dim j As Integer
         For j = 1 To referenceCount
             If devConf >= 0 And devConf <= confCount Then m_referenceSheet.Cells(nbTitleRows + j, nbTitleColumns + i) = "X"
-            If m_referenceSheet.Cells(nbTitleRows + j, 1) = "VBAToolKit" And i <> devConf Then m_referenceSheet.Cells(nbTitleRows + j, nbTitleColumns + i) = ""
+            If m_referenceSheet.Cells(nbTitleRows + j, 1) = ref.name And i <> devConf Then m_referenceSheet.Cells(nbTitleRows + j, nbTitleColumns + i) = ""
         Next j
     Next i
 End Sub

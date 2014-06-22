@@ -152,3 +152,21 @@ Public Sub initWithVBAReference(ref As Reference)
     Me.GUID = ref.GUID
     Me.fullPath = ref.fullPath
 End Sub
+
+'---------------------------------------------------------------------------------------
+' Subroutine : addToWorkbook
+' Author     : Jean-Pierre Imbert
+' Date       : 22/06/2014
+' Purpose    : add the vtkReference to the workbook given as a parameter
+'              - no error if the reference is already set
+'---------------------------------------------------------------------------------------
+'
+Public Sub addToWorkbook(Wb As Workbook)
+    On Error Resume Next
+    If Me.GUID = "" Then
+        Wb.VBProject.references.AddFromFile Me.fullPath
+       Else
+        Wb.VBProject.references.AddFromGuid Me.GUID, 0, 0
+    End If
+    On Error GoTo 0
+End Sub
