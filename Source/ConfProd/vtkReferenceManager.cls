@@ -88,17 +88,21 @@ End Sub
 '               - Configuration count in the configuration sheet
 '               - Title columns count in the configuration sheet
 '               - optional devConf number
-'                   the devConf is attached to VBAToolKit reference when the reference sheet is created
+'                   the devConf is attached to the running project (VBAToolKit) reference when the reference sheet is created
 '                   if devConf = 0, there is no devConf, and VBAToolKit is not attached, but included
 '                   if devConf is <0 or >confCount, no attachment is performed
+'               - optional references collection
+'                   A collection of vtkReference objects for the reference sheet initialization
+'                   if the collection is nothing or absent, the sheet is initialized with a default reference list
+'                   Default is : VBA, Excel, stdole, Office, MSForms, Scripting, VBIDE, Shell32, MSXML2, ADOBD, active project (VBAToolKit)
 '---------------------------------------------------------------------------------------
 '
-Public Sub init(Wb As Workbook, confCount As Integer, nbTitleColumnsInConfSheet As Integer, Optional devConf As Integer = -1)
+Public Sub init(Wb As Workbook, confCount As Integer, nbTitleColumnsInConfSheet As Integer, Optional devConf As Integer = -1, Optional references As Collection = Nothing)
     If Not m_workbook Is Wb Then
         Set m_workbook = Wb
         m_nbTitleColumnsInConfSheet = nbTitleColumnsInConfSheet
         If Not m_workbook Is Nothing Then
-            setReferenceSheet confCount, devConf    ' Reset the reference sheet when the attached workbook is changed
+            setReferenceSheet confCount, devConf, references    ' Reset the reference sheet when the attached workbook is changed
            Else
             Set m_referenceSheet = Nothing
         End If
@@ -132,9 +136,13 @@ End Property
 '                   the devConf is attached to VBAToolKit reference when the reference sheet is created
 '                   if devConf = 0, there is no devConf, and VBAToolKit is not attached, but included
 '                   if devConf is <0 or >confCount, no attachment is performed
+'               - optional references collection
+'                   A collection of vtkReference objects for the reference sheet initialization
+'                   if the collection is nothing or absent, the sheet is initialized with a default reference list
+'                   Default is : VBA, Excel, stdole, Office, MSForms, Scripting, VBIDE, Shell32, MSXML2, ADOBD, active project (VBAToolKit)
 '---------------------------------------------------------------------------------------
 '
-Private Sub setReferenceSheet(confCount As Integer, devConf As Integer)
+Private Sub setReferenceSheet(confCount As Integer, devConf As Integer, references As Collection)
     On Error Resume Next
     Set m_referenceSheet = m_workbook.Worksheets(sheetName)
     On Error GoTo 0
@@ -143,7 +151,7 @@ Private Sub setReferenceSheet(confCount As Integer, devConf As Integer)
         Set m_referenceSheet = m_workbook.Worksheets.Add(Type:=xlWorksheet)
         m_referenceSheet.name = sheetName
         '   Initialize the reference sheet
-        initializeReferenceSheet confCount, devConf
+        initializeReferenceSheet confCount, devConf, references
         End If
     ' Verify that the configuration sheet is in last known version
     If m_referenceSheet.Range("A1") <> currentVersion Then
@@ -182,47 +190,57 @@ End Function
 '                   the devConf is attached to VBAToolKit reference when the reference sheet is created
 '                   if devConf = 0, there is no devConf, and VBAToolKit is not attached, but included
 '                   if devConf is <0 or >confCount, no attachment is performed
+'               - optional references collection
+'                   A collection of vtkReference objects for the reference sheet initialization
+'                   if the collection is nothing or absent, the sheet is initialized with a default reference list
+'                   Default is : VBA, Excel, stdole, Office, MSForms, Scripting, VBIDE, Shell32, MSXML2, ADOBD, active project (VBAToolKit)
 '---------------------------------------------------------------------------------------
 '
-Private Sub initializeReferenceSheet(confCount As Integer, devConf As Integer)
+Private Sub initializeReferenceSheet(confCount As Integer, devConf As Integer, references As Collection)
+    Dim ref As vtkReference, i As Integer, j As Integer
     ' Init titles
     m_referenceSheet.Range("A1") = currentVersion
     m_referenceSheet.Range("A1").Font.Size = 8
     m_referenceSheet.Range("B1") = ""
     m_referenceSheet.Range("C1") = "-"      ' addConfiguration works with the usedRange property
     m_referenceSheet.Columns("A:C").ColumnWidth = 22
-    ' Init standard references
-    m_referenceSheet.Range("A2") = "VBA"
-    m_referenceSheet.Range("B2") = "{000204EF-0000-0000-C000-000000000046}"
-    m_referenceSheet.Range("A3") = "Excel"
-    m_referenceSheet.Range("B3") = "{00020813-0000-0000-C000-000000000046}"
-    m_referenceSheet.Range("A4") = "stdole"
-    m_referenceSheet.Range("B4") = "{00020430-0000-0000-C000-000000000046}"
-    m_referenceSheet.Range("A5") = "Office"
-    m_referenceSheet.Range("B5") = "{2DF8D04C-5BFA-101B-BDE5-00AA0044DE52}"
-    m_referenceSheet.Range("A6") = "MSForms"
-    m_referenceSheet.Range("B6") = "{0D452EE1-E08F-101A-852E-02608C4D0BB4}"
-    m_referenceSheet.Range("A7") = "Scripting"
-    m_referenceSheet.Range("B7") = "{420B2830-E718-11CF-893D-00A0C9054228}"
-    m_referenceSheet.Range("A8") = "VBIDE"
-    m_referenceSheet.Range("B8") = "{0002E157-0000-0000-C000-000000000046}"
-    m_referenceSheet.Range("A9") = "Shell32"
-    m_referenceSheet.Range("B9") = "{50A7E9B0-70EF-11D1-B75A-00A0C90564FE}"
-    m_referenceSheet.Range("A10") = "MSXML2"
-    m_referenceSheet.Range("B10") = "{F5078F18-C551-11D3-89B9-0000F81FE221}"
-    m_referenceSheet.Range("A11") = "ADODB"
-    m_referenceSheet.Range("B11") = "{00000206-0000-0010-8000-00AA006D2EA4}"
     
-    Dim ref As vtkReference
+    If references Is Nothing Then
+        ' Init standard references
+        m_referenceSheet.Range("A2") = "VBA"
+        m_referenceSheet.Range("B2") = "{000204EF-0000-0000-C000-000000000046}"
+        m_referenceSheet.Range("A3") = "Excel"
+        m_referenceSheet.Range("B3") = "{00020813-0000-0000-C000-000000000046}"
+        m_referenceSheet.Range("A4") = "stdole"
+        m_referenceSheet.Range("B4") = "{00020430-0000-0000-C000-000000000046}"
+        m_referenceSheet.Range("A5") = "Office"
+        m_referenceSheet.Range("B5") = "{2DF8D04C-5BFA-101B-BDE5-00AA0044DE52}"
+        m_referenceSheet.Range("A6") = "MSForms"
+        m_referenceSheet.Range("B6") = "{0D452EE1-E08F-101A-852E-02608C4D0BB4}"
+        m_referenceSheet.Range("A7") = "Scripting"
+        m_referenceSheet.Range("B7") = "{420B2830-E718-11CF-893D-00A0C9054228}"
+        m_referenceSheet.Range("A8") = "VBIDE"
+        m_referenceSheet.Range("B8") = "{0002E157-0000-0000-C000-000000000046}"
+        m_referenceSheet.Range("A9") = "Shell32"
+        m_referenceSheet.Range("B9") = "{50A7E9B0-70EF-11D1-B75A-00A0C90564FE}"
+        m_referenceSheet.Range("A10") = "MSXML2"
+        m_referenceSheet.Range("B10") = "{F5078F18-C551-11D3-89B9-0000F81FE221}"
+        m_referenceSheet.Range("A11") = "ADODB"
+        m_referenceSheet.Range("B11") = "{00000206-0000-0010-8000-00AA006D2EA4}"
+       Else
+        ' Init given references
+        For Each ref In references
+            addOneReference ref
+        Next
+    End If
+    
+    ' Add a reference to the running project (VBAToolKit)
     Set ref = selfReference()
-    m_referenceSheet.Range("A12") = ref.name
-    m_referenceSheet.Range("C12") = ref.relPath
+    addOneReference ref
     
     ' Init configuration titles
-    Dim i As Integer
     For i = 1 To confCount
         addConfiguration
-        Dim j As Integer
         For j = 1 To referenceCount
             If devConf >= 0 And devConf <= confCount Then m_referenceSheet.Cells(nbTitleRows + j, nbTitleColumns + i) = "X"
             If m_referenceSheet.Cells(nbTitleRows + j, 1) = ref.name And i <> devConf Then m_referenceSheet.Cells(nbTitleRows + j, nbTitleColumns + i) = ""
@@ -299,20 +317,32 @@ End Sub
 '---------------------------------------------------------------------------------------
 '
 Private Sub addReferences()
-    Dim ref As Reference, ra As Range, newRow As Integer, vtkRef As New vtkReference
+    Dim ref As Reference, ra As Range, vtkRef As New vtkReference
     For Each ref In m_workbook.VBProject.references
         Set ra = m_referenceSheet.Columns("A:A").Find(ref.name, , xlValues, xlWhole)
         If ra Is Nothing Then
             vtkRef.initWithVBAReference ref
-            newRow = m_referenceSheet.UsedRange.Rows.Count + 1
-            m_referenceSheet.Cells(newRow, 1) = vtkRef.name
-            If ref.GUID Like "" Then
-                m_referenceSheet.Cells(newRow, 3) = vtkRef.relPath
-               Else
-                m_referenceSheet.Cells(newRow, 2) = vtkRef.GUID
-            End If
+            addOneReference vtkRef
         End If
     Next
+End Sub
+
+'---------------------------------------------------------------------------------------
+' Subroutine  : addOneReference
+' Author      : Jean-Pierre Imbert
+' Date        : 23/06/2014
+' Purpose     : Add one reference at the end of the reference sheet
+'---------------------------------------------------------------------------------------
+'
+Private Sub addOneReference(vtkRef As vtkReference)
+    Dim newRow As Integer
+    newRow = m_referenceSheet.UsedRange.Rows.Count + 1
+    m_referenceSheet.Cells(newRow, 1) = vtkRef.name
+    If vtkRef.GUID Like "" Then
+        m_referenceSheet.Cells(newRow, 3) = vtkRef.relPath
+       Else
+        m_referenceSheet.Cells(newRow, 2) = vtkRef.GUID
+    End If
 End Sub
 
 '---------------------------------------------------------------------------------------

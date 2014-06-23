@@ -132,6 +132,7 @@ Public Sub vtkInitializeConfigurationForActiveWorkBook(Optional withBeforeSaveHa
     Next
     
     ' Initialize the reference sheet
+    cm.initReferences vtkReferencesInWorkbook(ActiveWorkbook)
     
     ' Add a BeforeSave event handler for the workbook
     If withBeforeSaveHandler Then vtkAddBeforeSaveHandlerInDEVWorkbook Wb:=ActiveWorkbook, projectName:=project.projectName, confName:=project.projectDEVName

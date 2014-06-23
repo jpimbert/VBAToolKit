@@ -146,9 +146,7 @@ Public Function vtkReferencesInWorkbook(Wb As Workbook) As Collection
     Dim c As New Collection, ref As vtkReference, r As VBIDE.Reference
     For Each r In Wb.VBProject.references
         Set ref = New vtkReference
-        ref.name = r.name
-        ref.GUID = r.GUID
-        ref.fullPath = r.fullPath
+        ref.initWithVBAReference r
         c.Add Item:=ref, Key:=ref.name
     Next
     Set vtkReferencesInWorkbook = c

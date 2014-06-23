@@ -693,10 +693,7 @@ End Sub
 '---------------------------------------------------------------------------------------
 '
 Private Function referenceManager() As vtkReferenceManager
-    If m_refManager Is Nothing Then
-        Set m_refManager = New vtkReferenceManager
-        m_refManager.init Wb:=Workbook, confCount:=Me.configurationCount, nbTitleColumnsInConfSheet:=nbTitleColumns, devConf:=m_devConfiguration
-    End If
+    initReferences refs:=Nothing
     Set referenceManager = m_refManager
 End Function
 
@@ -711,5 +708,18 @@ Public Function references() As Collection
     Set references = referenceManager.allReferences
 End Function
 
-' Il faut implémenter une propriété DevConf à -1 par défaut
+'---------------------------------------------------------------------------------------
+' Procedure : initReferences
+' Author    : Jean-Pierre Imbert
+' Date      : 23/06/2014
+' Purpose   : Initialize the references with the collection of vtkReference
+'---------------------------------------------------------------------------------------
+'
+Public Sub initReferences(refs As Collection)
+    If m_refManager Is Nothing Then
+        Set m_refManager = New vtkReferenceManager
+        m_refManager.init Wb:=Workbook, confCount:=Me.configurationCount, nbTitleColumnsInConfSheet:=nbTitleColumns, devConf:=m_devConfiguration, references:=refs
+    End If
+End Sub
+
 
