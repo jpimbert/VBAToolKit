@@ -132,3 +132,24 @@ Public Function vtkDefaultIsAddIn(filePath As String) As Boolean
     vtkDefaultIsAddIn = (vtkGetFileExtension(filePath) = "xlam") Or (vtkGetFileExtension(filePath) = "xla")
 End Function
 
+'---------------------------------------------------------------------------------------
+' Function  : vtkReferencesInWorkbook as Collection of vtkReferences
+' Author    : Jean-Pierre Imbert
+' Date      : 23/06/2014
+' Purpose   : return a collection of references of the workbook given as a parameter
+'             - the ID property of each vtkReference instance of this collection is not initialized
+'             - the collection is indexed by the name of the references
+' NOTE      : this function is not tested
+'---------------------------------------------------------------------------------------
+'
+Public Function vtkReferencesInWorkbook(Wb As Workbook) As Collection
+    Dim c As New Collection, ref As vtkReference, r As VBIDE.Reference
+    For Each r In Wb.VBProject.references
+        Set ref = New vtkReference
+        ref.name = r.name
+        ref.GUID = r.GUID
+        ref.fullPath = r.fullPath
+        c.Add Item:=ref, Key:=ref.name
+    Next
+    Set vtkReferencesInWorkbook = c
+End Function

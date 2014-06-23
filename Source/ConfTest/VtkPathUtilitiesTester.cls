@@ -212,6 +212,35 @@ Public Sub Test_vtkStripPathOrNameOfVtkExtension_pathVtkExtensionMistake()
     mAssert.Equals vtkStripPathOrNameOfVtkExtension("dummyFolder\dummy_VTKEXT.extension", "VTKEXTMISTAKE"), "dummy_VTKEXT"
 End Sub
 
+Public Sub Test_vtkIsPathAbsolute_ServerPath()
+    Dim path As String
+    path = "\\Server\dummyFolder\dummy_VTKEXT.extension"
+    mAssert.Should vtkIsPathAbsolute(path), "Path " & path & " is absolute"
+End Sub
+
+Public Sub Test_vtkIsPathAbsolute_AbsDirPath()
+    Dim path As String
+    path = "\dummyFolder\dummy_VTKEXT.extension"
+    mAssert.Should vtkIsPathAbsolute(path), "Path " & path & " is absolute"
+End Sub
+
+Public Sub Test_vtkIsPathAbsolute_UpcaseDrivePath()
+    Dim path As String
+    path = "C:\Server\dummyFolder\dummy_VTKEXT.extension"
+    mAssert.Should vtkIsPathAbsolute(path), "Path " & path & " is absolute"
+End Sub
+
+Public Sub Test_vtkIsPathAbsolute_LowcaseDrivePath()
+    Dim path As String
+    path = "a:\Server\dummyFolder\dummy_VTKEXT.extension"
+    mAssert.Should vtkIsPathAbsolute(path), "Path " & path & " is absolute"
+End Sub
+
+Public Sub Test_vtkIsPathAbsolute_RelativePath()
+    Dim path As String
+    path = "dummyFolder\dummy_VTKEXT.extension"
+    mAssert.Should Not vtkIsPathAbsolute(path), "Path " & path & " is relative"
+End Sub
 
 Private Function ITest_Suite() As TestSuite
     Set ITest_Suite = New TestSuite
@@ -252,6 +281,11 @@ Private Function ITest_Suite() As TestSuite
     ITest_Suite.AddTest ITest_Manager.ClassName, "Test_vtkStripPathOrNameOfVtkExtension_nameEmptyVtkExtension"
     ITest_Suite.AddTest ITest_Manager.ClassName, "Test_vtkStripPathOrNameOfVtkExtension_fileNameVtkExtensionMistake"
     ITest_Suite.AddTest ITest_Manager.ClassName, "Test_vtkStripPathOrNameOfVtkExtension_pathVtkExtensionMistake"
+    ITest_Suite.AddTest ITest_Manager.ClassName, "Test_vtkIsPathAbsolute_ServerPath"
+    ITest_Suite.AddTest ITest_Manager.ClassName, "Test_vtkIsPathAbsolute_AbsDirPath"
+    ITest_Suite.AddTest ITest_Manager.ClassName, "Test_vtkIsPathAbsolute_UpcaseDrivePath"
+    ITest_Suite.AddTest ITest_Manager.ClassName, "Test_vtkIsPathAbsolute_LowcaseDrivePath"
+    ITest_Suite.AddTest ITest_Manager.ClassName, "Test_vtkIsPathAbsolute_RelativePath"
 End Function
 
 Private Sub ITestCase_RunTest()
@@ -293,6 +327,11 @@ Private Sub ITestCase_RunTest()
         Case "Test_vtkStripPathOrNameOfVtkExtension_nameEmptyVtkExtension": Test_vtkStripPathOrNameOfVtkExtension_nameEmptyVtkExtension
         Case "Test_vtkStripPathOrNameOfVtkExtension_fileNameVtkExtensionMistake": Test_vtkStripPathOrNameOfVtkExtension_fileNameVtkExtensionMistake
         Case "Test_vtkStripPathOrNameOfVtkExtension_pathVtkExtensionMistake": Test_vtkStripPathOrNameOfVtkExtension_pathVtkExtensionMistake
+        Case "Test_vtkIsPathAbsolute_ServerPath": Test_vtkIsPathAbsolute_ServerPath
+        Case "Test_vtkIsPathAbsolute_AbsDirPath": Test_vtkIsPathAbsolute_AbsDirPath
+        Case "Test_vtkIsPathAbsolute_UpcaseDrivePath": Test_vtkIsPathAbsolute_UpcaseDrivePath
+        Case "Test_vtkIsPathAbsolute_LowcaseDrivePath": Test_vtkIsPathAbsolute_LowcaseDrivePath
+        Case "Test_vtkIsPathAbsolute_RelativePath": Test_vtkIsPathAbsolute_RelativePath
         Case Else: mAssert.Should False, "Invalid test name: " & mManager.methodName
     End Select
 End Sub

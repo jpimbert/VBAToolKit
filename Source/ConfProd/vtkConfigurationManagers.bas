@@ -94,6 +94,7 @@ End Sub
 '             - the suffix "_DEV" is appended to the project name
 '             - the Excel workbook is saved as a new file with DEV appended to the name
 '             - the Delivery version is described in configuration but not created
+'             - the reference sheet is created and initialized according to the actual references
 '---------------------------------------------------------------------------------------
 '
 Public Sub vtkInitializeConfigurationForActiveWorkBook(Optional withBeforeSaveHandler As Boolean = False)
@@ -129,6 +130,8 @@ Public Sub vtkInitializeConfigurationForActiveWorkBook(Optional withBeforeSaveHa
             End If
         End If
     Next
+    
+    ' Initialize the reference sheet
     
     ' Add a BeforeSave event handler for the workbook
     If withBeforeSaveHandler Then vtkAddBeforeSaveHandlerInDEVWorkbook Wb:=ActiveWorkbook, projectName:=project.projectName, confName:=project.projectDEVName

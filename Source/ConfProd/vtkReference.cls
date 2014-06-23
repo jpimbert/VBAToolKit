@@ -125,7 +125,11 @@ End Property
 '---------------------------------------------------------------------------------------
 '
 Private Function convertRelativePathToFullPath(relPath As String) As String
-    convertRelativePathToFullPath = Environ("AppData") & "\" & relPath
+    If vtkIsPathAbsolute(relPath) Then
+        convertRelativePathToFullPath = relPath
+       Else
+        convertRelativePathToFullPath = Environ("AppData") & "\" & relPath
+    End If
 End Function
 
 '---------------------------------------------------------------------------------------

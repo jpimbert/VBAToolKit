@@ -76,8 +76,8 @@ End Sub
 '---------------------------------------------------------------------------------------
 '
 Public Sub vtkDisplayActivatedReferencesGuid()
-    Dim r As VBIDE.Reference
-    For Each r In ActiveWorkbook.VBProject.references
+    Dim r As vtkReference
+    For Each r In vtkReferencesInWorkbook(ActiveWorkbook)
         Debug.Print r.name, r.GUID, r.fullPath
     Next
 End Sub
