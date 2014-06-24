@@ -157,8 +157,6 @@ End Sub
 '             - All modules really present in a configuration are described in the description with non null path
 '             - All modules pathes are reachable
 '             - Each code module implemented in a configuration is the same as the source code module
-'
-'   To be implemented later (with XML configuration files)
 '             - All references listed in a configuration description are existing in the configuration
 '             - All references really present in a configuration are described in the description
 '---------------------------------------------------------------------------------------
@@ -272,6 +270,33 @@ Sub vtkVerifyConfigurations()
         Next
     Next i
     vtkDeleteFolder testPath
+    
+    ' Verify that all references listed in a configuration description are existing in the configuration
+    ' and that all references really present in a configuration are described in the description
+    '   - for each configuration, get both collection
+    '   - compare one list to the other whikle removing each found item
+    '       - alert if an item is not found in the other list
+    '   - the count of remaining items must be null at the end of the comparison
+    '       - alert if not, and list the remaining items
+    Dim actualList As Collection, actualRef  As vtkReference, expectedRef As vtkReference
+    For i = 1 To nbConf
+        Set actualList = vtkReferencesInWorkbook(cwb(i).Wb) ' Get the actual list, indexed by name
+        For Each expectedRef In cwb(i).conf.references      ' the expected list is indexed by ID
+           On Error Resume Next
+            Set actualRef = actualList(expectedRef.name)
+            If Err.Number <> 0 Then
+                Debug.Print "Reference " & expectedRef.name & " is expected but not present in configuration " & cwb(i).conf.name & "."
+               Else
+                actualList.Remove expectedRef.name
+            End If
+           On Error GoTo 0
+        Next expectedRef
+        If actualList.Count <> 0 Then
+            For Each actualRef In actualList
+                Debug.Print "Reference " & actualRef.name & " is present but not expected in configuration " & cwb(i).conf.name & "."
+            Next actualRef
+        End If
+    Next i
     
     ' Close all Worbooks opened during this verification
     For i = 1 To nbConf
