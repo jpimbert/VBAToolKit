@@ -33,7 +33,7 @@ Implements ITest
 Implements ITestCase
 
 Private Const vtkTestProjectName = "TestProject"
-Private Const expectedReferenceCount = 9
+Private Const expectedReferenceCount = 10
 
 Private mManager As TestCaseManager
 Private mAssert As IAssert
@@ -153,13 +153,13 @@ Public Sub TestReferencesOfDevWorkbookWasActivated()
 returnValue = vtkCreateProject(path:=VBAToolKit.vtkTestPath, name:=vtkTestProjectName, displayError:=False)
     OpenDeliveryProject
  
-    For i = 1 To Workbooks(vtkTestProjectName & "_DEV.xlsm").VBProject.References.Count
-        If ((Workbooks(vtkTestProjectName & "_DEV.xlsm").VBProject.References(i).GUID) = "{420B2830-E718-11CF-893D-00A0C9054228}") Or (Workbooks(vtkTestProjectName & "_DEV.xlsm").VBProject.References(i).GUID = "{0002E157-0000-0000-C000-000000000046}") Then
+    For i = 1 To Workbooks(vtkTestProjectName & "_DEV.xlsm").VBProject.references.Count
+        If ((Workbooks(vtkTestProjectName & "_DEV.xlsm").VBProject.references(i).GUID) = "{420B2830-E718-11CF-893D-00A0C9054228}") Or (Workbooks(vtkTestProjectName & "_DEV.xlsm").VBProject.references(i).GUID = "{0002E157-0000-0000-C000-000000000046}") Then
         j = j + 1
         End If
     Next
 mAssert.Equals j, 2, "the searched reference number must be equal to " & 2
-mAssert.Equals Workbooks(vtkTestProjectName & "_DEV.xlsm").VBProject.References.count, expectedReferenceCount + 1, "the total references number must be equal to " & expectedReferenceCount + 1
+mAssert.Equals Workbooks(vtkTestProjectName & "_DEV.xlsm").VBProject.references.count, expectedReferenceCount + 1, "the total references number must be equal to " & expectedReferenceCount + 1
 End Sub
 
 Public Sub TestReferencesOfDeliveryWorkbookWasActivated()
@@ -172,13 +172,13 @@ Public Sub TestReferencesOfDeliveryWorkbookWasActivated()
 returnValue = vtkCreateProject(path:=VBAToolKit.vtkTestPath, name:=vtkTestProjectName, displayError:=False)
     OpenDeliveryProject
     
-    For i = 1 To Workbooks(vtkTestProjectName & ".xlsm").VBProject.References.Count
-        If ((Workbooks(vtkTestProjectName & ".xlsm").VBProject.References(i).GUID) = "{420B2830-E718-11CF-893D-00A0C9054228}") Or (Workbooks(vtkTestProjectName & ".xlsm").VBProject.References(i).GUID = "{0002E157-0000-0000-C000-000000000046}") Then
+    For i = 1 To Workbooks(vtkTestProjectName & ".xlsm").VBProject.references.Count
+        If ((Workbooks(vtkTestProjectName & ".xlsm").VBProject.references(i).GUID) = "{420B2830-E718-11CF-893D-00A0C9054228}") Or (Workbooks(vtkTestProjectName & ".xlsm").VBProject.references(i).GUID = "{0002E157-0000-0000-C000-000000000046}") Then
         j = j + 1
         End If
     Next
 mAssert.Equals j, 2, "the searched reference number must be equal to " & 2
-mAssert.Equals Workbooks(vtkTestProjectName & ".xlsm").VBProject.References.count, expectedReferenceCount, "the total references number must be equal to " & expectedReferenceCount
+mAssert.Equals Workbooks(vtkTestProjectName & ".xlsm").VBProject.references.count, expectedReferenceCount, "the total references number must be equal to " & expectedReferenceCount
 End Sub
 
 Public Sub Test_VBAUnitModulesExportation()

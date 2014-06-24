@@ -243,4 +243,13 @@ Public Sub vtkDeleteTreeFolder(rootPath As String)
     RmDir rootPath
 End Sub
 
-
+'---------------------------------------------------------------------------------------
+' Function  : vtkIsPathAbsolute as Boolean
+' Author    : Jean-Pierre Imbert
+' Date      : 23/06/2014
+' Purpose   : Return True if the path given as a parameter is absolute
+'---------------------------------------------------------------------------------------
+'
+Public Function vtkIsPathAbsolute(path As String) As Boolean
+    vtkIsPathAbsolute = (UCase(Left(path, 3)) Like "[A-Z]:\") Or (Left(path, 1) = "\")
+End Function

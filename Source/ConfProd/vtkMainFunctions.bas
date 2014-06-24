@@ -71,7 +71,7 @@ Public Function vtkCreateProject(path As String, name As String, Optional displa
     ' Rename the VBProject of the DEV workbook
     Workbooks(project.workbookDEVName).VBProject.name = project.projectDEVName
     ' Activate references and reference to the current workbook (the VBAToolKit add-in)
-    VtkActivateReferences Wb:=Workbooks(project.workbookDEVName), toSelf:=True
+    VtkActivateReferences Wb:=Workbooks(project.workbookDEVName), projectName:=project.projectName, confName:=project.projectDEVName
     ' Initialize configuration Sheet with VBAUnit modules
     vtkInitializeVbaUnitNamesAndPathes project:=project.projectName
     ' Save DEV Workbook
@@ -83,7 +83,7 @@ Public Function vtkCreateProject(path As String, name As String, Optional displa
     ' Rename the VBProject of the Delivery workbook
     Workbooks(project.workbookName).VBProject.name = project.projectName
     ' Activate references
-    VtkActivateReferences Wb:=Workbooks(project.workbookName), toSelf:=False
+    VtkActivateReferences Wb:=Workbooks(project.workbookName), projectName:=project.projectName, confName:=project.projectName
     ' A module must be added in the Excel File for the project parameters to be saved
     Workbooks(project.workbookName).VBProject.VBComponents.Add ComponentType:=vbext_ct_StdModule
     ' Save and Close Delivery Workbook
@@ -98,7 +98,7 @@ Public Function vtkCreateProject(path As String, name As String, Optional displa
     vtkImportModulesInAnotherProject projectForModules:=Wb.VBProject, projectName:=project.projectName, confName:=project.projectDEVName
     
     ' Insert the BeforeSave handler in the newly created project
-    vtkAddBeforeSaveHandlerInDEVWorkbook Wb:=Wb, projectName:=project.projectName, confName:=project.projectDEVName
+    vtkAddBeforeSaveHandlerInDEVWorkbook Wb:=wb, projectName:=project.projectName, confName:=project.projectDEVName
     ' Save configured and updated project for test
     Wb.Save
         

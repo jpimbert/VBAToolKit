@@ -54,22 +54,17 @@ End Function
 
 '---------------------------------------------------------------------------------------
 ' Procedure : VtkAvtivateReferences
-' Author    : Abdelfattah Lahbib
-' Date      : 26/04/2013
-' Purpose   : - Check that workbook is open and activate VBIDE and +-scripting references
-'             - Optionally, activate reference to the current workbook (see comments in vtkCreateProject for the use
-'               of this parameter)
+' Author    : Jean-Pierre IMBERT
+' Date      : 22/06/2014
+' Purpose   : - Check that workbook is open
+'             - Activate references of the configuration whose name is given as a parameter
 '---------------------------------------------------------------------------------------
-Public Sub VtkActivateReferences(Wb As Workbook, Optional toSelf As Boolean = False)
-    If VtkWorkbookIsOpen(Wb.name) = True Then     'if the workbook is opened
-        On Error Resume Next ' if an extention is already activated, we will try to activate the next one
-        Wb.VBProject.References.AddFromGuid "{420B2830-E718-11CF-893D-00A0C9054228}", 0, 0  ' Scripting : Microsoft scripting runtime
-        Wb.VBProject.References.AddFromGuid "{0002E157-0000-0000-C000-000000000046}", 0, 0  ' VBIDE : Microsoft visual basic for applications extensibility 5.3
-        Wb.VBProject.References.AddFromGuid "{50A7E9B0-70EF-11D1-B75A-00A0C90564FE}", 0, 0  ' Shell32 : Microsoft Shell Controls and Automation
-        Wb.VBProject.References.AddFromGuid "{F5078F18-C551-11D3-89B9-0000F81FE221}", 0, 0  ' MSXML2 : Microsoft XML V5.0
-        Wb.VBProject.References.AddFromGuid "{00000206-0000-0010-8000-00AA006D2EA4}", 0, 0  ' ADODB : Microsoft ActiveX Data Objects V2.6 Library
-        If toSelf Then Wb.VBProject.References.AddFromFile ThisWorkbook.FullName ' if specified, add reference to current workbook.
-        On Error GoTo 0
+Public Sub VtkActivateReferences(Wb As Workbook, projectName As String, confName As String)
+    Dim ref As vtkReference
+    If VtkWorkbookIsOpen(Wb.name) Then
+        For Each ref In vtkConfigurationManagerForProject(projectName).getConfigurationReferencesWithNumber(vtkConfigurationManagerForProject(projectName).getConfigurationNumber(confName))
+            ref.addToWorkbook Wb
+        Next
     End If
 End Sub
 
@@ -81,9 +76,9 @@ End Sub
 '---------------------------------------------------------------------------------------
 '
 Public Sub vtkDisplayActivatedReferencesGuid()
-    Dim r As VBIDE.Reference
-    For Each r In ActiveWorkbook.VBProject.References
-        Debug.Print r.name, r.GUID
+    Dim r As vtkReference
+    For Each r In vtkReferencesInWorkbook(ActiveWorkbook)
+        Debug.Print r.name, r.GUID, r.fullPath
     Next
 End Sub
 
@@ -106,7 +101,11 @@ End Sub
 Public Sub vtkAddBeforeSaveHandlerInDEVWorkbook(Wb As Workbook, projectName As String, confName As String)
     
     On Error GoTo vtkAddBeforeSaveHandlerInDEVWorkbook_Error
-          
+    
+    ' Force the vtkReferences sheet for the BeforeSave Handler to work in eac case
+    Dim c As Collection
+    Set c = vtkConfigurationManagerForProject(projectName).references
+    
     Dim wbVTKName As String
     wbVTKName = ThisWorkbook.VBProject.name ' Get the name of the Running project (VBAToolKit)
     

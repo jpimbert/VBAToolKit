@@ -48,15 +48,22 @@ Private m_projectName As String             ' The configuration of a project is 
 Private m_workbook As Workbook
 Private m_configurationSheet As Worksheet
 Private m_rootPath As String
+Private m_refManager As vtkReferenceManager
+Private m_devConfiguration As Integer
 Private Const sheetName As String = "vtkConfigurations"
 Private Const currentVersion As String = "vtkConfigurations v1.1"
 Private Const version10 As String = "vtkConfigurations v1.0"
 Private m_sheetVersion As String
 Private Const nbTitleColumns As Integer = 1
 
+Private Sub Class_Initialize()
+    m_devConfiguration = -1
+End Sub
+
 Private Sub Class_Terminate()
     Set m_configurationSheet = Nothing
     Set m_workbook = Nothing
+    Set m_refManager = Nothing
 End Sub
 
 '---------------------------------------------------------------------------------------
@@ -227,6 +234,8 @@ Private Sub initializeConfigurationSheet(ws As Worksheet)
     ws.Range("B2") = vtkProjectForName(projectName).projectStandardRelativePath
     ws.Range("C1") = vtkProjectForName(projectName).projectDEVName
     ws.Range("C2") = vtkProjectForName(projectName).projectDEVStandardRelativePath
+    
+    m_devConfiguration = 2
     
     ws.Columns("A:C").ColumnWidth = 22
     ws.Range("A1").Font.Size = 8
@@ -532,6 +541,17 @@ Public Sub setConfigurationCommentWithNumber(n As Integer, comment As String)
 End Sub
 
 '---------------------------------------------------------------------------------------
+' Procedure : getConfigurationReferencesWithNumber
+' Author    : Jean-Pierre Imbert
+' Date      : 08/06/2014
+' Purpose   : return the n-th configuration references collection of the project, given n as integer
+'---------------------------------------------------------------------------------------
+'
+Public Function getConfigurationReferencesWithNumber(n As Integer) As Collection
+    Set getConfigurationReferencesWithNumber = referenceManager.references(n)
+End Function
+
+'---------------------------------------------------------------------------------------
 ' Property  : moduleCount as Integer - Read Only - Public
 ' Author    : Jean-Pierre Imbert
 ' Date      : 25/05/2013
@@ -664,3 +684,42 @@ Public Sub setModulePathWithNumber(path As String, numModule As Integer, numConf
         configurationSheet.Cells(numModule + nbTitleRows, numConfiguration + nbTitleColumns) = s
     End If
 End Sub
+
+'---------------------------------------------------------------------------------------
+' Procedure : referenceManager, private
+' Author    : Jean-Pierre Imbert
+' Date      : 19/06/2014
+' Purpose   : Return the reference manager associated with the configuration manager
+'---------------------------------------------------------------------------------------
+'
+Private Function referenceManager() As vtkReferenceManager
+    initReferences refs:=Nothing
+    Set referenceManager = m_refManager
+End Function
+
+'---------------------------------------------------------------------------------------
+' Procedure : references
+' Author    : Jean-Pierre Imbert
+' Date      : 19/06/2014
+' Purpose   : Return a collection of all vtkReferences objects
+'---------------------------------------------------------------------------------------
+'
+Public Function references() As Collection
+    Set references = referenceManager.allReferences
+End Function
+
+'---------------------------------------------------------------------------------------
+' Procedure : initReferences
+' Author    : Jean-Pierre Imbert
+' Date      : 23/06/2014
+' Purpose   : Initialize the references with the collection of vtkReference
+'---------------------------------------------------------------------------------------
+'
+Public Sub initReferences(refs As Collection)
+    If m_refManager Is Nothing Then
+        Set m_refManager = New vtkReferenceManager
+        m_refManager.init Wb:=Workbook, confCount:=Me.configurationCount, nbTitleColumnsInConfSheet:=nbTitleColumns, devConf:=m_devConfiguration, references:=refs
+    End If
+End Sub
+
+

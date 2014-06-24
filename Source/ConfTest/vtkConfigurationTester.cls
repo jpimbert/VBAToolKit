@@ -35,10 +35,11 @@ Implements ITestCase
 
 Private initializedWorkbook As Workbook    ' Existing Workbook opened for each test
 Private Const initializedWorkbookName As String = "InitializedProject_DEV.xlsm"
-Private confManager As vtkConfigurationManager   ' Configuration Manager for the new workbook
+Private confManager As vtkConfigurationManager   ' Configuration Manager for the existing workbook
 Private Const initializedProjectName As String = "InitializedProject"
 
 Private Const workbookNameWithConfigurationV10 As String = "WorkBookForConfigurationsTests10.xlsm"
+Private Const workbookNameWithConfigurationV11 As String = "WorkBookForConfigurationsTests.xlsm"
 
 Private mManager As TestCaseManager
 Private mAssert As IAssert
@@ -70,14 +71,14 @@ End Sub
 
 Public Sub Test_ConfigurationCollection_Count()
     ' This test verifies the count of configurations collection property of Configuration Management
-    ' just initialized from an Excel worlbook
+    ' just initialized from an Excel workbook
     
     mAssert.Equals confManager.configurations.count, 1, "Number of configurations in the Test workbook"
 End Sub
 
 Public Sub Test_AddedConfigurationCollection_Count()
     ' This test verifies the count of configurations collection property of Configuration Management
-    ' Added configuration to the initialized from an Excel worlbook
+    ' Added configuration to the initialized from an Excel workbook
     
     confManager.addConfiguration ("NewConfiguration")
     
@@ -86,14 +87,14 @@ End Sub
 
 Public Sub Test_ConfigurationCollection_Parent()
     ' This test verifies the parent of each vtkConfiguration object
-    ' collection just initialized from an Excel worlbook
+    ' collection just initialized from an Excel workbook
     
     mAssert.Should confManager.configurations(1).parent Is confManager, "The parent of each vtkConfiguration must be initialized"
 End Sub
 
 Public Sub Test_AddedConfigurationCollection_Parent()
     ' This test verifies the parent of each vtkConfiguration object
-    ' Added configuration to the collection initialized from an Excel worlbook
+    ' Added configuration to the collection initialized from an Excel workbook
     
     confManager.addConfiguration ("NewConfiguration")
     
@@ -103,21 +104,21 @@ End Sub
 
 Public Sub Test_ConfigurationCollection_Number()
     ' This test verifies the number of each vtkConfiguration object
-    ' collection just initialized from an Excel worlbook
+    ' collection just initialized from an Excel workbook
     
     mAssert.Equals confManager.configurations(1).Number, 1, "The number of each vtkConfiguration must be initialized"
 End Sub
 
 Public Sub Test_ConfigurationCollection_ID()
     ' This test verifies the ID of each vtkConfiguration object
-    ' collection just initialized from an Excel worlbook
+    ' collection just initialized from an Excel workbook
     
-    mAssert.Equals confManager.configurations(1).ID, "c1", "Expected ID for the first vtkConfiguration"
+    mAssert.Equals confManager.configurations(1).id, "c1", "Expected ID for the first vtkConfiguration"
 End Sub
 
 Public Sub Test_AddedConfigurationCollection_Number()
     ' This test verifies the number of each vtkConfiguration object
-    ' Added configuration to the collection initialized from an Excel worlbook
+    ' Added configuration to the collection initialized from an Excel workbook
     
     confManager.addConfiguration ("NewConfiguration")
     
@@ -127,7 +128,7 @@ End Sub
 
 Public Sub Test_AddedConfigurationCollection_isDEV()
     ' This test verifies the number of each vtkConfiguration object
-    ' Added configuration to the collection initialized from an Excel worlbook
+    ' Added configuration to the collection initialized from an Excel workbook
     
     confManager.addConfiguration ("NewConfiguration")
     
@@ -137,17 +138,17 @@ End Sub
 
 Public Sub Test_AddedConfigurationCollection_ID()
     ' This test verifies the ID of each vtkConfiguration object
-    ' Added configuration to the collection initialized from an Excel worlbook
+    ' Added configuration to the collection initialized from an Excel workbook
     
     confManager.addConfiguration ("NewConfiguration")
     
-    mAssert.Equals confManager.configurations(1).ID, "c1", "Expected ID for the first vtkConfiguration"
-    mAssert.Equals confManager.configurations(2).ID, "c2", "Expected ID for the second vtkConfiguration"
+    mAssert.Equals confManager.configurations(1).id, "c1", "Expected ID for the first vtkConfiguration"
+    mAssert.Equals confManager.configurations(2).id, "c2", "Expected ID for the second vtkConfiguration"
 End Sub
 
 Public Sub Test_ConfigurationGetName()
     ' This test verifies the name of each vtkConfiguration object
-    ' collection just initialized from an Excel worlbook
+    ' collection just initialized from an Excel workbook
     
    On Error GoTo M_Error
 
@@ -195,7 +196,7 @@ End Sub
 
 Public Sub Test_ConfigurationGetDefaultProjectNameFromVersion11()
     ' This test verifies the default projectName of a vtkConfiguration object
-    ' Added configuration to the initialized from an Excel worlbook
+    ' Added configuration to the initialized from an Excel workbook
     
     confManager.addConfiguration ("NewConfiguration")
     
@@ -213,7 +214,7 @@ End Sub
 
 Public Sub Test_ConfigurationGetDefaultCommentFromVersion11()
     ' This test verifies the default comment of a vtkConfiguration object
-    ' Added configuration to the initialized from an Excel worlbook
+    ' Added configuration to the initialized from an Excel workbook
     
     confManager.addConfiguration ("NewConfiguration")
     
@@ -231,7 +232,7 @@ End Sub
 
 Public Sub Test_ConfigurationIsDEV_True()
     ' This test verifies the property isDEV of vtkConfiguration object
-    ' collection just initialized from an Excel worlbook
+    ' collection just initialized from an Excel workbook
     
    On Error GoTo M_Error
 
@@ -247,7 +248,7 @@ End Sub
 
 Public Sub Test_ConfigurationGetPath()
     ' This test verifies the path of each vtkConfiguration object
-    ' collection just initialized from an Excel worlbook
+    ' collection just initialized from an Excel workbook
     
    On Error GoTo M_Error
 
@@ -263,7 +264,7 @@ End Sub
 
 Public Sub Test_ConfigurationSetPath()
     ' This test verifies the path setting of each vtkConfiguration object
-    ' collection just initialized from an Excel worlbook
+    ' collection just initialized from an Excel workbook
 
    On Error GoTo M_Error
     confManager.configurations(1).path = "NewPath"
@@ -370,7 +371,7 @@ End Sub
 
 Public Sub Test_ConfigurationGetDefaultProjectNameFromVersion10()
     ' This test verifies the default project name of a V1.0 vtkConfiguration object
-    ' Added configuration to the initialized from an Excel worlbook
+    ' Added configuration to the initialized from an Excel workbook
     Dim workbookV10 As Workbook, confManagerV10 As vtkConfigurationManager
     
    On Error GoTo M_Error
@@ -392,7 +393,7 @@ End Sub
 
 Public Sub Test_ConfigurationGetDefaultCommentFromVersion10()
     ' This test verifies the default comment of a V1.0 vtkConfiguration object
-    ' Added configuration to the initialized from an Excel worlbook
+    ' Added configuration to the initialized from an Excel workbook
     Dim workbookV10 As Workbook, confManagerV10 As vtkConfigurationManager
     
    On Error GoTo M_Error
@@ -414,7 +415,7 @@ End Sub
 
 Public Sub Test_ConfigurationModules_Initialized()
     ' This test verifies the modules property of a vtkConfiguration object
-    ' collection just initialized from an Excel worlbook
+    ' collection just initialized from an Excel workbook
 
    On Error GoTo M_Error
     mAssert.Equals confManager.configurations(1).modules.count, 4, "Number of modules in the Configuration"
@@ -432,7 +433,7 @@ End Sub
 
 Public Sub Test_ConfigurationModules_NewEmpty()
     ' This test verifies the modules property of a vtkConfiguration object
-    ' New collection added in an Excel worlbook
+    ' New collection added in an Excel workbook
     
     confManager.addConfiguration ("NewConfiguration")
 
@@ -448,7 +449,7 @@ End Sub
 
 Public Sub Test_ConfigurationModules_NewNotEmpty()
     ' This test verifies the modules property of a vtkConfiguration object
-    ' New collection initialized in an Excel worlbook
+    ' New collection initialized in an Excel workbook
     
     confManager.addConfiguration ("NewConfiguration")
     confManager.setModulePathWithNumber "newPath", 3, 2
@@ -458,6 +459,88 @@ Public Sub Test_ConfigurationModules_NewNotEmpty()
 
    On Error GoTo 0
    Exit Sub
+
+M_Error:
+    mAssert.Should False, "Unexpected Error (" & Err.Number & "): " & Err.Description
+End Sub
+
+Public Sub Test_ConfigurationReferences_NoReferenceSheet()
+    ' This test verifies the references property of a vtkConfiguration object
+    ' no references are initialized when creating a reference sheet
+
+    Dim c As Collection
+
+   On Error GoTo M_Error
+    Set c = confManager.configurations(1).references
+    
+    mAssert.Equals c.count, 0, "Count of references of the first configuration"
+   On Error GoTo 0
+    Exit Sub
+
+M_Error:
+    mAssert.Should False, "Unexpected Error (" & Err.Number & "): " & Err.Description
+End Sub
+
+Public Sub Test_ConfigurationReferences_WithReferenceSheet()
+    ' This test verifies the references property of a vtkConfiguration object
+    ' collection just initialized from an Excel workbook
+
+    Dim refNames(), i As Integer, c1 As Collection, c2 As Collection, r As vtkReference
+    Dim Wb As Workbook, cf As vtkConfigurationManager
+    refNames = Array("VBA", "Excel", "stdole", "Office", "MSForms", "Scripting", "VBIDE", "Shell32", "MSXML2")
+       
+    Set Wb = getTestFileFromTemplate(fileName:=workbookNameWithConfigurationV11, destinationName:="ProjectV11_DEV.xlsm", openExcel:=True)
+    Set cf = vtkConfigurationManagerForProject("ProjectV11")
+
+   On Error Resume Next
+    ' Test for the main configuration
+    Set c1 = cf.configurations(1).references
+    ' Rearrange the collection by name
+    Set c2 = New Collection
+    For Each r In c1
+        c2.Add r, r.name
+    Next
+    mAssert.Equals c2.count, UBound(refNames) - LBound(refNames) + 1, "Count of all references of a new workbook"
+    ' il faut boucler sur le tableau et rechercher dans la collection (si pas trouvé = erreur)
+    For i = LBound(refNames) To UBound(refNames)
+        Set r = c2(refNames(i))
+        mAssert.Equals Err.Number, 0, "Error when getting " & refNames(i) & " reference"
+    Next i
+    
+    ' Test for the Development configuration
+    Set c1 = cf.configurations(2).references
+    ' Rearrange the collection by name
+    Set c2 = New Collection
+    For Each r In c1
+        c2.Add r, r.name
+    Next
+    mAssert.Equals c2.count, UBound(refNames) - LBound(refNames) + 1, "Count of all references of a new workbook"
+    ' il faut boucler sur le tableau et rechercher dans la collection (si pas trouvé = erreur)
+    For i = LBound(refNames) To UBound(refNames)
+        Set r = c2(refNames(i))
+        mAssert.Equals Err.Number, 0, "Error when getting " & refNames(i) & " reference"
+    Next i
+   On Error GoTo 0
+    vtkCloseAndKillWorkbook Wb:=Wb ' close the existing Excel project
+
+End Sub
+
+Public Sub Test_ConfigurationReferences_NewWorkbook()
+    ' This test verifies the references property of a vtkConfiguration object
+    ' references are initialized when creating a new workbook
+
+    Dim newWorkbook As Workbook, newConfManager As vtkConfigurationManager
+    
+    Set newWorkbook = vtkCreateExcelWorkbookForTestWithProjectName("NewProject")    ' create an Excel project for tests
+    Set newConfManager = vtkConfigurationManagerForProject(newWorkbook.VBProject.name)
+
+   On Error GoTo M_Error
+    mAssert.Equals newConfManager.configurations(1).references.count, 10, "Count of references of the main configuration"
+    mAssert.Equals newConfManager.configurations(2).references.count, 11, "Count of references of the development configuration"
+   
+   On Error GoTo 0
+    vtkCloseAndKillWorkbook Wb:=newWorkbook     ' close the new Excel project
+    Exit Sub
 
 M_Error:
     mAssert.Should False, "Unexpected Error (" & Err.Number & "): " & Err.Description
@@ -491,6 +574,9 @@ Private Function ITest_Suite() As TestSuite
     ITest_Suite.AddTest ITest_Manager.ClassName, "Test_ConfigurationModules_Initialized"
     ITest_Suite.AddTest ITest_Manager.ClassName, "Test_ConfigurationModules_NewEmpty"
     ITest_Suite.AddTest ITest_Manager.ClassName, "Test_ConfigurationModules_NewNotEmpty"
+    ITest_Suite.AddTest ITest_Manager.ClassName, "Test_ConfigurationReferences_NoReferenceSheet"
+    ITest_Suite.AddTest ITest_Manager.ClassName, "Test_ConfigurationReferences_WithReferenceSheet"
+    ITest_Suite.AddTest ITest_Manager.ClassName, "Test_ConfigurationReferences_NewWorkbook"
 End Function
 
 Private Sub ITestCase_RunTest()
@@ -521,6 +607,9 @@ Private Sub ITestCase_RunTest()
         Case "Test_ConfigurationModules_Initialized": Test_ConfigurationModules_Initialized
         Case "Test_ConfigurationModules_NewEmpty": Test_ConfigurationModules_NewEmpty
         Case "Test_ConfigurationModules_NewNotEmpty": Test_ConfigurationModules_NewNotEmpty
+        Case "Test_ConfigurationReferences_NoReferenceSheet": Test_ConfigurationReferences_NoReferenceSheet
+        Case "Test_ConfigurationReferences_WithReferenceSheet": Test_ConfigurationReferences_WithReferenceSheet
+        Case "Test_ConfigurationReferences_NewWorkbook": Test_ConfigurationReferences_NewWorkbook
         Case Else: mAssert.Should False, "Invalid test name: " & mManager.methodName
     End Select
 End Sub
