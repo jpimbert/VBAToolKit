@@ -71,19 +71,19 @@
         <name>VBAToolKit</name>
         <path>C:\Documents and Settings\Demonn\Application Data\Microsoft\AddIns\VBAToolKit.xlam</path>
     </reference>
-    <configuration cID="c1" refIDs="r1 r2 r3 r4 r5 r6 r7 r8 r9 ">
+    <configuration cID="c1" refIDs="r1 r2 r3 r4 r5 r6 r7 r8 r9">
         <name>VBAToolKit</name>
         <path>Delivery\VBAToolKit.xlam</path>
         <title>VBAToolKit</title>
         <comment>Project VBAToolKit</comment>
     </configuration>
-    <configuration cID="c2" refIDs="r1 r2 r3 r4 r5 r6 r7 r8 r9 r11 ">
+    <configuration cID="c2" refIDs="r1 r2 r3 r4 r5 r6 r7 r8 r9 r11">
         <name>VBAToolKit_DEV</name>
         <path>Project\VBAToolKit_DEV.xlsm</path>
         <title>VBAToolKit_DEV</title>
         <comment>Project VBAToolKit_DEV</comment>
     </configuration>
-    <configuration cID="c3" refIDs="r1 r2 r3 r4 r5 r6 r7 r8 r9 ">
+    <configuration cID="c3" refIDs="r1 r2 r3 r4 r5 r6 r7 r8 r9">
         <name>VBAToolKit_2003</name>
         <path>Delivery\VBAToolKit.xla</path>
         <title>VBAToolKit_2003</title>

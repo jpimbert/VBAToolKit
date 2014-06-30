@@ -55,6 +55,11 @@ Private Const currentVersion As String = "vtkConfigurations v1.1"
 Private Const version10 As String = "vtkConfigurations v1.0"
 Private m_sheetVersion As String
 Private Const nbTitleColumns As Integer = 1
+Private Const nameLine = 1
+Private Const pathLine = 2
+Private Const templateLine = 3
+Private Const projectNameLine = 4
+Private Const commentLine = 5
 
 Private Sub Class_Initialize()
     m_devConfiguration = -1
@@ -182,7 +187,7 @@ End Function
 '
 Private Function nbTitleRows() As Integer
     If m_sheetVersion = version10 Then nbTitleRows = 2
-    If m_sheetVersion = currentVersion Then nbTitleRows = 4
+    If m_sheetVersion = currentVersion Then nbTitleRows = 5
 End Function
 
 '---------------------------------------------------------------------------------------
@@ -228,8 +233,9 @@ End Sub
 Private Sub initializeConfigurationSheet(ws As Worksheet)
     ws.Range("A1") = currentVersion
     ws.Range("A2") = ""
-    ws.Range("A3") = "Path, name and comment"
-    ws.Range("A4") = "Module Name"
+    ws.Range("A3") = "Path, template, name and comment"
+    ws.Range("A4") = ""
+    ws.Range("A5") = "Module Name"
     ws.Range("B1") = vtkProjectForName(projectName).projectName
     ws.Range("B2") = vtkProjectForName(projectName).projectStandardRelativePath
     ws.Range("C1") = vtkProjectForName(projectName).projectDEVName
@@ -240,8 +246,8 @@ Private Sub initializeConfigurationSheet(ws As Worksheet)
     ws.Columns("A:C").ColumnWidth = 22
     ws.Range("A1").Font.Size = 8
     ws.Range("A3").HorizontalAlignment = xlCenter
-    ws.Range("A4").HorizontalAlignment = xlCenter
-    ws.Range("A4").Font.Bold = True
+    ws.Range("A5").HorizontalAlignment = xlCenter
+    ws.Range("A5").Font.Bold = True
     ws.Range("B1:C2").HorizontalAlignment = xlCenter
     ws.Range("B1:C1").Font.Bold = True
 End Sub
@@ -259,18 +265,19 @@ Public Sub updateConfigurationSheetFormat()
     If m_sheetVersion = version10 Then
         Set ws = configurationSheet
          
-        ws.Rows("3:4").EntireRow.Insert     ' Insert new lines for the new format
+        ws.Rows("3:5").EntireRow.Insert     ' Insert new lines for the new format
         
         ws.Range("A1") = currentVersion
         ws.Range("A2") = ""
-        ws.Range("A3") = "Path, name and comment"
-        ws.Range("A4") = "Module Name"
+        ws.Range("A3") = "Path, template, name and comment"
+        ws.Range("A4") = ""
+        ws.Range("A5") = "Module Name"
     
         ws.Range("A2").Font.Bold = False
         ws.Range("A3").Font.Bold = False
         ws.Range("A3").HorizontalAlignment = xlCenter
-        ws.Range("A4").HorizontalAlignment = xlCenter
-        ws.Range("A4").Font.Bold = True
+        ws.Range("A5").HorizontalAlignment = xlCenter
+        ws.Range("A5").Font.Bold = True
         
         m_sheetVersion = currentVersion     ' Set the sheetVersion for correct behavior after conversion
     End If
@@ -331,15 +338,16 @@ End Function
 '             - if the configuration already exists, return minus the configuration number
 '---------------------------------------------------------------------------------------
 '
-Public Function addConfiguration(configuration As String, Optional path As String = "", Optional projectName As String = "", Optional comment As String = "") As Integer
+Public Function addConfiguration(configuration As String, Optional path As String = "", Optional template As String = "", Optional projectName As String = "", Optional comment As String = "") As Integer
     Dim n As Integer
     n = getConfigurationNumber(configuration)
     If n = 0 Then   ' n = 0 means non-existant configuration
         n = configurationCount + 1                                        ' Set configuration number
         configurationSheet.Cells(1, n + nbTitleColumns) = configuration   ' Write configuration name
         configurationSheet.Cells(2, n + nbTitleColumns) = path            ' Write configuration path
-        configurationSheet.Cells(3, n + nbTitleColumns) = projectName     ' Write configuration projectName
-        configurationSheet.Cells(4, n + nbTitleColumns) = comment         ' Write configuration Comment
+        configurationSheet.Cells(3, n + nbTitleColumns) = template        ' Write configuration Excel template path
+        configurationSheet.Cells(4, n + nbTitleColumns) = projectName     ' Write configuration projectName
+        configurationSheet.Cells(5, n + nbTitleColumns) = comment         ' Write configuration Comment
         Dim i As Integer
         For i = 1 To moduleCount                         ' For each module
             configurationSheet.Cells(i + nbTitleRows, n + nbTitleColumns) = "-"     ' Set Default path as not initialized
@@ -401,7 +409,7 @@ Public Function getConfigurationPathWithNumber(n As Integer) As String
     Dim sResult As String
     sResult = ""
     If n >= 1 And n <= configurationCount Then
-        sResult = configurationSheet.Cells(2, n + nbTitleColumns)
+        sResult = configurationSheet.Cells(pathLine, n + nbTitleColumns)
        Else
         sResult = ""
     End If
@@ -418,7 +426,7 @@ End Function
 '
 Public Sub setConfigurationPathWithNumber(n As Integer, path As String)
     If n >= 1 And n <= configurationCount Then
-        configurationSheet.Cells(2, n + nbTitleColumns) = path
+        configurationSheet.Cells(pathLine, n + nbTitleColumns) = path
     End If
 End Sub
 
@@ -461,7 +469,7 @@ Public Function getConfigurationProjectNameWithNumber(n As Integer) As String
     sResult = ""
     If n >= 1 And n <= configurationCount Then
         If m_sheetVersion = currentVersion Then
-            sResult = configurationSheet.Cells(3, n + nbTitleColumns)
+            sResult = configurationSheet.Cells(projectNameLine, n + nbTitleColumns)
             If sResult = "" Then sResult = defaultProjectNameWithNumber(n)
            Else
             sResult = defaultProjectNameWithNumber(n)
@@ -484,7 +492,7 @@ End Function
 Public Sub setConfigurationProjectNameWithNumber(n As Integer, projectName As String)
     If n >= 1 And n <= configurationCount Then
         If m_sheetVersion = currentVersion Then
-            configurationSheet.Cells(3, n + nbTitleColumns) = projectName
+            configurationSheet.Cells(projectNameLine, n + nbTitleColumns) = projectName
            Else
             Err.Raise VTK_OBSOLETE_CONFIGURATION_SHEET, "vtkConfigurationManager:setConfigurationProjectNameWithNumber", _
             "Impossible to set a configuration projectName with this configuration sheet version (project=" & m_projectName & ", " & m_sheetVersion & ")"
@@ -508,7 +516,7 @@ Public Function getConfigurationCommentWithNumber(n As Integer) As String
     sResult = ""
     If n >= 1 And n <= configurationCount Then
         If m_sheetVersion = currentVersion Then
-            sResult = configurationSheet.Cells(4, n + nbTitleColumns)
+            sResult = configurationSheet.Cells(commentLine, n + nbTitleColumns)
             If sResult = "" Then sResult = defaultCommentWithNumber(n)
            Else
             sResult = defaultCommentWithNumber(n)
@@ -531,12 +539,12 @@ End Function
 Public Sub setConfigurationCommentWithNumber(n As Integer, comment As String)
     If n >= 1 And n <= configurationCount Then
         If m_sheetVersion = currentVersion Then
-            configurationSheet.Cells(4, n + nbTitleColumns) = comment
+            configurationSheet.Cells(commentLine, n + nbTitleColumns) = comment
            Else
             Err.Raise VTK_OBSOLETE_CONFIGURATION_SHEET, "vtkConfigurationManager:setConfigurationCommentWithNumber", _
             "Impossible to set a configuration comment with this configuration sheet version (project=" & m_projectName & ", " & m_sheetVersion & ")"
         End If
-        configurationSheet.Cells(4, n + nbTitleColumns) = comment
+        configurationSheet.Cells(commentLine, n + nbTitleColumns) = comment
     End If
 End Sub
 
