@@ -132,6 +132,17 @@ Private Function defaultCommentWithNumber(n As Integer) As String
 End Function
 
 '---------------------------------------------------------------------------------------
+' Function  : defaultTemplateWithNumber as String - Read Only - Private
+' Author    : Jean-Pierre Imbert
+' Date      : 01/07/2014
+' Purpose   : return the default Excel template path of a configuration given its number
+'---------------------------------------------------------------------------------------
+'
+Private Function defaultTemplateWithNumber(n As Integer) As String
+    defaultTemplateWithNumber = ""
+End Function
+
+'---------------------------------------------------------------------------------------
 ' Property  : rootPath as String - Read Only - Public
 ' Author    : Jean-Pierre Imbert
 ' Date      : 09/08/2013
@@ -483,7 +494,7 @@ End Function
 '---------------------------------------------------------------------------------------
 ' Procedure : setConfigurationProjectNameWithNumber
 ' Author    : Jean-Pierre Imbert
-' Date      : 08/06/2013
+' Date      : 08/06/2014
 ' Purpose   : change the n-th configuration project name of the project, given n as integer
 '               - does nothing if the configuration is inexistant
 '               - does nothing and return an error if the configuration sheet is v1.0
@@ -530,7 +541,7 @@ End Function
 '---------------------------------------------------------------------------------------
 ' Procedure : setConfigurationCommentWithNumber
 ' Author    : Jean-Pierre Imbert
-' Date      : 08/06/2013
+' Date      : 08/06/2014
 ' Purpose   : change the n-th configuration comment of the project, given n as integer
 '               - does nothing if the configuration is inexistant
 '               - does nothing and return an error if the configuration sheet is v1.0
@@ -544,7 +555,53 @@ Public Sub setConfigurationCommentWithNumber(n As Integer, comment As String)
             Err.Raise VTK_OBSOLETE_CONFIGURATION_SHEET, "vtkConfigurationManager:setConfigurationCommentWithNumber", _
             "Impossible to set a configuration comment with this configuration sheet version (project=" & m_projectName & ", " & m_sheetVersion & ")"
         End If
-        configurationSheet.Cells(commentLine, n + nbTitleColumns) = comment
+    End If
+End Sub
+
+'---------------------------------------------------------------------------------------
+' Procedure : getConfigurationTemplateWithNumber
+' Author    : Jean-Pierre Imbert
+' Date      : 01/07/2014
+' Purpose   : return the n-th configuration Excel template path of the project, given n as integer
+'               - return "" if the configuration is inexistant
+'               - return the default comment if
+'                   - it is not initialized in the configuration sheet v1.1
+'                   - the configuration sheet is v1.0, so there is no comment field
+'---------------------------------------------------------------------------------------
+'
+Public Function getConfigurationTemplateWithNumber(n As Integer) As String
+    Dim sResult As String
+    sResult = ""
+    If n >= 1 And n <= configurationCount Then
+        If m_sheetVersion = currentVersion Then
+            sResult = configurationSheet.Cells(templateLine, n + nbTitleColumns)
+            If sResult = "" Then sResult = defaultTemplateWithNumber(n)
+           Else
+            sResult = defaultTemplateWithNumber(n)
+            End If
+       Else
+        sResult = ""
+    End If
+    getConfigurationTemplateWithNumber = sResult
+End Function
+
+'---------------------------------------------------------------------------------------
+' Procedure : setConfigurationTemplateWithNumber
+' Author    : Jean-Pierre Imbert
+' Date      : 01/07/2014
+' Purpose   : change the n-th configuration comment of the project, given n as integer
+'               - does nothing if the configuration is inexistant
+'               - does nothing and return an error if the configuration sheet is v1.0
+'---------------------------------------------------------------------------------------
+'
+Public Sub setConfigurationTemplateWithNumber(n As Integer, template As String)
+    If n >= 1 And n <= configurationCount Then
+        If m_sheetVersion = currentVersion Then
+            configurationSheet.Cells(templateLine, n + nbTitleColumns) = template
+           Else
+            Err.Raise VTK_OBSOLETE_CONFIGURATION_SHEET, "vtkConfigurationManager:setConfigurationTemplateWithNumber", _
+            "Impossible to set a configuration template path with this configuration sheet version (project=" & m_projectName & ", " & m_sheetVersion & ")"
+        End If
     End If
 End Sub
 

@@ -157,6 +157,22 @@ Property Let comment(newComment As String)
 End Property
 
 '---------------------------------------------------------------------------------------
+' Property  : template as string (wrapper on the parent vtkConfigurationManager)
+' Author    : Jean-Pierre Imbert
+' Date      : 01/07/2014
+' Purpose   : The Excel template path for the configuration
+'---------------------------------------------------------------------------------------
+'
+Property Get template() As String
+    template = m_parent.getConfigurationTemplateWithNumber(m_number)
+End Property
+
+Property Let template(newTemplate As String)
+   On Error Resume Next
+    m_parent.setConfigurationTemplateWithNumber m_number, newTemplate
+End Property
+
+'---------------------------------------------------------------------------------------
 ' Property  : modules as collection (Read Only)
 ' Author    : Jean-Pierre Imbert
 ' Date      : 28/08/2013
