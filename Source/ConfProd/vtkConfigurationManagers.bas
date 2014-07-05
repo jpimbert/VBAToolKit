@@ -153,6 +153,7 @@ End Sub
 '             - All configuration projectName property is the same as the project name of the configuration
 '             - All configuration projectName property is the same as the title property of the configuration
 '             - All configuration comment property is the same as the comment property of the configuration
+'             - All configuration template path is reachable
 '             - All modules listed in a configuration description are existing in the configuration
 '             - All modules really present in a configuration are described in the description with non null path
 '             - All modules pathes are reachable
@@ -204,6 +205,11 @@ Sub vtkVerifyConfigurations()
     ' Verify workbooks comment
                 If Not (c.comment = cwb(nbConf).Wb.BuiltinDocumentProperties("Comments").Value) Then
                     Debug.Print "For configuration " & c.name & ", the comment property (" & c.comment & ") is different of the workbook comment (" & cwb(nbConf).Wb.BuiltinDocumentProperties("Comments").Value & ")."
+                End If
+
+    ' Verify workbooks template path
+                If Not (fso.FileExists(cm.rootPath & "\" & c.template)) Then
+                    Debug.Print "For configuration " & c.name & ", the template path (" & cm.rootPath & "\" & c.template & ") is unreachable."
                 End If
 
                Else
