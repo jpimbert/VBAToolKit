@@ -75,19 +75,19 @@
         <name>VBAToolKit</name>
         <path>Delivery\VBAToolKit.xlam</path>
         <title>VBAToolKit</title>
-        <comment>Project VBAToolKit</comment>
+        <comment>ToolKit for improving VBA development. Add-In for Excel 2007 and above.</comment>
     </configuration>
     <configuration cID="c2" refIDs="r1 r2 r3 r4 r5 r6 r7 r8 r9 r11">
         <name>VBAToolKit_DEV</name>
         <path>Project\VBAToolKit_DEV.xlsm</path>
         <title>VBAToolKit_DEV</title>
-        <comment>Project VBAToolKit_DEV</comment>
+        <comment>Development and Test version for VBAToolKit</comment>
     </configuration>
     <configuration cID="c3" refIDs="r1 r2 r3 r4 r5 r6 r7 r8 r9">
         <name>VBAToolKit_2003</name>
         <path>Delivery\VBAToolKit.xla</path>
-        <title>VBAToolKit_2003</title>
-        <comment>Project VBAToolKit_2003</comment>
+        <title>VBAToolKit</title>
+        <comment>ToolKit for improving VBA development. Add-In for Excel 2003.</comment>
     </configuration>
     <module mID="m1">
         <name>vtkImportExportUtilities</name>
