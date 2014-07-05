@@ -133,11 +133,16 @@ Public Sub Test_vtkExportConfigurationsAsXML_correctConfigurationContent()
 
     mAssert.Equals reloadDom.SelectSingleNode("/vtkConf/configuration[@cID=""c1""]/name").Text, "TestProject", "Expected name of first configuration"
     mAssert.Equals reloadDom.SelectSingleNode("/vtkConf/configuration[@cID=""c1""]/path").Text, "Project\TestProject.xlsm", "Expected path of first configuration"
+    mAssert.Equals reloadDom.SelectSingleNode("/vtkConf/configuration[@cID=""c1""]/templatePath").Text, "Template\TestProjectTemplate.xlsm", "Expected template of first configuration"
     mAssert.Equals reloadDom.SelectSingleNode("/vtkConf/configuration[@cID=""c1""]/title").Text, "TestProjectName", "Expected title of first configuration"
     mAssert.Equals reloadDom.SelectSingleNode("/vtkConf/configuration[@cID=""c1""]/comment").Text, "Existing project for various tests of VBAToolKit", "Expected comment of first configuration"
     
     mAssert.Equals reloadDom.SelectSingleNode("/vtkConf/configuration[@cID=""c2""]/name").Text, "TestProject_DEV", "Expected name of second configuration"
     mAssert.Equals reloadDom.SelectSingleNode("/vtkConf/configuration[@cID=""c2""]/path").Text, "Project\TestProject_DEV.xlsm", "Expected path of second configuration"
+   On Error Resume Next
+    mAssert.Equals reloadDom.SelectSingleNode("/vtkConf/configuration[@cID=""c2""]/templatePath").Text, "", "Expected template of second configuration"
+    mAssert.Equals Err.Number, 91, "The templatePath element must not be present for the second configuration"
+   On Error GoTo Test_vtkExportConfigurationsAsXML_correctConfigurationContent_Error
     mAssert.Equals reloadDom.SelectSingleNode("/vtkConf/configuration[@cID=""c2""]/title").Text, "TestProject_DEV", "Expected title of second configuration"
     mAssert.Equals reloadDom.SelectSingleNode("/vtkConf/configuration[@cID=""c2""]/comment").Text, "Existing project for development for various tests of VBAToolKit", "Expected comment of second configuration"
 
@@ -326,12 +331,6 @@ Public Sub Test_vtkExportConfigurationsAsXML_fileContentIsValidDom()
 Test_vtkExportConfigurationsAsXML_fileContentIsValidDom_Error:
     mAssert.Should False, "Unexpected error " & Err.Number & " (" & Err.Description & ")"
 End Sub
-
-'   Other tests to write
-'
-'   Verifies the content of the generated configuration file
-'   - for these tests the XML file is created then re-read in a DOM structure
-'   - the the old tests are recycled to work on the re-read structure rather than on an exported DOM structure
 
 Private Function ITest_Suite() As TestSuite
     Set ITest_Suite = New TestSuite

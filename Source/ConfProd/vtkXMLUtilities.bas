@@ -111,6 +111,8 @@ Public Sub vtkExportConfigurationsAsXML(projectName As String, filePath As Strin
         End If
         xmlFile.WriteLine Text:="        <name>" & cf.name & "</name>"
         xmlFile.WriteLine Text:="        <path>" & cf.path & "</path>"
+        If cf.template <> "" Then _
+        xmlFile.WriteLine Text:="        <templatePath>" & cf.template & "</templatePath>"
         xmlFile.WriteLine Text:="        <title>" & cf.projectName & "</title>" ' must be initialized in Workbook with Wb.BuiltinDocumentProperties("Title").Value
         xmlFile.WriteLine Text:="        <comment>" & cf.comment & "</comment>" ' must be initialized in Workbook with Wb.BuiltinDocumentProperties("Comments").Value
         xmlFile.WriteLine Text:="    </configuration>"

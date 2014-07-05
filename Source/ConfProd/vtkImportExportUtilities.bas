@@ -369,7 +369,7 @@ End Sub
 Public Sub vtkRecreateConfiguration(projectName As String, configurationName As String)
     Dim cm As vtkConfigurationManager
     Dim rootPath As String
-    Dim wbPath As String
+    Dim wbPath As String, templatePath As String
     Dim Wb As Workbook
     Dim tmpWb As Workbook
     Dim fso As New FileSystemObject
@@ -400,7 +400,16 @@ Public Sub vtkRecreateConfiguration(projectName As String, configurationName As 
     Next
     
     ' Create a new Excel file
-    Set Wb = vtkCreateExcelWorkbook()
+    templatePath = conf.template
+    If templatePath = "" Then
+        Set Wb = vtkCreateExcelWorkbook()   ' If there is no template, a new workbook is created
+       Else
+        templatePath = rootPath & "\" & templatePath
+        If Not fso.FileExists(templatePath) Then
+            Err.Raise VTK_TEMPLATE_NOT_FOUND
+        End If
+        Set Wb = Workbooks.Open(fileName:=templatePath, ReadOnly:=True) ' If there is a template, it's open as ReadOnly
+    End If
     
     ' Set the projectName
     Wb.VBProject.name = conf.projectName
@@ -455,6 +464,10 @@ vtkRecreateConfiguration_Error:
             Err.Number = VTK_WORKBOOK_ALREADY_OPEN
             Err.Description = "The configuration you're trying to create (" & configurationName & ") corresponds to an open workbook. " & _
                               "Please close it before recreating the configuration."
+        Case VTK_TEMPLATE_NOT_FOUND
+            Err.Number = VTK_TEMPLATE_NOT_FOUND
+            Err.Description = "The configuration you're trying to create (" & configurationName & ") needs an Excel template file (" & templatePath & "). " & _
+                              "This template file is unreachable."
         Case VTK_NO_SOURCE_FILES
             Err.Number = VTK_NO_SOURCE_FILES
             Err.Description = "The configuration you're trying to create (" & configurationName & ") is missing one or several source files." & _
