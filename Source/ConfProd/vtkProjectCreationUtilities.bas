@@ -28,6 +28,7 @@ Option Explicit
 ' Date      : 09/05/2013
 ' Purpose   : - Initialize DEV project ConfSheet with vbaunit module names and pathes
 '             - Return True if module names and paths are initialized without error
+' WARNING   : This function must use an Excel ConfigurationManager (not XML)
 '---------------------------------------------------------------------------------------
 '
 Public Function vtkInitializeVbaUnitNamesAndPathes(project As String) As Boolean

@@ -228,12 +228,12 @@
         <modulePath confId="c3">Source\ConfProd\vtkConfigurationManager.cls</modulePath>
     </module>
     <module mID="m25">
-        <name>vtkConfigurationManager10Tester</name>
-        <modulePath confId="c2">Source\ConfTest\vtkConfigurationManager10Tester.cls</modulePath>
+        <name>vtkConfManagerExcel10Tester</name>
+        <modulePath confId="c2">Source\ConfTest\vtkConfManagerExcel10Tester.cls</modulePath>
     </module>
     <module mID="m26">
-        <name>vtkConfigurationManager11Tester</name>
-        <modulePath confId="c2">Source\ConfTest\vtkConfigurationManager11Tester.cls</modulePath>
+        <name>vtkConfManagerExcel11Tester</name>
+        <modulePath confId="c2">Source\ConfTest\vtkConfManagerExcel11Tester.cls</modulePath>
     </module>
     <module mID="m27">
         <name>vtkConfigurationManagers</name>
@@ -442,5 +442,11 @@
         <modulePath confId="c1">Source\ConfProd\vtkReference.cls</modulePath>
         <modulePath confId="c2">Source\ConfProd\vtkReference.cls</modulePath>
         <modulePath confId="c3">Source\ConfProd\vtkReference.cls</modulePath>
+    </module>
+    <module mID="m68">
+        <name>vtkConfigurationManagerExcel</name>
+        <modulePath confId="c1">Source\ConfProd\vtkConfigurationManagerExcel.cls</modulePath>
+        <modulePath confId="c2">Source\ConfProd\vtkConfigurationManagerExcel.cls</modulePath>
+        <modulePath confId="c3">Source\ConfProd\vtkConfigurationManagerExcel.cls</modulePath>
     </module>
 </vtkConf>
