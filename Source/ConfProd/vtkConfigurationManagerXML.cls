@@ -142,6 +142,17 @@ Public Function vtkConfigurationManager_configuration(n As Integer) As String
 End Function
 
 '---------------------------------------------------------------------------------------
+' Procedure : raiseReadOnlyError
+' Author    : Jean-Pierre Imbert
+' Date      : 06/07/2014
+' Purpose   : Return the Error VTK_READONLY_FILE because XML file is unmodifiable
+'---------------------------------------------------------------------------------------
+'
+Private Sub raiseReadOnlyError(Source As String)
+    Err.Raise Number:=VTK_READONLY_FILE, Source:=source, Description:="A XML Configuration File is considered Read-Only"
+End Sub
+
+'---------------------------------------------------------------------------------------
 ' Procedure : addConfiguration
 ' Author    : Jean-Pierre Imbert
 ' Date      : 06/07/2014
@@ -149,6 +160,7 @@ End Function
 '---------------------------------------------------------------------------------------
 '
 Public Function addConfiguration(configuration As String, Optional path As String = "", Optional template As String = "", Optional projectName As String = "", Optional comment As String = "") As Integer
+    raiseReadOnlyError Source:="addConfiguration:vtkConfigurationManagerXML"
 End Function
 
 Public Function vtkConfigurationManager_addConfiguration(configuration As String, Optional path As String = "", Optional template As String = "", Optional projectName As String = "", Optional comment As String = "") As Integer
@@ -207,6 +219,7 @@ End Function
 '---------------------------------------------------------------------------------------
 '
 Public Sub setConfigurationPathWithNumber(n As Integer, path As String)
+    raiseReadOnlyError Source:="setConfigurationPathWithNumber:vtkConfigurationManagerXML"
 End Sub
 
 Public Sub vtkConfigurationManager_setConfigurationPathWithNumber(n As Integer, path As String)
@@ -236,6 +249,7 @@ End Function
 '---------------------------------------------------------------------------------------
 '
 Public Sub setConfigurationPath(configuration As String, path As String)
+    raiseReadOnlyError Source:="setConfigurationPath:vtkConfigurationManagerXML"
 End Sub
 
 Public Sub vtkConfigurationManager_setConfigurationPath(configuration As String, path As String)
@@ -268,6 +282,7 @@ End Function
 '---------------------------------------------------------------------------------------
 '
 Public Sub setConfigurationProjectNameWithNumber(n As Integer, projectName As String)
+    raiseReadOnlyError Source:="setConfigurationProjectNameWithNumber:vtkConfigurationManagerXML"
 End Sub
 
 Public Sub vtkConfigurationManager_setConfigurationProjectNameWithNumber(n As Integer, projectName As String)
@@ -300,6 +315,7 @@ End Function
 '---------------------------------------------------------------------------------------
 '
 Public Sub setConfigurationCommentWithNumber(n As Integer, comment As String)
+    raiseReadOnlyError Source:="setConfigurationCommentWithNumber:vtkConfigurationManagerXML"
 End Sub
 
 Public Sub vtkConfigurationManager_setConfigurationCommentWithNumber(n As Integer, comment As String)
@@ -332,6 +348,7 @@ End Function
 '---------------------------------------------------------------------------------------
 '
 Public Sub setConfigurationTemplateWithNumber(n As Integer, template As String)
+    raiseReadOnlyError Source:="setConfigurationTemplateWithNumber:vtkConfigurationManagerXML"
 End Sub
 
 Public Sub vtkConfigurationManager_setConfigurationTemplateWithNumber(n As Integer, template As String)
@@ -418,6 +435,7 @@ End Function
 '---------------------------------------------------------------------------------------
 '
 Public Function addModule(module As String) As Integer
+    raiseReadOnlyError Source:="addModule:vtkConfigurationManagerXML"
 End Function
 
 Public Function vtkConfigurationManager_addModule(module As String) As Integer
@@ -449,6 +467,7 @@ End Function
 '---------------------------------------------------------------------------------------
 '
 Public Sub setModulePathWithNumber(path As String, numModule As Integer, numConfiguration As Integer)
+    raiseReadOnlyError Source:="setModulePathWithNumber:vtkConfigurationManagerXML"
 End Sub
 
 Public Sub vtkConfigurationManager_setModulePathWithNumber(path As String, numModule As Integer, numConfiguration As Integer)
