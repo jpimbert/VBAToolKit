@@ -407,6 +407,10 @@ Public Function configurations() As Collection
     Set configurations = col
 End Function
 
+Public Function vtkConfigurationManager_configurations() As Collection
+    Set vtkConfigurationManager_configurations = configurations
+End Function
+
 '---------------------------------------------------------------------------------------
 ' Procedure : getConfigurationNumber
 ' Author    : Jean-Pierre Imbert
@@ -532,6 +536,10 @@ Public Function getConfigurationProjectNameWithNumber(n As Integer) As String
     getConfigurationProjectNameWithNumber = sResult
 End Function
 
+Public Function vtkConfigurationManager_getConfigurationProjectNameWithNumber(n As Integer) As String
+    vtkConfigurationManager_getConfigurationProjectNameWithNumber = getConfigurationProjectNameWithNumber(n)
+End Function
+
 '---------------------------------------------------------------------------------------
 ' Procedure : setConfigurationProjectNameWithNumber
 ' Author    : Jean-Pierre Imbert
@@ -550,6 +558,10 @@ Public Sub setConfigurationProjectNameWithNumber(n As Integer, projectName As St
             "Impossible to set a configuration projectName with this configuration sheet version (project=" & m_projectName & ", " & m_sheetVersion & ")"
         End If
     End If
+End Sub
+
+Public Sub vtkConfigurationManager_setConfigurationProjectNameWithNumber(n As Integer, projectName As String)
+    setConfigurationProjectNameWithNumber n, projectName
 End Sub
 
 '---------------------------------------------------------------------------------------
@@ -579,6 +591,10 @@ Public Function getConfigurationCommentWithNumber(n As Integer) As String
     getConfigurationCommentWithNumber = sResult
 End Function
 
+Public Function vtkConfigurationManager_getConfigurationCommentWithNumber(n As Integer) As String
+    vtkConfigurationManager_getConfigurationCommentWithNumber = getConfigurationCommentWithNumber(n)
+End Function
+
 '---------------------------------------------------------------------------------------
 ' Procedure : setConfigurationCommentWithNumber
 ' Author    : Jean-Pierre Imbert
@@ -597,6 +613,10 @@ Public Sub setConfigurationCommentWithNumber(n As Integer, comment As String)
             "Impossible to set a configuration comment with this configuration sheet version (project=" & m_projectName & ", " & m_sheetVersion & ")"
         End If
     End If
+End Sub
+
+Public Sub vtkConfigurationManager_setConfigurationCommentWithNumber(n As Integer, comment As String)
+    setConfigurationCommentWithNumber n, comment
 End Sub
 
 '---------------------------------------------------------------------------------------
@@ -626,6 +646,10 @@ Public Function getConfigurationTemplateWithNumber(n As Integer) As String
     getConfigurationTemplateWithNumber = sResult
 End Function
 
+Public Function vtkConfigurationManager_getConfigurationTemplateWithNumber(n As Integer) As String
+    vtkConfigurationManager_getConfigurationTemplateWithNumber = getConfigurationTemplateWithNumber(n)
+End Function
+
 '---------------------------------------------------------------------------------------
 ' Procedure : setConfigurationTemplateWithNumber
 ' Author    : Jean-Pierre Imbert
@@ -646,6 +670,10 @@ Public Sub setConfigurationTemplateWithNumber(n As Integer, template As String)
     End If
 End Sub
 
+Public Sub vtkConfigurationManager_setConfigurationTemplateWithNumber(n As Integer, template As String)
+    setConfigurationTemplateWithNumber n, template
+End Sub
+
 '---------------------------------------------------------------------------------------
 ' Procedure : getConfigurationReferencesWithNumber
 ' Author    : Jean-Pierre Imbert
@@ -655,6 +683,10 @@ End Sub
 '
 Public Function getConfigurationReferencesWithNumber(n As Integer) As Collection
     Set getConfigurationReferencesWithNumber = referenceManager.references(n)
+End Function
+
+Public Function vtkConfigurationManager_getConfigurationReferencesWithNumber(n As Integer) As Collection
+    Set vtkConfigurationManager_getConfigurationReferencesWithNumber = getConfigurationReferencesWithNumber(n)
 End Function
 
 '---------------------------------------------------------------------------------------

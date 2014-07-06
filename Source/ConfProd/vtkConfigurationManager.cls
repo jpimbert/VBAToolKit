@@ -54,6 +54,7 @@ End Property
 ' configurationCount
 Public Property Get configurationCount() As Integer
 ' configurations
+Public Function configurations() As Collection
 ' configuration
 Public Function configuration(n As Integer) As String
 ' getConfigurationNumber
@@ -67,11 +68,17 @@ Public Function getConfigurationPathWithNumber(n As Integer) As String
 ' setConfigurationPathWithNumber <- (dans vtkConfiguration, ne sont utilisés que pour les tests)
 Public Sub setConfigurationPathWithNumber(n As Integer, path As String)
 ' getConfigurationProjectNameWithNumber
+Public Function getConfigurationProjectNameWithNumber(n As Integer) As String
 ' setConfigurationProjectNameWithNumber <-
+Public Sub setConfigurationProjectNameWithNumber(n As Integer, projectName As String)
 ' getConfigurationCommentWithNumber
+Public Function getConfigurationCommentWithNumber(n As Integer) As String
 ' setConfigurationCommentWithNumber <-
+Public Sub setConfigurationCommentWithNumber(n As Integer, comment As String)
 ' getConfigurationTemplateWithNumber
+Public Function getConfigurationTemplateWithNumber(n As Integer) As String
 ' setConfigurationTemplateWithNumber <-
+Public Sub setConfigurationTemplateWithNumber(n As Integer, template As String)
 ' addConfiguration
 Public Function addConfiguration(configuration As String, Optional path As String = "", Optional template As String = "", Optional projectName As String = "", Optional comment As String = "") As Integer
 ' --> on garde les setters dans l'interface, avec une erreur dans XML
@@ -93,8 +100,9 @@ Public Function addModule(module As String) As Integer
 ' references
 Public Function references() As Collection
 ' getConfigurationReferencesWithNumber
+Public Function getConfigurationReferencesWithNumber(n As Integer) As Collection
 
 ' Stratégie de refactorisation
 '  - dérouler les tests significatifs un par un (un commit par test)
 '  - implémentation des méthodes d'interface au fur et à mesure pour chaque test
-'  - Tests à exécuter : confManagerExcel10, confManagerExcel11, configurationManagers, configuration
+'  - Tests à exécuter : confManagerExcel10, confManagerExcel11, configurationManagers, configuration, module
