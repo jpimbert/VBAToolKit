@@ -57,9 +57,26 @@ End Sub
 ' Error detected :
 '           - VTK_WRONG_FILE_PATH if the XML file can't be opened
 '           - VTK_INVALID_XML_FILE if the XML File is not a V2.0 Configuration file
+'           - VTK_OBSOLETE_CONFIGURATION_SHEET if the XML file is not on the good version
+'           In case of error the instance keeps the previous DOM document
 '---------------------------------------------------------------------------------------
 '
 Public Sub init(ByVal XMLFilePath As String)
+    Dim fso As New FileSystemObject, DDoc As MSXML2.DOMDocument
+    If fso.FileExists(XMLFilePath) Then
+        Set DDoc = New MSXML2.DOMDocument
+        DDoc.Load XMLFilePath
+        DDoc.setProperty "SelectionLanguage", "XPath"  ' for the use of the contains() function of XPath
+        If DDoc.parseError.ErrorCode <> 0 Then
+            Err.Raise Number:=VTK_INVALID_XML_FILE, Source:="init:vtkConfigurationManagerXML", Description:="Parse error of " & XMLFilePath & " : " & DDoc.parseError.reason
+        End If
+        If DDoc.SelectSingleNode("/vtkConf/info/vtkConfigurationsVersion").Text <> "2.0" Then
+            Err.Raise Number:=VTK_OBSOLETE_CONFIGURATION_SHEET, Source:="init:vtkConfigurationManagerXML", Description:="Bad version of XML File : 2.0 expected."
+        End If
+        Set m_DOMDocument = DDoc
+       Else
+        Err.Raise Number:=VTK_WRONG_FILE_PATH, Source:="init:vtkConfigurationManagerXML", Description:="The File " & XMLFilePath & " is unreachable."
+    End If
 End Sub
 
 '---------------------------------------------------------------------------------------

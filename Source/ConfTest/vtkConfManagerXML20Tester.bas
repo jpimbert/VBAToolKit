@@ -53,15 +53,52 @@ Private Property Get ITest_Manager() As ITestManager
 End Property
 
 Private Sub ITestCase_SetUp(Assert As IAssert)
-
+    Dim cmE As vtkConfigurationManagerXML, testFilePath As String, testFileName As String
     Set mAssert = Assert
     
-    getTestFileFromTemplate fileName:=existingXMLNameForTest, destinationName:=existingProjectName & ".xml", openExcel:=False
+    testFileName = existingProjectName & ".xml"
+    testFilePath = VBAToolKit.vtkTestPath & "\" & testFileName
+    getTestFileFromTemplate fileName:=existingXMLNameForTest, destinationName:=testFileName, openExcel:=False
     Set existingConfManager = New vtkConfigurationManagerXML
-    existingConfManager.init vtkTestPath & "\" & existingProjectName & ".xml"
+    Set cmE = existingConfManager
+    cmE.init testFilePath
 End Sub
 
 Private Sub ITestCase_TearDown()
+    VBAToolKit.resetTestFolder
+End Sub
+
+Public Sub Test_Init_FileNotFound()
+    ' Verify that the proper error is raised in case of file not found
+    Dim cm As New vtkConfigurationManagerXML
+   On Error Resume Next
+    cm.init "C:\NoFolder\NoFile.xml"
+    mAssert.Equals Err.Number, VTK_WRONG_FILE_PATH, "Error returned when init the XML conf manager"
+   On Error GoTo 0
+End Sub
+
+Public Sub Test_Init_BadXMLFile()
+    ' Verify that the proper error is raised in case of bad XML File
+    Dim cm As New vtkConfigurationManagerXML, filePath As String
+    filePath = VBAToolKit.vtkTestPath & "\EmptyXMLFile.xml"
+    Dim fso As New FileSystemObject
+    fso.CreateTextFile filePath
+   On Error Resume Next
+    cm.init filePath
+    mAssert.Equals Err.Number, VTK_INVALID_XML_FILE, "Error returned when init the XML conf manager"
+   On Error GoTo 0
+End Sub
+
+Public Sub Test_Init_ObsoleteXMLFile()
+    ' Verify that the proper error is raised in case of obsolete XML File
+    Dim fileName As String, filePath As String, cm As New vtkConfigurationManagerXML
+    fileName = "ExistingProject.xml"
+    filePath = VBAToolKit.vtkTestPath & "\" & fileName
+    getTestFileFromTemplate fileName:="EmptyXMLForConfigurationsTests.xml", destinationName:=fileName, openExcel:=False
+   On Error Resume Next
+    cm.init filePath
+    mAssert.Equals Err.Number, VTK_OBSOLETE_CONFIGURATION_SHEET, "Error returned when init the XML conf manager"
+   On Error GoTo 0
 End Sub
 
 'Public Sub Test_PropertyName_DefaultGet()
@@ -534,10 +571,16 @@ End Sub
 
 Private Function ITest_Suite() As TestSuite
     Set ITest_Suite = New TestSuite
+    ITest_Suite.AddTest ITest_Manager.ClassName, "Test_Init_FileNotFound"
+    ITest_Suite.AddTest ITest_Manager.ClassName, "Test_Init_BadXMLFile"
+    ITest_Suite.AddTest ITest_Manager.ClassName, "Test_Init_ObsoleteXMLFile"
 End Function
 
 Private Sub ITestCase_RunTest()
     Select Case mManager.methodName
+        Case "Test_Init_FileNotFound": Test_Init_FileNotFound
+        Case "Test_Init_BadXMLFile": Test_Init_BadXMLFile
+        Case "Test_Init_ObsoleteXMLFile": Test_Init_ObsoleteXMLFile
         Case Else: mAssert.Should False, "Invalid test name: " & mManager.methodName
     End Select
 End Sub
