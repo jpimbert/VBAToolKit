@@ -8,8 +8,9 @@ Attribute VB_Creatable = False
 Attribute VB_PredeclaredId = False
 Attribute VB_Exposed = False
 Option Explicit
+Implements vtkConfigurationManager
 '---------------------------------------------------------------------------------------
-' Module    : vtkConfigurationManager
+' Module    : vtkConfigurationManagerExcel, implements vtkConfigurationManager
 ' Author    : Jean-Pierre Imbert
 ' Date      : 25/05/2013
 ' Purpose   : Manage Configurations and Modules of a VTK Project
@@ -84,6 +85,10 @@ End Sub
 '
 Public Property Get projectName() As String
     projectName = m_projectName
+End Property
+
+Public Property Get vtkConfigurationManager_projectName() As String
+    vtkConfigurationManager_projectName = projectName
 End Property
 
 Public Property Let projectName(ByVal sprojectName As String)
@@ -167,6 +172,10 @@ Public Property Get rootPath() As String
         End If
     End If
     rootPath = ret
+End Property
+
+Public Property Get vtkConfigurationManager_rootPath() As String
+    vtkConfigurationManager_rootPath = rootPath
 End Property
 
 '---------------------------------------------------------------------------------------
@@ -318,6 +327,10 @@ Public Property Get configurationCount() As Integer
     configurationCount = configurationSheet.UsedRange.Columns.Count - 1
 End Property
 
+Public Property Get vtkConfigurationManager_configurationCount() As Integer
+    vtkConfigurationManager_configurationCount = configurationCount
+End Property
+
 '---------------------------------------------------------------------------------------
 ' Function  : configuration
 ' Author    : Jean-Pierre Imbert
@@ -335,6 +348,10 @@ Public Function configuration(n As Integer) As String
         sResult = ""
     End If
     configuration = sResult
+End Function
+
+Public Function vtkConfigurationManager_configuration(n As Integer) As String
+    vtkConfigurationManager_configuration = configuration(n)
 End Function
 
 '---------------------------------------------------------------------------------------
@@ -427,6 +444,10 @@ Public Function getConfigurationPathWithNumber(n As Integer) As String
     getConfigurationPathWithNumber = sResult
 End Function
 
+Public Function vtkConfigurationManager_getConfigurationPathWithNumber(n As Integer) As String
+    vtkConfigurationManager_getConfigurationPathWithNumber = getConfigurationPathWithNumber(n)
+End Function
+
 '---------------------------------------------------------------------------------------
 ' Procedure : setConfigurationPathWithNumber
 ' Author    : Jean-Pierre Imbert
@@ -451,6 +472,10 @@ End Sub
 '
 Public Function getConfigurationPath(configuration As String) As String
     getConfigurationPath = getConfigurationPathWithNumber(getConfigurationNumber(configuration))
+End Function
+
+Public Function vtkConfigurationManager_getConfigurationPath(configuration As String) As String
+    vtkConfigurationManager_getConfigurationPath = getConfigurationPath(configuration)
 End Function
 
 '---------------------------------------------------------------------------------------
@@ -505,7 +530,7 @@ Public Sub setConfigurationProjectNameWithNumber(n As Integer, projectName As St
         If m_sheetVersion = currentVersion Then
             configurationSheet.Cells(projectNameLine, n + nbTitleColumns) = projectName
            Else
-            Err.Raise VTK_OBSOLETE_CONFIGURATION_SHEET, "vtkConfigurationManager:setConfigurationProjectNameWithNumber", _
+            Err.Raise VTK_OBSOLETE_CONFIGURATION_SHEET, "vtkConfigurationManagerExcel:setConfigurationProjectNameWithNumber", _
             "Impossible to set a configuration projectName with this configuration sheet version (project=" & m_projectName & ", " & m_sheetVersion & ")"
         End If
     End If
@@ -552,7 +577,7 @@ Public Sub setConfigurationCommentWithNumber(n As Integer, comment As String)
         If m_sheetVersion = currentVersion Then
             configurationSheet.Cells(commentLine, n + nbTitleColumns) = comment
            Else
-            Err.Raise VTK_OBSOLETE_CONFIGURATION_SHEET, "vtkConfigurationManager:setConfigurationCommentWithNumber", _
+            Err.Raise VTK_OBSOLETE_CONFIGURATION_SHEET, "vtkConfigurationManagerExcel:setConfigurationCommentWithNumber", _
             "Impossible to set a configuration comment with this configuration sheet version (project=" & m_projectName & ", " & m_sheetVersion & ")"
         End If
     End If
@@ -599,7 +624,7 @@ Public Sub setConfigurationTemplateWithNumber(n As Integer, template As String)
         If m_sheetVersion = currentVersion Then
             configurationSheet.Cells(templateLine, n + nbTitleColumns) = template
            Else
-            Err.Raise VTK_OBSOLETE_CONFIGURATION_SHEET, "vtkConfigurationManager:setConfigurationTemplateWithNumber", _
+            Err.Raise VTK_OBSOLETE_CONFIGURATION_SHEET, "vtkConfigurationManagerExcel:setConfigurationTemplateWithNumber", _
             "Impossible to set a configuration template path with this configuration sheet version (project=" & m_projectName & ", " & m_sheetVersion & ")"
         End If
     End If
@@ -626,6 +651,10 @@ End Function
 Public Property Get moduleCount() As Integer
     ' The number of modules is the number of used rows minus two
     moduleCount = configurationSheet.UsedRange.Rows.Count - nbTitleRows
+End Property
+
+Public Property Get vtkConfigurationManager_moduleCount() As Integer
+    vtkConfigurationManager_moduleCount = moduleCount()
 End Property
 
 '---------------------------------------------------------------------------------------
@@ -663,6 +692,10 @@ Public Function module(n As Integer) As String
     module = sResult
 End Function
 
+Public Function vtkConfigurationManager_module(n As Integer) As String
+    vtkConfigurationManager_module = module(n)
+End Function
+
 '---------------------------------------------------------------------------------------
 ' Procedure : getModuleNumber
 ' Author    : Jean-Pierre Imbert
@@ -683,6 +716,10 @@ Public Function getModuleNumber(module As String) As Integer
        Else
         getModuleNumber = r.Row - nbTitleRows
     End If
+End Function
+
+Public Function vtkConfigurationManager_getModuleNumber(module As String) As Integer
+    vtkConfigurationManager_getModuleNumber = getModuleNumber(module)
 End Function
 
 '---------------------------------------------------------------------------------------
@@ -728,6 +765,10 @@ Public Function getModulePathWithNumber(numModule As Integer, numConfiguration A
         sResult = ""
     End If
     getModulePathWithNumber = sResult
+End Function
+
+Public Function vtkConfigurationManager_getModulePathWithNumber(numModule As Integer, numConfiguration As Integer) As String
+    vtkConfigurationManager_getModulePathWithNumber = getModulePathWithNumber(numModule, numConfiguration)
 End Function
 
 '---------------------------------------------------------------------------------------

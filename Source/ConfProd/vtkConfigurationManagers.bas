@@ -57,8 +57,10 @@ Public Function vtkConfigurationManagerForProject(projectName As String) As vtkC
     On Error Resume Next
     Set cm = configurationManagers(projectName)
     If Err <> 0 Then
-        Set cm = New vtkConfigurationManager
-        cm.projectName = projectName
+        Set cm = New vtkConfigurationManagerExcel
+        Dim cmE As vtkConfigurationManagerExcel
+        Set cmE = cm
+        cmE.projectName = projectName    ' The projectName setter is specific to the Excel conf Manager
         If cm.projectName Like projectName Then     ' The initialization could fail (if the Workbook is closed)
             configurationManagers.Add Item:=cm, Key:=projectName
            Else
@@ -103,7 +105,7 @@ End Sub
 '
 Public Sub vtkInitializeConfigurationForActiveWorkBook(Optional withBeforeSaveHandler As Boolean = False)
     ' If a configuration sheet exists, does nothing
-    Dim cm As New vtkConfigurationManager
+    Dim cm As New vtkConfigurationManagerExcel
     If cm.isConfigurationInitializedForWorkbook(ExcelName:=ActiveWorkbook.name) Then Exit Sub
     Set cm = Nothing
     

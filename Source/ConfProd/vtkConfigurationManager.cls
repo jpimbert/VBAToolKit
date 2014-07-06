@@ -45,14 +45,22 @@ Option Explicit
 ' init (avec XMLPath spécifique pour XML, avant d'avoir la gestion centralisée des projets)
 
 ' rootPath
+Public Property Get rootPath() As String
 ' projectName (uniquement en Get pour la première version avant gestion des projets)
+Public Property Get projectName() As String
+Attribute projectName.VB_UserMemId = 0
+End Property
 
 ' configurationCount
+Public Property Get configurationCount() As Integer
 ' configurations
 ' configuration
+Public Function configuration(n As Integer) As String
 ' getConfigurationNumber
 ' getConfigurationPath
+Public Function getConfigurationPath(configuration As String) As String
 ' getConfigurationPathWithNumber
+Public Function getConfigurationPathWithNumber(n As Integer) As String
 ' setConfigurationPathWithNumber <- (dans vtkConfiguration, ne sont utilisés que pour les tests)
 ' getConfigurationProjectNameWithNumber
 ' setConfigurationProjectNameWithNumber <-
@@ -63,14 +71,20 @@ Option Explicit
 ' --> Soit on supprime les setters inutiles, soit on les garde dans l'interface, avec une erreur dans XML
 
 ' moduleCount
+Public Property Get moduleCount() As Integer
 ' modules
 ' module
+Public Function module(n As Integer) As String
+' getModuleNumber
+Public Function getModuleNumber(module As String) As Integer
 ' getModulePathWithNumber
+Public Function getModulePathWithNumber(numModule As Integer, numConfiguration As Integer) As String
 ' setModulePathWithNumber <- (dans vtkModule, non utilisé à part dans les tests)
 
 ' references
 ' getConfigurationReferencesWithNumber
 
 ' Stratégie de refactorisation
-'  - implémentation des méthodes d'interface au fur et à mesure
-'  - implémentation des tests en utilisant l'IF à la place du Excel au fur et à mesure
+'  - dérouler les tests significatifs un par un (un commit par test)
+'  - implémentation des méthodes d'interface au fur et à mesure pour chaque test
+'  - Tests à exécuter : confManagerExcel10, confManagerExcel11, configurationManagers, configuration

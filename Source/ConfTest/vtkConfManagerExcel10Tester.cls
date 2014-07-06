@@ -39,6 +39,7 @@ Private mAssert As IAssert
 Private existingWorkbook As Workbook    ' Existing Workbook opened for each test
 Private Const existingWorkbookNameForTest As String = "WorkBookForConfigurationsTests10.xlsm"
 Private existingConfManager As vtkConfigurationManager   ' Configuration Manager for the existing workbook
+Private existingConfManagerExcel As vtkConfigurationManagerExcel   ' Excel Configuration Manager for the existing workbook
 Private Const existingProjectName As String = "ExistingProject"
 Private existingWorkbookName As String
 
@@ -61,6 +62,7 @@ Private Sub ITestCase_SetUp(Assert As IAssert)
     Set existingWorkbook = getTestFileFromTemplate(fileName:=existingWorkbookNameForTest, destinationName:=existingProjectName & "_DEV.xlsm", openExcel:=True)
     existingWorkbookName = existingWorkbook.name
     Set existingConfManager = vtkConfigurationManagerForProject(existingProjectName)
+    Set existingConfManagerExcel = existingConfManager
 End Sub
 
 Private Sub ITestCase_TearDown()
@@ -77,7 +79,7 @@ End Sub
 Public Sub TestConfigurationSheetExistsInExistingWorkbook()
     '   Verify that the configuration sheet presence is detected in existing workbook
     '   using a fresh configuration Manager (with no default sheet initialized)
-    Dim cm As New vtkConfigurationManager
+    Dim cm As New vtkConfigurationManagerExcel
     mAssert.Should cm.isConfigurationInitializedForWorkbook(ExcelName:=existingWorkbookName), "The Configuration sheet must exist in existing workbook"
 End Sub
 
@@ -88,13 +90,13 @@ Public Sub TestConfigurationSheetRetrievalForExistingProject()
     Set ws = existingWorkbook.Sheets("vtkConfigurations")
     mAssert.Equals Err, 0, "A configuration manager must be accessible in an existing project"
     On Error GoTo 0
-    mAssert.Should existingWorkbook.Sheets("vtkConfigurations") Is existingConfManager.configurationSheet, "The configurationSheet property of the conf manager must be equal to the configuration sheet of the workbook"
+    mAssert.Should existingWorkbook.Sheets("vtkConfigurations") Is existingConfManagerExcel.configurationSheet, "The configurationSheet property of the conf manager must be equal to the configuration sheet of the workbook"
 End Sub
 
 Public Sub TestConfigurationSheetFormatForExistingProjet()
 '       Verify the retrieved configuration sheet from an existing project
     Dim ws As Worksheet
-    Set ws = existingConfManager.configurationSheet
+    Set ws = existingConfManagerExcel.configurationSheet
     mAssert.Equals ws.Range("A1"), "vtkConfigurations v1.0", "Expected identification of the configuration sheet"
     mAssert.Equals ws.Range("A2"), "Module Name", "Expected Title for Modules column"
     mAssert.Equals ws.Range("B1"), existingProjectName, "Expected Title for main project column"
@@ -118,7 +120,7 @@ Public Sub Test_AddConfigurationInExistingProject_Name()
 '       Verify the add of configuration in an existing project
 '       Verify the number and name of the added configuration
     Dim n As Integer
-    n = existingConfManager.addConfiguration("NewConfiguration", "ConfigurationPath")
+    n = existingConfManagerExcel.addConfiguration("NewConfiguration", "ConfigurationPath")
 
     mAssert.Equals existingConfManager.configurationCount, 3, "There must be two configurations in the existing template project"
     mAssert.Equals existingConfManager.configuration(0), "", "Inexistant configuration number 0"
@@ -136,9 +138,9 @@ Public Sub Test_AddConfigurationInExistingProject_Cells()
 '       Verify the cells of the configuration sheet
     Dim ws As Worksheet
     Dim n As Integer
-    n = existingConfManager.addConfiguration("NewConfiguration", "ConfigurationPath")
+    n = existingConfManagerExcel.addConfiguration("NewConfiguration", "ConfigurationPath")
     
-    Set ws = existingConfManager.configurationSheet
+    Set ws = existingConfManagerExcel.configurationSheet
     mAssert.Equals ws.Range("A1"), "vtkConfigurations v1.0", "Expected identification of the configuration sheet"
     mAssert.Equals ws.Range("A2"), "Module Name", "Expected Title for Modules column"
     mAssert.Equals ws.Range("B1"), existingProjectName, "Expected Title for main project column"
@@ -153,7 +155,7 @@ Public Sub Test_AddConfigurationInExistingProject_NullPathes()
 '       Verify the add of configuration in an existing project
 '       Verify That the module pathes are initialized to null
     Dim n As Integer, i As Integer
-    n = existingConfManager.addConfiguration("NewConfiguration", "ConfigurationPath")
+    n = existingConfManagerExcel.addConfiguration("NewConfiguration", "ConfigurationPath")
     
     For i = 1 To existingConfManager.configurationCount
         mAssert.Equals existingConfManager.getModulePathWithNumber(i, n), "", "Path of module " & i & " must be null"
@@ -204,8 +206,8 @@ Public Sub TestAddExistantModuleToExistingProject()
 '       Verify the capability to not add an existing module in an existing project
     Dim n As Integer
     ' set new modules
-    mAssert.Equals existingConfManager.addModule(module:="Module1"), -1, "Number of the first existing module"
-    mAssert.Equals existingConfManager.addModule(module:="Module5"), -5, "Number of the fifth existing module"
+    mAssert.Equals existingConfManagerExcel.addModule(module:="Module1"), -1, "Number of the first existing module"
+    mAssert.Equals existingConfManagerExcel.addModule(module:="Module5"), -5, "Number of the fifth existing module"
     mAssert.Equals existingConfManager.moduleCount, 5, "There must be five modules, no change, in the existing project"
 End Sub
 
@@ -213,7 +215,7 @@ Public Sub TestAddModuleWithExistingStringToExistingProject()
 '       Verify the capability to add a new module whose name is included in existing module in an existing project
     Dim n As Integer
     ' set new modules
-    mAssert.Equals existingConfManager.addModule(module:="Module"), 6, "Number for the new module"
+    mAssert.Equals existingConfManagerExcel.addModule(module:="Module"), 6, "Number for the new module"
     mAssert.Equals existingConfManager.moduleCount, 6, "There must be six modules, one more module, in the existing project"
 End Sub
 
