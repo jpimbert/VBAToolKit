@@ -63,6 +63,7 @@ End Sub
 '
 Public Sub init(ByVal XMLFilePath As String)
     Dim fso As New FileSystemObject, DDoc As MSXML2.DOMDocument
+    Dim projectName As String, rootPath As String
     If fso.FileExists(XMLFilePath) Then
         Set DDoc = New MSXML2.DOMDocument
         DDoc.Load XMLFilePath
@@ -73,10 +74,19 @@ Public Sub init(ByVal XMLFilePath As String)
         If DDoc.SelectSingleNode("/vtkConf/info/vtkConfigurationsVersion").Text <> "2.0" Then
             Err.Raise Number:=VTK_OBSOLETE_CONFIGURATION_SHEET, Source:="init:vtkConfigurationManagerXML", Description:="Bad version of XML File : 2.0 expected."
         End If
+       On Error GoTo M_Error
+        projectName = DDoc.SelectSingleNode("/vtkConf/info/projectName").Text
+        rootPath = fso.GetParentFolderName(fso.GetParentFolderName(XMLFilePath))
+       On Error GoTo 0
         Set m_DOMDocument = DDoc
+        m_projectName = projectName
+        m_rootPath = rootPath
        Else
         Err.Raise Number:=VTK_WRONG_FILE_PATH, Source:="init:vtkConfigurationManagerXML", Description:="The File " & XMLFilePath & " is unreachable."
     End If
+    Exit Sub
+M_Error:
+    Err.Raise Number:=VTK_INVALID_XML_FILE, Source:="init:vtkConfigurationManagerXML", Description:="Parse error of " & XMLFilePath & " : " & DDoc.parseError.reason
 End Sub
 
 '---------------------------------------------------------------------------------------
@@ -106,6 +116,7 @@ End Property
 '---------------------------------------------------------------------------------------
 '
 Public Property Get rootPath() As String
+    rootPath = m_rootPath
 End Property
 
 Public Property Get vtkConfigurationManager_rootPath() As String
@@ -120,6 +131,7 @@ End Property
 '---------------------------------------------------------------------------------------
 '
 Public Property Get configurationCount() As Integer
+    configurationCount = m_DOMDocument.SelectNodes("/vtkConf/configuration").Length
 End Property
 
 Public Property Get vtkConfigurationManager_configurationCount() As Integer
@@ -135,6 +147,11 @@ End Property
 '---------------------------------------------------------------------------------------
 '
 Public Function configuration(n As Integer) As String
+    If n > 0 And n <= configurationCount Then
+        configuration = m_DOMDocument.SelectSingleNode("/vtkConf/configuration[@cID=""c" & n & """]/name").Text
+       Else
+        configuration = ""
+    End If
 End Function
 
 Public Function vtkConfigurationManager_configuration(n As Integer) As String
@@ -190,6 +207,15 @@ End Function
 '---------------------------------------------------------------------------------------
 '
 Public Function getConfigurationNumber(configuration As String) As Integer
+    Dim textValue As String
+   On Error Resume Next
+    textValue = m_DOMDocument.SelectSingleNode("/vtkConf/configuration[name=""" & configuration & """]/@cID").Text
+   On Error GoTo 0
+    If textValue = "" Then
+        getConfigurationNumber = 0
+       Else
+        getConfigurationNumber = CInt(Right$(textValue, Len(textValue) - 1))
+    End If
 End Function
 
 Public Function vtkConfigurationManager_getConfigurationNumber(configuration As String) As Integer
@@ -205,6 +231,11 @@ End Function
 '---------------------------------------------------------------------------------------
 '
 Public Function getConfigurationPathWithNumber(n As Integer) As String
+    If n > 0 And n <= configurationCount Then
+        getConfigurationPathWithNumber = m_DOMDocument.SelectSingleNode("/vtkConf/configuration[@cID=""c" & n & """]/path").Text
+       Else
+        getConfigurationPathWithNumber = ""
+    End If
 End Function
 
 Public Function vtkConfigurationManager_getConfigurationPathWithNumber(n As Integer) As String
@@ -235,6 +266,7 @@ End Sub
 '---------------------------------------------------------------------------------------
 '
 Public Function getConfigurationPath(configuration As String) As String
+    getConfigurationPath = getConfigurationPathWithNumber(getConfigurationNumber(configuration))
 End Function
 
 Public Function vtkConfigurationManager_getConfigurationPath(configuration As String) As String
@@ -377,6 +409,7 @@ End Function
 '---------------------------------------------------------------------------------------
 '
 Public Property Get moduleCount() As Integer
+    moduleCount = m_DOMDocument.SelectNodes("/vtkConf/module").Length
 End Property
 
 Public Property Get vtkConfigurationManager_moduleCount() As Integer
@@ -406,6 +439,11 @@ End Function
 '---------------------------------------------------------------------------------------
 '
 Public Function module(n As Integer) As String
+    If n > 0 And n <= moduleCount Then
+        module = m_DOMDocument.SelectSingleNode("/vtkConf/module[@mID=""m" & n & """]/name").Text
+       Else
+        module = ""
+    End If
 End Function
 
 Public Function vtkConfigurationManager_module(n As Integer) As String
@@ -421,6 +459,15 @@ End Function
 '---------------------------------------------------------------------------------------
 '
 Public Function getModuleNumber(module As String) As Integer
+    Dim textValue As String
+   On Error Resume Next
+    textValue = m_DOMDocument.SelectSingleNode("/vtkConf/module[name=""" & module & """]/@mID").Text
+   On Error GoTo 0
+    If textValue = "" Then
+        getModuleNumber = 0
+       Else
+        getModuleNumber = CInt(Right$(textValue, Len(textValue) - 1))
+    End If
 End Function
 
 Public Function vtkConfigurationManager_getModuleNumber(module As String) As Integer
@@ -452,6 +499,13 @@ End Function
 '---------------------------------------------------------------------------------------
 '
 Public Function getModulePathWithNumber(numModule As Integer, numConfiguration As Integer) As String
+    If numModule > 0 And numModule <= moduleCount And numConfiguration > 0 And numConfiguration <= configurationCount Then
+       On Error Resume Next
+        getModulePathWithNumber = m_DOMDocument.SelectSingleNode("/vtkConf/module[@mID=""m" & numModule & """]/modulePath[@confId=""c" & numConfiguration & """]").Text
+       On Error GoTo 0
+       Else
+        getModulePathWithNumber = ""
+    End If
 End Function
 
 Public Function vtkConfigurationManager_getModulePathWithNumber(numModule As Integer, numConfiguration As Integer) As String
@@ -482,6 +536,21 @@ End Sub
 '---------------------------------------------------------------------------------------
 '
 Public Function references() As Collection
+    Dim i As Integer, refs As New Collection, ref As vtkReference
+    For i = 1 To m_DOMDocument.SelectNodes("/vtkConf/reference").Length
+        Set ref = New vtkReference
+        ref.id = "r" & i
+        ref.name = m_DOMDocument.SelectSingleNode("/vtkConf/reference[@refID=""" & ref.id & """]/name").Text
+       On Error Resume Next
+        ref.GUID = m_DOMDocument.SelectSingleNode("/vtkConf/reference[@refID=""" & ref.id & """]/guid").Text
+        If Err.Number <> 0 Then
+            Err.Number = 0
+            ref.fullPath = m_DOMDocument.SelectSingleNode("/vtkConf/reference[@refID=""" & ref.id & """]/path").Text
+        End If
+       On Error GoTo 0
+        refs.Add Item:=ref, Key:=ref.id
+    Next i
+    Set references = refs
 End Function
 
 Public Function vtkConfigurationManager_references() As Collection
