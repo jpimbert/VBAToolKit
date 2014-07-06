@@ -1,0 +1,454 @@
+VERSION 1.0 CLASS
+BEGIN
+  MultiUse = -1  'True
+END
+Attribute VB_Name = "vtkConfigurationManagerXML"
+Attribute VB_GlobalNameSpace = False
+Attribute VB_Creatable = False
+Attribute VB_PredeclaredId = False
+Attribute VB_Exposed = False
+Option Explicit
+Implements vtkConfigurationManager
+'---------------------------------------------------------------------------------------
+' Module    : vtkConfigurationManagerXML, implements vtkConfigurationManager
+' Author    : Jean-Pierre Imbert
+' Date      : 06/07/2014
+' Purpose   : Manage Configurations and Modules of a VTK Project
+'               - a Configuration is an Excel file containing Modules
+'               - for each configuration, a Module can be imported/exported to a specific path relative to the VTK Project directory
+'               - each configuration is a VBA project included in a specific Excel file whose path is relative to the VTK Project directory
+'
+' Usage:
+'   - Each instance of Configuration Manager is attached to the XML file describing a VTK project
+'       - the method init is used for this attachment
+'
+' NOTE      : The XML configuration manager is read only
+'             a call to a setter function will cause an error
+'
+' Copyright 2014 Skwal-Soft (http://skwalsoft.com)
+'
+'   Licensed under the Apache License, Version 2.0 (the "License");
+'   you may not use this file except in compliance with the License.
+'   You may obtain a copy of the License at
+'
+'       http://www.apache.org/licenses/LICENSE-2.0
+'
+'   Unless required by applicable law or agreed to in writing, software
+'   distributed under the License is distributed on an "AS IS" BASIS,
+'   WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+'   See the License for the specific language governing permissions and
+'   limitations under the License.
+'---------------------------------------------------------------------------------------
+
+Private m_DOMDocument As DOMDocument
+Private m_projectName As String
+Private m_rootPath As String
+
+Private Sub Class_Terminate()
+    Set m_DOMDocument = Nothing
+End Sub
+
+'---------------------------------------------------------------------------------------
+' Sub       : init - Public
+' Author    : Jean-Pierre Imbert
+' Date      : 06/07/2014
+' Purpose   : Attach the instance to an XML file, and initialize
+' Parameter : XMLFilePath (absolute path) as a string
+' Error detected :
+'           - VTK_WRONG_FILE_PATH if the XML file can't be opened
+'           - VTK_INVALID_XML_FILE if the XML File is not a V2.0 Configuration file
+'---------------------------------------------------------------------------------------
+'
+Public Sub init(ByVal XMLFilePath As String)
+End Sub
+
+'---------------------------------------------------------------------------------------
+' Property  : projectName as String - Read Only - Public
+' Author    : Jean-Pierre Imbert
+' Date      : 06/07/2014
+' Purpose   : name of the project attached to this configuration manager
+' NOTE      : This is the Default property
+'               - "Attribute Value.VB_UserMemId = 0" is added as first line of property Get (in exported Module)
+' WARNING   : The attribute must be explicitly added after each export, or just before import
+'---------------------------------------------------------------------------------------
+'
+Public Property Get projectName() As String
+    projectName = m_projectName
+End Property
+
+Public Property Get vtkConfigurationManager_projectName() As String
+    vtkConfigurationManager_projectName = projectName
+End Property
+
+'---------------------------------------------------------------------------------------
+' Property  : rootPath as String - Read Only - Public
+' Author    : Jean-Pierre Imbert
+' Date      : 06/07/2014
+' Purpose   : return the rootPath of the project
+'             - or return "" if the rootPath can't be determined
+'---------------------------------------------------------------------------------------
+'
+Public Property Get rootPath() As String
+End Property
+
+Public Property Get vtkConfigurationManager_rootPath() As String
+    vtkConfigurationManager_rootPath = rootPath
+End Property
+
+'---------------------------------------------------------------------------------------
+' Property  : configurationCount as Integer - Read Only - Public
+' Author    : Jean-Pierre Imbert
+' Date      : 06/07/2014
+' Purpose   : Get the number of configurations
+'---------------------------------------------------------------------------------------
+'
+Public Property Get configurationCount() As Integer
+End Property
+
+Public Property Get vtkConfigurationManager_configurationCount() As Integer
+    vtkConfigurationManager_configurationCount = configurationCount
+End Property
+
+'---------------------------------------------------------------------------------------
+' Function  : configuration
+' Author    : Jean-Pierre Imbert
+' Date      : 06/07/2014
+' Purpose   : return the n-th configuration of the project, given n as integer
+'               - return "" if the configuration is inexistant
+'---------------------------------------------------------------------------------------
+'
+Public Function configuration(n As Integer) As String
+End Function
+
+Public Function vtkConfigurationManager_configuration(n As Integer) As String
+    vtkConfigurationManager_configuration = configuration(n)
+End Function
+
+'---------------------------------------------------------------------------------------
+' Procedure : addConfiguration
+' Author    : Jean-Pierre Imbert
+' Date      : 06/07/2014
+' Purpose   : Return the Error VTK_READONLY_FILE because XML file is unmodifiable
+'---------------------------------------------------------------------------------------
+'
+Public Function addConfiguration(configuration As String, Optional path As String = "", Optional template As String = "", Optional projectName As String = "", Optional comment As String = "") As Integer
+End Function
+
+Public Function vtkConfigurationManager_addConfiguration(configuration As String, Optional path As String = "", Optional template As String = "", Optional projectName As String = "", Optional comment As String = "") As Integer
+    vtkConfigurationManager_addConfiguration = addConfiguration(configuration, path, template, projectName, comment)
+End Function
+
+'---------------------------------------------------------------------------------------
+' Procedure : configurations
+' Author    : Jean-Pierre Imbert
+' Date      : 06/07/2014
+' Purpose   : Return a collection of initialized vtkConfiguration objects
+'---------------------------------------------------------------------------------------
+'
+Public Function configurations() As Collection
+End Function
+
+Public Function vtkConfigurationManager_configurations() As Collection
+    Set vtkConfigurationManager_configurations = configurations
+End Function
+
+'---------------------------------------------------------------------------------------
+' Procedure : getConfigurationNumber
+' Author    : Jean-Pierre Imbert
+' Date      : 06/07/2014
+' Purpose   : return the number of a configuration given its name
+'               - return 0 of the name is inexistant
+'---------------------------------------------------------------------------------------
+'
+Public Function getConfigurationNumber(configuration As String) As Integer
+End Function
+
+Public Function vtkConfigurationManager_getConfigurationNumber(configuration As String) As Integer
+    vtkConfigurationManager_getConfigurationNumber = getConfigurationNumber(configuration)
+End Function
+
+'---------------------------------------------------------------------------------------
+' Procedure : getConfigurationPathWithNumber
+' Author    : Jean-Pierre Imbert
+' Date      : 06/07/2014
+' Purpose   : return the n-th relative configuration path of the project, given n as integer
+'               - return "" if the configuration is inexistant
+'---------------------------------------------------------------------------------------
+'
+Public Function getConfigurationPathWithNumber(n As Integer) As String
+End Function
+
+Public Function vtkConfigurationManager_getConfigurationPathWithNumber(n As Integer) As String
+    vtkConfigurationManager_getConfigurationPathWithNumber = getConfigurationPathWithNumber(n)
+End Function
+
+'---------------------------------------------------------------------------------------
+' Procedure : setConfigurationPathWithNumber
+' Author    : Jean-Pierre Imbert
+' Date      : 06/07/2014
+' Purpose   : Return the Error VTK_READONLY_FILE because XML file is unmodifiable
+'---------------------------------------------------------------------------------------
+'
+Public Sub setConfigurationPathWithNumber(n As Integer, path As String)
+End Sub
+
+Public Sub vtkConfigurationManager_setConfigurationPathWithNumber(n As Integer, path As String)
+    setConfigurationPathWithNumber n, path
+End Sub
+
+'---------------------------------------------------------------------------------------
+' Function  : getConfigurationPath
+' Author    : Jean-Pierre Imbert
+' Date      : 06/07/2014
+' Purpose   : return the relative path of a configuration given its name
+'               - return "" of the name is inexistant
+'---------------------------------------------------------------------------------------
+'
+Public Function getConfigurationPath(configuration As String) As String
+End Function
+
+Public Function vtkConfigurationManager_getConfigurationPath(configuration As String) As String
+    vtkConfigurationManager_getConfigurationPath = getConfigurationPath(configuration)
+End Function
+
+'---------------------------------------------------------------------------------------
+' Procedure : setConfigurationPath
+' Author    : Jean-Pierre Imbert
+' Date      : 06/07/2014
+' Purpose   : Return the Error VTK_READONLY_FILE because XML file is unmodifiable
+'---------------------------------------------------------------------------------------
+'
+Public Sub setConfigurationPath(configuration As String, path As String)
+End Sub
+
+Public Sub vtkConfigurationManager_setConfigurationPath(configuration As String, path As String)
+    setConfigurationPath configuration, path
+End Sub
+
+'---------------------------------------------------------------------------------------
+' Procedure : getConfigurationProjectNameWithNumber
+' Author    : Jean-Pierre Imbert
+' Date      : 06/07/2014
+' Purpose   : return the n-th configuration project name of the project, given n as integer
+'               - return "" if the configuration is inexistant
+'               - return the default project name if
+'                   - it is not initialized in the configuration sheet v1.1
+'                   - the configuration sheet is v1.0, so there is no project name field
+'---------------------------------------------------------------------------------------
+'
+Public Function getConfigurationProjectNameWithNumber(n As Integer) As String
+End Function
+
+Public Function vtkConfigurationManager_getConfigurationProjectNameWithNumber(n As Integer) As String
+    vtkConfigurationManager_getConfigurationProjectNameWithNumber = getConfigurationProjectNameWithNumber(n)
+End Function
+
+'---------------------------------------------------------------------------------------
+' Procedure : setConfigurationProjectNameWithNumber
+' Author    : Jean-Pierre Imbert
+' Date      : 06/07/2014
+' Purpose   : Return the Error VTK_READONLY_FILE because XML file is unmodifiable
+'---------------------------------------------------------------------------------------
+'
+Public Sub setConfigurationProjectNameWithNumber(n As Integer, projectName As String)
+End Sub
+
+Public Sub vtkConfigurationManager_setConfigurationProjectNameWithNumber(n As Integer, projectName As String)
+    setConfigurationProjectNameWithNumber n, projectName
+End Sub
+
+'---------------------------------------------------------------------------------------
+' Procedure : getConfigurationCommentWithNumber
+' Author    : Jean-Pierre Imbert
+' Date      : 06/07/2014
+' Purpose   : return the n-th configuration comment of the project, given n as integer
+'               - return "" if the configuration is inexistant
+'               - return the default comment if
+'                   - it is not initialized in the configuration sheet v1.1
+'                   - the configuration sheet is v1.0, so there is no comment field
+'---------------------------------------------------------------------------------------
+'
+Public Function getConfigurationCommentWithNumber(n As Integer) As String
+End Function
+
+Public Function vtkConfigurationManager_getConfigurationCommentWithNumber(n As Integer) As String
+    vtkConfigurationManager_getConfigurationCommentWithNumber = getConfigurationCommentWithNumber(n)
+End Function
+
+'---------------------------------------------------------------------------------------
+' Procedure : setConfigurationCommentWithNumber
+' Author    : Jean-Pierre Imbert
+' Date      : 06/07/2014
+' Purpose   : Return the Error VTK_READONLY_FILE because XML file is unmodifiable
+'---------------------------------------------------------------------------------------
+'
+Public Sub setConfigurationCommentWithNumber(n As Integer, comment As String)
+End Sub
+
+Public Sub vtkConfigurationManager_setConfigurationCommentWithNumber(n As Integer, comment As String)
+    setConfigurationCommentWithNumber n, comment
+End Sub
+
+'---------------------------------------------------------------------------------------
+' Procedure : getConfigurationTemplateWithNumber
+' Author    : Jean-Pierre Imbert
+' Date      : 06/07/2014
+' Purpose   : return the n-th configuration Excel template path of the project, given n as integer
+'               - return "" if the configuration is inexistant
+'               - return the default comment if
+'                   - it is not initialized in the configuration sheet v1.1
+'                   - the configuration sheet is v1.0, so there is no comment field
+'---------------------------------------------------------------------------------------
+'
+Public Function getConfigurationTemplateWithNumber(n As Integer) As String
+End Function
+
+Public Function vtkConfigurationManager_getConfigurationTemplateWithNumber(n As Integer) As String
+    vtkConfigurationManager_getConfigurationTemplateWithNumber = getConfigurationTemplateWithNumber(n)
+End Function
+
+'---------------------------------------------------------------------------------------
+' Procedure : setConfigurationTemplateWithNumber
+' Author    : Jean-Pierre Imbert
+' Date      : 06/07/2014
+' Purpose   : Return the Error VTK_READONLY_FILE because XML file is unmodifiable
+'---------------------------------------------------------------------------------------
+'
+Public Sub setConfigurationTemplateWithNumber(n As Integer, template As String)
+End Sub
+
+Public Sub vtkConfigurationManager_setConfigurationTemplateWithNumber(n As Integer, template As String)
+    setConfigurationTemplateWithNumber n, template
+End Sub
+
+'---------------------------------------------------------------------------------------
+' Procedure : getConfigurationReferencesWithNumber
+' Author    : Jean-Pierre Imbert
+' Date      : 06/07/2014
+' Purpose   : return the n-th configuration references collection of the project, given n as integer
+'---------------------------------------------------------------------------------------
+'
+Public Function getConfigurationReferencesWithNumber(n As Integer) As Collection
+End Function
+
+Public Function vtkConfigurationManager_getConfigurationReferencesWithNumber(n As Integer) As Collection
+    Set vtkConfigurationManager_getConfigurationReferencesWithNumber = getConfigurationReferencesWithNumber(n)
+End Function
+
+'---------------------------------------------------------------------------------------
+' Property  : moduleCount as Integer - Read Only - Public
+' Author    : Jean-Pierre Imbert
+' Date      : 06/07/2014
+' Purpose   : Get the number of modules
+'---------------------------------------------------------------------------------------
+'
+Public Property Get moduleCount() As Integer
+End Property
+
+Public Property Get vtkConfigurationManager_moduleCount() As Integer
+    vtkConfigurationManager_moduleCount = moduleCount()
+End Property
+
+'---------------------------------------------------------------------------------------
+' Procedure : modules
+' Author    : Jean-Pierre Imbert
+' Date      : 06/07/2014
+' Purpose   : Return a collection of initialized vtkModule objects
+'---------------------------------------------------------------------------------------
+'
+Public Function modules() As Collection
+End Function
+
+Public Function vtkConfigurationManager_modules() As Collection
+    Set vtkConfigurationManager_modules = modules
+End Function
+
+'---------------------------------------------------------------------------------------
+' Function  : module
+' Author    : Jean-Pierre Imbert
+' Date      : 06/07/2014
+' Purpose   : return the n-th module of the project, given n as integer
+'               - return "" if the module is inexistant
+'---------------------------------------------------------------------------------------
+'
+Public Function module(n As Integer) As String
+End Function
+
+Public Function vtkConfigurationManager_module(n As Integer) As String
+    vtkConfigurationManager_module = module(n)
+End Function
+
+'---------------------------------------------------------------------------------------
+' Procedure : getModuleNumber
+' Author    : Jean-Pierre Imbert
+' Date      : 06/07/2014
+' Purpose   : return the number of a module given its name
+'               - return 0 of the name is inexistant
+'---------------------------------------------------------------------------------------
+'
+Public Function getModuleNumber(module As String) As Integer
+End Function
+
+Public Function vtkConfigurationManager_getModuleNumber(module As String) As Integer
+    vtkConfigurationManager_getModuleNumber = getModuleNumber(module)
+End Function
+
+'---------------------------------------------------------------------------------------
+' Procedure : addModule
+' Author    : Jean-Pierre Imbert
+' Date      : 06/07/2014
+' Purpose   : Return the Error VTK_READONLY_FILE because XML file is unmodifiable
+'---------------------------------------------------------------------------------------
+'
+Public Function addModule(module As String) As Integer
+End Function
+
+Public Function vtkConfigurationManager_addModule(module As String) As Integer
+    vtkConfigurationManager_addModule = addModule(module)
+End Function
+
+'---------------------------------------------------------------------------------------
+' Procedure : getModulePathWithNumber
+' Author    : Jean-Pierre Imbert
+' Date      : 06/07/2014
+' Purpose   : Get a module relative path given its module and configuration numbers
+'               - return "" if the module or the configuration doesn't exist
+'               - return "" if the path is not initialized ("-" in the cell of the configuration sheet)
+'---------------------------------------------------------------------------------------
+'
+Public Function getModulePathWithNumber(numModule As Integer, numConfiguration As Integer) As String
+End Function
+
+Public Function vtkConfigurationManager_getModulePathWithNumber(numModule As Integer, numConfiguration As Integer) As String
+    vtkConfigurationManager_getModulePathWithNumber = getModulePathWithNumber(numModule, numConfiguration)
+End Function
+
+'---------------------------------------------------------------------------------------
+' Procedure : setModulePathWithNumber
+' Author    : Jean-Pierre Imbert
+' Date      : 06/07/2014
+' Purpose   : Set a module relative path given its module and configuration numbers
+'               - if the path given is "", it is replaced by "-" in the configuration sheet cell
+'---------------------------------------------------------------------------------------
+'
+Public Sub setModulePathWithNumber(path As String, numModule As Integer, numConfiguration As Integer)
+End Sub
+
+Public Sub vtkConfigurationManager_setModulePathWithNumber(path As String, numModule As Integer, numConfiguration As Integer)
+    setModulePathWithNumber path, numModule, numConfiguration
+End Sub
+
+'---------------------------------------------------------------------------------------
+' Procedure : references
+' Author    : Jean-Pierre Imbert
+' Date      : 06/07/2014
+' Purpose   : Return a collection of all vtkReferences objects
+'---------------------------------------------------------------------------------------
+'
+Public Function references() As Collection
+End Function
+
+Public Function vtkConfigurationManager_references() As Collection
+    Set vtkConfigurationManager_references = references
+End Function
+

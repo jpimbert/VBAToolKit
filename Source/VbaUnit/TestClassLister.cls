@@ -62,6 +62,7 @@ Public Function SelectTestClass(TestClassName As String) As ITest
         Case "vtkConfManagerExcel11Tester": Set SelectTestClass = New vtkConfManagerExcel11Tester
         Case "vtkTestUtilitiesTester": Set SelectTestClass = New vtkTestUtilitiesTester
         Case "vtkReferenceManagerTester": Set SelectTestClass = New vtkReferenceManagerTester
+        Case "vtkConfManagerXML20Tester": Set SelectTestClass = New vtkConfManagerXML20Tester
         Case Else:
     End Select
 End Function

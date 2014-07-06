@@ -449,4 +449,14 @@
         <modulePath confId="c2">Source\ConfProd\vtkConfigurationManagerExcel.cls</modulePath>
         <modulePath confId="c3">Source\ConfProd\vtkConfigurationManagerExcel.cls</modulePath>
     </module>
+    <module mID="m69">
+        <name>vtkConfigurationManagerXML</name>
+        <modulePath confId="c1">Source\ConfProd\vtkConfigurationManagerXML.cls</modulePath>
+        <modulePath confId="c2">Source\ConfProd\vtkConfigurationManagerXML.cls</modulePath>
+        <modulePath confId="c3">Source\ConfProd\vtkConfigurationManagerXML.cls</modulePath>
+    </module>
+    <module mID="m70">
+        <name>vtkConfManagerXML20Tester</name>
+        <modulePath confId="c2">Source\ConfTest\vtkConfManagerXML20Tester.bas</modulePath>
+    </module>
 </vtkConf>
