@@ -721,6 +721,11 @@ Public Function modules() As Collection
     Next i
     Set modules = col
 End Function
+
+Public Function vtkConfigurationManager_modules() As Collection
+    Set vtkConfigurationManager_modules = modules
+End Function
+
 '---------------------------------------------------------------------------------------
 ' Function  : module
 ' Author    : Jean-Pierre Imbert

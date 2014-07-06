@@ -86,6 +86,7 @@ Public Function addConfiguration(configuration As String, Optional path As Strin
 ' moduleCount
 Public Property Get moduleCount() As Integer
 ' modules
+Public Function modules() As Collection
 ' module
 Public Function module(n As Integer) As String
 ' getModuleNumber
@@ -102,7 +103,3 @@ Public Function references() As Collection
 ' getConfigurationReferencesWithNumber
 Public Function getConfigurationReferencesWithNumber(n As Integer) As Collection
 
-' Stratégie de refactorisation
-'  - dérouler les tests significatifs un par un (un commit par test)
-'  - implémentation des méthodes d'interface au fur et à mesure pour chaque test
-'  - Tests à exécuter : confManagerExcel10, confManagerExcel11, configurationManagers, configuration, module
