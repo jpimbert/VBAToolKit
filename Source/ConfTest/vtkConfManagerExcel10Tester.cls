@@ -120,7 +120,7 @@ Public Sub Test_AddConfigurationInExistingProject_Name()
 '       Verify the add of configuration in an existing project
 '       Verify the number and name of the added configuration
     Dim n As Integer
-    n = existingConfManagerExcel.addConfiguration("NewConfiguration", "ConfigurationPath")
+    n = existingConfManager.addConfiguration("NewConfiguration", "ConfigurationPath")
 
     mAssert.Equals existingConfManager.configurationCount, 3, "There must be two configurations in the existing template project"
     mAssert.Equals existingConfManager.configuration(0), "", "Inexistant configuration number 0"
@@ -138,7 +138,7 @@ Public Sub Test_AddConfigurationInExistingProject_Cells()
 '       Verify the cells of the configuration sheet
     Dim ws As Worksheet
     Dim n As Integer
-    n = existingConfManagerExcel.addConfiguration("NewConfiguration", "ConfigurationPath")
+    n = existingConfManager.addConfiguration("NewConfiguration", "ConfigurationPath")
     
     Set ws = existingConfManagerExcel.configurationSheet
     mAssert.Equals ws.Range("A1"), "vtkConfigurations v1.0", "Expected identification of the configuration sheet"
@@ -155,7 +155,7 @@ Public Sub Test_AddConfigurationInExistingProject_NullPathes()
 '       Verify the add of configuration in an existing project
 '       Verify That the module pathes are initialized to null
     Dim n As Integer, i As Integer
-    n = existingConfManagerExcel.addConfiguration("NewConfiguration", "ConfigurationPath")
+    n = existingConfManager.addConfiguration("NewConfiguration", "ConfigurationPath")
     
     For i = 1 To existingConfManager.configurationCount
         mAssert.Equals existingConfManager.getModulePathWithNumber(i, n), "", "Path of module " & i & " must be null"
@@ -206,8 +206,8 @@ Public Sub TestAddExistantModuleToExistingProject()
 '       Verify the capability to not add an existing module in an existing project
     Dim n As Integer
     ' set new modules
-    mAssert.Equals existingConfManagerExcel.addModule(module:="Module1"), -1, "Number of the first existing module"
-    mAssert.Equals existingConfManagerExcel.addModule(module:="Module5"), -5, "Number of the fifth existing module"
+    mAssert.Equals existingConfManager.addModule(module:="Module1"), -1, "Number of the first existing module"
+    mAssert.Equals existingConfManager.addModule(module:="Module5"), -5, "Number of the fifth existing module"
     mAssert.Equals existingConfManager.moduleCount, 5, "There must be five modules, no change, in the existing project"
 End Sub
 
@@ -215,7 +215,7 @@ Public Sub TestAddModuleWithExistingStringToExistingProject()
 '       Verify the capability to add a new module whose name is included in existing module in an existing project
     Dim n As Integer
     ' set new modules
-    mAssert.Equals existingConfManagerExcel.addModule(module:="Module"), 6, "Number for the new module"
+    mAssert.Equals existingConfManager.addModule(module:="Module"), 6, "Number for the new module"
     mAssert.Equals existingConfManager.moduleCount, 6, "There must be six modules, one more module, in the existing project"
 End Sub
 

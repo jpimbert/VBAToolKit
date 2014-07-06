@@ -386,6 +386,10 @@ Public Function addConfiguration(configuration As String, Optional path As Strin
     End If
 End Function
 
+Public Function vtkConfigurationManager_addConfiguration(configuration As String, Optional path As String = "", Optional template As String = "", Optional projectName As String = "", Optional comment As String = "") As Integer
+    vtkConfigurationManager_addConfiguration = addConfiguration(configuration, path, template, projectName, comment)
+End Function
+
 '---------------------------------------------------------------------------------------
 ' Procedure : configurations
 ' Author    : Jean-Pierre Imbert
@@ -425,6 +429,10 @@ Public Function getConfigurationNumber(configuration As String) As Integer
     End If
 End Function
 
+Public Function vtkConfigurationManager_getConfigurationNumber(configuration As String) As Integer
+    vtkConfigurationManager_getConfigurationNumber = getConfigurationNumber(configuration)
+End Function
+
 '---------------------------------------------------------------------------------------
 ' Procedure : getConfigurationPathWithNumber
 ' Author    : Jean-Pierre Imbert
@@ -462,6 +470,10 @@ Public Sub setConfigurationPathWithNumber(n As Integer, path As String)
     End If
 End Sub
 
+Public Sub vtkConfigurationManager_setConfigurationPathWithNumber(n As Integer, path As String)
+    setConfigurationPathWithNumber n, path
+End Sub
+
 '---------------------------------------------------------------------------------------
 ' Function  : getConfigurationPath
 ' Author    : Jean-Pierre Imbert
@@ -487,6 +499,10 @@ End Function
 '
 Public Sub setConfigurationPath(configuration As String, path As String)
     setConfigurationPathWithNumber n:=getConfigurationNumber(configuration), path:=path
+End Sub
+
+Public Sub vtkConfigurationManager_setConfigurationPath(configuration As String, path As String)
+    setConfigurationPath configuration, path
 End Sub
 
 '---------------------------------------------------------------------------------------
@@ -747,6 +763,10 @@ Public Function addModule(module As String) As Integer
     End If
 End Function
 
+Public Function vtkConfigurationManager_addModule(module As String) As Integer
+    vtkConfigurationManager_addModule = addModule(module)
+End Function
+
 '---------------------------------------------------------------------------------------
 ' Procedure : getModulePathWithNumber
 ' Author    : Jean-Pierre Imbert
@@ -791,6 +811,10 @@ Public Sub setModulePathWithNumber(path As String, numModule As Integer, numConf
     End If
 End Sub
 
+Public Sub vtkConfigurationManager_setModulePathWithNumber(path As String, numModule As Integer, numConfiguration As Integer)
+    setModulePathWithNumber path, numModule, numConfiguration
+End Sub
+
 '---------------------------------------------------------------------------------------
 ' Procedure : referenceManager, private
 ' Author    : Jean-Pierre Imbert
@@ -812,6 +836,10 @@ End Function
 '
 Public Function references() As Collection
     Set references = referenceManager.allReferences
+End Function
+
+Public Function vtkConfigurationManager_references() As Collection
+    Set vtkConfigurationManager_references = references
 End Function
 
 '---------------------------------------------------------------------------------------

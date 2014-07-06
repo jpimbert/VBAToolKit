@@ -57,18 +57,24 @@ Public Property Get configurationCount() As Integer
 ' configuration
 Public Function configuration(n As Integer) As String
 ' getConfigurationNumber
+Public Function getConfigurationNumber(configuration As String) As Integer
+' setConfigurationPath
+Public Sub setConfigurationPath(configuration As String, path As String)
 ' getConfigurationPath
 Public Function getConfigurationPath(configuration As String) As String
 ' getConfigurationPathWithNumber
 Public Function getConfigurationPathWithNumber(n As Integer) As String
 ' setConfigurationPathWithNumber <- (dans vtkConfiguration, ne sont utilisés que pour les tests)
+Public Sub setConfigurationPathWithNumber(n As Integer, path As String)
 ' getConfigurationProjectNameWithNumber
 ' setConfigurationProjectNameWithNumber <-
 ' getConfigurationCommentWithNumber
 ' setConfigurationCommentWithNumber <-
 ' getConfigurationTemplateWithNumber
 ' setConfigurationTemplateWithNumber <-
-' --> Soit on supprime les setters inutiles, soit on les garde dans l'interface, avec une erreur dans XML
+' addConfiguration
+Public Function addConfiguration(configuration As String, Optional path As String = "", Optional template As String = "", Optional projectName As String = "", Optional comment As String = "") As Integer
+' --> on garde les setters dans l'interface, avec une erreur dans XML
 
 ' moduleCount
 Public Property Get moduleCount() As Integer
@@ -80,8 +86,12 @@ Public Function getModuleNumber(module As String) As Integer
 ' getModulePathWithNumber
 Public Function getModulePathWithNumber(numModule As Integer, numConfiguration As Integer) As String
 ' setModulePathWithNumber <- (dans vtkModule, non utilisé à part dans les tests)
+Public Sub setModulePathWithNumber(path As String, numModule As Integer, numConfiguration As Integer)
+' addModule
+Public Function addModule(module As String) As Integer
 
 ' references
+Public Function references() As Collection
 ' getConfigurationReferencesWithNumber
 
 ' Stratégie de refactorisation
