@@ -77,9 +77,10 @@
         <title>ExistingProjectName</title>
         <comment>Existing project for various tests of VBAToolKit</comment>
     </configuration>
-    <configuration cID="c2" refIDs="r1 r2 r3 r4 r5 r6 r7 r8 r9">
+    <configuration cID="c2" refIDs="r1 r2 r3 r4 r5 r6 r7 r8 r9 r11">
         <name>ExistingProject_DEV</name>
         <path>Project\ExistingProject_DEV.xlsm</path>
+	<templatePath>Templates\ExistingProjectTemplate.xlsm</templatePath>
         <title>ExistingProject_DEV</title>
         <comment>Existing project for development for various tests of VBAToolKit</comment>
     </configuration>

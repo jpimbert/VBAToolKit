@@ -457,6 +457,6 @@
     </module>
     <module mID="m70">
         <name>vtkConfManagerXML20Tester</name>
-        <modulePath confId="c2">Source\ConfTest\vtkConfManagerXML20Tester.bas</modulePath>
+        <modulePath confId="c2">Source\ConfTest\vtkConfManagerXML20Tester.cls</modulePath>
     </module>
 </vtkConf>

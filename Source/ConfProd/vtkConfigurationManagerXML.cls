@@ -192,6 +192,13 @@ End Function
 '---------------------------------------------------------------------------------------
 '
 Public Function configurations() As Collection
+    Dim col As New Collection, i As Integer, c As vtkConfiguration
+    For i = 1 To configurationCount
+        Set c = New vtkConfiguration
+        c.init confManager:=Me, confNumber:=i
+        col.Add Item:=c, Key:=configuration(i)
+    Next i
+    Set configurations = col
 End Function
 
 Public Function vtkConfigurationManager_configurations() As Collection
@@ -300,6 +307,11 @@ End Sub
 '---------------------------------------------------------------------------------------
 '
 Public Function getConfigurationProjectNameWithNumber(n As Integer) As String
+    If n > 0 And n <= configurationCount Then
+        getConfigurationProjectNameWithNumber = m_DOMDocument.SelectSingleNode("/vtkConf/configuration[@cID=""c" & n & """]/title").Text
+       Else
+        getConfigurationProjectNameWithNumber = ""
+    End If
 End Function
 
 Public Function vtkConfigurationManager_getConfigurationProjectNameWithNumber(n As Integer) As String
@@ -333,6 +345,11 @@ End Sub
 '---------------------------------------------------------------------------------------
 '
 Public Function getConfigurationCommentWithNumber(n As Integer) As String
+    If n > 0 And n <= configurationCount Then
+        getConfigurationCommentWithNumber = m_DOMDocument.SelectSingleNode("/vtkConf/configuration[@cID=""c" & n & """]/comment").Text
+       Else
+        getConfigurationCommentWithNumber = ""
+    End If
 End Function
 
 Public Function vtkConfigurationManager_getConfigurationCommentWithNumber(n As Integer) As String
@@ -366,6 +383,13 @@ End Sub
 '---------------------------------------------------------------------------------------
 '
 Public Function getConfigurationTemplateWithNumber(n As Integer) As String
+    If n > 0 And n <= configurationCount Then
+       On Error Resume Next
+        getConfigurationTemplateWithNumber = m_DOMDocument.SelectSingleNode("/vtkConf/configuration[@cID=""c" & n & """]/templatePath").Text
+       On Error GoTo 0
+       Else
+        getConfigurationTemplateWithNumber = ""
+    End If
 End Function
 
 Public Function vtkConfigurationManager_getConfigurationTemplateWithNumber(n As Integer) As String
@@ -388,6 +412,26 @@ Public Sub vtkConfigurationManager_setConfigurationTemplateWithNumber(n As Integ
 End Sub
 
 '---------------------------------------------------------------------------------------
+' Function  : vtkReferenceWithXML, private
+' Author    : Jean-Pierre Imbert
+' Date      : 08/07/2014
+' Purpose   : Create and init a vtkReference with XML, given an Id
+'---------------------------------------------------------------------------------------
+'
+Private Function vtkReferenceWithXML(id As String) As vtkReference
+    Dim ref As New vtkReference
+    ref.id = id
+    ref.name = m_DOMDocument.SelectSingleNode("/vtkConf/reference[@refID=""" & id & """]/name").Text
+   On Error Resume Next
+    ref.GUID = m_DOMDocument.SelectSingleNode("/vtkConf/reference[@refID=""" & id & """]/guid").Text
+    If Err.Number <> 0 Then
+        Err.Number = 0
+        ref.fullPath = m_DOMDocument.SelectSingleNode("/vtkConf/reference[@refID=""" & id & """]/path").Text
+    End If
+   On Error GoTo 0
+    Set vtkReferenceWithXML = ref
+End Function
+'---------------------------------------------------------------------------------------
 ' Procedure : getConfigurationReferencesWithNumber
 ' Author    : Jean-Pierre Imbert
 ' Date      : 06/07/2014
@@ -395,6 +439,12 @@ End Sub
 '---------------------------------------------------------------------------------------
 '
 Public Function getConfigurationReferencesWithNumber(n As Integer) As Collection
+    Dim refIDs() As String, i As Integer, refs As New Collection
+    refIDs = Split(m_DOMDocument.SelectSingleNode("/vtkConf/configuration[@cID=""c" & n & """]").Attributes.getNamedItem("refIDs").Text)
+    For i = LBound(refIDs) To UBound(refIDs)
+        refs.Add vtkReferenceWithXML(refIDs(i)), Key:=refIDs(i)
+    Next i
+    Set getConfigurationReferencesWithNumber = refs
 End Function
 
 Public Function vtkConfigurationManager_getConfigurationReferencesWithNumber(n As Integer) As Collection
@@ -424,6 +474,13 @@ End Property
 '---------------------------------------------------------------------------------------
 '
 Public Function modules() As Collection
+    Dim col As New Collection, i As Integer, m As vtkModule
+    For i = 1 To moduleCount
+        Set m = New vtkModule
+        m.init confManager:=Me, modNumber:=i
+        col.Add Item:=m, Key:=module(i)
+    Next i
+    Set modules = col
 End Function
 
 Public Function vtkConfigurationManager_modules() As Collection
@@ -536,19 +593,10 @@ End Sub
 '---------------------------------------------------------------------------------------
 '
 Public Function references() As Collection
-    Dim i As Integer, refs As New Collection, ref As vtkReference
+    Dim i As Integer, refs As New Collection, id As String
     For i = 1 To m_DOMDocument.SelectNodes("/vtkConf/reference").Length
-        Set ref = New vtkReference
-        ref.id = "r" & i
-        ref.name = m_DOMDocument.SelectSingleNode("/vtkConf/reference[@refID=""" & ref.id & """]/name").Text
-       On Error Resume Next
-        ref.GUID = m_DOMDocument.SelectSingleNode("/vtkConf/reference[@refID=""" & ref.id & """]/guid").Text
-        If Err.Number <> 0 Then
-            Err.Number = 0
-            ref.fullPath = m_DOMDocument.SelectSingleNode("/vtkConf/reference[@refID=""" & ref.id & """]/path").Text
-        End If
-       On Error GoTo 0
-        refs.Add Item:=ref, Key:=ref.id
+        id = "r" & i
+        refs.Add vtkReferenceWithXML(id), Key:=id
     Next i
     Set references = refs
 End Function

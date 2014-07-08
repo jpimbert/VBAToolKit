@@ -189,7 +189,7 @@ Public Sub TestConfigurationSheetFormatForExistingProjet()
     mAssert.Equals ws.Range("B5"), "Existing project for various tests of VBAToolKit", "Expected Comment for main workbook"
     mAssert.Equals ws.Range("C1"), existingProjectName & "_DEV", "Expected Title for development project column"
     mAssert.Equals ws.Range("C2"), "Project\ExistingProject_DEV.xlsm", "Expected related Path for development workbook"
-    mAssert.Equals ws.Range("C3"), "", "Expected Template path for development workbook"
+    mAssert.Equals ws.Range("C3"), "Templates\ExistingProjectTemplate.xlsm", "Expected Template path for development workbook"
     mAssert.Equals ws.Range("C4"), "", "Expected empty projectName for development workbook"
     mAssert.Equals ws.Range("C5"), "Existing project for development for various tests of VBAToolKit", "Expected Comment for development workbook"
 End Sub
@@ -253,7 +253,7 @@ Public Sub Test_AddConfigurationInExistingProject_Cells()
     mAssert.Equals ws.Range("B5"), "Existing project for various tests of VBAToolKit", "Expected Comment for main workbook"
     mAssert.Equals ws.Range("C1"), existingProjectName & "_DEV", "Expected Title for development project column"
     mAssert.Equals ws.Range("C2"), "Project\ExistingProject_DEV.xlsm", "Expected related Path for new development workbook"
-    mAssert.Equals ws.Range("C3"), "", "Expected Template path for development workbook"
+    mAssert.Equals ws.Range("C3"), "Templates\ExistingProjectTemplate.xlsm", "Expected Template path for development workbook"
     mAssert.Equals ws.Range("C4"), "", "Expected empty projectName for development workbook"
     mAssert.Equals ws.Range("C5"), "Existing project for development for various tests of VBAToolKit", "Expected Comment for development workbook"
     mAssert.Equals ws.Range("D1"), "NewConfiguration", "Expected Title for new configuration column"
@@ -515,7 +515,7 @@ Public Sub TestConfigurationSheetFormatUpToDateConversion()
     mAssert.Equals ws.Range("B5"), "Existing project for various tests of VBAToolKit", "Expected Comment for existing workbook"
     mAssert.Equals ws.Range("C1"), "ExistingProject_DEV", "Expected Title for development project column"
     mAssert.Equals ws.Range("C2"), "Project\ExistingProject_DEV.xlsm", "Expected related Path for new development workbook"
-    mAssert.Equals ws.Range("C3"), "", "Expected Template path for development workbook"
+    mAssert.Equals ws.Range("C3"), "Templates\ExistingProjectTemplate.xlsm", "Expected Template path for development workbook"
     mAssert.Equals ws.Range("C4"), "", "Expected Project name for existing workbook"
     mAssert.Equals ws.Range("C5"), "Existing project for development for various tests of VBAToolKit", "Expected Comment for existing workbook"
     

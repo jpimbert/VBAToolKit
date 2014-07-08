@@ -156,6 +156,30 @@ Public Sub TestGetConfigurationPathWithNumberFromExistingProject()
     mAssert.Equals existingConfManager.getConfigurationPathWithNumber(3), "", "Inexistant configuration number 3"
 End Sub
 
+Public Sub TestGetConfigurationProjectNameWithNumberFromExistingProject()
+'       Verify the capability to get the configuration project name by number
+    mAssert.Equals existingConfManager.getConfigurationProjectNameWithNumber(0), "", "Inexistant configuration number 0"
+    mAssert.Equals existingConfManager.getConfigurationProjectNameWithNumber(1), "ExistingProjectName", "Project Name of first configuration given by number"
+    mAssert.Equals existingConfManager.getConfigurationProjectNameWithNumber(2), "ExistingProject_DEV", "Project Name of second configuration given by number"
+    mAssert.Equals existingConfManager.getConfigurationProjectNameWithNumber(3), "", "Inexistant configuration number 3"
+End Sub
+
+Public Sub TestGetConfigurationCommentWithNumberFromExistingProject()
+'       Verify the capability to get the configuration comment by number
+    mAssert.Equals existingConfManager.getConfigurationCommentWithNumber(0), "", "Inexistant configuration number 0"
+    mAssert.Equals existingConfManager.getConfigurationCommentWithNumber(1), "Existing project for various tests of VBAToolKit", "Comment of first configuration given by number"
+    mAssert.Equals existingConfManager.getConfigurationCommentWithNumber(2), "Existing project for development for various tests of VBAToolKit", "Comment of second configuration given by number"
+    mAssert.Equals existingConfManager.getConfigurationCommentWithNumber(3), "", "Inexistant configuration number 3"
+End Sub
+
+Public Sub TestGetConfigurationTemplateWithNumberFromExistingProject()
+'       Verify the capability to get the configuration template path by number
+    mAssert.Equals existingConfManager.getConfigurationTemplateWithNumber(0), "", "Inexistant configuration number 0"
+    mAssert.Equals existingConfManager.getConfigurationTemplateWithNumber(1), "", "Template path of first configuration given by number"
+    mAssert.Equals existingConfManager.getConfigurationTemplateWithNumber(2), "Templates\ExistingProjectTemplate.xlsm", "Template path of second configuration given by number"
+    mAssert.Equals existingConfManager.getConfigurationTemplateWithNumber(3), "", "Inexistant configuration number 3"
+End Sub
+
 Public Sub TestGetConfigurationNumbersFromExistingProject()
 '       Verify the capability to get the number of a configuration
     mAssert.Equals existingConfManager.configurationCount, 2, "There must be two configurations in a new project"
@@ -212,6 +236,89 @@ Public Sub TestGetModulePathWithNumberFromExistingProject()
     mAssert.Equals existingConfManager.getModulePathWithNumber(numModule:=5, numConfiguration:=2), "Path2Module5", "Module path number 5,2"
 End Sub
 
+Public Sub TestModulesFromExistingProject()
+'       Verify the capability to get the modules list
+    Dim n As Integer
+   On Error GoTo M_Error
+    mAssert.Equals existingConfManager.modules.count, 5, "Number of modules in the existing project"
+    For n = 1 To n
+        mAssert.Should existingConfManager.modules(n).parent Is existingConfManager, "Parent of the vtkModule " & n & " of existing project"
+        mAssert.Equals existingConfManager.modules(n).Number, n, "The number of vtkModule " & n & " of existing project"
+        mAssert.Equals existingConfManager.modules(n).id, "m" & n, "Expected ID for module " & n
+        mAssert.Equals existingConfManager.modules(n).name, "Module" & n, "Name of the module " & n & " get by number"
+        mAssert.Equals existingConfManager.modules("Module" & n).Number, n, "Number of the module " & n & " get by name"
+    Next n
+   On Error GoTo 0
+    Exit Sub
+M_Error:
+    mAssert.Should False, "Unexpected error (" & Err.Number & ") : " & Err.Description
+End Sub
+
+Public Sub TestConfigurationsCollectionFromExistingProject()
+'       Verify the behavior of the configurations function of Conf manager
+   On Error GoTo M_Error
+    mAssert.Equals existingConfManager.configurations.count, 2, "Number of configurations in the existing project"
+    ' Check the first configuration
+    mAssert.Should existingConfManager.configurations(1).parent Is existingConfManager, "Parent of the first configuration"
+    mAssert.Equals existingConfManager.configurations(1).Number, 1, "Number of the first configuration"
+    mAssert.Equals existingConfManager.configurations(1).id, "c1", "Expected ID for the first vtkConfiguration"
+    mAssert.Should Not existingConfManager.configurations(1).isDEV, "The first configuration is expected not to be DEV"
+    mAssert.Equals existingConfManager.configurations(1).name, "ExistingProject", "Name of the configuration for the first vtkConfiguration"
+    mAssert.Equals existingConfManager.configurations("ExistingProject").name, "ExistingProject", "Name of the configuration for the first vtkConfiguration"
+    mAssert.Equals existingConfManager.configurations(1).comment, "Existing project for various tests of VBAToolKit", "Comment got by number of the first configuration"
+    mAssert.Equals existingConfManager.configurations("ExistingProject").comment, "Existing project for various tests of VBAToolKit", "Comment got by name of the first configuration"
+    mAssert.Equals existingConfManager.configurations(1).template, "", "Template got by number of the first configuration"
+    mAssert.Equals existingConfManager.configurations("ExistingProject").template, "", "Template got by name of the first configuration"
+    mAssert.Equals existingConfManager.configurations(1).projectName, "ExistingProjectName", "Project Name (Title) got by number of the first configuration"
+    mAssert.Equals existingConfManager.configurations("ExistingProject").projectName, "ExistingProjectName", "Project Name (Title) got by name of the first configuration"
+    ' Check the second configuration
+    mAssert.Should existingConfManager.configurations(2).parent Is existingConfManager, "Parent of the second configuration"
+    mAssert.Equals existingConfManager.configurations(2).Number, 2, "Number of the second configuration"
+    mAssert.Equals existingConfManager.configurations(2).id, "c2", "Expected ID for the second vtkConfiguration"
+    mAssert.Should existingConfManager.configurations(2).isDEV, "The second configuration is expected to be DEV"
+    mAssert.Equals existingConfManager.configurations(2).name, "ExistingProject_DEV", "Name of the configuration for the second vtkConfiguration"
+    mAssert.Equals existingConfManager.configurations("ExistingProject_DEV").name, "ExistingProject_DEV", "Name of the configuration for the second vtkConfiguration"
+    mAssert.Equals existingConfManager.configurations(2).comment, "Existing project for development for various tests of VBAToolKit", "Comment got by number of the second configuration"
+    mAssert.Equals existingConfManager.configurations("ExistingProject_DEV").comment, "Existing project for development for various tests of VBAToolKit", "Comment got by name of the second configuration"
+    mAssert.Equals existingConfManager.configurations(2).template, "Templates\ExistingProjectTemplate.xlsm", "Template got by number of the second configuration"
+    mAssert.Equals existingConfManager.configurations("ExistingProject_DEV").template, "Templates\ExistingProjectTemplate.xlsm", "Template got by name of the second configuration"
+    mAssert.Equals existingConfManager.configurations(2).projectName, "ExistingProject_DEV", "Project Name (Title) got by number of the second configuration"
+    mAssert.Equals existingConfManager.configurations("ExistingProject_DEV").projectName, "ExistingProject_DEV", "Project Name (Title) got by name of the second configuration"
+   On Error GoTo 0
+    Exit Sub
+M_Error:
+    mAssert.Should False, "Unexpected error (" & Err.Number & ") : " & Err.Description
+End Sub
+
+Public Sub TestGetConfigurationReferencesWithNumber()
+'       Check the behavior of the getConfigurationReferencesWithNumber function
+    Dim refNames(), i As Integer, cn As Integer, c1 As Collection, c2 As Collection, r As vtkReference
+    Dim expectedCount As Integer
+    refNames = Array("VBA", "Excel", "stdole", "Office", "MSForms", "Scripting", "VBIDE", "Shell32", "MSXML2")
+   On Error Resume Next
+    For cn = 1 To existingConfManager.configurationCount
+        Set c1 = existingConfManager.configurations(cn).references
+        ' Rearrange the collection by name
+        Set c2 = New Collection
+        For Each r In c1
+            c2.Add r, r.name
+        Next
+        expectedCount = UBound(refNames) - LBound(refNames) + 1
+        If existingConfManager.configurations(cn).isDEV Then expectedCount = expectedCount + 1
+        mAssert.Equals c2.count, expectedCount, "Count of references in configuration " & cn
+        ' il faut boucler sur le tableau et rechercher dans la collection (si pas trouvé = erreur)
+        For i = LBound(refNames) To UBound(refNames)
+            Set r = c2(refNames(i))
+            mAssert.Equals Err.Number, 0, "Error when getting " & refNames(i) & " reference from configuration " & cn
+        Next i
+        If existingConfManager.configurations(cn).isDEV Then
+            Set r = c2("VBAToolKit")
+            mAssert.Equals Err.Number, 0, "Error when getting VBAToolKit reference from configuration " & cn
+        End If
+    Next cn
+   On Error GoTo 0
+End Sub
+
 Public Sub TestRootPathForExistingProject()
     mAssert.Equals existingConfManager.rootPath, vtkPathOfCurrentProject, "The root Path is not initialized for a new Workbook"
     mAssert.Equals existingConfManager.rootPath, vtkPathOfCurrentProject, "The second call to rootPath give the same result as the previous one"
@@ -247,11 +354,17 @@ Private Function ITest_Suite() As TestSuite
     ITest_Suite.AddTest ITest_Manager.ClassName, "Test_PropertyName_DefaultGet"
     ITest_Suite.AddTest ITest_Manager.ClassName, "TestGetConfigurationsFromExistingProject"
     ITest_Suite.AddTest ITest_Manager.ClassName, "TestGetConfigurationPathWithNumberFromExistingProject"
+    ITest_Suite.AddTest ITest_Manager.ClassName, "TestGetConfigurationProjectNameWithNumberFromExistingProject"
+    ITest_Suite.AddTest ITest_Manager.ClassName, "TestGetConfigurationCommentWithNumberFromExistingProject"
+    ITest_Suite.AddTest ITest_Manager.ClassName, "TestGetConfigurationTemplateWithNumberFromExistingProject"
     ITest_Suite.AddTest ITest_Manager.ClassName, "TestGetConfigurationNumbersFromExistingProject"
     ITest_Suite.AddTest ITest_Manager.ClassName, "TestGetConfigurationPathFromExistingProject"
     ITest_Suite.AddTest ITest_Manager.ClassName, "TestGetModulesFromExistingProject"
     ITest_Suite.AddTest ITest_Manager.ClassName, "TestGetModuleNumbersFromExistingProject"
     ITest_Suite.AddTest ITest_Manager.ClassName, "TestGetModulePathWithNumberFromExistingProject"
+    ITest_Suite.AddTest ITest_Manager.ClassName, "TestModulesFromExistingProject"
+    ITest_Suite.AddTest ITest_Manager.ClassName, "TestConfigurationsCollectionFromExistingProject"
+    ITest_Suite.AddTest ITest_Manager.ClassName, "TestGetConfigurationReferencesWithNumber"
     ITest_Suite.AddTest ITest_Manager.ClassName, "TestRootPathForExistingProject"
     ITest_Suite.AddTest ITest_Manager.ClassName, "TestGetAllReferencesFromExistingWorkbook"
 End Function
@@ -265,11 +378,17 @@ Private Sub ITestCase_RunTest()
         Case "Test_PropertyName_DefaultGet": Test_PropertyName_DefaultGet
         Case "TestGetConfigurationsFromExistingProject": TestGetConfigurationsFromExistingProject
         Case "TestGetConfigurationPathWithNumberFromExistingProject": TestGetConfigurationPathWithNumberFromExistingProject
+        Case "TestGetConfigurationProjectNameWithNumberFromExistingProject": TestGetConfigurationProjectNameWithNumberFromExistingProject
+        Case "TestGetConfigurationCommentWithNumberFromExistingProject": TestGetConfigurationCommentWithNumberFromExistingProject
+        Case "TestGetConfigurationTemplateWithNumberFromExistingProject": TestGetConfigurationTemplateWithNumberFromExistingProject
         Case "TestGetConfigurationNumbersFromExistingProject": TestGetConfigurationNumbersFromExistingProject
         Case "TestGetConfigurationPathFromExistingProject": TestGetConfigurationPathFromExistingProject
         Case "TestGetModulesFromExistingProject": TestGetModulesFromExistingProject
         Case "TestGetModuleNumbersFromExistingProject": TestGetModuleNumbersFromExistingProject
         Case "TestGetModulePathWithNumberFromExistingProject": TestGetModulePathWithNumberFromExistingProject
+        Case "TestModulesFromExistingProject": TestModulesFromExistingProject
+        Case "TestConfigurationsCollectionFromExistingProject": TestConfigurationsCollectionFromExistingProject
+        Case "TestGetConfigurationReferencesWithNumber": TestGetConfigurationReferencesWithNumber
         Case "TestRootPathForExistingProject": TestRootPathForExistingProject
         Case "TestGetAllReferencesFromExistingWorkbook": TestGetAllReferencesFromExistingWorkbook
         Case Else: mAssert.Should False, "Invalid test name: " & mManager.methodName
