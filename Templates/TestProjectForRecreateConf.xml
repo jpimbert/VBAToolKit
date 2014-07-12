@@ -1,0 +1,192 @@
+<?xml version="1.0" encoding="ISO-8859-1" standalone="yes"?>
+<!DOCTYPE vtkConf [
+    <!ELEMENT vtkConf (info, reference*, configuration*, module*)>
+        <!ELEMENT info (vtkConfigurationsVersion,projectName)>
+                <!ELEMENT vtkConfigurationsVersion (#PCDATA)>
+                <!ELEMENT projectName (#PCDATA)>
+        <!ELEMENT configuration (name,path,templatePath?,title?,comment?)>
+         <!ATTLIST configuration cID ID #REQUIRED>
+         <!ATTLIST configuration refIDs IDREFS #IMPLIED>
+                <!ELEMENT name (#PCDATA)>
+                <!ELEMENT path (#PCDATA)>
+                <!ELEMENT templatePath (#PCDATA)>
+                <!ELEMENT title        (#PCDATA)>
+                <!ELEMENT comment (#PCDATA)>
+        <!ELEMENT module (name, modulePath*)>
+         <!ATTLIST module mID ID #REQUIRED>
+                <!ELEMENT modulePath (#PCDATA)>
+                <!ATTLIST modulePath confId IDREF #REQUIRED>
+        <!ELEMENT reference (name, (guid|path))>
+         <!ATTLIST reference refID ID #REQUIRED>
+                <!ELEMENT guid (#PCDATA)>
+]>
+<vtkConf>
+
+    <info>
+        <vtkConfigurationsVersion>2.0</vtkConfigurationsVersion>
+        <projectName>TestProjectForRecreateConf</projectName>
+    </info>
+
+    <reference refID="r1">
+        <name>VBA</name>
+        <guid>{000204EF-0000-0000-C000-000000000046}</guid>
+    </reference>
+    <reference refID="r2">
+        <name>Excel</name>
+        <guid>{00020813-0000-0000-C000-000000000046}</guid>
+    </reference>
+    <reference refID="r3">
+        <name>stdole</name>
+        <guid>{00020430-0000-0000-C000-000000000046}</guid>
+    </reference>
+    <reference refID="r4">
+        <name>Office</name>
+        <guid>{2DF8D04C-5BFA-101B-BDE5-00AA0044DE52}</guid>
+    </reference>
+    <reference refID="r5">
+        <name>MSForms</name>
+        <guid>{0D452EE1-E08F-101A-852E-02608C4D0BB4}</guid>
+    </reference>
+    <reference refID="r6">
+        <name>Scripting</name>
+        <guid>{420B2830-E718-11CF-893D-00A0C9054228}</guid>
+    </reference>
+    <reference refID="r7">
+        <name>VBIDE</name>
+        <guid>{0002E157-0000-0000-C000-000000000046}</guid>
+    </reference>
+    <reference refID="r8">
+        <name>Shell32</name>
+        <guid>{50A7E9B0-70EF-11D1-B75A-00A0C90564FE}</guid>
+    </reference>
+    <reference refID="r9">
+        <name>MSXML2</name>
+        <guid>{F5078F18-C551-11D3-89B9-0000F81FE221}</guid>
+    </reference>
+    <reference refID="r10">
+        <name>ADODB</name>
+        <guid>{00000206-0000-0010-8000-00AA006D2EA4}</guid>
+    </reference>
+    <reference refID="r11">
+        <name>VBAToolKit_DEV</name>
+        <path>C:\Documents and Settings\Demonn\Bureau\VBAToolKit\Project\VBAToolKit_DEV.xlsm</path>
+    </reference>
+    <reference refID="r12">
+        <name>VBAToolKit</name>
+        <path>C:\Documents and Settings\Demonn\Application Data\Microsoft\AddIns\VBAToolKit.xlam</path>
+    </reference>
+    <configuration cID="c1">
+        <name>TestProject</name>
+        <path>TestProject.xlsm</path>
+        <title>ProjectName1</title>
+        <comment>Comment for Workbook #1</comment>
+    </configuration>
+    <configuration cID="c2">
+        <name>TestProject_DEV</name>
+        <path>TestProject_DEV.xlsm</path>
+        <title>ProjectName2</title>
+        <comment>Comment for Workbook #2</comment>
+    </configuration>
+    <configuration cID="c3">
+        <name>TestProject_notExistingPathConf1</name>
+        <path>testFolder1\TestProject_notExistingPathConf1.xlsm</path>
+        <title>ProjectName3</title>
+        <comment>Comment for Workbook #3</comment>
+    </configuration>
+    <configuration cID="c4">
+        <name>TestProject_notExistingPathConf2</name>
+        <path>testFolder1\testFolder2\TestProject_notExistingPathConf2.xlsm</path>
+        <title>ProjectName4</title>
+        <comment>Comment for Workbook #4</comment>
+    </configuration>
+    <configuration cID="c5">
+        <name>TestProject_emptyConf</name>
+        <path>TestProject_emptyConf.xlsm</path>
+        <title>ProjectName5</title>
+        <comment>Comment for Workbook #5</comment>
+    </configuration>
+    <configuration cID="c6" refIDs="r1 r2 r3 r4 r5 r6 r7 r8 r9 r10 r11">
+        <name>TestProject_normalConf</name>
+        <path>TestProject_normalConf.xlsm</path>
+        <templatePath>Templates\TestProjectTemplate.xlsx</templatePath>
+        <title>ProjectName6</title>
+        <comment>Comment for Workbook #6</comment>
+    </configuration>
+    <configuration cID="c7">
+        <name>TestProject_xlamConf</name>
+        <path>TestProject_xlamConf.xlam</path>
+        <title>ProjectName7</title>
+        <comment>Comment for Workbook #7</comment>
+    </configuration>
+    <configuration cID="c8">
+        <name>TestProject_xlsConf</name>
+        <path>TestProject_xlsConf.xls</path>
+        <title>ProjectName8</title>
+        <comment>Comment for Workbook #8</comment>
+    </configuration>
+    <configuration cID="c9">
+        <name>TestProject_xlaConf</name>
+        <path>TestProject_xlaConf.xla</path>
+        <title>ProjectName9</title>
+        <comment>Comment for Workbook #9</comment>
+    </configuration>
+    <configuration cID="c10">
+        <name>TestProject_multitypeConf</name>
+        <path>TestProject_multitypeConf.xlsm</path>
+        <title>ProjectName10</title>
+        <comment>Comment for Workbook #10</comment>
+    </configuration>
+    <configuration cID="c11">
+        <name>TestProject_VTKConf</name>
+        <path>VBAToolKit.xlam</path>
+        <title>ProjectName11</title>
+        <comment>Comment for Workbook #11</comment>
+    </configuration>
+    <configuration cID="c12">
+        <name>VBAToolKit</name>
+        <path>VBAToolKit.xlam</path>
+        <title>ProjectName12</title>
+        <comment>Comment for Workbook #12</comment>
+    </configuration>
+    <configuration cID="c13">
+        <name>TestProject_NoTemplate</name>
+        <path>TestProject_normalConf.xlsm</path>
+        <templatePath>Templates\NoTestProjectTemplate.xlsx</templatePath>
+        <title>ProjectName13</title>
+        <comment>Comment for Workbook #13</comment>
+    </configuration>
+    <module mID="m1">
+        <name>TestModule1</name>
+        <modulePath confId="c2">TestModule1.bas</modulePath>
+        <modulePath confId="c3">TestModule1.bas</modulePath>
+        <modulePath confId="c4">TestModule1.bas</modulePath>
+        <modulePath confId="c6">TestModule1.bas</modulePath>
+        <modulePath confId="c7">TestModule1.bas</modulePath>
+        <modulePath confId="c8">TestModule1.bas</modulePath>
+        <modulePath confId="c9">TestModule1.bas</modulePath>
+        <modulePath confId="c10">TestModule1.bas</modulePath>
+        <modulePath confId="c11">TestModule1.bas</modulePath>
+        <modulePath confId="c12">TestModule1.bas</modulePath>
+        <modulePath confId="c13">TestModule1.bas</modulePath>
+    </module>
+    <module mID="m2">
+        <name>TestModule2</name>
+        <modulePath confId="c2">TestModule2.bas</modulePath>
+        <modulePath confId="c6">TestModule2.bas</modulePath>
+        <modulePath confId="c7">TestModule2.bas</modulePath>
+        <modulePath confId="c8">TestModule2.bas</modulePath>
+        <modulePath confId="c9">TestModule2.bas</modulePath>
+        <modulePath confId="c10">TestModule2.bas</modulePath>
+        <modulePath confId="c11">TestModule2.bas</modulePath>
+        <modulePath confId="c12">TestModule2.bas</modulePath>
+        <modulePath confId="c13">TestModule2.bas</modulePath>
+    </module>
+    <module mID="m3">
+        <name>TestClassModule1</name>
+        <modulePath confId="c10">TestClassModule1.cls</modulePath>
+    </module>
+    <module mID="m4">
+        <name>TestFormModule1</name>
+        <modulePath confId="c10">TestFormModule1.frm</modulePath>
+    </module>
+</vtkConf>

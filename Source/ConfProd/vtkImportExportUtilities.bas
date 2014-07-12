@@ -354,6 +354,9 @@ End Sub
 '
 ' Params    : - projectName
 '             - configurationName
+'             - Optional Configuration Manager
+'                   if no Conf Manager are given, the standard Conf manager (Excel)
+'                   of the project is used
 '
 ' Raises    : - VTK_UNEXPECTED_ERROR
 '             - VTK_WORKBOOK_ALREADY_OPEN
@@ -366,7 +369,7 @@ End Sub
 '
 '---------------------------------------------------------------------------------------
 '
-Public Sub vtkRecreateConfiguration(projectName As String, configurationName As String)
+Public Sub vtkRecreateConfiguration(projectName As String, configurationName As String, Optional confManager As vtkConfigurationManager = Nothing)
     Dim cm As vtkConfigurationManager
     Dim rootPath As String
     Dim wbPath As String, templatePath As String
@@ -376,8 +379,12 @@ Public Sub vtkRecreateConfiguration(projectName As String, configurationName As 
 
     On Error GoTo vtkRecreateConfiguration_Error
     
-    ' Get the project and the rootPath of the project
-    Set cm = vtkConfigurationManagerForProject(projectName)
+    ' Get the Conf Manager and the rootPath of the project
+    If confManager Is Nothing Then
+        Set cm = vtkConfigurationManagerForProject(projectName)
+       Else
+        Set cm = confManager
+    End If
     rootPath = cm.rootPath
     
     ' Get the configuration number in the project and the path of the file
@@ -480,7 +487,7 @@ vtkRecreateConfiguration_Error:
             Err.Number = VTK_UNEXPECTED_ERROR
     End Select
 
-    Err.Raise Err.Number, Err.Source, Err.Description
+    Err.Raise Err.Number, Err.source, Err.Description
     
     Exit Sub
     

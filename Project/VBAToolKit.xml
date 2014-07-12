@@ -414,8 +414,8 @@
         <modulePath confId="c2">Source\ConfTest\vtkXMLExportTester.cls</modulePath>
     </module>
     <module mID="m62">
-        <name>vtkRecreateConfigurationTester</name>
-        <modulePath confId="c2">Source\ConfTest\vtkRecreateConfigurationTester.cls</modulePath>
+        <name>vtkRecreateConfExcelTester</name>
+        <modulePath confId="c2">Source\ConfTest\vtkRecreateConfExcelTester.cls</modulePath>
     </module>
     <module mID="m63">
         <name>vtkRecreateConfigurationForm</name>
@@ -458,5 +458,9 @@
     <module mID="m70">
         <name>vtkConfManagerXML20Tester</name>
         <modulePath confId="c2">Source\ConfTest\vtkConfManagerXML20Tester.cls</modulePath>
+    </module>
+    <module mID="m71">
+        <name>vtkRecreateConfXMLTester</name>
+        <modulePath confId="c2">Source\ConfTest\vtkRecreateConfXMLTester.cls</modulePath>
     </module>
 </vtkConf>

@@ -440,10 +440,13 @@ End Function
 '
 Public Function getConfigurationReferencesWithNumber(n As Integer) As Collection
     Dim refIDs() As String, i As Integer, refs As New Collection
+   On Error GoTo M_Error
     refIDs = Split(m_DOMDocument.SelectSingleNode("/vtkConf/configuration[@cID=""c" & n & """]").Attributes.getNamedItem("refIDs").Text)
+   On Error GoTo 0
     For i = LBound(refIDs) To UBound(refIDs)
         refs.Add vtkReferenceWithXML(refIDs(i)), Key:=refIDs(i)
     Next i
+M_Error:    ' refIDs attribute is optional
     Set getConfigurationReferencesWithNumber = refs
 End Function
 
