@@ -2,15 +2,15 @@ VERSION 1.0 CLASS
 BEGIN
   MultiUse = -1  'True
 END
-Attribute VB_Name = "vtkRecreateConfigurationTester"
+Attribute VB_Name = "vtkRecreateConfExcelTester"
 Attribute VB_GlobalNameSpace = False
 Attribute VB_Creatable = False
 Attribute VB_PredeclaredId = False
 Attribute VB_Exposed = False
 '---------------------------------------------------------------------------------------
-' Module    : vtkRecreateConfigurationTester
+' Module    : vtkRecreateConfExcelTester
 ' Author    : Lucas Vitorino
-' Purpose   : Test the vtkRecreateConfiguration function
+' Purpose   : Test the vtkRecreateConfiguration function with Excel Conf Manager
 '
 ' Copyright 2013 Skwal-Soft (http://skwalsoft.com)
 '
@@ -181,7 +181,7 @@ Private Sub exportModulesAndRecreateWb(Wb As Workbook, testProject As vtkProject
 
 exportModulesAndRecreateWb_Error:
     Err.Source = "exportModulesAndRecreateWb of module vtkRecreateConfigurationTester"
-    Err.Raise Err.Number, Err.Source, Err.Description
+    Err.Raise Err.Number, Err.source, Err.Description
     Exit Sub
 End Sub
 

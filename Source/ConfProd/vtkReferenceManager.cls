@@ -405,3 +405,28 @@ Public Function references(confNumber As Integer) As Collection
         Err.Raise Number:=VTK_NOTINITIALIZED, Source:="vtkReferenceManager:references", Description:="Impossible to get references from a sheet of a null workbook"
     End If
 End Function
+
+'---------------------------------------------------------------------------------------
+' Sub       : setReferenceWihNumber
+' Author    : Jean-Pierre Imbert
+' Date      : 14/07/2014
+' Purpose   : Set a reference as used or not used for a configuration
+' Parameter : - usedRef, true if the reference must be used by the configuration
+'             - refNumber, the reference number between 1 and refs count
+'             - confNumber, the configuration number between 1 and conf count
+'               if the numbers are not legal, VTK_FORBIDDEN_PARAMETER Error is returned
+' NOTE      : not tested, only used for duplicate configuration manager
+'---------------------------------------------------------------------------------------
+'
+Public Sub setReferenceWihNumber(usedRef As Boolean, refNumber As Integer, confNumber As Integer)
+    If refNumber < 1 Or refNumber > referenceCount Then _
+        Err.Raise Number:=VTK_FORBIDDEN_PARAMETER, Source:="vtkReferenceManager:setReferenceWithNumber", Description:="Reference number (" & refNumber & ") must be between 1 and " & referenceCount
+    If confNumber < 1 Or confNumber > configurationCount Then _
+        Err.Raise Number:=VTK_FORBIDDEN_PARAMETER, Source:="vtkReferenceManager:setReferenceWithNumber", Description:="Configuration number (" & confNumber & ") must be between 1 and " & configurationCount
+    If usedRef Then
+        m_referenceSheet.Cells(nbTitleRows + refNumber, nbTitleColumns + confNumber) = "X"
+       Else
+        m_referenceSheet.Cells(nbTitleRows + refNumber, nbTitleColumns + confNumber) = ""
+    End If
+End Sub
+

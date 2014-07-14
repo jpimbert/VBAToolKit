@@ -256,20 +256,21 @@ Private Sub initializeConfigurationSheet(ws As Worksheet)
     ws.Range("A3") = "Path, template, name and comment"
     ws.Range("A4") = ""
     ws.Range("A5") = "Module Name"
-    ws.Range("B1") = vtkProjectForName(projectName).projectName
-    ws.Range("B2") = vtkProjectForName(projectName).projectStandardRelativePath
-    ws.Range("C1") = vtkProjectForName(projectName).projectDEVName
-    ws.Range("C2") = vtkProjectForName(projectName).projectDEVStandardRelativePath
-    
-    m_devConfiguration = 2
-    
-    ws.Columns("A:C").ColumnWidth = 22
+    ws.Columns("A").ColumnWidth = 22
     ws.Range("A1").Font.Size = 8
     ws.Range("A3").HorizontalAlignment = xlCenter
     ws.Range("A5").HorizontalAlignment = xlCenter
     ws.Range("A5").Font.Bold = True
-    ws.Range("B1:C2").HorizontalAlignment = xlCenter
-    ws.Range("B1:C1").Font.Bold = True
+    If Me.projectName <> "" Then
+        m_devConfiguration = 2
+        ws.Range("B1") = vtkProjectForName(projectName).projectName
+        ws.Range("B2") = vtkProjectForName(projectName).projectStandardRelativePath
+        ws.Range("C1") = vtkProjectForName(projectName).projectDEVName
+        ws.Range("C2") = vtkProjectForName(projectName).projectDEVStandardRelativePath
+        ws.Range("B1:C2").HorizontalAlignment = xlCenter
+        ws.Range("B1:C1").Font.Bold = True
+        ws.Columns("B:C").ColumnWidth = 22
+    End If
 End Sub
 
 '---------------------------------------------------------------------------------------
@@ -891,6 +892,69 @@ Public Sub initReferences(refs As Collection)
         Set m_refManager = New vtkReferenceManager
         m_refManager.init Wb:=Workbook, confCount:=Me.configurationCount, nbTitleColumnsInConfSheet:=nbTitleColumns, devConf:=m_devConfiguration, references:=refs
     End If
+End Sub
+
+'---------------------------------------------------------------------------------------
+' Procedure : duplicate
+' Author    : Jean-Pierre Imbert
+' Date      : 13/07/2014
+' Purpose   : Duplicate a configuration manager
+'               This method is used when DEV configuration recreation
+' Parameters :
+'             - wb, workBook in which the configuration manager mus be initialized
+'                   an error is raised if the workbook already contains a configuration sheet
+'             - cm, the configuration manager from which to duplicate informations
+' NOTE      : Must be used with an uninitialized instance of conf manager (just created)
+'---------------------------------------------------------------------------------------
+'
+Public Sub duplicate(Wb As Workbook, cm As vtkConfigurationManager)
+    ' Check that the instance is uninitialized (no workbook attached)
+    Dim ws As Worksheet, i As Integer, j As Integer, ref As vtkReference, refs As Collection, refn As Integer
+    If Not m_workbook Is Nothing Then _
+        Err.Raise Number:=VTK_ALREADY_INITIALIZED, Source:="vtkConfigurationManagerExcel:duplicate", Description:="The configuration manager to duplicate to is already initialized with an attached workbook."
+    ' Check that the wb is open (perhaps not if checked in following step)
+    If Wb Is Nothing Then _
+        Err.Raise Number:=VTK_WORKBOOK_NOTOPEN, Source:="vtkConfigurationManagerExcel:duplicate", Description:="The workbook in which to is not opened."
+    ' Check that the wb has no configuration sheet
+   On Error Resume Next
+    Set ws = Wb.Worksheets(sheetName)
+   On Error GoTo 0
+    If Not ws Is Nothing Then _
+        Err.Raise Number:=VTK_ALREADY_INITIALIZED, Source:="vtkConfigurationManagerExcel:duplicate", Description:="The Excel workbook already contains a configuration sheet."
+    
+    ' attach wb, initialized conf sheet
+    Set m_workbook = Wb     ' setConfigurationSheet needs a workbook
+    setConfigurationSheet   ' NOTE: must be called before projectName set to not create the two standard confs
+    ' init projectName and rootPath from cm
+    m_projectName = cm.projectName
+    m_rootPath = cm.rootPath
+    ' call initReferences with the references from cm
+    Me.initReferences cm.references
+    ' create all configuration from cm
+    For i = 1 To cm.configurationCount
+        Me.addConfiguration configuration:=cm.configuration(i), path:=cm.getConfigurationPathWithNumber(i), _
+            template:=cm.getConfigurationTemplateWithNumber(i), projectName:=cm.getConfigurationProjectNameWithNumber(i), _
+            comment:=cm.getConfigurationCommentWithNumber(i)
+    Next i
+    ' create all modules from cm
+    For i = 1 To cm.moduleCount
+        Me.addModule module:=cm.module(i)
+    Next i
+    ' init module pathes for each configuration
+    For i = 1 To cm.configurationCount
+        For j = 1 To cm.moduleCount
+            Me.setModulePathWithNumber cm.getModulePathWithNumber(j, i), j, i
+        Next j
+    Next i
+    ' init reference usage for each configuration
+    For i = 1 To cm.configurationCount
+        Set refs = cm.references
+        For j = 1 To refs.Count
+            Set ref = refs(j)
+            refn = CInt(Right(ref.id, Length(ref.id) - 1))
+            referenceManager.setReferenceWihNumber True, refn, i
+        Next j
+    Next i
 End Sub
 
 
