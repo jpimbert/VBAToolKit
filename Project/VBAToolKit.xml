@@ -463,4 +463,10 @@
         <name>vtkRecreateConfXMLTester</name>
         <modulePath confId="c2">Source\ConfTest\vtkRecreateConfXMLTester.cls</modulePath>
     </module>
+    <module mID="m72">
+        <name>vtkWaitForm</name>
+        <modulePath confId="c1">Source\ConfProd\vtkWaitForm.frm</modulePath>
+        <modulePath confId="c2">Source\ConfProd\vtkWaitForm.frm</modulePath>
+        <modulePath confId="c3">Source\ConfProd\vtkWaitForm.frm</modulePath>
+    </module>
 </vtkConf>

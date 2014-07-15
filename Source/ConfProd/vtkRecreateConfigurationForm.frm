@@ -1,10 +1,10 @@
 VERSION 5.00
 Begin {C62A69F0-16DC-11CE-9E98-00AA00574A4F} vtkRecreateConfigurationForm 
    Caption         =   "Recreate Configuration"
-   ClientHeight    =   3120
+   ClientHeight    =   4485
    ClientLeft      =   45
    ClientTop       =   435
-   ClientWidth     =   4710
+   ClientWidth     =   4680
    OleObjectBlob   =   "vtkRecreateConfigurationForm.frx":0000
    StartUpPosition =   1  'CenterOwner
 End
@@ -13,14 +13,13 @@ Attribute VB_GlobalNameSpace = False
 Attribute VB_Creatable = False
 Attribute VB_PredeclaredId = True
 Attribute VB_Exposed = False
-
-
+Option Explicit
 '---------------------------------------------------------------------------------------
 ' Module    : vtkCreateProjectForm
-' Author    : Lucas Vitorino
+' Author    : Jean-Pierre IMBERT
 ' Purpose   : UserForm for VBAToolKit configuration recreation
 '
-' Copyright 2013 Skwal-Soft (http://skwalsoft.com)
+' Copyright 2014 Skwal-Soft (http://skwalsoft.com)
 '
 '   Licensed under the Apache License, Version 2.0 (the "License");
 '   you may not use this file except in compliance with the License.
@@ -36,9 +35,31 @@ Attribute VB_Exposed = False
 '---------------------------------------------------------------------------------------
 
 
-Private cm As vtkConfigurationManager
-Private currentConf As vtkConfiguration
-Private currentProjectName As String
+Private m_confManager As vtkConfigurationManager
+Private m_XMLFilePath As String
+Private m_XMLFileOK As Boolean
+Private m_ConfSelected As Boolean
+
+Private Const PINK = &HC0E0FF
+Private Const GREEN = &HC0FFC0
+
+
+'---------------------------------------------------------------------------------------
+' Procedure : BrowseButton_Click
+' Author    : Jean-Pierre Imbert
+' Date      : 15/07/2014
+' Purpose   : Open a browse window and initialize the XML Configuration File Text field
+'---------------------------------------------------------------------------------------
+'
+Private Sub BrowseButton_Click()
+    With Application.FileDialog(msoFileDialogFilePicker)
+        .AllowMultiSelect = False
+        .Show
+        If .SelectedItems.Count > 0 Then
+            XMLFileTextBox.Text = .SelectedItems(1)
+        End If
+    End With
+End Sub
 
 '---------------------------------------------------------------------------------------
 ' Procedure : UserForm_Initialize
@@ -47,70 +68,40 @@ Private currentProjectName As String
 '---------------------------------------------------------------------------------------
 '
 Private Sub UserForm_Initialize()
-
-    ' Get the name of the current DEV workbook
-    currentProjectName = getCurrentProjectName
-
-    ' Initialize configuration manager
-    Set cm = vtkConfigurationManagerForProject(currentProjectName)
+    
+    ' Select the previous XML File Path if any
+    XMLFileTextBox.Text = m_XMLFilePath
+    validateXMLFileTextBox
     
     ' Disable the "Create Configuration" button as no configuration is selected
-    enableCreateConfigurationButton
+    enableReCreateButton
 
-    ' Initialize the content of the combo box
-    If Not cm Is Nothing Then
-        Dim conf As vtkConfiguration
-        For Each conf In cm.configurations
-            ConfigurationComboBox.AddItem (conf.name)
-        Next
-    End If
-    
 End Sub
 
-
 '---------------------------------------------------------------------------------------
-' Procedure : ConfigurationComboBox_Change
-' Author    : Lucas Vitorino
-' Purpose   : Manage the combo box containing the list of configurations
+' Procedure : ConfigurationListBox_AfterUpdate
+' Author    : Jean-Pierre Imbert
+' Purpose   : Manage the list box containing the list of configurations
 '---------------------------------------------------------------------------------------
 '
-Private Sub ConfigurationComboBox_Change()
-    
-    On Error GoTo ConfigurationComboBox_Change_Error
-
-    Set currentConf = cm.configurations(ConfigurationComboBox.Value)
-    
-    If AllConfigurationsExceptThisOneCheckBox.Value = False Then
-        PathTextBox.Text = currentConf.path
-    End If
-    
-    enableCreateConfigurationButton
-
-    On Error GoTo 0
-    Exit Sub
-
-ConfigurationComboBox_Change_Error:
-    Set currentConf = Nothing
-    Resume Next
+Private Sub ConfigurationListBox_AfterUpdate()
+    If m_ConfSelected Then ConfigurationListBox.BackColor = GREEN Else ConfigurationListBox.BackColor = PINK
 End Sub
 
-
 '---------------------------------------------------------------------------------------
-' Procedure : AllConfigurationsExceptThisOneCheckBox_Change
-' Author    : Lucas Vitorino
-' Purpose   : Manage what happens when the checkbox changes.
+' Procedure : ConfigurationListBox_Change
+' Author    : Jean-Pierre Imbert
+' Purpose   : Manage the list box containing the list of configurations
 '---------------------------------------------------------------------------------------
 '
-Private Sub AllConfigurationsExceptThisOneCheckBox_Change()
-
-    If AllConfigurationsExceptThisOneCheckBox.Value = True Or currentConf Is Nothing Then
-        PathTextBox.Text = ""
-    Else
-        PathTextBox.Text = currentConf.path
-    End If
-
+Private Sub ConfigurationListBox_Change()
+    Dim i As Integer
+    m_ConfSelected = False
+    For i = 0 To ConfigurationListBox.ListCount - 1
+        m_ConfSelected = m_ConfSelected Or ConfigurationListBox.Selected(i)
+    Next i
+    enableReCreateButton
 End Sub
-
 
 '---------------------------------------------------------------------------------------
 ' Procedure : CancelButton_Click
@@ -119,7 +110,7 @@ End Sub
 '---------------------------------------------------------------------------------------
 '
 Private Sub CancelButton_Click()
-    Unload vtkRecreateConfigurationForm
+    vtkRecreateConfigurationForm.Hide
 End Sub
 
 
@@ -130,20 +121,65 @@ End Sub
 '---------------------------------------------------------------------------------------
 '
 Private Sub CreateConfigurationButton_Click()
-    vtkRecreateConfigurations projectName:=currentProjectName, confName:=currentConf.name, AllExceptSelected:=AllConfigurationsExceptThisOneCheckBox.Value
+    Me.Hide
+    ' display wait message modeless for the present code to keep running
+    vtkWaitForm.Show vbModeless
+    ' build the confNames collection
+    Dim confNames As New Collection, i As Integer
+    For i = 0 To ConfigurationListBox.ListCount - 1
+        If ConfigurationListBox.Selected(i) Then confNames.Add ConfigurationListBox.List(i)
+    Next i
+    ' recreate configurations
+    vtkRecreateConfigurations m_confManager, confNames
+    ' Hide wait message
+    vtkWaitForm.Hide
+End Sub
+
+'---------------------------------------------------------------------------------------
+' Procedure : validateXMLFileTextBox
+' Author    : Jean-Pierre Imbert
+' Date      : 15/07/2014
+' Purpose   : Check the XMLFileTextBox and establish status of the form
+'
+'---------------------------------------------------------------------------------------
+'
+Private Sub validateXMLFileTextBox()
+    Dim cmX As New vtkConfigurationManagerXML, conf As vtkConfiguration
+   On Error Resume Next
+    cmX.init XMLFileTextBox.Text
+    m_XMLFileOK = (Err.Number = 0)
+   On Error GoTo 0
+    ConfigurationListBox.Clear
+    m_ConfSelected = False
+    If m_XMLFileOK Then
+        XMLFileTextBox.BackColor = GREEN
+        m_XMLFilePath = XMLFileTextBox.Text
+        Set m_confManager = cmX
+        For Each conf In m_confManager.configurations
+            ConfigurationListBox.AddItem conf.name
+        Next conf
+       Else
+        XMLFileTextBox.BackColor = PINK
+        m_XMLFilePath = ""
+        Set m_confManager = Nothing
+    End If
+    enableReCreateButton
+End Sub
+
+'---------------------------------------------------------------------------------------
+' Procedure : enableReCreateButton
+' Author    : Jean-Pierre Imbert
+' Date      : 15/07/2014
+' Purpose   : Enable the ReCreate Button only if all parameters are typed and OK
+'
+'---------------------------------------------------------------------------------------
+'
+Private Sub enableReCreateButton()
+    ' Enable ReCreate Button only if all parameters are OK
+    CreateConfigurationButton.Enabled = m_XMLFileOK And m_ConfSelected
 End Sub
 
 
-'---------------------------------------------------------------------------------------
-' Procedure : enableCreateConfigurationButton
-' Author    : Lucas Vitorino
-' Purpose   : Decide if the "Create Configuration" button should be enabled or disabled.
-'---------------------------------------------------------------------------------------
-'
-Private Sub enableCreateConfigurationButton()
-    If currentConf Is Nothing Then
-        CreateConfigurationButton.Enabled = False
-    Else
-        CreateConfigurationButton.Enabled = True
-    End If
+Private Sub XMLFileTextBox_Change()
+    validateXMLFileTextBox
 End Sub

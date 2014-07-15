@@ -233,7 +233,9 @@ Public Sub Test_vtkRecreateConfigurations_normalConf()
     Set testedConf = normalConf
 
     vtkExportConfiguration Wb.VBProject, testProject.projectName, testedConf.name
-    vtkRecreateConfigurations testProject.projectName, testedConf.name
+    Dim confNames As New Collection
+    confNames.Add testedConf.name
+    vtkRecreateConfigurations cm, confNames
     Set recreatedWb = Workbooks.Open(VBAToolKit.vtkTestPath & "\" & testProject.projectName & "\" & testedConf.path)
 
     mAssert.Should fso.FileExists(VBAToolKit.vtkTestPath & "\" & testProject.projectName & "\" & testedConf.path), _
