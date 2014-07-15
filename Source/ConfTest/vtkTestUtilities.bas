@@ -77,7 +77,7 @@ Public Function getTestFileFromTemplate(fileName As String, Optional destination
         destination = vtkTestPath & "\" & destinationName
     End If
     
-    FileCopy Source:=Source, destination:=destination
+    FileCopy Source:=source, destination:=destination
     
     ' Open Excel file if required
     Set getTestFileFromTemplate = Nothing
@@ -130,7 +130,7 @@ Public Function getTestFolderFromTemplate(folderName As String, Optional destina
         destination = vtkTestPath & "\" & destinationName
     End If
     
-    fso.CopyFolder Source:=Source, destination:=destination, OverWriteFiles:=True
+    fso.CopyFolder Source:=source, destination:=destination, OverWriteFiles:=True
     
     On Error GoTo 0
     Exit Function
@@ -270,4 +270,60 @@ ErrorHandler:
 If iFileNum1 > 0 Then Close #iFileNum1
 If iFileNum2 > 0 Then Close #iFileNum2
 End Function
+
+'---------------------------------------------------------------------------------------
+' Procedure : vtkCompareConfManagers
+' Author    : Jean-Pierre Imbert
+' Date      : 15/07/2014
+' Purpose   : Compare Conf managers and use mAssert to report differences
+'---------------------------------------------------------------------------------------
+'
+Public Sub vtkCompareConfManagers(ByVal mAssert As IAssert, ByVal expectedConf As vtkConfigurationManager, ByVal actualConf As vtkConfigurationManager)
+    Dim refX As vtkReference, refE As vtkReference, i As Integer, j As Integer
+    ' Check configuration manager parameters
+    mAssert.Equals actualConf.projectName, expectedConf.projectName, "Project name of conf manager"
+    mAssert.Equals actualConf.rootPath, expectedConf.rootPath, "Root Path of conf manager"
+    ' Check counts
+    mAssert.Equals actualConf.configurationCount, expectedConf.configurationCount, "Configuration count of conf manager"
+    mAssert.Equals actualConf.moduleCount, expectedConf.moduleCount, "Module count of conf manager"
+    mAssert.Equals actualConf.references.count, expectedConf.references.count, "Reference count of conf manager"
+    ' Check configurations name and parameters
+    For i = 1 To expectedConf.configurationCount
+        mAssert.Equals actualConf.configuration(i), expectedConf.configuration(i), "Name of configuration number " & i
+        mAssert.Equals actualConf.getConfigurationPathWithNumber(i), expectedConf.getConfigurationPathWithNumber(i), "Configuration Path of configuration number " & i
+        mAssert.Equals actualConf.getConfigurationProjectNameWithNumber(i), expectedConf.getConfigurationProjectNameWithNumber(i), "Project name of configuration number " & i
+        mAssert.Equals actualConf.getConfigurationTemplateWithNumber(i), expectedConf.getConfigurationTemplateWithNumber(i), "Template path of configuration number " & i
+        mAssert.Equals actualConf.getConfigurationCommentWithNumber(i), expectedConf.getConfigurationCommentWithNumber(i), "Comment of configuration number " & i
+    Next i
+    ' Check modules name
+    For i = 1 To expectedConf.moduleCount
+        mAssert.Equals actualConf.module(i), expectedConf.module(i), "Name of module number " & i
+    Next i
+    ' Check references name and parameters
+    For i = 1 To expectedConf.references.Count
+        Set refX = expectedConf.references(i)
+        Set refE = actualConf.references(i)
+        mAssert.Equals refE.name, refX.name, "Name of reference number " & i
+        mAssert.Equals refE.relPath, refX.relPath, "Relative path of reference number " & i
+        mAssert.Equals refE.GUID, refX.GUID, "GUID of reference number " & i
+    Next i
+    ' Check module pathes
+    For i = 1 To expectedConf.configurationCount
+        For j = 1 To expectedConf.moduleCount
+            mAssert.Equals actualConf.getModulePathWithNumber(j, i), expectedConf.getModulePathWithNumber(j, i), "Module path for module " & j & " and configuration " & i
+        Next j
+    Next i
+    ' Check reference uses
+    For i = 1 To expectedConf.configurationCount
+        mAssert.Equals actualConf.getConfigurationReferencesWithNumber(i).count, expectedConf.getConfigurationReferencesWithNumber(i).count, "Reference count for configuration number " & i
+        For j = 1 To expectedConf.getConfigurationReferencesWithNumber(i).Count
+            Set refX = expectedConf.getConfigurationReferencesWithNumber(i)(j)
+           On Error Resume Next
+            Set refE = actualConf.getConfigurationReferencesWithNumber(i)(j)
+           On Error GoTo 0
+            mAssert.Equals refE.id, refX.id, "Reference Id for used reference number " & j & " for configuration number " & i
+        Next j
+    Next i
+End Sub
+
 

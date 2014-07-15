@@ -650,49 +650,7 @@ Public Sub Test_Duplicate_Nominal()
     
     ' Check configuration manager parameters
     mAssert.Should Wb.Worksheets("vtkConfigurations") Is cmE.configurationSheet, "Configuration sheet of duplicated conf manager"
-    mAssert.Equals cmE.projectName, cm.projectName, "Project name of duplicated conf manager"
-    mAssert.Equals cmE.rootPath, cm.rootPath, "Root Path of duplicated conf manager"
-    ' Check counts
-    mAssert.Equals cmE.configurationCount, cm.configurationCount, "Configuration count of duplicated conf manager"
-    mAssert.Equals cmE.moduleCount, cm.moduleCount, "Module count of duplicated conf manager"
-    mAssert.Equals cmE.references.count, cm.references.Count + 1, "Reference count of duplicated conf manager" ' +1 because the added reference to running project (VBAToolKit_DEV)
-    ' Check configurations name and parameters
-    For i = 1 To cm.configurationCount
-        mAssert.Equals cmE.configuration(i), cm.configuration(i), "Name of configuration number " & i
-        mAssert.Equals cmE.getConfigurationPathWithNumber(i), cm.getConfigurationPathWithNumber(i), "Configuration Path of configuration number " & i
-        mAssert.Equals cmE.getConfigurationProjectNameWithNumber(i), cm.getConfigurationProjectNameWithNumber(i), "Project name of configuration number " & i
-        mAssert.Equals cmE.getConfigurationTemplateWithNumber(i), cm.getConfigurationTemplateWithNumber(i), "Template path of configuration number " & i
-        mAssert.Equals cmE.getConfigurationCommentWithNumber(i), cm.getConfigurationCommentWithNumber(i), "Comment of configuration number " & i
-    Next i
-    ' Check modules name
-    For i = 1 To cm.moduleCount
-        mAssert.Equals cmE.module(i), cm.module(i), "Name of module number " & i
-    Next i
-    ' Check references name and parameters
-    For i = 1 To cm.references.Count
-        Set refX = cm.references(i)
-        Set refE = cmE.references(i)
-        mAssert.Equals refE.name, refX.name, "Name of reference number " & i
-        mAssert.Equals refE.relPath, refX.relPath, "Relative path of reference number " & i
-        mAssert.Equals refE.GUID, refX.GUID, "GUID of reference number " & i
-    Next i
-    ' Check module pathes
-    For i = 1 To cm.configurationCount
-        For j = 1 To cm.moduleCount
-            mAssert.Equals cmE.getModulePathWithNumber(j, i), cm.getModulePathWithNumber(j, i), "Module path for module " & j & " and configuration " & i
-        Next j
-    Next i
-    ' Check reference uses
-    For i = 1 To cm.configurationCount
-        mAssert.Equals cmE.getConfigurationReferencesWithNumber(i).count, cm.getConfigurationReferencesWithNumber(i).count, "Reference count for configuration number " & i
-        For j = 1 To cm.getConfigurationReferencesWithNumber(i).Count
-            Set refX = cm.getConfigurationReferencesWithNumber(i)(j)
-           On Error Resume Next
-            Set refE = cmE.getConfigurationReferencesWithNumber(i)(j)
-           On Error GoTo 0
-            mAssert.Equals refE.id, refX.id, "Reference Id for used reference number " & j & " for configuration number " & i
-        Next j
-    Next i
+    vtkCompareConfManagers mAssert, expectedConf:=cm, actualConf:=cmE
     
    On Error GoTo 0
     GoTo M_Exit

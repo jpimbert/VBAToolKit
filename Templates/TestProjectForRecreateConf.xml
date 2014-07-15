@@ -82,8 +82,8 @@
         <comment>Comment for Workbook #1</comment>
     </configuration>
     <configuration cID="c2">
-        <name>TestProject_DEV</name>
-        <path>TestProject_DEV.xlsm</path>
+        <name>TestProjectForRecreateConf_DEV</name>
+        <path>Project\TestProjectForRecreateConf_DEV.xlsm</path>
         <title>ProjectName2</title>
         <comment>Comment for Workbook #2</comment>
     </configuration>

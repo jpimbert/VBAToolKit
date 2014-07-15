@@ -236,14 +236,14 @@ Private Sub initializeReferenceSheet(confCount As Integer, devConf As Integer, r
     
     ' Add a reference to the running project (VBAToolKit)
     Set ref = selfReference()
-    addOneReference ref
+    If devConf >= 0 Then addOneReference ref
     
     ' Init configuration titles
     For i = 1 To confCount
         addConfiguration
         For j = 1 To referenceCount
             If devConf >= 0 And devConf <= confCount Then m_referenceSheet.Cells(nbTitleRows + j, nbTitleColumns + i) = "X"
-            If m_referenceSheet.Cells(nbTitleRows + j, 1) = ref.name And i <> devConf Then m_referenceSheet.Cells(nbTitleRows + j, nbTitleColumns + i) = ""
+            If i <> devConf And m_referenceSheet.Cells(nbTitleRows + j, 1) = ref.name Then m_referenceSheet.Cells(nbTitleRows + j, nbTitleColumns + i) = ""
         Next j
     Next i
 End Sub

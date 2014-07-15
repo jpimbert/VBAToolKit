@@ -271,8 +271,6 @@ Test_vtkRecreateConfiguration_workbookIsCreatedInTheGoodPath_emptyConf_Error:
     Exit Sub
 End Sub
 
-
-
 Public Sub Test_vtkRecreateConfiguration_workbookIsCreatedInTheGoodPath_multitypeConf()
 ' workbook is created in the good path
 
@@ -295,8 +293,6 @@ Test_vtkRecreateConfiguration_workbookIsCreatedInTheGoodPath_multitypeConf_Error
     Exit Sub
 End Sub
 
-
-
 Public Sub Test_vtkRecreateConfiguration_modulesNotYetExported_normalConf()
 ' modules have not been exported, normal conf : raise error VTK_NO_SOURCE_FILES
 
@@ -317,9 +313,6 @@ Test_vtkRecreateConfiguration_modulesNotYetExported_normalConf_Error:
     error = Err.Number
     Resume Next
 End Sub
-
-
-
 
 Public Sub Test_vtkRecreateConfiguration_modulesNotYetExported_emptyConf()
 ' modules have not been exported, empty conf : don't raise error, create the file normally
@@ -347,7 +340,6 @@ Test_vtkRecreateConfiguration_modulesNotYetExported_emptyConf_Error:
     Resume Next
 End Sub
 
-
 Public Sub Test_vtkRecreateConfiguration_pathDoesNotExistYet1()
 ' normal conf, 1-level path does not exist yet : don't raise error, create the file normally
 
@@ -374,7 +366,6 @@ Test_vtkRecreateConfiguration_pathDoesNotExistYet1_Error:
     Resume Next
 End Sub
 
-
 Public Sub Test_vtkRecreateConfiguration_pathDoesNotExistYet2()
 ' normal conf, 2-level path does not exist yet : raise error VTK_WRONG_FILE_PATH, don't create the file
 
@@ -399,7 +390,6 @@ Test_vtkRecreateConfiguration_pathDoesNotExistYet2_Error:
     error = Err.Number
     Resume Next
 End Sub
-
 
 Public Sub Test_vtkRecreateConfiguration_allModulesArePresent_normalConf()
 ' all modules of the configuration are present
@@ -434,8 +424,6 @@ Test_vtkRecreateConfiguration_allModulesArePresent_normalConf_Error:
             Exit Sub
         End If
 End Sub
-
-
 
 Public Sub Test_vtkRecreateConfiguration_allModulesArePresent_multitypeConf()
 ' all modules of the configuration are present
@@ -472,8 +460,6 @@ Test_vtkRecreateConfiguration_allModulesArePresent_multitypeConf_Error:
             Exit Sub
         End If
 End Sub
-
-
 
 Public Sub Test_vtkRecreateConfiguration_referencesAreActivated()
 ' references are activated
@@ -518,8 +504,6 @@ Test_vtkRecreateConfiguration_referencesAreActivated_Error:
     Exit Sub
 End Sub
 
-
-
 Public Sub Test_vtkRecreateConfiguration_nameOfTheVBProjectIsCorrect()
 ' name of the vbproject is correct : same name as the recreated configuration
 
@@ -541,8 +525,6 @@ Test_vtkRecreateConfiguration_nameOfTheVBProjectIsCorrect_Error:
     mAssert.Should False, "Unexpected error " & Err.Number & " (" & Err.Description & ") in " & Err.Source
     Exit Sub
 End Sub
-
-
 
 Public Sub Test_vtkRecreateConfiguration_formatLikeExtension_XLSM()
 ' test the xlsm format
@@ -566,8 +548,6 @@ Test_vtkRecreateConfiguration_formatLikeExtension_XLSM_Error:
     Exit Sub
 End Sub
 
-
-
 Public Sub Test_vtkRecreateConfiguration_formatLikeExtension_XLAM()
 ' test the xlam format
 
@@ -590,8 +570,6 @@ Test_vtkRecreateConfiguration_formatLikeExtension_XLAM_Error:
     mAssert.Should False, "Unexpected error " & Err.Number & " (" & Err.Description & ") in " & Err.Source
     Exit Sub
 End Sub
-
-
 
 Public Sub Test_vtkRecreateConfiguration_formatLikeExtension_XLS()
 ' test the xls format
@@ -670,8 +648,6 @@ Test_vtkRecreateConfiguration_workbookOpen_Error:
         End If
 End Sub
 
-
-
 Public Sub Test_vtkRecreateConfiguration_addInOpen_XLAM()
 ' add-in with the same name is activated : recreate the configuration normally
 
@@ -695,8 +671,6 @@ Test_vtkRecreateConfiguration_addInOpen_Error:
     error = Err.Number
     Resume Next
 End Sub
-
-
 
 Public Sub Test_vtkRecreateConfiguration_workbookAndVbProjectAlreadyOpen()
 ' workbook and vbproject with the same name already open -> there shouldn't be errors
@@ -742,7 +716,6 @@ M_Error:
     mAssert.Should False, "Unexpected error " & Err.Number & " (" & Err.Description & ")"
 End Sub
 
-
 Public Sub Test_vtkRecreateConfiguration_overwriteFile_normal()
 ' file already exists : overwrite it
 
@@ -771,8 +744,6 @@ Test_vtkRecreateConfiguration_overwriteFile_normal_Error:
     mAssert.Should False, "Unexpected error " & Err.Number & " (" & Err.Description & ") in " & Err.Source
     Exit Sub
 End Sub
-
-
 
 Public Sub Test_vtkRecreateConfiguration_overwriteFile_addIn()
 ' add-in already exists : overwrite it
@@ -803,7 +774,34 @@ Test_vtkRecreateConfiguration_overwriteFile_addIn_Error:
     Exit Sub
 End Sub
 
+Public Sub Test_vtkRecreateConfiguration_DEVConf_normal()
+' file already exists and it is the DEV configuration : overwrite it
+    Dim actualCm As vtkConfigurationManager
 
+    On Error GoTo M_Error
+
+    ' Export modules, then close WorkBook for recreation
+    vtkExportConfiguration Wb.VBProject, testProject.projectName, testProject.projectDEVName
+    Wb.Close saveChanges:=False
+    
+    ' Recreate DEV configuration then open the recreated DEV configuration
+    vtkRecreateConfiguration testProject.projectName, testProject.projectDEVName, cm
+    Set recreatedWb = Workbooks.Open(VBAToolKit.vtkTestPath & "\" & testProject.projectName & "\" & testProject.projectDEVStandardRelativePath)
+
+    ' Create a new Excel conf manager from the DEV workbook
+    vtkResetConfigurationManagers
+    Set actualCm = vtkConfigurationManagerForProject(testProject.projectName)
+    
+    ' Test the new Conf Manager
+    vtkCompareConfManagers mAssert, expectedConf:=cm, actualConf:=actualCm
+    
+    On Error GoTo 0
+    Exit Sub
+
+M_Error:
+    mAssert.Should False, "Unexpected error " & Err.Number & " (" & Err.Description & ") in " & Err.Source
+    Exit Sub
+End Sub
 
 Private Function ITest_Suite() As TestSuite
     Set ITest_Suite = New TestSuite
@@ -829,6 +827,7 @@ Private Function ITest_Suite() As TestSuite
     ITest_Suite.AddTest ITest_Manager.ClassName, "Test_vtkRecreateConfiguration_unreachableTemplate"
     ITest_Suite.AddTest ITest_Manager.ClassName, "Test_vtkRecreateConfiguration_overwriteFile_normal"
     ITest_Suite.AddTest ITest_Manager.ClassName, "Test_vtkRecreateConfiguration_overwriteFile_addIn"
+    ITest_Suite.AddTest ITest_Manager.ClassName, "Test_vtkRecreateConfiguration_DEVConf_normal"
 End Function
 
 Private Sub ITestCase_RunTest()
@@ -855,6 +854,7 @@ Private Sub ITestCase_RunTest()
         Case "Test_vtkRecreateConfiguration_unreachableTemplate": Test_vtkRecreateConfiguration_unreachableTemplate
         Case "Test_vtkRecreateConfiguration_overwriteFile_normal": Test_vtkRecreateConfiguration_overwriteFile_normal
         Case "Test_vtkRecreateConfiguration_overwriteFile_addIn": Test_vtkRecreateConfiguration_overwriteFile_addIn
+        Case "Test_vtkRecreateConfiguration_DEVConf_normal": Test_vtkRecreateConfiguration_DEVConf_normal
         Case Else: mAssert.Should False, "Invalid test name: " & mManager.methodName
     End Select
 End Sub
