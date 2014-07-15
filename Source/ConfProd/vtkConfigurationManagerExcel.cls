@@ -928,14 +928,14 @@ Public Sub duplicate(Wb As Workbook, cm As vtkConfigurationManager)
     ' init projectName and rootPath from cm
     m_projectName = cm.projectName
     m_rootPath = cm.rootPath
-    ' call initReferences with the references from cm
-    Me.initReferences cm.references
     ' create all configuration from cm
     For i = 1 To cm.configurationCount
         Me.addConfiguration configuration:=cm.configuration(i), path:=cm.getConfigurationPathWithNumber(i), _
             template:=cm.getConfigurationTemplateWithNumber(i), projectName:=cm.getConfigurationProjectNameWithNumber(i), _
             comment:=cm.getConfigurationCommentWithNumber(i)
     Next i
+    ' call initReferences with the references from cm
+    Me.initReferences cm.references
     ' create all modules from cm
     For i = 1 To cm.moduleCount
         Me.addModule module:=cm.module(i)
@@ -948,10 +948,10 @@ Public Sub duplicate(Wb As Workbook, cm As vtkConfigurationManager)
     Next i
     ' init reference usage for each configuration
     For i = 1 To cm.configurationCount
-        Set refs = cm.references
+        Set refs = cm.getConfigurationReferencesWithNumber(i)
         For j = 1 To refs.Count
             Set ref = refs(j)
-            refn = CInt(Right(ref.id, Length(ref.id) - 1))
+            refn = CInt(Right(ref.id, Len(ref.id) - 1))
             referenceManager.setReferenceWihNumber True, refn, i
         Next j
     Next i
