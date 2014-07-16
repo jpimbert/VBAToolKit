@@ -10,6 +10,9 @@ Option Explicit
 '   - Each instance of Configuration Manager is attached to the DEV Excel Workbook of a project
 '       - the method vtkConfigurationManagerForProject give the instance attached to a workbook, or create it
 '
+' NOTE      : For now this module uses only Excel Configuration Managers
+'             The use of XML configuration managers needs a centralized Project management
+'
 ' Copyright 2013 Skwal-Soft (http://skwalsoft.com)
 '
 '   Licensed under the Apache License, Version 2.0 (the "License");
@@ -54,8 +57,10 @@ Public Function vtkConfigurationManagerForProject(projectName As String) As vtkC
     On Error Resume Next
     Set cm = configurationManagers(projectName)
     If Err <> 0 Then
-        Set cm = New vtkConfigurationManager
-        cm.projectName = projectName
+        Set cm = New vtkConfigurationManagerExcel
+        Dim cmE As vtkConfigurationManagerExcel
+        Set cmE = cm
+        cmE.projectName = projectName    ' The projectName setter is specific to the Excel conf Manager
         If cm.projectName Like projectName Then     ' The initialization could fail (if the Workbook is closed)
             configurationManagers.Add Item:=cm, Key:=projectName
            Else
@@ -85,6 +90,7 @@ End Sub
 '
 ' WARNING 1 : for now used only with manual run to convert a VBA project for VBAToolkit
 ' WARNING 2 : A beforeSave event handler is added even if one is already existing
+' WARNING 3 : This function must use an Excel Configuration Manager (not XML)
 '
 ' Purpose   : Create and Initialize a vtkConfiguration sheet for the active workbook
 '             - does nothing if the active workbook already contains a vtkConfiguration worksheet
@@ -99,7 +105,7 @@ End Sub
 '
 Public Sub vtkInitializeConfigurationForActiveWorkBook(Optional withBeforeSaveHandler As Boolean = False)
     ' If a configuration sheet exists, does nothing
-    Dim cm As New vtkConfigurationManager
+    Dim cm As New vtkConfigurationManagerExcel
     If cm.isConfigurationInitializedForWorkbook(ExcelName:=ActiveWorkbook.name) Then Exit Sub
     Set cm = Nothing
     

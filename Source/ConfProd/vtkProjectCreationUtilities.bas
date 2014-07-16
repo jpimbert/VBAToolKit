@@ -28,6 +28,7 @@ Option Explicit
 ' Date      : 09/05/2013
 ' Purpose   : - Initialize DEV project ConfSheet with vbaunit module names and pathes
 '             - Return True if module names and paths are initialized without error
+' WARNING   : This function must use an Excel ConfigurationManager (not XML)
 '---------------------------------------------------------------------------------------
 '
 Public Function vtkInitializeVbaUnitNamesAndPathes(project As String) As Boolean
@@ -112,6 +113,7 @@ Public Sub vtkAddBeforeSaveHandlerInDEVWorkbook(Wb As Workbook, projectName As S
     Dim handlerString As String
     handlerString = _
     "Private Sub Workbook_BeforeSave(ByVal SaveAsUI As Boolean, Cancel As Boolean)" & vbNewLine & _
+    "   On error goto M_Error" & vbNewLine & _
     "   " & wbVTKName & ".vtkExportConfiguration projectWithModules:=ThisWorkbook.VBProject, projectName:=" & """" & projectName & """" & _
                                                                     " , confName:=" & """" & confName & """" & _
                                                                     " , onlyModified:=True" & _
@@ -119,6 +121,7 @@ Public Sub vtkAddBeforeSaveHandlerInDEVWorkbook(Wb As Workbook, projectName As S
                                                                     vbNewLine & _
     "   " & wbVTKName & ".vtkExportConfigurationsAsXML projectName:=""" & projectName & """, filePath:=" & _
     wbVTKName & ".vtkPathOfCurrentProject(ThisWorkbook) & ""\"" & " & wbVTKName & ".vtkProjectForName(""" & projectName & """).XMLConfigurationStandardRelativePath" & vbNewLine & _
+    "M_Error:" & vbNewLine & _
     "End Sub" & vbNewLine
     
     With Wb.VBProject.VBComponents("ThisWorkbook").CodeModule

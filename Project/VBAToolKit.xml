@@ -228,12 +228,12 @@
         <modulePath confId="c3">Source\ConfProd\vtkConfigurationManager.cls</modulePath>
     </module>
     <module mID="m25">
-        <name>vtkConfigurationManager10Tester</name>
-        <modulePath confId="c2">Source\ConfTest\vtkConfigurationManager10Tester.cls</modulePath>
+        <name>vtkConfManagerExcel10Tester</name>
+        <modulePath confId="c2">Source\ConfTest\vtkConfManagerExcel10Tester.cls</modulePath>
     </module>
     <module mID="m26">
-        <name>vtkConfigurationManager11Tester</name>
-        <modulePath confId="c2">Source\ConfTest\vtkConfigurationManager11Tester.cls</modulePath>
+        <name>vtkConfManagerExcel11Tester</name>
+        <modulePath confId="c2">Source\ConfTest\vtkConfManagerExcel11Tester.cls</modulePath>
     </module>
     <module mID="m27">
         <name>vtkConfigurationManagers</name>
@@ -414,8 +414,8 @@
         <modulePath confId="c2">Source\ConfTest\vtkXMLExportTester.cls</modulePath>
     </module>
     <module mID="m62">
-        <name>vtkRecreateConfigurationTester</name>
-        <modulePath confId="c2">Source\ConfTest\vtkRecreateConfigurationTester.cls</modulePath>
+        <name>vtkRecreateConfExcelTester</name>
+        <modulePath confId="c2">Source\ConfTest\vtkRecreateConfExcelTester.cls</modulePath>
     </module>
     <module mID="m63">
         <name>vtkRecreateConfigurationForm</name>
@@ -442,5 +442,31 @@
         <modulePath confId="c1">Source\ConfProd\vtkReference.cls</modulePath>
         <modulePath confId="c2">Source\ConfProd\vtkReference.cls</modulePath>
         <modulePath confId="c3">Source\ConfProd\vtkReference.cls</modulePath>
+    </module>
+    <module mID="m68">
+        <name>vtkConfigurationManagerExcel</name>
+        <modulePath confId="c1">Source\ConfProd\vtkConfigurationManagerExcel.cls</modulePath>
+        <modulePath confId="c2">Source\ConfProd\vtkConfigurationManagerExcel.cls</modulePath>
+        <modulePath confId="c3">Source\ConfProd\vtkConfigurationManagerExcel.cls</modulePath>
+    </module>
+    <module mID="m69">
+        <name>vtkConfigurationManagerXML</name>
+        <modulePath confId="c1">Source\ConfProd\vtkConfigurationManagerXML.cls</modulePath>
+        <modulePath confId="c2">Source\ConfProd\vtkConfigurationManagerXML.cls</modulePath>
+        <modulePath confId="c3">Source\ConfProd\vtkConfigurationManagerXML.cls</modulePath>
+    </module>
+    <module mID="m70">
+        <name>vtkConfManagerXML20Tester</name>
+        <modulePath confId="c2">Source\ConfTest\vtkConfManagerXML20Tester.cls</modulePath>
+    </module>
+    <module mID="m71">
+        <name>vtkRecreateConfXMLTester</name>
+        <modulePath confId="c2">Source\ConfTest\vtkRecreateConfXMLTester.cls</modulePath>
+    </module>
+    <module mID="m72">
+        <name>vtkWaitForm</name>
+        <modulePath confId="c1">Source\ConfProd\vtkWaitForm.frm</modulePath>
+        <modulePath confId="c2">Source\ConfProd\vtkWaitForm.frm</modulePath>
+        <modulePath confId="c3">Source\ConfProd\vtkWaitForm.frm</modulePath>
     </module>
 </vtkConf>

@@ -44,12 +44,16 @@ Private Sub Workbook_AddinUninstall()
 End Sub
 
 Private Sub Workbook_BeforeSave(ByVal SaveAsUI As Boolean, Cancel As Boolean)
+    ' If error Exit silently
+    On Error GoTo M_Error
+
     ' Export and normalize modules
     VBAToolKit.vtkExportConfiguration ThisWorkbook.VBProject, "VBAToolKit", "VBAToolKit_DEV", onlyModified:=True
     
     ' Export as XML
     VBAToolKit.vtkExportConfigurationsAsXML projectName:="VBAToolKit", filePath:=VBAToolKit.vtkPathOfCurrentProject(ThisWorkbook) & "\" & VBAToolKit.vtkProjectForName("VBAToolKit").XMLConfigurationStandardRelativePath
 
+M_Error:
 End Sub
 
 

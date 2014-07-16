@@ -2,7 +2,7 @@ VERSION 1.0 CLASS
 BEGIN
   MultiUse = -1  'True
 END
-Attribute VB_Name = "vtkConfigurationManager11Tester"
+Attribute VB_Name = "vtkConfManagerExcel11Tester"
 Attribute VB_GlobalNameSpace = False
 Attribute VB_Creatable = False
 Attribute VB_PredeclaredId = False
@@ -39,11 +39,13 @@ Private mAssert As IAssert
 Private newWorkbook As Workbook         ' New Workbook created for each test
 Private newWorkbookName As String
 Private newConfManager As vtkConfigurationManager   ' Configuration Manager for the new workbook
+Private newConfManagerExcel As vtkConfigurationManagerExcel   ' For specialized test for Excel Conf Manager
 Private newProjectName As String
 
 Private existingWorkbook As Workbook    ' Existing Workbook opened for each test
 Private Const existingWorkbookNameForTest As String = "WorkBookForConfigurationsTests.xlsm"
 Private existingConfManager As vtkConfigurationManager   ' Configuration Manager for the existing workbook
+Private existingConfManagerExcel As vtkConfigurationManagerExcel   ' For specialized test for Excel Conf Manager
 Private Const existingProjectName As String = "ExistingProject"
 Private existingWorkbookName As String
 
@@ -83,16 +85,19 @@ Private Sub ITestCase_SetUp(Assert As IAssert)
     newWorkbookName = newWorkbook.name
     newProjectName = newWorkbook.VBProject.name
     Set newConfManager = vtkConfigurationManagerForProject(newProjectName)
+    Set newConfManagerExcel = newConfManager
     
     Set existingWorkbook = getTestFileFromTemplate(fileName:=existingWorkbookNameForTest, destinationName:=existingProjectName & "_DEV.xlsm", openExcel:=True)
     existingWorkbookName = existingWorkbook.name
     Set existingConfManager = vtkConfigurationManagerForProject(existingProjectName)
+    Set existingConfManagerExcel = existingConfManager
 End Sub
 
 Private Sub ITestCase_TearDown()
     vtkCloseAndKillWorkbook Wb:=newWorkbook     ' close the new Excel project
     vtkCloseAndKillWorkbook Wb:=existingWorkbook ' close the existing Excel project
     vtkResetConfigurationManagers             ' reset all configuration managers
+    VBAToolKit.resetTestFolder                ' reset the test folder
 End Sub
 
 Public Sub Test_PropertyName_DefaultGet()
@@ -106,21 +111,21 @@ Public Sub Test_PropertyName_DefaultLet()
     '   - In fact there is no need to run the test, just to compile it
     '   - both existing project and new project worbooks must be opened
     mAssert.Equals existingConfManager, "ExistingProject", "The name property of existingConf before modification"
-    existingConfManager = "NewProject"
+    existingConfManagerExcel = "NewProject"
     mAssert.Equals existingConfManager, "NewProject", "The name property of existingConf after modification"
 End Sub
 
 Public Sub TestConfigurationSheetExistsInExistingWorkbook()
     '   Verify that the configuration sheet presence is detected in existing workbook
     '   using a fresh configuration Manager (with no default sheet initialized)
-    Dim cm As New vtkConfigurationManager
+    Dim cm As New vtkConfigurationManagerExcel
     mAssert.Should cm.isConfigurationInitializedForWorkbook(ExcelName:=existingWorkbookName), "The Configuration sheet must exist in existing workbook"
 End Sub
 
 Public Sub TestConfigurationSheetDoesntExistInNewWorkbook()
     '   Verify that the configuration sheet missing is created in new workbook
     '   using a fresh configuration Manager (with no default sheet initialized)
-    Dim cm As New vtkConfigurationManager, Wb As Workbook, wbFullName As String
+    Dim cm As New vtkConfigurationManagerExcel, Wb As Workbook, wbFullName As String
     Set Wb = vtkCreateExcelWorkbookForTestWithProjectName("NewWorkbook")    ' create a fresh new Excel workbook
     wbFullName = Wb.FullName
     mAssert.Should Not cm.isConfigurationInitializedForWorkbook(ExcelName:=Wb.name), "The Configuration sheet must not exist in new workbook"
@@ -135,7 +140,7 @@ Public Sub TestConfigurationSheetCreationForNewProject()
     Set ws = newWorkbook.Sheets("vtkConfigurations")
     mAssert.Equals Err, 0, "A configuration manager must create a Configuration sheet"
     On Error GoTo 0
-    mAssert.Should newWorkbook.Sheets("vtkConfigurations") Is newConfManager.configurationSheet, "The configurationSheet property of the conf manager must be equal to the configuration sheet of the workbook"
+    mAssert.Should newWorkbook.Sheets("vtkConfigurations") Is newConfManagerExcel.configurationSheet, "The configurationSheet property of the conf manager must be equal to the configuration sheet of the workbook"
 End Sub
 
 Public Sub TestConfigurationSheetRetrievalForExistingProject()
@@ -145,13 +150,13 @@ Public Sub TestConfigurationSheetRetrievalForExistingProject()
     Set ws = existingWorkbook.Sheets("vtkConfigurations")
     mAssert.Equals Err, 0, "A configuration manager must be accessible in an existing project"
     On Error GoTo 0
-    mAssert.Should existingWorkbook.Sheets("vtkConfigurations") Is existingConfManager.configurationSheet, "The configurationSheet property of the conf manager must be equal to the configuration sheet of the workbook"
+    mAssert.Should existingWorkbook.Sheets("vtkConfigurations") Is existingConfManagerExcel.configurationSheet, "The configurationSheet property of the conf manager must be equal to the configuration sheet of the workbook"
 End Sub
 
 Public Sub TestConfigurationSheetFormatForNewProjet()
 '       Verify the newly created configuration sheet of a new project
     Dim ws As Worksheet
-    Set ws = newConfManager.configurationSheet
+    Set ws = newConfManagerExcel.configurationSheet
     mAssert.Equals ws.Range("A1"), "vtkConfigurations v1.1", "Expected identification of the configuration sheet"
     mAssert.Equals ws.Range("A2"), "", "Expected Title for Modules column"
     mAssert.Equals ws.Range("A3"), "Path, template, name and comment", "Expected Title for Configurations columns"
@@ -172,7 +177,7 @@ End Sub
 Public Sub TestConfigurationSheetFormatForExistingProjet()
 '       Verify the retrieved configuration sheet from an existing project
     Dim ws As Worksheet
-    Set ws = existingConfManager.configurationSheet
+    Set ws = existingConfManagerExcel.configurationSheet
     mAssert.Equals ws.Range("A1"), "vtkConfigurations v1.1", "Expected identification of the configuration sheet"
     mAssert.Equals ws.Range("A2"), "", "Expected empty cell"
     mAssert.Equals ws.Range("A3"), "Path, template, name and comment", "Expected Title for Configurations columns"
@@ -185,7 +190,7 @@ Public Sub TestConfigurationSheetFormatForExistingProjet()
     mAssert.Equals ws.Range("B5"), "Existing project for various tests of VBAToolKit", "Expected Comment for main workbook"
     mAssert.Equals ws.Range("C1"), existingProjectName & "_DEV", "Expected Title for development project column"
     mAssert.Equals ws.Range("C2"), "Project\ExistingProject_DEV.xlsm", "Expected related Path for development workbook"
-    mAssert.Equals ws.Range("C3"), "", "Expected Template path for development workbook"
+    mAssert.Equals ws.Range("C3"), "Templates\ExistingProjectTemplate.xlsm", "Expected Template path for development workbook"
     mAssert.Equals ws.Range("C4"), "", "Expected empty projectName for development workbook"
     mAssert.Equals ws.Range("C5"), "Existing project for development for various tests of VBAToolKit", "Expected Comment for development workbook"
 End Sub
@@ -236,7 +241,7 @@ Public Sub Test_AddConfigurationInExistingProject_Cells()
     Dim n As Integer
     n = existingConfManager.addConfiguration("NewConfiguration", "ConfigurationPath", comment:="New comment")
     
-    Set ws = existingConfManager.configurationSheet
+    Set ws = existingConfManagerExcel.configurationSheet
     mAssert.Equals ws.Range("A1"), "vtkConfigurations v1.1", "Expected identification of the configuration sheet"
     mAssert.Equals ws.Range("A2"), "", "Expected Title for Modules column"
     mAssert.Equals ws.Range("A3"), "Path, template, name and comment", "Expected Title for Configurations columns"
@@ -249,7 +254,7 @@ Public Sub Test_AddConfigurationInExistingProject_Cells()
     mAssert.Equals ws.Range("B5"), "Existing project for various tests of VBAToolKit", "Expected Comment for main workbook"
     mAssert.Equals ws.Range("C1"), existingProjectName & "_DEV", "Expected Title for development project column"
     mAssert.Equals ws.Range("C2"), "Project\ExistingProject_DEV.xlsm", "Expected related Path for new development workbook"
-    mAssert.Equals ws.Range("C3"), "", "Expected Template path for development workbook"
+    mAssert.Equals ws.Range("C3"), "Templates\ExistingProjectTemplate.xlsm", "Expected Template path for development workbook"
     mAssert.Equals ws.Range("C4"), "", "Expected empty projectName for development workbook"
     mAssert.Equals ws.Range("C5"), "Existing project for development for various tests of VBAToolKit", "Expected Comment for development workbook"
     mAssert.Equals ws.Range("D1"), "NewConfiguration", "Expected Title for new configuration column"
@@ -461,7 +466,7 @@ End Sub
 
 Public Sub TestConfigurationSheetFormatAfterConversion()
 '       Verify the newly converted configuration sheet of a new project
-    Dim ws As Worksheet, workbookV10 As Workbook, confManagerV10 As vtkConfigurationManager
+    Dim ws As Worksheet, workbookV10 As Workbook, confManagerV10 As vtkConfigurationManagerExcel
     
     Set workbookV10 = getTestFileFromTemplate(fileName:=workbookNameWithConfigurationV10, destinationName:="ProjectV10_DEV.xlsm", openExcel:=True)
     Set confManagerV10 = vtkConfigurationManagerForProject("ProjectV10")
@@ -496,9 +501,9 @@ Public Sub TestConfigurationSheetFormatUpToDateConversion()
 '       Verify that an up to date configuration sheet is not modified when converted
     Dim ws As Worksheet
     
-    existingConfManager.updateConfigurationSheetFormat
+    existingConfManagerExcel.updateConfigurationSheetFormat
    
-    Set ws = existingConfManager.configurationSheet
+    Set ws = existingConfManagerExcel.configurationSheet
     mAssert.Equals ws.Range("A1"), "vtkConfigurations v1.1", "Expected identification of the configuration sheet"
     mAssert.Equals ws.Range("A2"), "", "Expected Title for Modules column"
     mAssert.Equals ws.Range("A3"), "Path, template, name and comment", "Expected Title for Configurations columns"
@@ -511,7 +516,7 @@ Public Sub TestConfigurationSheetFormatUpToDateConversion()
     mAssert.Equals ws.Range("B5"), "Existing project for various tests of VBAToolKit", "Expected Comment for existing workbook"
     mAssert.Equals ws.Range("C1"), "ExistingProject_DEV", "Expected Title for development project column"
     mAssert.Equals ws.Range("C2"), "Project\ExistingProject_DEV.xlsm", "Expected related Path for new development workbook"
-    mAssert.Equals ws.Range("C3"), "", "Expected Template path for development workbook"
+    mAssert.Equals ws.Range("C3"), "Templates\ExistingProjectTemplate.xlsm", "Expected Template path for development workbook"
     mAssert.Equals ws.Range("C4"), "", "Expected Project name for existing workbook"
     mAssert.Equals ws.Range("C5"), "Existing project for development for various tests of VBAToolKit", "Expected Comment for existing workbook"
     
@@ -563,6 +568,99 @@ Public Sub TestGetAllReferencesFromExistingWorkbook()
    On Error GoTo 0
 End Sub
 
+Public Sub Test_Duplicate_InitializedConfManager()
+'       Check the raise of an error when conf manager already initialized
+    Dim Wb As Workbook, cm As vtkConfigurationManager, cmE As vtkConfigurationManagerExcel
+    Dim cmX As vtkConfigurationManagerXML, testFilePath As String, testFileName As String
+    
+    Set Wb = vtkCreateExcelWorkbookForTestWithProjectName("DupProject")    ' create an Excel project
+    testFileName = "ExistingProject.xml"
+    testFilePath = VBAToolKit.vtkTestPath & "\" & testFileName
+    getTestFileFromTemplate fileName:="XMLForConfigurationsTests.xml", destinationName:=testFileName, openExcel:=False
+    Set cm = New vtkConfigurationManagerXML
+    Set cmX = cm
+    cmX.init testFilePath   ' create and initialize a XML conf manager to duplicate
+   
+   On Error Resume Next
+    Set cmE = existingConfManager
+    cmE.duplicate Wb:=wb, cm:=cm
+    mAssert.Equals Err.Number, VTK_ALREADY_INITIALIZED, "Error raised by duplicate method"
+   On Error GoTo 0
+   
+    vtkCloseAndKillWorkbook Wb:=Wb     ' close the new Excel project
+End Sub
+
+Public Sub Test_Duplicate_WorkbookNotOpened()
+'       Check the raise of an error when workbook is not open
+    Dim cmFrom As vtkConfigurationManager
+    Dim cmE As vtkConfigurationManagerExcel, cmX As vtkConfigurationManagerXML
+    Dim testFilePath As String, testFileName As String
+    
+    testFileName = "ExistingProject.xml"
+    testFilePath = VBAToolKit.vtkTestPath & "\" & testFileName
+    getTestFileFromTemplate fileName:="XMLForConfigurationsTests.xml", destinationName:=testFileName, openExcel:=False
+    Set cmFrom = New vtkConfigurationManagerXML
+    Set cmX = cmFrom
+    cmX.init testFilePath   ' create and initialize a XML conf manager to duplicate
+   
+   On Error Resume Next
+    Set cmE = New vtkConfigurationManagerExcel
+    cmE.duplicate Wb:=Nothing, cm:=cmFrom
+    mAssert.Equals Err.Number, VTK_WORKBOOK_NOTOPEN, "Error raised by duplicate method"
+   On Error GoTo 0
+End Sub
+
+Public Sub Test_Duplicate_InitializedWorkbook()
+'       Check the raise of an error when workbook already initialized
+    Dim cmFrom As vtkConfigurationManager
+    Dim cmE As vtkConfigurationManagerExcel, cmX As vtkConfigurationManagerXML
+    Dim testFilePath As String, testFileName As String
+    
+    testFileName = "ExistingProject.xml"
+    testFilePath = VBAToolKit.vtkTestPath & "\" & testFileName
+    getTestFileFromTemplate fileName:="XMLForConfigurationsTests.xml", destinationName:=testFileName, openExcel:=False
+    Set cmFrom = New vtkConfigurationManagerXML
+    Set cmX = cmFrom
+    cmX.init testFilePath   ' create and initialize a XML conf manager to duplicate
+   
+   On Error Resume Next
+    Set cmE = New vtkConfigurationManagerExcel
+    cmE.duplicate Wb:=existingWorkbook, cm:=cmFrom
+    mAssert.Equals Err.Number, VTK_ALREADY_INITIALIZED, "Error raised by duplicate method"
+   On Error GoTo 0
+End Sub
+
+Public Sub Test_Duplicate_Nominal()
+'       Check the behavior of duplicate method in nominal case
+    Dim Wb As Workbook, cm As vtkConfigurationManager, cmE As vtkConfigurationManagerExcel
+    Dim cmX As vtkConfigurationManagerXML, testFilePath As String, testFileName As String, i As Integer, j As Integer
+    Dim refE As vtkReference, refX As vtkReference
+    
+    Set Wb = vtkCreateExcelWorkbookForTestWithProjectName("DupProject")    ' create an Excel project
+    testFileName = "ExistingProject.xml"
+    testFilePath = VBAToolKit.vtkTestPath & "\" & testFileName
+    getTestFileFromTemplate fileName:="XMLForConfigurationsTests.xml", destinationName:=testFileName, openExcel:=False
+    Set cm = New vtkConfigurationManagerXML
+    Set cmX = cm
+    cmX.init testFilePath   ' create and initialize a XML conf manager to duplicate
+   
+   On Error GoTo M_Error
+    Set cmE = New vtkConfigurationManagerExcel
+    cmE.duplicate Wb:=wb, cm:=cm
+    
+    ' Check configuration manager parameters
+    mAssert.Should Wb.Worksheets("vtkConfigurations") Is cmE.configurationSheet, "Configuration sheet of duplicated conf manager"
+    vtkCompareConfManagers mAssert, expectedConf:=cm, actualConf:=cmE
+    
+   On Error GoTo 0
+    GoTo M_Exit
+    
+M_Error:
+    mAssert.Should False, "Unexpected error (" & Err.Number & ") : " & Err.Description
+M_Exit:
+    vtkCloseAndKillWorkbook Wb:=Wb     ' close the new Excel project
+End Sub
+
 Private Function ITest_Suite() As TestSuite
     Set ITest_Suite = New TestSuite
     ITest_Suite.AddTest ITest_Manager.ClassName, "Test_PropertyName_DefaultGet"
@@ -598,6 +696,10 @@ Private Function ITest_Suite() As TestSuite
     ITest_Suite.AddTest ITest_Manager.ClassName, "TestConfigurationSheetFormatUpToDateConversion"
     ITest_Suite.AddTest ITest_Manager.ClassName, "TestGetAllReferencesFromNewWorkbook"
     ITest_Suite.AddTest ITest_Manager.ClassName, "TestGetAllReferencesFromExistingWorkbook"
+    ITest_Suite.AddTest ITest_Manager.ClassName, "Test_Duplicate_InitializedConfManager"
+    ITest_Suite.AddTest ITest_Manager.ClassName, "Test_Duplicate_WorkbookNotOpened"
+    ITest_Suite.AddTest ITest_Manager.ClassName, "Test_Duplicate_InitializedWorkbook"
+    ITest_Suite.AddTest ITest_Manager.ClassName, "Test_Duplicate_Nominal"
 End Function
 
 Private Sub ITestCase_RunTest()
@@ -635,6 +737,10 @@ Private Sub ITestCase_RunTest()
         Case "TestConfigurationSheetFormatUpToDateConversion": TestConfigurationSheetFormatUpToDateConversion
         Case "TestGetAllReferencesFromNewWorkbook": TestGetAllReferencesFromNewWorkbook
         Case "TestGetAllReferencesFromExistingWorkbook": TestGetAllReferencesFromExistingWorkbook
+        Case "Test_Duplicate_InitializedConfManager": Test_Duplicate_InitializedConfManager
+        Case "Test_Duplicate_WorkbookNotOpened": Test_Duplicate_WorkbookNotOpened
+        Case "Test_Duplicate_InitializedWorkbook": Test_Duplicate_InitializedWorkbook
+        Case "Test_Duplicate_Nominal": Test_Duplicate_Nominal
         Case Else: mAssert.Should False, "Invalid test name: " & mManager.methodName
     End Select
 End Sub

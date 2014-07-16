@@ -321,14 +321,13 @@ End Sub
 '             - the modules are imported from pathes listed in project/configuration
 '---------------------------------------------------------------------------------------
 '
-Public Sub vtkImportModulesInAnotherProject(projectForModules As VBProject, projectName As String, confName As String)
-    Dim cm As vtkConfigurationManager, rootPath As String
-    Dim cn As Integer, filePath As String, i As Integer
+Public Sub vtkImportModulesInAnotherProject(projectForModules As VBProject, projectName As String, confName As String, Optional cm As vtkConfigurationManager = Nothing)
+    Dim rootPath As String, cn As Integer, filePath As String, i As Integer
     
    On Error GoTo vtkImportModulesInAnotherProject_Error
 
     ' Get the project and the rootPath of the project
-    Set cm = vtkConfigurationManagerForProject(projectName)
+    If cm Is Nothing Then Set cm = vtkConfigurationManagerForProject(projectName)
     cn = cm.getConfigurationNumber(configuration:=confName)
     rootPath = cm.rootPath
     
@@ -354,6 +353,9 @@ End Sub
 '
 ' Params    : - projectName
 '             - configurationName
+'             - Optional Configuration Manager
+'                   if no Conf Manager are given, the standard Conf manager (Excel)
+'                   of the project is used
 '
 ' Raises    : - VTK_UNEXPECTED_ERROR
 '             - VTK_WORKBOOK_ALREADY_OPEN
@@ -366,7 +368,7 @@ End Sub
 '
 '---------------------------------------------------------------------------------------
 '
-Public Sub vtkRecreateConfiguration(projectName As String, configurationName As String)
+Public Sub vtkRecreateConfiguration(projectName As String, configurationName As String, Optional confManager As vtkConfigurationManager = Nothing)
     Dim cm As vtkConfigurationManager
     Dim rootPath As String
     Dim wbPath As String, templatePath As String
@@ -376,8 +378,12 @@ Public Sub vtkRecreateConfiguration(projectName As String, configurationName As 
 
     On Error GoTo vtkRecreateConfiguration_Error
     
-    ' Get the project and the rootPath of the project
-    Set cm = vtkConfigurationManagerForProject(projectName)
+    ' Get the Conf Manager and the rootPath of the project
+    If confManager Is Nothing Then
+        Set cm = vtkConfigurationManagerForProject(projectName)
+       Else
+        Set cm = confManager
+    End If
     rootPath = cm.rootPath
     
     ' Get the configuration number in the project and the path of the file
@@ -419,10 +425,16 @@ Public Sub vtkRecreateConfiguration(projectName As String, configurationName As 
     Wb.BuiltinDocumentProperties("Comments").Value = conf.comment
     
     ' Import all modules for this configuration from the source directory
-    vtkImportModulesInAnotherProject projectForModules:=Wb.VBProject, projectName:=projectName, confName:=configurationName
+    vtkImportModulesInAnotherProject projectForModules:=Wb.VBProject, projectName:=projectName, confName:=configurationName, cm:=cm
     
     ' Recreate references in the new Excel File
     conf.addReferencesToWorkbook Wb
+    
+    ' Duplicate Conf Manager if DEV configuration
+    If conf.isDEV Then
+        Dim cmE As New vtkConfigurationManagerExcel
+        cmE.duplicate wb, cm
+    End If
     
     ' VB will not let the workbook be saved under the name of an already opened workbook, which
     ' is annoying when recreating an add-in (always opened). The following code works around this.
@@ -480,7 +492,7 @@ vtkRecreateConfiguration_Error:
             Err.Number = VTK_UNEXPECTED_ERROR
     End Select
 
-    Err.Raise Err.Number, Err.Source, Err.Description
+    Err.Raise Err.Number, Err.source, Err.Description
     
     Exit Sub
     

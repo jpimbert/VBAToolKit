@@ -448,12 +448,12 @@ Public Sub TestGetReferencesWithNoDevConf()
 '       Verify that VBAToolKit reference is not attached to any configuration
     Dim c As Collection
       
+   On Error GoTo M_Error
+   
     Set newRefManager = Nothing
     newWorkbook.Sheets("vtkReferences").name = "oldOne"
     Set newRefManager = New vtkReferenceManager
     newRefManager.init Wb:=newWorkbook, confCount:=2, nbTitleColumnsInConfSheet:=1
-      
-   On Error GoTo M_Error
     
     ' Test references for the main configuration (#1)
     Set c = newRefManager.references(1)

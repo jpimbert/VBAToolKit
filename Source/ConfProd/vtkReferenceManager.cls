@@ -236,14 +236,14 @@ Private Sub initializeReferenceSheet(confCount As Integer, devConf As Integer, r
     
     ' Add a reference to the running project (VBAToolKit)
     Set ref = selfReference()
-    addOneReference ref
+    If devConf >= 0 Then addOneReference ref
     
     ' Init configuration titles
     For i = 1 To confCount
         addConfiguration
         For j = 1 To referenceCount
             If devConf >= 0 And devConf <= confCount Then m_referenceSheet.Cells(nbTitleRows + j, nbTitleColumns + i) = "X"
-            If m_referenceSheet.Cells(nbTitleRows + j, 1) = ref.name And i <> devConf Then m_referenceSheet.Cells(nbTitleRows + j, nbTitleColumns + i) = ""
+            If i <> devConf And m_referenceSheet.Cells(nbTitleRows + j, 1) = ref.name Then m_referenceSheet.Cells(nbTitleRows + j, nbTitleColumns + i) = ""
         Next j
     Next i
 End Sub
@@ -405,3 +405,28 @@ Public Function references(confNumber As Integer) As Collection
         Err.Raise Number:=VTK_NOTINITIALIZED, Source:="vtkReferenceManager:references", Description:="Impossible to get references from a sheet of a null workbook"
     End If
 End Function
+
+'---------------------------------------------------------------------------------------
+' Sub       : setReferenceWihNumber
+' Author    : Jean-Pierre Imbert
+' Date      : 14/07/2014
+' Purpose   : Set a reference as used or not used for a configuration
+' Parameter : - usedRef, true if the reference must be used by the configuration
+'             - refNumber, the reference number between 1 and refs count
+'             - confNumber, the configuration number between 1 and conf count
+'               if the numbers are not legal, VTK_FORBIDDEN_PARAMETER Error is returned
+' NOTE      : not tested, only used for duplicate configuration manager
+'---------------------------------------------------------------------------------------
+'
+Public Sub setReferenceWihNumber(usedRef As Boolean, refNumber As Integer, confNumber As Integer)
+    If refNumber < 1 Or refNumber > referenceCount Then _
+        Err.Raise Number:=VTK_FORBIDDEN_PARAMETER, Source:="vtkReferenceManager:setReferenceWithNumber", Description:="Reference number (" & refNumber & ") must be between 1 and " & referenceCount
+    If confNumber < 1 Or confNumber > configurationCount Then _
+        Err.Raise Number:=VTK_FORBIDDEN_PARAMETER, Source:="vtkReferenceManager:setReferenceWithNumber", Description:="Configuration number (" & confNumber & ") must be between 1 and " & configurationCount
+    If usedRef Then
+        m_referenceSheet.Cells(nbTitleRows + refNumber, nbTitleColumns + confNumber) = "X"
+       Else
+        m_referenceSheet.Cells(nbTitleRows + refNumber, nbTitleColumns + confNumber) = ""
+    End If
+End Sub
+

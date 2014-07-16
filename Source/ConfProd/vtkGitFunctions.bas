@@ -121,6 +121,9 @@ Public Function vtkInitializeGit(folderPath As String, Optional logFile As Strin
     contentStream.WriteLine
     contentStream.WriteLine "# Ignore the delivery Excel files"
     contentStream.WriteLine "/Delivery/*.xl*"
+    contentStream.WriteLine
+    contentStream.WriteLine "# Ignore the Project Excel files"
+    contentStream.WriteLine "/Project/*.xl*"
     contentStream.Close
     
     ' Adds all the files in the folder tree to the git repository

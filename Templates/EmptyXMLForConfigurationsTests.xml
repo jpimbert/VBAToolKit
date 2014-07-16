@@ -1,0 +1,106 @@
+<?xml version="1.0" encoding="ISO-8859-1" standalone="yes"?>
+<!DOCTYPE vtkConf [
+    <!ELEMENT vtkConf (info, reference*, configuration*, module*)>
+        <!ELEMENT info (vtkConfigurationsVersion,projectName)>
+                <!ELEMENT vtkConfigurationsVersion (#PCDATA)>
+                <!ELEMENT projectName (#PCDATA)>
+        <!ELEMENT configuration (name,path,templatePath?,title?,comment?)>
+         <!ATTLIST configuration cID ID #REQUIRED>
+         <!ATTLIST configuration refIDs IDREFS #IMPLIED>
+                <!ELEMENT name (#PCDATA)>
+                <!ELEMENT path (#PCDATA)>
+                <!ELEMENT templatePath (#PCDATA)>
+                <!ELEMENT title        (#PCDATA)>
+                <!ELEMENT comment (#PCDATA)>
+        <!ELEMENT module (name, modulePath*)>
+         <!ATTLIST module mID ID #REQUIRED>
+                <!ELEMENT modulePath (#PCDATA)>
+                <!ATTLIST modulePath confId IDREF #REQUIRED>
+        <!ELEMENT reference (name, (guid|path))>
+         <!ATTLIST reference refID ID #REQUIRED>
+                <!ELEMENT guid (#PCDATA)>
+]>
+<vtkConf>
+
+    <info>
+        <vtkConfigurationsVersion>1.0</vtkConfigurationsVersion>
+        <projectName>ExistingProject</projectName>
+    </info>
+
+    <reference refID="r1">
+        <name>VBA</name>
+        <guid>{000204EF-0000-0000-C000-000000000046}</guid>
+    </reference>
+    <reference refID="r2">
+        <name>Excel</name>
+        <guid>{00020813-0000-0000-C000-000000000046}</guid>
+    </reference>
+    <reference refID="r3">
+        <name>stdole</name>
+        <guid>{00020430-0000-0000-C000-000000000046}</guid>
+    </reference>
+    <reference refID="r4">
+        <name>Office</name>
+        <guid>{2DF8D04C-5BFA-101B-BDE5-00AA0044DE52}</guid>
+    </reference>
+    <reference refID="r5">
+        <name>MSForms</name>
+        <guid>{0D452EE1-E08F-101A-852E-02608C4D0BB4}</guid>
+    </reference>
+    <reference refID="r6">
+        <name>Scripting</name>
+        <guid>{420B2830-E718-11CF-893D-00A0C9054228}</guid>
+    </reference>
+    <reference refID="r7">
+        <name>VBIDE</name>
+        <guid>{0002E157-0000-0000-C000-000000000046}</guid>
+    </reference>
+    <reference refID="r8">
+        <name>Shell32</name>
+        <guid>{50A7E9B0-70EF-11D1-B75A-00A0C90564FE}</guid>
+    </reference>
+    <reference refID="r9">
+        <name>MSXML2</name>
+        <guid>{F5078F18-C551-11D3-89B9-0000F81FE221}</guid>
+    </reference>
+    <reference refID="r10">
+        <name>EventSystemLib</name>
+        <guid>{4E14FB90-2E22-11D1-9964-00C04FBBB345}</guid>
+    </reference>
+    <reference refID="r11">
+        <name>VBAToolKit</name>
+        <path>C:\Documents and Settings\Demonn\Application Data\Microsoft\AddIns\VBAToolKit.xlam</path>
+    </reference>
+    <configuration cID="c1" refIDs="r1 r2 r3 r4 r5 r6 r7 r8 r9">
+        <name>ExistingProject</name>
+        <path>Delivery\ExistingProject.xlsm</path>
+        <title>ExistingProjectName</title>
+        <comment>Existing project for various tests of VBAToolKit</comment>
+    </configuration>
+    <configuration cID="c2" refIDs="r1 r2 r3 r4 r5 r6 r7 r8 r9">
+        <name>ExistingProject_DEV</name>
+        <path>Project\ExistingProject_DEV.xlsm</path>
+        <title>ExistingProject_DEV</title>
+        <comment>Existing project for development for various tests of VBAToolKit</comment>
+    </configuration>
+    <module mID="m1">
+        <name>Module1</name>
+        <modulePath confId="c1">Path1Module1</modulePath>
+    </module>
+    <module mID="m2">
+        <name>Module2</name>
+        <modulePath confId="c2">Path2Module2</modulePath>
+    </module>
+    <module mID="m3">
+        <name>Module3</name>
+    </module>
+    <module mID="m4">
+        <name>Module4</name>
+        <modulePath confId="c1">Path1Module4</modulePath>
+        <modulePath confId="c2">Path2Module4</modulePath>
+    </module>
+    <module mID="m5">
+        <name>Module5</name>
+        <modulePath confId="c2">Path2Module5</modulePath>
+    </module>
+</vtkConf>
