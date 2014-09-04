@@ -169,6 +169,9 @@ End Sub
 '---------------------------------------------------------------------------------------
 '
 Sub vtkVerifyConfigurations()
+    ' Invalid events management for silently open workbooks
+    Application.EnableEvents = False
+
     ' Init project and configuration manager
     Dim prj As vtkProject
     Set prj = vtkProjectForName(getCurrentProjectName)
@@ -214,7 +217,7 @@ Sub vtkVerifyConfigurations()
                 End If
 
     ' Verify workbooks template path
-                If Not (fso.FileExists(cm.rootPath & "\" & c.template)) Then
+                If (c.template <> "") And Not (fso.FileExists(cm.rootPath & "\" & c.template)) Then
                     Debug.Print "For configuration " & c.name & ", the template path (" & cm.rootPath & "\" & c.template & ") is unreachable."
                 End If
 
@@ -315,4 +318,8 @@ Sub vtkVerifyConfigurations()
         If Not cwb(i).wasOpened Then cwb(i).Wb.Close saveChanges:=False
     Next i
     Debug.Print "----------------------------------------------------"
+    
+    ' Reactivate events management for silently open workbooks
+    Application.EnableEvents = True
+
 End Sub

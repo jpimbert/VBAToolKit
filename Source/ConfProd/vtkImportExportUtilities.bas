@@ -259,6 +259,9 @@ Public Sub vtkExportOneModule(project As VBProject, moduleName As String, filePa
     ' Kill file if it already exists only AFTER get the module, if it not exists the file must not be deleted
     If fso.FileExists(filePath) Then fso.DeleteFile fileSpec:=filePath
     
+    ' Create full path if needed
+    vtkCreateFolderPath fileOrFolderPath:=filePath
+    
     ' Export module
     m.Export fileName:=filePath
     
@@ -433,7 +436,7 @@ Public Sub vtkRecreateConfiguration(projectName As String, configurationName As 
     ' Duplicate Conf Manager if DEV configuration
     If conf.isDEV Then
         Dim cmE As New vtkConfigurationManagerExcel
-        cmE.duplicate wb, cm
+        cmE.duplicate Wb, cm
     End If
     
     ' VB will not let the workbook be saved under the name of an already opened workbook, which
@@ -492,7 +495,7 @@ vtkRecreateConfiguration_Error:
             Err.Number = VTK_UNEXPECTED_ERROR
     End Select
 
-    Err.Raise Err.Number, Err.source, Err.Description
+    Err.Raise Err.Number, Err.Source, Err.Description
     
     Exit Sub
     
