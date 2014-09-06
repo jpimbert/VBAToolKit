@@ -50,20 +50,20 @@ Public Function SelectTestClass(TestClassName As String) As ITest
         Case "vtkToolBarsTester": Set SelectTestClass = New vtkToolBarsTester
         Case "vtkExportOneModuleTester": Set SelectTestClass = New vtkExportOneModuleTester
         Case "vtkGitFunctionsTester": Set SelectTestClass = New vtkGitFunctionsTester
+        Case "vtkFileSystemUtilitiesTester": Set SelectTestClass = New vtkFileSystemUtilitiesTester
         Case "vtkConfigurationTester": Set SelectTestClass = New vtkConfigurationTester
         Case "vtkModuleTester": Set SelectTestClass = New vtkModuleTester
         Case "vtkExportConfigurationTester": Set SelectTestClass = New vtkExportConfigurationTester
         Case "vtkNormalizeTester": Set SelectTestClass = New vtkNormalizeTester
+        Case "vtkTestUtilitiesTester": Set SelectTestClass = New vtkTestUtilitiesTester
         Case "vtkXMLExportTester": Set SelectTestClass = New vtkXMLExportTester
-        Case "vtkFileSystemUtilitiesTester": Set SelectTestClass = New vtkFileSystemUtilitiesTester
         Case "vtkRecreateConfExcelTester": Set SelectTestClass = New vtkRecreateConfExcelTester
         Case "vtkExcelUtilitiesTester": Set SelectTestClass = New vtkExcelUtilitiesTester
-        Case "vtkConfManagerExcel10Tester": Set SelectTestClass = New vtkConfManagerExcel10Tester
-        Case "vtkConfManagerExcel11Tester": Set SelectTestClass = New vtkConfManagerExcel11Tester
-        Case "vtkTestUtilitiesTester": Set SelectTestClass = New vtkTestUtilitiesTester
         Case "vtkReferenceManagerTester": Set SelectTestClass = New vtkReferenceManagerTester
         Case "vtkConfManagerXML20Tester": Set SelectTestClass = New vtkConfManagerXML20Tester
         Case "vtkRecreateConfXMLTester": Set SelectTestClass = New vtkRecreateConfXMLTester
+        Case "vtkConfManagerExcel10Tester": Set SelectTestClass = New vtkConfManagerExcel10Tester
+        Case "vtkConfManagerExcel11Tester": Set SelectTestClass = New vtkConfManagerExcel11Tester
         Case Else:
     End Select
 End Function

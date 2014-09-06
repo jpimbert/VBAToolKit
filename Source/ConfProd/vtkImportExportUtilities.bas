@@ -380,6 +380,7 @@ Public Sub vtkRecreateConfiguration(projectName As String, configurationName As 
     Dim fso As New FileSystemObject
 
     On Error GoTo vtkRecreateConfiguration_Error
+    Application.EnableEvents = False
     
     ' Get the Conf Manager and the rootPath of the project
     If confManager Is Nothing Then
@@ -456,6 +457,7 @@ Public Sub vtkRecreateConfiguration(projectName As String, configurationName As 
     Wb.IsAddin = vtkDefaultIsAddIn(wbPath)
     Wb.SaveAs fileName:=tmpPath, FileFormat:=vtkDefaultFileFormat(wbPath)
     Wb.Close saveChanges:=False
+    Application.EnableEvents = True
     
     ' Delete the old workbook if it exists
     Dim fullWbpath As String
