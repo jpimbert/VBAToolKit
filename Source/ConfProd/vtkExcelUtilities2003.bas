@@ -101,23 +101,30 @@ End Function
 '
 Public Function vtkDefaultFileFormat(filePath As String) As XlFileFormat
     Select Case vtkGetFileExtension(filePath)
-        Case "xlsx"
-            vtkDefaultFileFormat = xlOpenXMLWorkbook
-        Case "xltx"
-            vtkDefaultFileFormat = xlOpenXMLTemplate
-        Case "xltm"
-            vtkDefaultFileFormat = xlOpenXMLTemplateMacroEnabled
-        Case "xlsm"
-            vtkDefaultFileFormat = xlOpenXMLWorkbookMacroEnabled
-        Case "xlam"
-            vtkDefaultFileFormat = xlOpenXMLAddIn
         Case "xla"
             vtkDefaultFileFormat = xlAddIn
         Case "xls"
-            vtkDefaultFileFormat = xlExcel8
+            vtkDefaultFileFormat = xlWorkbookNormal
         Case Else
             vtkDefaultFileFormat = 0
         End Select
+End Function
+
+'---------------------------------------------------------------------------------------
+' Function  : vtkDefaultExcelExtension as String
+' Author    : Jean-Pierre Imbert
+' Date      : 06/09/2014
+' Purpose   : return the default extension for an Excel file
+'             - .xls for Excel until 2003 (11.0)
+'             - .xlsm for Excel since 2007 (12.0)
+'---------------------------------------------------------------------------------------
+'
+Public Function vtkDefaultExcelExtension() As String
+    If Val(Application.Version) >= 12 Then
+        vtkDefaultExcelExtension = ".xlsm"
+    Else
+        vtkDefaultExcelExtension = ".xls"
+    End If
 End Function
 
 '---------------------------------------------------------------------------------------

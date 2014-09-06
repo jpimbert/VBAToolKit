@@ -134,7 +134,7 @@ End Property
 '
 Public Property Get workbookDEVName() As String
     If initialized Then
-        workbookDEVName = projectDEVName & ".xlsm"
+        workbookDEVName = projectDEVName & vtkDefaultExcelExtension
        Else
         workbookDEVName = ""
     End If
@@ -149,7 +149,7 @@ End Property
 '
 Public Property Get workbookName() As String
     If initialized Then
-        workbookName = projectName & ".xlsm"
+        workbookName = projectName & vtkDefaultExcelExtension
        Else
         workbookName = ""
     End If

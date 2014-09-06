@@ -271,9 +271,9 @@
     </module>
     <module mID="m34">
         <name>vtkExcelUtilities</name>
-        <modulePath confId="c1">Source\ConfProd\vtkExcelUtilities.bas</modulePath>
-        <modulePath confId="c2">Source\ConfProd\vtkExcelUtilities.bas</modulePath>
-        <modulePath confId="c3">Source\ConfProd\vtkExcelUtilities.bas</modulePath>
+        <modulePath confId="c1">Source\ConfProd\vtkExcelUtilities2007.bas</modulePath>
+        <modulePath confId="c2">Source\ConfProd\vtkExcelUtilities2007.bas</modulePath>
+        <modulePath confId="c3">Source\ConfProd\vtkExcelUtilities2003.bas</modulePath>
     </module>
     <module mID="m35">
         <name>vtkProjectCreationUtilities</name>

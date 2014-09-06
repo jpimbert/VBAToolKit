@@ -44,14 +44,20 @@ Public Sub Test_vtkDefaultIsAddIn()
     mAssert.Should Not vtkDefaultIsAddIn("TestFile.xls"), "xls extension is not Add-In"
 End Sub
 
+Public Sub Test_vtkDefaultExcelExtension()
+    mAssert.Equals ".xlsm", vtkDefaultExcelExtension, "Default Excel 2007 extension"
+End Sub
+
 Private Function ITest_Suite() As TestSuite
     Set ITest_Suite = New TestSuite
     ITest_Suite.AddTest ITest_Manager.ClassName, "Test_vtkDefaultIsAddIn"
+    ITest_Suite.AddTest ITest_Manager.ClassName, "Test_vtkDefaultExcelExtension"
 End Function
 
 Private Sub ITestCase_RunTest()
     Select Case mManager.methodName
         Case "Test_vtkDefaultIsAddIn": Test_vtkDefaultIsAddIn
+        Case "Test_vtkDefaultExcelExtension": Test_vtkDefaultExcelExtension
         Case Else: mAssert.Should False, "Invalid test name: " & mManager.methodName
     End Select
 End Sub
