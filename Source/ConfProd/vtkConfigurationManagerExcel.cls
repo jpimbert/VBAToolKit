@@ -52,8 +52,9 @@ Private m_rootPath As String
 Private m_refManager As vtkReferenceManager
 Private m_devConfiguration As Integer
 Private Const sheetName As String = "vtkConfigurations"
-Private Const currentVersion As String = "vtkConfigurations v1.1"
+Private Const currentVersion As String = "vtkConfigurations v1.2"
 Private Const version10 As String = "vtkConfigurations v1.0"
+Private Const version11 As String = "vtkConfigurations v1.1"
 Private m_sheetVersion As String
 Private Const nbTitleColumns As Integer = 1
 Private Const nameLine = 1
@@ -61,6 +62,7 @@ Private Const pathLine = 2
 Private Const templateLine = 3
 Private Const projectNameLine = 4
 Private Const commentLine = 5
+Private Const passwordLine = 6
 
 Private Sub Class_Initialize()
     m_devConfiguration = -1
@@ -202,12 +204,13 @@ End Function
 ' Author    : Jean-Pierre Imbert
 ' Date      : 08/06/2014
 ' Purpose   : return the number of Title rows in the configuration sheet depend on its version
-'             - 2 for v1.0, 4 for 1.1
+'             - 2 for v1.0, 5 for v1.1, 6 for v1.2
 '---------------------------------------------------------------------------------------
 '
 Private Function nbTitleRows() As Integer
     If m_sheetVersion = version10 Then nbTitleRows = 2
-    If m_sheetVersion = currentVersion Then nbTitleRows = 5
+    If m_sheetVersion = version11 Then nbTitleRows = 5
+    If m_sheetVersion = currentVersion Then nbTitleRows = 6
 End Function
 
 '---------------------------------------------------------------------------------------
@@ -231,10 +234,14 @@ Private Sub setConfigurationSheet()
         End If
     ' Verify that the configuration sheet is in last known version
     If ws.Range("A1") <> currentVersion Then
-        If ws.Range("A1") <> version10 Then
-        ' Code to convert from previous version will be implemented here or in a specific method
+        If ws.Range("A1") <> version11 Then
+            If ws.Range("A1") <> version10 Then
+            ' Code to convert from previous version will be implemented here or in a specific method
+                Else
+                m_sheetVersion = version10
+                End If
             Else
-            m_sheetVersion = version10
+            m_sheetVersion = version11
             End If
         Else
         m_sheetVersion = currentVersion
@@ -252,15 +259,19 @@ End Sub
 '
 Private Sub initializeConfigurationSheet(ws As Worksheet)
     ws.Range("A1") = currentVersion
-    ws.Range("A2") = ""
-    ws.Range("A3") = "Path, template, name and comment"
-    ws.Range("A4") = ""
-    ws.Range("A5") = "Module Name"
+    ws.Range("A2") = "Path"
+    ws.Range("A3") = "Template"
+    ws.Range("A4") = "Name"
+    ws.Range("A5") = "Comment"
+    ws.Range("A6") = "Module Name \ Password"
     ws.Columns("A").ColumnWidth = 22
     ws.Range("A1").Font.Size = 8
-    ws.Range("A3").HorizontalAlignment = xlCenter
-    ws.Range("A5").HorizontalAlignment = xlCenter
-    ws.Range("A5").Font.Bold = True
+    ws.Range("A2").HorizontalAlignment = xlRight
+    ws.Range("A3").HorizontalAlignment = xlRight
+    ws.Range("A4").HorizontalAlignment = xlRight
+    ws.Range("A5").HorizontalAlignment = xlRight
+    ws.Range("A6").HorizontalAlignment = xlCenter
+    ws.Range("A6").Font.Bold = True
     If Me.projectName <> "" Then
         m_devConfiguration = 2
         ws.Range("B1") = vtkProjectForName(projectName).projectName
@@ -286,19 +297,23 @@ Public Sub updateConfigurationSheetFormat()
     If m_sheetVersion = version10 Then
         Set ws = configurationSheet
          
-        ws.Rows("3:5").EntireRow.Insert     ' Insert new lines for the new format
+        ws.Rows("3:6").EntireRow.Insert     ' Insert new lines for the new format
         
         ws.Range("A1") = currentVersion
-        ws.Range("A2") = ""
-        ws.Range("A3") = "Path, template, name and comment"
-        ws.Range("A4") = ""
-        ws.Range("A5") = "Module Name"
+        ws.Range("A2") = "Path"
+        ws.Range("A3") = "Template"
+        ws.Range("A4") = "Name"
+        ws.Range("A5") = "Comment"
+        ws.Range("A6") = "Module Name \ Password"
     
         ws.Range("A2").Font.Bold = False
         ws.Range("A3").Font.Bold = False
-        ws.Range("A3").HorizontalAlignment = xlCenter
-        ws.Range("A5").HorizontalAlignment = xlCenter
-        ws.Range("A5").Font.Bold = True
+        ws.Range("A2").HorizontalAlignment = xlRight
+        ws.Range("A3").HorizontalAlignment = xlRight
+        ws.Range("A4").HorizontalAlignment = xlRight
+        ws.Range("A5").HorizontalAlignment = xlRight
+        ws.Range("A6").HorizontalAlignment = xlCenter
+        ws.Range("A6").Font.Bold = True
         
         m_sheetVersion = currentVersion     ' Set the sheetVersion for correct behavior after conversion
     End If
@@ -525,7 +540,7 @@ Public Function getConfigurationProjectNameWithNumber(n As Integer) As String
     Dim sResult As String
     sResult = ""
     If n >= 1 And n <= configurationCount Then
-        If m_sheetVersion = currentVersion Then
+        If m_sheetVersion = currentVersion Or m_sheetVersion = version11 Then
             sResult = configurationSheet.Cells(projectNameLine, n + nbTitleColumns)
             If sResult = "" Then sResult = defaultProjectNameWithNumber(n)
            Else
@@ -552,7 +567,7 @@ End Function
 '
 Public Sub setConfigurationProjectNameWithNumber(n As Integer, projectName As String)
     If n >= 1 And n <= configurationCount Then
-        If m_sheetVersion = currentVersion Then
+        If m_sheetVersion = currentVersion Or m_sheetVersion = version11 Then
             configurationSheet.Cells(projectNameLine, n + nbTitleColumns) = projectName
            Else
             Err.Raise VTK_OBSOLETE_CONFIGURATION_SHEET, "vtkConfigurationManagerExcel:setConfigurationProjectNameWithNumber", _
@@ -580,7 +595,7 @@ Public Function getConfigurationCommentWithNumber(n As Integer) As String
     Dim sResult As String
     sResult = ""
     If n >= 1 And n <= configurationCount Then
-        If m_sheetVersion = currentVersion Then
+        If m_sheetVersion = currentVersion Or m_sheetVersion = version11 Then
             sResult = configurationSheet.Cells(commentLine, n + nbTitleColumns)
             If sResult = "" Then sResult = defaultCommentWithNumber(n)
            Else
@@ -607,7 +622,7 @@ End Function
 '
 Public Sub setConfigurationCommentWithNumber(n As Integer, comment As String)
     If n >= 1 And n <= configurationCount Then
-        If m_sheetVersion = currentVersion Then
+        If m_sheetVersion = currentVersion Or m_sheetVersion = version11 Then
             configurationSheet.Cells(commentLine, n + nbTitleColumns) = comment
            Else
             Err.Raise VTK_OBSOLETE_CONFIGURATION_SHEET, "vtkConfigurationManagerExcel:setConfigurationCommentWithNumber", _
@@ -635,7 +650,7 @@ Public Function getConfigurationTemplateWithNumber(n As Integer) As String
     Dim sResult As String
     sResult = ""
     If n >= 1 And n <= configurationCount Then
-        If m_sheetVersion = currentVersion Then
+        If m_sheetVersion = currentVersion Or m_sheetVersion = version11 Then
             sResult = configurationSheet.Cells(templateLine, n + nbTitleColumns)
             If sResult = "" Then sResult = defaultTemplateWithNumber(n)
            Else
@@ -662,7 +677,7 @@ End Function
 '
 Public Sub setConfigurationTemplateWithNumber(n As Integer, template As String)
     If n >= 1 And n <= configurationCount Then
-        If m_sheetVersion = currentVersion Then
+        If m_sheetVersion = currentVersion Or m_sheetVersion = version11 Then
             configurationSheet.Cells(templateLine, n + nbTitleColumns) = template
            Else
             Err.Raise VTK_OBSOLETE_CONFIGURATION_SHEET, "vtkConfigurationManagerExcel:setConfigurationTemplateWithNumber", _

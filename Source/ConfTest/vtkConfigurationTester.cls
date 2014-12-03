@@ -39,7 +39,8 @@ Private confManager As vtkConfigurationManager   ' Configuration Manager for the
 Private Const initializedProjectName As String = "InitializedProject"
 
 Private Const workbookNameWithConfigurationV10 As String = "WorkBookForConfigurationsTests10.xlsm"
-Private Const workbookNameWithConfigurationV11 As String = "WorkBookForConfigurationsTests.xlsm"
+Private Const workbookNameWithConfigurationV11 As String = "WorkBookForConfigurationsTests11.xlsm"
+Private Const workbookNameWithConfigurationV12 As String = "WorkBookForConfigurationsTests.xlsm"
 
 Private mManager As TestCaseManager
 Private mAssert As IAssert
@@ -73,7 +74,7 @@ Public Sub Test_ConfigurationCollection_Count()
     ' This test verifies the count of configurations collection property of Configuration Management
     ' just initialized from an Excel workbook
     
-    mAssert.Equals confManager.configurations.count, 1, "Number of configurations in the Test workbook"
+    mAssert.Equals confManager.configurations.Count, 1, "Number of configurations in the Test workbook"
 End Sub
 
 Public Sub Test_AddedConfigurationCollection_Count()
@@ -82,7 +83,7 @@ Public Sub Test_AddedConfigurationCollection_Count()
     
     confManager.addConfiguration ("NewConfiguration")
     
-    mAssert.Equals confManager.configurations.count, 2, "Number of configurations in the Test workbook with added configuration"
+    mAssert.Equals confManager.configurations.Count, 2, "Number of configurations in the Test workbook with added configuration"
 End Sub
 
 Public Sub Test_ConfigurationCollection_Parent()
@@ -519,7 +520,7 @@ Public Sub Test_ConfigurationModules_Initialized()
     ' collection just initialized from an Excel workbook
 
    On Error GoTo M_Error
-    mAssert.Equals confManager.configurations(1).modules.count, 4, "Number of modules in the Configuration"
+    mAssert.Equals confManager.configurations(1).modules.Count, 4, "Number of modules in the Configuration"
     mAssert.Equals confManager.configurations(1).modules(1).name, "TestModule", "Name of the first module in the configuration"
     mAssert.Equals confManager.configurations(1).modules(2).name, "TestClass", "Name of the second module in the configuration"
     mAssert.Equals confManager.configurations(1).modules(3).name, "TestForm", "Name of the third module in the configuration"
@@ -539,7 +540,7 @@ Public Sub Test_ConfigurationModules_NewEmpty()
     confManager.addConfiguration ("NewConfiguration")
 
    On Error GoTo M_Error
-    mAssert.Equals confManager.configurations("NewConfiguration").modules.count, 0, "Number of modules in the Configuration"
+    mAssert.Equals confManager.configurations("NewConfiguration").modules.Count, 0, "Number of modules in the Configuration"
 
    On Error GoTo 0
    Exit Sub
@@ -556,7 +557,7 @@ Public Sub Test_ConfigurationModules_NewNotEmpty()
     confManager.setModulePathWithNumber "newPath", 3, 2
 
    On Error GoTo M_Error
-    mAssert.Equals confManager.configurations("NewConfiguration").modules.count, 1, "Number of modules in the Configuration"
+    mAssert.Equals confManager.configurations("NewConfiguration").modules.Count, 1, "Number of modules in the Configuration"
 
    On Error GoTo 0
    Exit Sub
@@ -574,7 +575,7 @@ Public Sub Test_ConfigurationReferences_NoReferenceSheet()
    On Error GoTo M_Error
     Set c = confManager.configurations(1).references
     
-    mAssert.Equals c.count, 0, "Count of references of the first configuration"
+    mAssert.Equals c.Count, 0, "Count of references of the first configuration"
    On Error GoTo 0
     Exit Sub
 
@@ -601,7 +602,7 @@ Public Sub Test_ConfigurationReferences_WithReferenceSheet()
     For Each r In c1
         c2.Add r, r.name
     Next
-    mAssert.Equals c2.count, UBound(refNames) - LBound(refNames) + 1, "Count of all references of a new workbook"
+    mAssert.Equals c2.Count, UBound(refNames) - LBound(refNames) + 1, "Count of all references of a new workbook"
     ' il faut boucler sur le tableau et rechercher dans la collection (si pas trouvé = erreur)
     For i = LBound(refNames) To UBound(refNames)
         Set r = c2(refNames(i))
@@ -615,7 +616,7 @@ Public Sub Test_ConfigurationReferences_WithReferenceSheet()
     For Each r In c1
         c2.Add r, r.name
     Next
-    mAssert.Equals c2.count, UBound(refNames) - LBound(refNames) + 1, "Count of all references of a new workbook"
+    mAssert.Equals c2.Count, UBound(refNames) - LBound(refNames) + 1, "Count of all references of a new workbook"
     ' il faut boucler sur le tableau et rechercher dans la collection (si pas trouvé = erreur)
     For i = LBound(refNames) To UBound(refNames)
         Set r = c2(refNames(i))
@@ -636,8 +637,8 @@ Public Sub Test_ConfigurationReferences_NewWorkbook()
     Set newConfManager = vtkConfigurationManagerForProject(newWorkbook.VBProject.name)
 
    On Error GoTo M_Error
-    mAssert.Equals newConfManager.configurations(1).references.count, 10, "Count of references of the main configuration"
-    mAssert.Equals newConfManager.configurations(2).references.count, 11, "Count of references of the development configuration"
+    mAssert.Equals newConfManager.configurations(1).references.Count, 10, "Count of references of the main configuration"
+    mAssert.Equals newConfManager.configurations(2).references.Count, 11, "Count of references of the development configuration"
    
    On Error GoTo 0
     vtkCloseAndKillWorkbook Wb:=newWorkbook     ' close the new Excel project
