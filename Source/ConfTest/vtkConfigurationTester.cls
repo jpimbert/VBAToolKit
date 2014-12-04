@@ -211,6 +211,22 @@ M_Error:
     mAssert.Should False, "Unexpected Error (" & Err.Number & "): " & Err.Description
 End Sub
 
+Public Sub Test_ConfigurationGetInitializedPasswordFromVersion12()
+    ' This test verifies the template of a vtkConfiguration object
+    ' collection just initialized from an Excel workbook
+    
+   On Error GoTo M_Error
+
+    mAssert.Equals confManager.configurations(1).password, "aPassword", "Password got by number of the configuration in the Test workbook"
+    mAssert.Equals confManager.configurations("InitializedProject_DEV").password, "aPassword", "Password got by name of the configuration in the Test workbook"
+
+   On Error GoTo 0
+   Exit Sub
+
+M_Error:
+    mAssert.Should False, "Unexpected Error (" & Err.Number & "): " & Err.Description
+End Sub
+
 Public Sub Test_ConfigurationGetDefaultProjectNameFromVersion12()
     ' This test verifies the default projectName of a vtkConfiguration object
     ' Added configuration to the initialized from an Excel workbook
@@ -257,6 +273,24 @@ Public Sub Test_ConfigurationGetDefaultTemplateFromVersion12()
 
     mAssert.Equals confManager.configurations(2).template, "", "template got by number of the configuration in the Test workbook"
     mAssert.Equals confManager.configurations("NewConfiguration").template, "", "template got by name of the configuration in the Test workbook"
+
+   On Error GoTo 0
+   Exit Sub
+
+M_Error:
+    mAssert.Should False, "Unexpected Error (" & Err.Number & "): " & Err.Description
+End Sub
+
+Public Sub Test_ConfigurationGetDefaultPasswordFromVersion12()
+    ' This test verifies the default password code of a vtkConfiguration object
+    ' Added configuration to the initialized from an Excel workbook
+    
+    confManager.addConfiguration ("NewConfiguration")
+    
+   On Error GoTo M_Error
+
+    mAssert.Equals confManager.configurations(2).password, "", "password got by number of the configuration in the Test workbook"
+    mAssert.Equals confManager.configurations("NewConfiguration").password, "", "password got by name of the configuration in the Test workbook"
 
    On Error GoTo 0
    Exit Sub
@@ -452,6 +486,60 @@ M_Error:
     mAssert.Should False, "Unexpected Error (" & Err.Number & "): " & Err.Description
 End Sub
 
+Public Sub Test_ConfigurationSetPasswordInVersion11()
+    ' This test verifies the error on setting of password in a v1.1 vtkConfiguration object
+    ' collection just initialized from an Excel workbook
+    Dim workbookV11 As Workbook, confManagerV11 As vtkConfigurationManager
+    
+   On Error GoTo M_Error
+
+    Set workbookV11 = getTestFileFromTemplate(fileName:=workbookNameWithConfigurationV11, destinationName:="ProjectV11_DEV.xlsm", openExcel:=True)
+    Set confManagerV11 = vtkConfigurationManagerForProject("ProjectV11")
+    
+   On Error GoTo 0
+    confManagerV11.configurations(1).password = "NewPassword"
+    mAssert.Equals Err.Number, VTK_OBSOLETE_CONFIGURATION_SHEET, "expected error when modifying a v1.1 password configuration"
+   On Error GoTo M_Error
+    
+    mAssert.Equals confManagerV11.configurations(1).password, "", "Set password of the vtkConfiguration object by index"
+    mAssert.Equals confManagerV11.configurations("ExistingProject").password, "", "Set password of the vtkConfiguration object by name"
+    mAssert.Equals confManagerV11.getConfigurationPasswordWithNumber(1), "", "Set password of the modified configuration in the configuration manager"
+
+   On Error GoTo 0
+    vtkCloseAndKillWorkbook Wb:=workbookV11 ' close the V10 Excel project
+   Exit Sub
+
+M_Error:
+    mAssert.Should False, "Unexpected Error (" & Err.Number & "): " & Err.Description
+End Sub
+
+Public Sub Test_ConfigurationSetPasswordInVersion10()
+    ' This test verifies the error on setting of password in a v1.0 vtkConfiguration object
+    ' collection just initialized from an Excel workbook
+    Dim workbookV10 As Workbook, confManagerV10 As vtkConfigurationManager
+    
+   On Error GoTo M_Error
+
+    Set workbookV10 = getTestFileFromTemplate(fileName:=workbookNameWithConfigurationV10, destinationName:="ProjectV10_DEV.xlsm", openExcel:=True)
+    Set confManagerV10 = vtkConfigurationManagerForProject("ProjectV10")
+    
+   On Error GoTo 0
+    confManagerV10.configurations(1).password = "NewPassword"
+    mAssert.Equals Err.Number, VTK_OBSOLETE_CONFIGURATION_SHEET, "expected error when modifying a v1.0 password configuration"
+   On Error GoTo M_Error
+    
+    mAssert.Equals confManagerV10.configurations(1).password, "", "Set password of the vtkConfiguration object by index"
+    mAssert.Equals confManagerV10.configurations("ExistingProject").password, "", "Set password of the vtkConfiguration object by name"
+    mAssert.Equals confManagerV10.getConfigurationPasswordWithNumber(1), "", "Set password of the modified configuration in the configuration manager"
+
+   On Error GoTo 0
+    vtkCloseAndKillWorkbook Wb:=workbookV10 ' close the V10 Excel project
+   Exit Sub
+
+M_Error:
+    mAssert.Should False, "Unexpected Error (" & Err.Number & "): " & Err.Description
+End Sub
+
 Public Sub Test_ConfigurationSetTemplateInVersion10()
     ' This test verifies the error on setting of template in a v1.0 vtkConfiguration object
     ' collection just initialized from an Excel workbook
@@ -513,6 +601,24 @@ Public Sub Test_ConfigurationSetTemplateInVersion12()
     mAssert.Equals confManager.configurations(1).template, "NewTemplatePath", "Set template of the vtkConfiguration object by index"
     mAssert.Equals confManager.configurations("InitializedProject_DEV").template, "NewTemplatePath", "Set template of the vtkConfiguration object by name"
     mAssert.Equals confManager.getConfigurationTemplateWithNumber(1), "NewTemplatePath", "Set template of the modified configuration in the configuration manager"
+
+   On Error GoTo 0
+   Exit Sub
+
+M_Error:
+    mAssert.Should False, "Unexpected Error (" & Err.Number & "): " & Err.Description
+End Sub
+
+Public Sub Test_ConfigurationSetPasswordInVersion12()
+    ' This test verifies the setting of code password in a vtkConfiguration object
+    ' collection just initialized from an Excel workbook
+    
+   On Error GoTo M_Error
+
+    confManager.configurations(1).password = "NewPassword"
+    mAssert.Equals confManager.configurations(1).password, "NewPassword", "Set password of the vtkConfiguration object by index"
+    mAssert.Equals confManager.configurations("InitializedProject_DEV").password, "NewPassword", "Set password of the vtkConfiguration object by name"
+    mAssert.Equals confManager.getConfigurationPasswordWithNumber(1), "NewPassword", "Set password of the modified configuration in the configuration manager"
 
    On Error GoTo 0
    Exit Sub
@@ -585,6 +691,50 @@ Public Sub Test_ConfigurationGetDefaultTemplateFromVersion10()
 M_Error:
     mAssert.Should False, "Unexpected Error (" & Err.Number & "): " & Err.Description
     vtkCloseAndKillWorkbook Wb:=workbookV10 ' close the V10 Excel project
+End Sub
+
+Public Sub Test_ConfigurationGetDefaultPasswordFromVersion10()
+    ' This test verifies the default Excel code password of a V1.0 vtkConfiguration object
+    ' Added configuration to the initialized from an Excel workbook
+    Dim workbookV10 As Workbook, confManagerV10 As vtkConfigurationManager
+    
+   On Error GoTo M_Error
+
+    Set workbookV10 = getTestFileFromTemplate(fileName:=workbookNameWithConfigurationV10, destinationName:="ProjectV10_DEV.xlsm", openExcel:=True)
+    Set confManagerV10 = vtkConfigurationManagerForProject("ProjectV10")
+    
+    mAssert.Equals confManagerV10.configurations(1).password, "", "password got by number of the configuration in the Test workbook"
+    mAssert.Equals confManagerV10.configurations("ExistingProject").password, "", "password got by name of the configuration in the Test workbook"
+
+   On Error GoTo 0
+    vtkCloseAndKillWorkbook Wb:=workbookV10 ' close the V10 Excel project
+   Exit Sub
+
+M_Error:
+    mAssert.Should False, "Unexpected Error (" & Err.Number & "): " & Err.Description
+    vtkCloseAndKillWorkbook Wb:=workbookV10 ' close the V10 Excel project
+End Sub
+
+Public Sub Test_ConfigurationGetDefaultPasswordFromVersion11()
+    ' This test verifies the default Excel code password of a V1.1 vtkConfiguration object
+    ' Added configuration to the initialized from an Excel workbook
+    Dim workbookV11 As Workbook, confManagerV11 As vtkConfigurationManager
+    
+   On Error GoTo M_Error
+
+    Set workbookV11 = getTestFileFromTemplate(fileName:=workbookNameWithConfigurationV11, destinationName:="ProjectV11_DEV.xlsm", openExcel:=True)
+    Set confManagerV11 = vtkConfigurationManagerForProject("ProjectV11")
+    
+    mAssert.Equals confManagerV11.configurations(1).password, "", "password got by number of the configuration in the Test workbook"
+    mAssert.Equals confManagerV11.configurations("ExistingProject").password, "", "password got by name of the configuration in the Test workbook"
+
+   On Error GoTo 0
+    vtkCloseAndKillWorkbook Wb:=workbookV11 ' close the V10 Excel project
+   Exit Sub
+
+M_Error:
+    mAssert.Should False, "Unexpected Error (" & Err.Number & "): " & Err.Description
+    vtkCloseAndKillWorkbook Wb:=workbookV11 ' close the V10 Excel project
 End Sub
 
 Public Sub Test_ConfigurationModules_Initialized()
@@ -735,9 +885,11 @@ Private Function ITest_Suite() As TestSuite
     ITest_Suite.AddTest ITest_Manager.ClassName, "Test_ConfigurationGetInitializedProjectNameFromVersion12"
     ITest_Suite.AddTest ITest_Manager.ClassName, "Test_ConfigurationGetInitializedCommentFromVersion12"
     ITest_Suite.AddTest ITest_Manager.ClassName, "Test_ConfigurationGetInitializedTemplateFromVersion12"
+    ITest_Suite.AddTest ITest_Manager.ClassName, "Test_ConfigurationGetInitializedPasswordFromVersion12"
     ITest_Suite.AddTest ITest_Manager.ClassName, "Test_ConfigurationGetDefaultProjectNameFromVersion12"
     ITest_Suite.AddTest ITest_Manager.ClassName, "Test_ConfigurationGetDefaultCommentFromVersion12"
     ITest_Suite.AddTest ITest_Manager.ClassName, "Test_ConfigurationGetDefaultTemplateFromVersion12"
+    ITest_Suite.AddTest ITest_Manager.ClassName, "Test_ConfigurationGetDefaultPasswordFromVersion12"
     ITest_Suite.AddTest ITest_Manager.ClassName, "Test_ConfigurationIsDEV_True"
     ITest_Suite.AddTest ITest_Manager.ClassName, "Test_ConfigurationGetPath"
     ITest_Suite.AddTest ITest_Manager.ClassName, "Test_ConfigurationSetPath"
@@ -747,11 +899,17 @@ Private Function ITest_Suite() As TestSuite
     ITest_Suite.AddTest ITest_Manager.ClassName, "Test_ConfigurationSetCommentInVersion10"
     ITest_Suite.AddTest ITest_Manager.ClassName, "Test_ConfigurationSetCommentInVersion11"
     ITest_Suite.AddTest ITest_Manager.ClassName, "Test_ConfigurationSetCommentInVersion12"
+    ITest_Suite.AddTest ITest_Manager.ClassName, "Test_ConfigurationSetPasswordInVersion11"
+    ITest_Suite.AddTest ITest_Manager.ClassName, "Test_ConfigurationSetPasswordInVersion10"
     ITest_Suite.AddTest ITest_Manager.ClassName, "Test_ConfigurationSetTemplateInVersion10"
+    ITest_Suite.AddTest ITest_Manager.ClassName, "Test_ConfigurationSetTemplateInVersion11"
     ITest_Suite.AddTest ITest_Manager.ClassName, "Test_ConfigurationSetTemplateInVersion12"
+    ITest_Suite.AddTest ITest_Manager.ClassName, "Test_ConfigurationSetPasswordInVersion12"
     ITest_Suite.AddTest ITest_Manager.ClassName, "Test_ConfigurationGetDefaultProjectNameFromVersion10"
     ITest_Suite.AddTest ITest_Manager.ClassName, "Test_ConfigurationGetDefaultCommentFromVersion10"
     ITest_Suite.AddTest ITest_Manager.ClassName, "Test_ConfigurationGetDefaultTemplateFromVersion10"
+    ITest_Suite.AddTest ITest_Manager.ClassName, "Test_ConfigurationGetDefaultPasswordFromVersion10"
+    ITest_Suite.AddTest ITest_Manager.ClassName, "Test_ConfigurationGetDefaultPasswordFromVersion11"
     ITest_Suite.AddTest ITest_Manager.ClassName, "Test_ConfigurationModules_Initialized"
     ITest_Suite.AddTest ITest_Manager.ClassName, "Test_ConfigurationModules_NewEmpty"
     ITest_Suite.AddTest ITest_Manager.ClassName, "Test_ConfigurationModules_NewNotEmpty"
@@ -775,9 +933,11 @@ Private Sub ITestCase_RunTest()
         Case "Test_ConfigurationGetInitializedProjectNameFromVersion12": Test_ConfigurationGetInitializedProjectNameFromVersion12
         Case "Test_ConfigurationGetInitializedCommentFromVersion12": Test_ConfigurationGetInitializedCommentFromVersion12
         Case "Test_ConfigurationGetInitializedTemplateFromVersion12": Test_ConfigurationGetInitializedTemplateFromVersion12
+        Case "Test_ConfigurationGetInitializedPasswordFromVersion12": Test_ConfigurationGetInitializedPasswordFromVersion12
         Case "Test_ConfigurationGetDefaultProjectNameFromVersion12": Test_ConfigurationGetDefaultProjectNameFromVersion12
         Case "Test_ConfigurationGetDefaultCommentFromVersion12": Test_ConfigurationGetDefaultCommentFromVersion12
         Case "Test_ConfigurationGetDefaultTemplateFromVersion12": Test_ConfigurationGetDefaultTemplateFromVersion12
+        Case "Test_ConfigurationGetDefaultPasswordFromVersion12": Test_ConfigurationGetDefaultPasswordFromVersion12
         Case "Test_ConfigurationIsDEV_True": Test_ConfigurationIsDEV_True
         Case "Test_ConfigurationGetPath": Test_ConfigurationGetPath
         Case "Test_ConfigurationSetPath": Test_ConfigurationSetPath
@@ -787,11 +947,17 @@ Private Sub ITestCase_RunTest()
         Case "Test_ConfigurationSetCommentInVersion10": Test_ConfigurationSetCommentInVersion10
         Case "Test_ConfigurationSetCommentInVersion11": Test_ConfigurationSetCommentInVersion11
         Case "Test_ConfigurationSetCommentInVersion12": Test_ConfigurationSetCommentInVersion12
+        Case "Test_ConfigurationSetPasswordInVersion11": Test_ConfigurationSetPasswordInVersion11
+        Case "Test_ConfigurationSetPasswordInVersion10": Test_ConfigurationSetPasswordInVersion10
         Case "Test_ConfigurationSetTemplateInVersion10": Test_ConfigurationSetTemplateInVersion10
+        Case "Test_ConfigurationSetTemplateInVersion11": Test_ConfigurationSetTemplateInVersion11
         Case "Test_ConfigurationSetTemplateInVersion12": Test_ConfigurationSetTemplateInVersion12
+        Case "Test_ConfigurationSetPasswordInVersion12": Test_ConfigurationSetPasswordInVersion12
         Case "Test_ConfigurationGetDefaultProjectNameFromVersion10": Test_ConfigurationGetDefaultProjectNameFromVersion10
         Case "Test_ConfigurationGetDefaultCommentFromVersion10": Test_ConfigurationGetDefaultCommentFromVersion10
         Case "Test_ConfigurationGetDefaultTemplateFromVersion10": Test_ConfigurationGetDefaultTemplateFromVersion10
+        Case "Test_ConfigurationGetDefaultPasswordFromVersion10": Test_ConfigurationGetDefaultPasswordFromVersion10
+        Case "Test_ConfigurationGetDefaultPasswordFromVersion11": Test_ConfigurationGetDefaultPasswordFromVersion11
         Case "Test_ConfigurationModules_Initialized": Test_ConfigurationModules_Initialized
         Case "Test_ConfigurationModules_NewEmpty": Test_ConfigurationModules_NewEmpty
         Case "Test_ConfigurationModules_NewNotEmpty": Test_ConfigurationModules_NewNotEmpty

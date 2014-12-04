@@ -150,6 +150,17 @@ Private Function defaultTemplateWithNumber(n As Integer) As String
 End Function
 
 '---------------------------------------------------------------------------------------
+' Function  : defaultPasswordWithNumber as String - Read Only - Private
+' Author    : Jean-Pierre Imbert
+' Date      : 04/12/2014
+' Purpose   : return the default Excel code password of a configuration given its number
+'---------------------------------------------------------------------------------------
+'
+Private Function defaultPasswordWithNumber(n As Integer) As String
+    defaultPasswordWithNumber = ""
+End Function
+
+'---------------------------------------------------------------------------------------
 ' Property  : rootPath as String - Read Only - Public
 ' Author    : Jean-Pierre Imbert
 ' Date      : 09/08/2013
@@ -712,6 +723,61 @@ End Sub
 
 Public Sub vtkConfigurationManager_setConfigurationTemplateWithNumber(n As Integer, template As String)
     setConfigurationTemplateWithNumber n, template
+End Sub
+
+'---------------------------------------------------------------------------------------
+' Procedure : getConfigurationPasswordWithNumber
+' Author    : Jean-Pierre Imbert
+' Date      : 04/12/2014
+' Purpose   : return the n-th configuration Excel code password of the project, given n as integer
+'               - return "" if the configuration is inexistant
+'               - return the default pasword if
+'                   - it is not initialized in the configuration sheet v1.2
+'                   - the configuration sheet is v1.0 or v1.1, so there is no password field
+'---------------------------------------------------------------------------------------
+'
+Public Function getConfigurationPasswordWithNumber(n As Integer) As String
+    Dim sResult As String
+    sResult = ""
+    If n >= 1 And n <= configurationCount Then
+        If m_sheetVersion = currentVersion Then
+            sResult = configurationSheet.Cells(passwordLine, n + nbTitleColumns)
+            If sResult = "" Then sResult = defaultPasswordWithNumber(n)
+           Else
+            sResult = defaultPasswordWithNumber(n)
+            End If
+       Else
+        sResult = ""
+    End If
+    getConfigurationPasswordWithNumber = sResult
+End Function
+
+Public Function vtkConfigurationManager_getConfigurationPasswordWithNumber(n As Integer) As String
+    vtkConfigurationManager_getConfigurationPasswordWithNumber = getConfigurationPasswordWithNumber(n)
+End Function
+
+'---------------------------------------------------------------------------------------
+' Procedure : setConfigurationPasswordWithNumber
+' Author    : Jean-Pierre Imbert
+' Date      : 04/12/2014
+' Purpose   : change the n-th configuration password of the project, given n as integer
+'               - does nothing if the configuration is inexistant
+'               - does nothing and return an error if the configuration sheet is not v1.2
+'---------------------------------------------------------------------------------------
+'
+Public Sub setConfigurationPasswordWithNumber(n As Integer, password As String)
+    If n >= 1 And n <= configurationCount Then
+        If m_sheetVersion = currentVersion Then
+            configurationSheet.Cells(passwordLine, n + nbTitleColumns) = password
+           Else
+            Err.Raise VTK_OBSOLETE_CONFIGURATION_SHEET, "vtkConfigurationManagerExcel:setConfigurationPasswordWithNumber", _
+            "Impossible to set a configuration code password with this configuration sheet version (project=" & m_projectName & ", " & m_sheetVersion & ")"
+        End If
+    End If
+End Sub
+
+Public Sub vtkConfigurationManager_setConfigurationPasswordWithNumber(n As Integer, password As String)
+    setConfigurationPasswordWithNumber n, password
 End Sub
 
 '---------------------------------------------------------------------------------------

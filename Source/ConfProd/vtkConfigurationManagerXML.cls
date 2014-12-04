@@ -166,7 +166,7 @@ End Function
 '---------------------------------------------------------------------------------------
 '
 Private Sub raiseReadOnlyError(Source As String)
-    Err.Raise Number:=VTK_READONLY_FILE, Source:=source, Description:="A XML Configuration File is considered Read-Only"
+    Err.Raise Number:=VTK_READONLY_FILE, Source:=Source, Description:="A XML Configuration File is considered Read-Only"
 End Sub
 
 '---------------------------------------------------------------------------------------
@@ -409,6 +409,46 @@ End Sub
 
 Public Sub vtkConfigurationManager_setConfigurationTemplateWithNumber(n As Integer, template As String)
     setConfigurationTemplateWithNumber n, template
+End Sub
+
+'---------------------------------------------------------------------------------------
+' Procedure : getConfigurationPasswordWithNumber
+' Author    : Jean-Pierre Imbert
+' Date      : 04/12/2014
+' Purpose   : return the n-th configuration Excel code password of the project, given n as integer
+'               - return "" if the configuration is inexistant
+'               - return the default password if
+'                   - it is not initialized in the configuration sheet v1.2
+'                   - the configuration sheet is v1.0 or v1.2, so there is no password field
+'---------------------------------------------------------------------------------------
+'
+Public Function getConfigurationPasswordWithNumber(n As Integer) As String
+'    If n > 0 And n <= configurationCount Then
+'       On Error Resume Next
+'        getConfigurationPasswordWithNumber = m_DOMDocument.SelectSingleNode("/vtkConf/configuration[@cID=""c" & n & """]/templatePath").Text
+'       On Error GoTo 0
+'       Else
+        getConfigurationPasswordWithNumber = ""
+'    End If
+End Function
+
+Public Function vtkConfigurationManager_getConfigurationPasswordWithNumber(n As Integer) As String
+    vtkConfigurationManager_getConfigurationPasswordWithNumber = getConfigurationPasswordWithNumber(n)
+End Function
+
+'---------------------------------------------------------------------------------------
+' Procedure : setConfigurationPasswordWithNumber
+' Author    : Jean-Pierre Imbert
+' Date      : 04/12/2014
+' Purpose   : Return the Error VTK_READONLY_FILE because XML file is unmodifiable
+'---------------------------------------------------------------------------------------
+'
+Public Sub setConfigurationPasswordWithNumber(n As Integer, password As String)
+    raiseReadOnlyError Source:="setConfigurationPasswordWithNumber:vtkConfigurationManagerXML"
+End Sub
+
+Public Sub vtkConfigurationManager_setConfigurationPasswordWithNumber(n As Integer, password As String)
+    setConfigurationPasswordWithNumber n, password
 End Sub
 
 '---------------------------------------------------------------------------------------
