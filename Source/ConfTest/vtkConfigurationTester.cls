@@ -163,7 +163,7 @@ M_Error:
     mAssert.Should False, "Unexpected Error (" & Err.Number & "): " & Err.Description
 End Sub
 
-Public Sub Test_ConfigurationGetInitializedProjectNameFromVersion11()
+Public Sub Test_ConfigurationGetInitializedProjectNameFromVersion12()
     ' This test verifies the projectName of a vtkConfiguration object
     ' collection just initialized from an Excel workbook
     
@@ -179,7 +179,7 @@ M_Error:
     mAssert.Should False, "Unexpected Error (" & Err.Number & "): " & Err.Description
 End Sub
 
-Public Sub Test_ConfigurationGetInitializedCommentFromVersion11()
+Public Sub Test_ConfigurationGetInitializedCommentFromVersion12()
     ' This test verifies the comment of a vtkConfiguration object
     ' collection just initialized from an Excel workbook
     
@@ -195,7 +195,7 @@ M_Error:
     mAssert.Should False, "Unexpected Error (" & Err.Number & "): " & Err.Description
 End Sub
 
-Public Sub Test_ConfigurationGetInitializedTemplateFromVersion11()
+Public Sub Test_ConfigurationGetInitializedTemplateFromVersion12()
     ' This test verifies the template of a vtkConfiguration object
     ' collection just initialized from an Excel workbook
     
@@ -211,7 +211,7 @@ M_Error:
     mAssert.Should False, "Unexpected Error (" & Err.Number & "): " & Err.Description
 End Sub
 
-Public Sub Test_ConfigurationGetDefaultProjectNameFromVersion11()
+Public Sub Test_ConfigurationGetDefaultProjectNameFromVersion12()
     ' This test verifies the default projectName of a vtkConfiguration object
     ' Added configuration to the initialized from an Excel workbook
     
@@ -229,7 +229,7 @@ M_Error:
     mAssert.Should False, "Unexpected Error (" & Err.Number & "): " & Err.Description
 End Sub
 
-Public Sub Test_ConfigurationGetDefaultCommentFromVersion11()
+Public Sub Test_ConfigurationGetDefaultCommentFromVersion12()
     ' This test verifies the default comment of a vtkConfiguration object
     ' Added configuration to the initialized from an Excel workbook
     
@@ -247,7 +247,7 @@ M_Error:
     mAssert.Should False, "Unexpected Error (" & Err.Number & "): " & Err.Description
 End Sub
 
-Public Sub Test_ConfigurationGetDefaultTemplateFromVersion11()
+Public Sub Test_ConfigurationGetDefaultTemplateFromVersion12()
     ' This test verifies the default template path of a vtkConfiguration object
     ' Added configuration to the initialized from an Excel workbook
     
@@ -314,7 +314,7 @@ M_Error:
     mAssert.Should False, "Unexpected Error (" & Err.Number & "): " & Err.Description
 End Sub
 
-Public Sub Test_ConfigurationSetProjectNameInVersion11()
+Public Sub Test_ConfigurationSetProjectNameInVersion12()
     ' This test verifies the setting of projectName in a vtkConfiguration object
     ' collection just initialized from an Excel workbook
     
@@ -330,6 +330,30 @@ Public Sub Test_ConfigurationSetProjectNameInVersion11()
 
 M_Error:
     mAssert.Should False, "Unexpected Error (" & Err.Number & "): " & Err.Description
+End Sub
+
+Public Sub Test_ConfigurationSetProjectNameInVersion11()
+    ' This test verifies the setting of projectName in a vtkConfiguration object
+    ' collection just initialized from an Excel workbook
+    Dim workbookV11 As Workbook, confManagerV11 As vtkConfigurationManager
+
+   On Error GoTo M_Error
+
+    Set workbookV11 = getTestFileFromTemplate(fileName:=workbookNameWithConfigurationV11, destinationName:="ProjectV11_DEV.xlsm", openExcel:=True)
+    Set confManagerV11 = vtkConfigurationManagerForProject("ProjectV11")
+
+    confManagerV11.configurations(1).projectName = "NewProjectName"
+    mAssert.Equals confManagerV11.configurations(1).projectName, "NewProjectName", "Set project name (title) of the vtkConfiguration object by index"
+    mAssert.Equals confManagerV11.configurations("ExistingProject").projectName, "NewProjectName", "Set project name (title) of the vtkConfiguration object by name"
+    mAssert.Equals confManagerV11.getConfigurationProjectNameWithNumber(1), "NewProjectName", "Set project name (title) of the modified configuration in the configuration manager"
+
+   On Error GoTo 0
+    vtkCloseAndKillWorkbook Wb:=workbookV11 ' close the V11 Excel project
+   Exit Sub
+
+M_Error:
+    mAssert.Should False, "Unexpected Error (" & Err.Number & "): " & Err.Description
+    vtkCloseAndKillWorkbook Wb:=workbookV11 ' close the V11 Excel project
 End Sub
 
 Public Sub Test_ConfigurationSetProjectNameInVersion10()
@@ -389,6 +413,30 @@ End Sub
 Public Sub Test_ConfigurationSetCommentInVersion11()
     ' This test verifies the setting of comment in a vtkConfiguration object
     ' collection just initialized from an Excel workbook
+    Dim workbookV11 As Workbook, confManagerV11 As vtkConfigurationManager
+
+   On Error GoTo M_Error
+
+    Set workbookV11 = getTestFileFromTemplate(fileName:=workbookNameWithConfigurationV11, destinationName:="ProjectV11_DEV.xlsm", openExcel:=True)
+    Set confManagerV11 = vtkConfigurationManagerForProject("ProjectV11")
+
+    confManagerV11.configurations(1).comment = "New comment of project"
+    mAssert.Equals confManagerV11.configurations(1).comment, "New comment of project", "Set comment of the vtkConfiguration object by index"
+    mAssert.Equals confManagerV11.configurations("ExistingProject").comment, "New comment of project", "Set comment of the vtkConfiguration object by name"
+    mAssert.Equals confManagerV11.getConfigurationCommentWithNumber(1), "New comment of project", "Set comment of the modified configuration in the configuration manager"
+
+   On Error GoTo 0
+    vtkCloseAndKillWorkbook Wb:=workbookV11 ' close the V11 Excel project
+   Exit Sub
+
+M_Error:
+    mAssert.Should False, "Unexpected Error (" & Err.Number & "): " & Err.Description
+    vtkCloseAndKillWorkbook Wb:=workbookV11 ' close the V11 Excel project
+End Sub
+
+Public Sub Test_ConfigurationSetCommentInVersion12()
+    ' This test verifies the setting of comment in a vtkConfiguration object
+    ' collection just initialized from an Excel workbook
     
    On Error GoTo M_Error
 
@@ -432,6 +480,30 @@ M_Error:
 End Sub
 
 Public Sub Test_ConfigurationSetTemplateInVersion11()
+    ' This test verifies the error on setting of template in a v1.1 vtkConfiguration object
+    ' collection just initialized from an Excel workbook
+    Dim workbookV11 As Workbook, confManagerV11 As vtkConfigurationManager
+
+   On Error GoTo M_Error
+
+    Set workbookV11 = getTestFileFromTemplate(fileName:=workbookNameWithConfigurationV11, destinationName:="ProjectV11_DEV.xlsm", openExcel:=True)
+    Set confManagerV11 = vtkConfigurationManagerForProject("ProjectV11")
+
+    confManagerV11.configurations(1).template = "NewTemplatePath"
+    mAssert.Equals confManagerV11.configurations(1).template, "NewTemplatePath", "Set template path of the vtkConfiguration object by index"
+    mAssert.Equals confManagerV11.configurations("ExistingProject").template, "NewTemplatePath", "Set template path of the vtkConfiguration object by name"
+    mAssert.Equals confManagerV11.getConfigurationTemplateWithNumber(1), "NewTemplatePath", "Set template path of the modified configuration in the configuration manager"
+
+   On Error GoTo 0
+    vtkCloseAndKillWorkbook Wb:=workbookV11 ' close the V11 Excel project
+   Exit Sub
+
+M_Error:
+    mAssert.Should False, "Unexpected Error (" & Err.Number & "): " & Err.Description
+    vtkCloseAndKillWorkbook Wb:=workbookV11 ' close the V11 Excel project
+End Sub
+
+Public Sub Test_ConfigurationSetTemplateInVersion12()
     ' This test verifies the setting of template path in a vtkConfiguration object
     ' collection just initialized from an Excel workbook
     
@@ -591,8 +663,8 @@ Public Sub Test_ConfigurationReferences_WithReferenceSheet()
     Dim Wb As Workbook, cf As vtkConfigurationManager
     refNames = Array("VBA", "Excel", "stdole", "Office", "MSForms", "Scripting", "VBIDE", "Shell32", "MSXML2")
        
-    Set Wb = getTestFileFromTemplate(fileName:=workbookNameWithConfigurationV11, destinationName:="ProjectV11_DEV.xlsm", openExcel:=True)
-    Set cf = vtkConfigurationManagerForProject("ProjectV11")
+    Set Wb = getTestFileFromTemplate(fileName:=workbookNameWithConfigurationV12, destinationName:="ProjectV12_DEV.xlsm", openExcel:=True)
+    Set cf = vtkConfigurationManagerForProject("ProjectV12")
 
    On Error Resume Next
     ' Test for the main configuration
@@ -660,21 +732,23 @@ Private Function ITest_Suite() As TestSuite
     ITest_Suite.AddTest ITest_Manager.ClassName, "Test_AddedConfigurationCollection_isDEV"
     ITest_Suite.AddTest ITest_Manager.ClassName, "Test_AddedConfigurationCollection_ID"
     ITest_Suite.AddTest ITest_Manager.ClassName, "Test_ConfigurationGetName"
-    ITest_Suite.AddTest ITest_Manager.ClassName, "Test_ConfigurationGetInitializedProjectNameFromVersion11"
-    ITest_Suite.AddTest ITest_Manager.ClassName, "Test_ConfigurationGetInitializedCommentFromVersion11"
-    ITest_Suite.AddTest ITest_Manager.ClassName, "Test_ConfigurationGetInitializedTemplateFromVersion11"
-    ITest_Suite.AddTest ITest_Manager.ClassName, "Test_ConfigurationGetDefaultProjectNameFromVersion11"
-    ITest_Suite.AddTest ITest_Manager.ClassName, "Test_ConfigurationGetDefaultCommentFromVersion11"
-    ITest_Suite.AddTest ITest_Manager.ClassName, "Test_ConfigurationGetDefaultTemplateFromVersion11"
+    ITest_Suite.AddTest ITest_Manager.ClassName, "Test_ConfigurationGetInitializedProjectNameFromVersion12"
+    ITest_Suite.AddTest ITest_Manager.ClassName, "Test_ConfigurationGetInitializedCommentFromVersion12"
+    ITest_Suite.AddTest ITest_Manager.ClassName, "Test_ConfigurationGetInitializedTemplateFromVersion12"
+    ITest_Suite.AddTest ITest_Manager.ClassName, "Test_ConfigurationGetDefaultProjectNameFromVersion12"
+    ITest_Suite.AddTest ITest_Manager.ClassName, "Test_ConfigurationGetDefaultCommentFromVersion12"
+    ITest_Suite.AddTest ITest_Manager.ClassName, "Test_ConfigurationGetDefaultTemplateFromVersion12"
     ITest_Suite.AddTest ITest_Manager.ClassName, "Test_ConfigurationIsDEV_True"
     ITest_Suite.AddTest ITest_Manager.ClassName, "Test_ConfigurationGetPath"
     ITest_Suite.AddTest ITest_Manager.ClassName, "Test_ConfigurationSetPath"
+    ITest_Suite.AddTest ITest_Manager.ClassName, "Test_ConfigurationSetProjectNameInVersion12"
     ITest_Suite.AddTest ITest_Manager.ClassName, "Test_ConfigurationSetProjectNameInVersion11"
     ITest_Suite.AddTest ITest_Manager.ClassName, "Test_ConfigurationSetProjectNameInVersion10"
     ITest_Suite.AddTest ITest_Manager.ClassName, "Test_ConfigurationSetCommentInVersion10"
     ITest_Suite.AddTest ITest_Manager.ClassName, "Test_ConfigurationSetCommentInVersion11"
+    ITest_Suite.AddTest ITest_Manager.ClassName, "Test_ConfigurationSetCommentInVersion12"
     ITest_Suite.AddTest ITest_Manager.ClassName, "Test_ConfigurationSetTemplateInVersion10"
-    ITest_Suite.AddTest ITest_Manager.ClassName, "Test_ConfigurationSetTemplateInVersion11"
+    ITest_Suite.AddTest ITest_Manager.ClassName, "Test_ConfigurationSetTemplateInVersion12"
     ITest_Suite.AddTest ITest_Manager.ClassName, "Test_ConfigurationGetDefaultProjectNameFromVersion10"
     ITest_Suite.AddTest ITest_Manager.ClassName, "Test_ConfigurationGetDefaultCommentFromVersion10"
     ITest_Suite.AddTest ITest_Manager.ClassName, "Test_ConfigurationGetDefaultTemplateFromVersion10"
@@ -698,21 +772,23 @@ Private Sub ITestCase_RunTest()
         Case "Test_AddedConfigurationCollection_isDEV": Test_AddedConfigurationCollection_isDEV
         Case "Test_AddedConfigurationCollection_ID": Test_AddedConfigurationCollection_ID
         Case "Test_ConfigurationGetName": Test_ConfigurationGetName
-        Case "Test_ConfigurationGetInitializedProjectNameFromVersion11": Test_ConfigurationGetInitializedProjectNameFromVersion11
-        Case "Test_ConfigurationGetInitializedCommentFromVersion11": Test_ConfigurationGetInitializedCommentFromVersion11
-        Case "Test_ConfigurationGetInitializedTemplateFromVersion11": Test_ConfigurationGetInitializedTemplateFromVersion11
-        Case "Test_ConfigurationGetDefaultProjectNameFromVersion11": Test_ConfigurationGetDefaultProjectNameFromVersion11
-        Case "Test_ConfigurationGetDefaultCommentFromVersion11": Test_ConfigurationGetDefaultCommentFromVersion11
-        Case "Test_ConfigurationGetDefaultTemplateFromVersion11": Test_ConfigurationGetDefaultTemplateFromVersion11
+        Case "Test_ConfigurationGetInitializedProjectNameFromVersion12": Test_ConfigurationGetInitializedProjectNameFromVersion12
+        Case "Test_ConfigurationGetInitializedCommentFromVersion12": Test_ConfigurationGetInitializedCommentFromVersion12
+        Case "Test_ConfigurationGetInitializedTemplateFromVersion12": Test_ConfigurationGetInitializedTemplateFromVersion12
+        Case "Test_ConfigurationGetDefaultProjectNameFromVersion12": Test_ConfigurationGetDefaultProjectNameFromVersion12
+        Case "Test_ConfigurationGetDefaultCommentFromVersion12": Test_ConfigurationGetDefaultCommentFromVersion12
+        Case "Test_ConfigurationGetDefaultTemplateFromVersion12": Test_ConfigurationGetDefaultTemplateFromVersion12
         Case "Test_ConfigurationIsDEV_True": Test_ConfigurationIsDEV_True
         Case "Test_ConfigurationGetPath": Test_ConfigurationGetPath
         Case "Test_ConfigurationSetPath": Test_ConfigurationSetPath
+        Case "Test_ConfigurationSetProjectNameInVersion12": Test_ConfigurationSetProjectNameInVersion12
         Case "Test_ConfigurationSetProjectNameInVersion11": Test_ConfigurationSetProjectNameInVersion11
         Case "Test_ConfigurationSetProjectNameInVersion10": Test_ConfigurationSetProjectNameInVersion10
         Case "Test_ConfigurationSetCommentInVersion10": Test_ConfigurationSetCommentInVersion10
         Case "Test_ConfigurationSetCommentInVersion11": Test_ConfigurationSetCommentInVersion11
+        Case "Test_ConfigurationSetCommentInVersion12": Test_ConfigurationSetCommentInVersion12
         Case "Test_ConfigurationSetTemplateInVersion10": Test_ConfigurationSetTemplateInVersion10
-        Case "Test_ConfigurationSetTemplateInVersion11": Test_ConfigurationSetTemplateInVersion11
+        Case "Test_ConfigurationSetTemplateInVersion12": Test_ConfigurationSetTemplateInVersion12
         Case "Test_ConfigurationGetDefaultProjectNameFromVersion10": Test_ConfigurationGetDefaultProjectNameFromVersion10
         Case "Test_ConfigurationGetDefaultCommentFromVersion10": Test_ConfigurationGetDefaultCommentFromVersion10
         Case "Test_ConfigurationGetDefaultTemplateFromVersion10": Test_ConfigurationGetDefaultTemplateFromVersion10
