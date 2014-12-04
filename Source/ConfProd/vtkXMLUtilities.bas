@@ -56,7 +56,7 @@ Public Sub vtkExportConfigurationsAsXML(projectName As String, filePath As Strin
     xmlFile.WriteLine Text:="        <!ELEMENT info (vtkConfigurationsVersion,projectName)>"
     xmlFile.WriteLine Text:="                <!ELEMENT vtkConfigurationsVersion (#PCDATA)>"
     xmlFile.WriteLine Text:="                <!ELEMENT projectName (#PCDATA)>"
-    xmlFile.WriteLine Text:="        <!ELEMENT configuration (name,path,templatePath?,title?,comment?)>"
+    xmlFile.WriteLine Text:="        <!ELEMENT configuration (name,path,templatePath?,title?,comment?,password?)>"
     xmlFile.WriteLine Text:="         <!ATTLIST configuration cID ID #REQUIRED>"
     xmlFile.WriteLine Text:="         <!ATTLIST configuration refIDs IDREFS #IMPLIED>"
     xmlFile.WriteLine Text:="                <!ELEMENT name (#PCDATA)>"
@@ -64,6 +64,7 @@ Public Sub vtkExportConfigurationsAsXML(projectName As String, filePath As Strin
     xmlFile.WriteLine Text:="                <!ELEMENT templatePath (#PCDATA)>"
     xmlFile.WriteLine Text:="                <!ELEMENT title        (#PCDATA)>"
     xmlFile.WriteLine Text:="                <!ELEMENT comment (#PCDATA)>"
+    xmlFile.WriteLine Text:="                <!ELEMENT password (#PCDATA)>"
     xmlFile.WriteLine Text:="        <!ELEMENT module (name, modulePath*)>"
     xmlFile.WriteLine Text:="         <!ATTLIST module mID ID #REQUIRED>"
     xmlFile.WriteLine Text:="                <!ELEMENT modulePath (#PCDATA)>"
@@ -115,6 +116,8 @@ Public Sub vtkExportConfigurationsAsXML(projectName As String, filePath As Strin
         xmlFile.WriteLine Text:="        <templatePath>" & cf.template & "</templatePath>"
         xmlFile.WriteLine Text:="        <title>" & cf.projectName & "</title>" ' must be initialized in Workbook with Wb.BuiltinDocumentProperties("Title").Value
         xmlFile.WriteLine Text:="        <comment>" & cf.comment & "</comment>" ' must be initialized in Workbook with Wb.BuiltinDocumentProperties("Comments").Value
+        If cf.password <> "" Then _
+        xmlFile.WriteLine Text:="        <password>" & cf.password & "</password>"
         xmlFile.WriteLine Text:="    </configuration>"
     Next
     
