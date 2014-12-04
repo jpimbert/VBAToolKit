@@ -423,13 +423,13 @@ End Sub
 '---------------------------------------------------------------------------------------
 '
 Public Function getConfigurationPasswordWithNumber(n As Integer) As String
-'    If n > 0 And n <= configurationCount Then
-'       On Error Resume Next
-'        getConfigurationPasswordWithNumber = m_DOMDocument.SelectSingleNode("/vtkConf/configuration[@cID=""c" & n & """]/templatePath").Text
-'       On Error GoTo 0
-'       Else
+    If n > 0 And n <= configurationCount Then
+       On Error Resume Next
+        getConfigurationPasswordWithNumber = m_DOMDocument.SelectSingleNode("/vtkConf/configuration[@cID=""c" & n & """]/password").Text
+       On Error GoTo 0
+       Else
         getConfigurationPasswordWithNumber = ""
-'    End If
+    End If
 End Function
 
 Public Function vtkConfigurationManager_getConfigurationPasswordWithNumber(n As Integer) As String

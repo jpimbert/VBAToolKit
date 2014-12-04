@@ -81,10 +81,10 @@ Public Function getConfigurationTemplateWithNumber(n As Integer) As String
 Public Sub setConfigurationTemplateWithNumber(n As Integer, template As String)
 ' getConfigurationPasswordWithNumber
 Public Function getConfigurationPasswordWithNumber(n As Integer) As String
-
-End Function
 ' setConfigurationPasswordWithNumber <-
-Public Sub setConfigurationPasswordWithNumber(n As Integer, template As String)
+Public Sub setConfigurationPasswordWithNumber(n As Integer, password As String)
+
+End Sub
 ' addConfiguration
 Public Function addConfiguration(configuration As String, Optional path As String = "", Optional template As String = "", Optional projectName As String = "", Optional comment As String = "") As Integer
 ' --> on garde les setters dans l'interface, avec une erreur dans XML
