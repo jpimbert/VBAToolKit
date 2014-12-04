@@ -294,6 +294,30 @@ End Sub
 Public Sub updateConfigurationSheetFormat()
     Dim ws As Worksheet
     
+    If m_sheetVersion = version11 Then
+        Set ws = configurationSheet
+         
+        ws.Rows("6:6").EntireRow.Insert     ' Insert new lines for the new format
+        
+        ws.Range("A1") = currentVersion
+        ws.Range("A2") = "Path"
+        ws.Range("A3") = "Template"
+        ws.Range("A4") = "Name"
+        ws.Range("A5") = "Comment"
+        ws.Range("A6") = "Module Name \ Password"
+    
+        ws.Range("A2").Font.Bold = False
+        ws.Range("A3").Font.Bold = False
+        ws.Range("A2").HorizontalAlignment = xlRight
+        ws.Range("A3").HorizontalAlignment = xlRight
+        ws.Range("A4").HorizontalAlignment = xlRight
+        ws.Range("A5").HorizontalAlignment = xlRight
+        ws.Range("A6").HorizontalAlignment = xlCenter
+        ws.Range("A6").Font.Bold = True
+        
+        m_sheetVersion = currentVersion     ' Set the sheetVersion for correct behavior after conversion
+    End If
+
     If m_sheetVersion = version10 Then
         Set ws = configurationSheet
          

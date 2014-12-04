@@ -475,7 +475,7 @@ Public Sub TestRootPathForExistingProject()
     mAssert.Equals existingConfManager.rootPath, vtkPathOfCurrentProject, "The second call to rootPath give the same result as the previous one"
 End Sub
 
-Public Sub TestConfigurationSheetFormatAfterConversion()
+Public Sub TestConfigurationSheetFormatAfterConversionV10()
 '       Verify the newly converted configuration sheet of a new project
     Dim ws As Worksheet, workbookV10 As Workbook, confManagerV10 As vtkConfigurationManagerExcel
     
@@ -542,6 +542,41 @@ Public Sub TestConfigurationSheetFormatUpToDateConversion()
     
 End Sub
 
+Public Sub TestConfigurationSheetFormatAfterConversionV11()
+'       Verify the newly converted configuration sheet of a new project
+    Dim ws As Worksheet, workbookV11 As Workbook, confManagerV11 As vtkConfigurationManagerExcel
+    
+    Set workbookV11 = getTestFileFromTemplate(fileName:=workbookNameWithConfigurationV11, destinationName:="ProjectV11_DEV.xlsm", openExcel:=True)
+    Set confManagerV11 = vtkConfigurationManagerForProject("ProjectV11")
+    Set ws = confManagerV11.configurationSheet
+    mAssert.Equals ws.Range("A1"), "vtkConfigurations v1.1", "Expected identification of the configuration sheet"
+    
+    confManagerV11.updateConfigurationSheetFormat
+   
+    mAssert.Equals ws.Range("A1"), "vtkConfigurations v1.2", "Expected identification of the configuration sheet"
+    mAssert.Equals ws.Range("A2"), "Path", "Expected Title for Path row"
+    mAssert.Equals ws.Range("A3"), "Template", "Expected Title for Template row"
+    mAssert.Equals ws.Range("A4"), "Name", "Expected Title for Name row"
+    mAssert.Equals ws.Range("A5"), "Comment", "Expected Title for Comment row"
+    mAssert.Equals ws.Range("A6"), "Module Name \ Password", "Expected Title for Modules column"
+    mAssert.Equals ws.Range("B1"), "ExistingProject", "Expected Title for main project column"
+    mAssert.Equals ws.Range("B2"), "Delivery\ExistingProject.xlsm", "Expected related Path for new main workbook"
+    mAssert.Equals ws.Range("B3"), "", "Expected Template path for main workbook"
+    mAssert.Equals ws.Range("B4"), "ExistingProjectName", "Expected Project name for existing workbook"
+    mAssert.Equals ws.Range("B5"), "Existing project for various tests of VBAToolKit", "Expected Comment for existing workbook"
+    mAssert.Equals ws.Range("B6"), "", "Expected Password for existing workbook"
+    mAssert.Equals ws.Range("C1"), "ExistingProject_DEV", "Expected Title for development project column"
+    mAssert.Equals ws.Range("C2"), "Project\ExistingProject_DEV.xlsm", "Expected related Path for new development workbook"
+    mAssert.Equals ws.Range("C3"), "Templates\ExistingProjectTemplate.xlsm", "Expected Template path for development workbook"
+    mAssert.Equals ws.Range("C4"), "", "Expected Project name for existing workbook"
+    mAssert.Equals ws.Range("C5"), "Existing project for development for various tests of VBAToolKit", "Expected Comment for existing workbook"
+    mAssert.Equals ws.Range("C6"), "", "Expected Password for existing workbook"
+    
+    mAssert.Equals confManagerV11.configurationCount, 2, "There must be two configurations in the converted project"
+    mAssert.Equals confManagerV11.moduleCount, 5, "There must be two modules in the converted project"
+    
+    vtkCloseAndKillWorkbook Wb:=workbookV11 ' close the V10 Excel project
+End Sub
 
 Public Sub TestGetAllReferencesFromNewWorkbook()
 '       Verify that all standard references are listed
@@ -709,8 +744,9 @@ Private Function ITest_Suite() As TestSuite
     ITest_Suite.AddTest ITest_Manager.ClassName, "TestGetModulePathWithNumberForNewModule"
     ITest_Suite.AddTest ITest_Manager.ClassName, "TestAddModulePathToSavedProject"
     ITest_Suite.AddTest ITest_Manager.ClassName, "TestRootPathForExistingProject"
-    ITest_Suite.AddTest ITest_Manager.ClassName, "TestConfigurationSheetFormatAfterConversion"
+    ITest_Suite.AddTest ITest_Manager.ClassName, "TestConfigurationSheetFormatAfterConversionV10"
     ITest_Suite.AddTest ITest_Manager.ClassName, "TestConfigurationSheetFormatUpToDateConversion"
+    ITest_Suite.AddTest ITest_Manager.ClassName, "TestConfigurationSheetFormatAfterConversionV11"
     ITest_Suite.AddTest ITest_Manager.ClassName, "TestGetAllReferencesFromNewWorkbook"
     ITest_Suite.AddTest ITest_Manager.ClassName, "TestGetAllReferencesFromExistingWorkbook"
     ITest_Suite.AddTest ITest_Manager.ClassName, "Test_Duplicate_InitializedConfManager"
@@ -750,8 +786,9 @@ Private Sub ITestCase_RunTest()
         Case "TestGetModulePathWithNumberForNewModule": TestGetModulePathWithNumberForNewModule
         Case "TestAddModulePathToSavedProject": TestAddModulePathToSavedProject
         Case "TestRootPathForExistingProject": TestRootPathForExistingProject
-        Case "TestConfigurationSheetFormatAfterConversion": TestConfigurationSheetFormatAfterConversion
+        Case "TestConfigurationSheetFormatAfterConversionV10": TestConfigurationSheetFormatAfterConversionV10
         Case "TestConfigurationSheetFormatUpToDateConversion": TestConfigurationSheetFormatUpToDateConversion
+        Case "TestConfigurationSheetFormatAfterConversionV11": TestConfigurationSheetFormatAfterConversionV11
         Case "TestGetAllReferencesFromNewWorkbook": TestGetAllReferencesFromNewWorkbook
         Case "TestGetAllReferencesFromExistingWorkbook": TestGetAllReferencesFromExistingWorkbook
         Case "Test_Duplicate_InitializedConfManager": Test_Duplicate_InitializedConfManager
