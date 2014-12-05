@@ -49,6 +49,7 @@ Private xlamConf As vtkConfiguration
 Private xlaConf As vtkConfiguration
 Private multitypeConf As vtkConfiguration
 Private noTemplateConf As vtkConfiguration
+Private passwordConf As vtkConfiguration
 Private VTKConf As vtkConfiguration
 Private VTKProjectConf As vtkConfiguration
 Private testedConf As vtkConfiguration
@@ -66,6 +67,7 @@ Private Const xlamConfName = "TestProject_xlamConf"
 Private Const xlaConfName = "TestProject_xlaConf"
 Private Const multitypeConfName = "TestProject_multitypeConf"
 Private Const noTemplateConfName = "TestProject_NoTemplate"
+Private Const passwordConfName = "TestProject_withPassword"
 Private Const VTKConfName = "TestProject_VTKConf"
 Private Const VTKProjectConfName = "VBAToolKit"
 
@@ -119,6 +121,7 @@ Private Sub ITestCase_SetUp(Assert As IAssert)
     Set xlaConf = cm.configurations(xlaConfName)
     Set multitypeConf = cm.configurations(multitypeConfName)
     Set noTemplateConf = cm.configurations(noTemplateConfName)
+    Set passwordConf = cm.configurations(passwordConfName)
     Set VTKConf = cm.configurations(VTKConfName)
     Set VTKProjectConf = cm.configurations(VTKProjectConfName)
 
@@ -188,11 +191,11 @@ Private Sub exportModulesAndRecreateWb(Wb As Workbook, testProject As vtkProject
 
 exportModulesAndRecreateWb_Error:
     Err.Source = "exportModulesAndRecreateWb of module vtkRecreateConfigurationTester"
-    Err.Raise Err.Number, Err.source, Err.Description
+    Err.Raise Err.Number, Err.Source, Err.Description
     Exit Sub
 End Sub
 
-Private Sub verifyV11Properties(Wb As Workbook, confNumber As Integer)
+Private Sub verifyProperties(Wb As Workbook, confNumber As Integer)
     mAssert.Equals Wb.VBProject.name, "ProjectName" & confNumber, "Expected project name"
     mAssert.Equals Wb.BuiltinDocumentProperties("Title").Value, "ProjectName" & confNumber, "Expected Workbook title"
     mAssert.Equals Wb.BuiltinDocumentProperties("Comments").Value, "Comment for Workbook #" & confNumber, "Expected Workbook comment"
@@ -209,11 +212,11 @@ Public Sub Test_vtkRecreateConfiguration_workbookIsCreatedInTheGoodPath_normalCo
 
     Set testedConf = normalConf
 
-    exportModulesAndRecreateWb wb, testProject, testedConf
+    exportModulesAndRecreateWb Wb, testProject, testedConf
 
     mAssert.Should fso.FileExists(VBAToolKit.vtkTestPath & "\" & testProject.projectName & "\" & testedConf.path), _
                    "The configuration should have been created in the designated path."
-    verifyV11Properties recreatedWb, testedConf.Number
+    verifyProperties recreatedWb, testedConf.Number
     
     On Error GoTo 0
     Exit Sub
@@ -259,7 +262,7 @@ Public Sub Test_vtkRecreateConfiguration_workbookIsCreatedInTheGoodPath_emptyCon
 
     Set testedConf = emptyConf
 
-    exportModulesAndRecreateWb wb, testProject, testedConf
+    exportModulesAndRecreateWb Wb, testProject, testedConf
 
     mAssert.Should fso.FileExists(VBAToolKit.vtkTestPath & "\" & testProject.projectName & "\" & testedConf.path), _
                    "The configuration should have been created in the designated path."
@@ -280,11 +283,11 @@ Public Sub Test_vtkRecreateConfiguration_workbookIsCreatedInTheGoodPath_multityp
 
     Set testedConf = multitypeConf
 
-    exportModulesAndRecreateWb wb, testProject, testedConf
+    exportModulesAndRecreateWb Wb, testProject, testedConf
 
     mAssert.Should fso.FileExists(VBAToolKit.vtkTestPath & "\" & testProject.projectName & "\" & testedConf.path), _
                    "The configuration should have been created in the designated path."
-    verifyV11Properties recreatedWb, testedConf.Number
+    verifyProperties recreatedWb, testedConf.Number
 
     On Error GoTo 0
     Exit Sub
@@ -332,7 +335,7 @@ Public Sub Test_vtkRecreateConfiguration_modulesNotYetExported_emptyConf()
 
     mAssert.Should fso.FileExists(VBAToolKit.vtkTestPath & "\" & testProject.projectName & "\" & testedConf.path), _
                    "The file shoud have been created normally as configuration is empty."
-    verifyV11Properties recreatedWb, testedConf.Number
+    verifyProperties recreatedWb, testedConf.Number
 
     On Error GoTo 0
     Exit Sub
@@ -351,14 +354,14 @@ Public Sub Test_vtkRecreateConfiguration_pathDoesNotExistYet1()
 
     Set testedConf = notExistingPathConf1
 
-    exportModulesAndRecreateWb wb, testProject, testedConf
+    exportModulesAndRecreateWb Wb, testProject, testedConf
 
     mAssert.Equals error, 0, _
                     "Error " & error & " (" & Err.Description & ") occured. It shouldn't have."
 
     mAssert.Should fso.FileExists(VBAToolKit.vtkTestPath & "\" & testProject.projectName & "\" & testedConf.path), _
                    "The file shoud have been created normally."
-    verifyV11Properties recreatedWb, testedConf.Number
+    verifyProperties recreatedWb, testedConf.Number
 
     On Error GoTo 0
     Exit Sub
@@ -377,14 +380,14 @@ Public Sub Test_vtkRecreateConfiguration_pathDoesNotExistYet2()
 
     Set testedConf = notExistingPathConf2
 
-    exportModulesAndRecreateWb wb, testProject, testedConf
+    exportModulesAndRecreateWb Wb, testProject, testedConf
 
     mAssert.Equals error, 0, _
                     "Error " & error & " (" & Err.Description & ") occured. It shouldn't have."
 
     mAssert.Should fso.FileExists(VBAToolKit.vtkTestPath & "\" & testProject.projectName & "\" & testedConf.path), _
                    "The file shoud have been created normally."
-    verifyV11Properties recreatedWb, testedConf.Number
+    verifyProperties recreatedWb, testedConf.Number
     On Error GoTo 0
     Exit Sub
 
@@ -402,7 +405,7 @@ Public Sub Test_vtkRecreateConfiguration_allModulesArePresent_normalConf()
 
     Set testedConf = normalConf
 
-    exportModulesAndRecreateWb wb, testProject, testedConf
+    exportModulesAndRecreateWb Wb, testProject, testedConf
 
     Dim mo As vtkModule
     Dim vbCmp As VBComponent
@@ -436,7 +439,7 @@ Public Sub Test_vtkRecreateConfiguration_allModulesArePresent_multitypeConf()
 
     Set testedConf = multitypeConf
 
-    exportModulesAndRecreateWb wb, testProject, testedConf
+    exportModulesAndRecreateWb Wb, testProject, testedConf
 
     Dim mo As vtkModule
     Dim vbCmp As VBComponent
@@ -477,7 +480,7 @@ Public Sub Test_vtkRecreateConfiguration_referencesAreActivated()
     Dim refIsActive As Boolean
     Dim guidArray() As String
 
-    exportModulesAndRecreateWb wb, testProject, testedConf
+    exportModulesAndRecreateWb Wb, testProject, testedConf
 
     ' Listing expected references in a collection
     numRef = 4
@@ -514,7 +517,7 @@ Public Sub Test_vtkRecreateConfiguration_nameOfTheVBProjectIsCorrect()
     Set testedConf = normalConf
 
     ' Set recreatedWb and open it
-    exportModulesAndRecreateWb wb, testProject, testedConf
+    exportModulesAndRecreateWb Wb, testProject, testedConf
 
     mAssert.Equals recreatedWb.VBProject.name, "ProjectName" & testedConf.Number, _
                    "The created project should have the same name as the recreated configuration."
@@ -535,7 +538,7 @@ Public Sub Test_vtkRecreateConfiguration_formatLikeExtension_XLSM()
 
     Set testedConf = normalConf
 
-    exportModulesAndRecreateWb wb, testProject, testedConf
+    exportModulesAndRecreateWb Wb, testProject, testedConf
 
     mAssert.Equals recreatedWb.FileFormat, _
                    xlOpenXMLWorkbookMacroEnabled, _
@@ -557,12 +560,12 @@ Public Sub Test_vtkRecreateConfiguration_formatLikeExtension_XLAM()
 
     Set testedConf = xlamConf
 
-    exportModulesAndRecreateWb wb, testProject, testedConf
+    exportModulesAndRecreateWb Wb, testProject, testedConf
 
     mAssert.Equals recreatedWb.FileFormat, _
                    xlOpenXMLAddIn, _
                    "File format is wrong."
-    verifyV11Properties recreatedWb, testedConf.Number
+    verifyProperties recreatedWb, testedConf.Number
 
     On Error GoTo 0
     Exit Sub
@@ -580,12 +583,12 @@ Public Sub Test_vtkRecreateConfiguration_formatLikeExtension_XLS()
 
     Set testedConf = xlsConf
 
-    exportModulesAndRecreateWb wb, testProject, testedConf
+    exportModulesAndRecreateWb Wb, testProject, testedConf
 
     mAssert.Equals recreatedWb.FileFormat, _
                    xlExcel8, _
                    "File format is wrong."
-    verifyV11Properties recreatedWb, testedConf.Number
+    verifyProperties recreatedWb, testedConf.Number
 
     On Error GoTo 0
     Exit Sub
@@ -603,12 +606,12 @@ Public Sub Test_vtkRecreateConfiguration_formatLikeExtension_XLA()
 
     Set testedConf = xlaConf
 
-    exportModulesAndRecreateWb wb, testProject, testedConf
+    exportModulesAndRecreateWb Wb, testProject, testedConf
 
     mAssert.Equals recreatedWb.FileFormat, _
                    xlAddIn, _
                    "File format is wrong."
-    verifyV11Properties recreatedWb, testedConf.Number
+    verifyProperties recreatedWb, testedConf.Number
 
     On Error GoTo 0
     Exit Sub
@@ -629,7 +632,7 @@ Public Sub Test_vtkRecreateConfiguration_workbookOpen()
     Set testedConf = normalConf
 
     ' Create and open recreatedWb
-    exportModulesAndRecreateWb wb, testProject, testedConf
+    exportModulesAndRecreateWb Wb, testProject, testedConf
 
     ' Recreate configuration with recreateWb already open
     vtkRecreateConfiguration testProject.projectName, testedConf.name, cm
@@ -732,7 +735,7 @@ Public Sub Test_vtkRecreateConfiguration_overwriteFile_normal()
     oldSize = fso.GetFile(VBAToolKit.vtkTestPath & "\" & testProject.projectName & "\" & testedConf.path).Size
 
     ' Create and open recreatedWb
-    exportModulesAndRecreateWb wb, testProject, testedConf
+    exportModulesAndRecreateWb Wb, testProject, testedConf
 
     newSize = fso.GetFile(VBAToolKit.vtkTestPath & "\" & testProject.projectName & "\" & testedConf.path).Size
 
@@ -761,7 +764,7 @@ Public Sub Test_vtkRecreateConfiguration_overwriteFile_addIn()
     oldSize = fso.GetFile(VBAToolKit.vtkTestPath & "\" & testProject.projectName & "\" & testedConf.path).Size
 
     ' Create and open recreatedWb
-    exportModulesAndRecreateWb wb, testProject, testedConf
+    exportModulesAndRecreateWb Wb, testProject, testedConf
 
     newSize = fso.GetFile(VBAToolKit.vtkTestPath & "\" & testProject.projectName & "\" & testedConf.path).Size
 
@@ -805,6 +808,68 @@ M_Error:
     Exit Sub
 End Sub
 
+Public Sub Test_vtkRecreateConfiguration_workbookIsCreatedInTheGoodPath_passwordConf()
+' workbook is created in the good path
+
+    On Error GoTo M_Error
+
+    Set testedConf = passwordConf
+
+    exportModulesAndRecreateWb Wb, testProject, testedConf
+
+    mAssert.Should fso.FileExists(VBAToolKit.vtkTestPath & "\" & testProject.projectName & "\" & testedConf.path), _
+                   "The configuration should have been created in the designated path."
+    verifyProperties recreatedWb, testedConf.Number
+    
+    On Error GoTo 0
+    Exit Sub
+
+M_Error:
+    Err.Source = "Test_vtkRecreateConfiguration_workbookIsCreatedInTheGoodPath_paswordConf of module vtkRecreateConfigurationTester"
+    mAssert.Should False, "Unexpected error " & Err.Number & " (" & Err.Description & ") in " & Err.Source
+    Exit Sub
+End Sub
+
+Public Sub Test_vtkRecreateConfiguration_projectNotProtected_normalConf()
+' workbook is created in the good path
+
+    On Error GoTo M_Error
+
+    Set testedConf = normalConf
+
+    exportModulesAndRecreateWb Wb, testProject, testedConf
+
+    mAssert.Should Not recreatedWb.VBProject.Protection, "The configuration should not be protected."
+    
+    On Error GoTo 0
+    Exit Sub
+
+M_Error:
+    Err.Source = "Test_vtkRecreateConfiguration_projectNotProtected_normalConf of module vtkRecreateConfigurationTester"
+    mAssert.Should False, "Unexpected error " & Err.Number & " (" & Err.Description & ") in " & Err.Source
+    Exit Sub
+End Sub
+
+Public Sub Test_vtkRecreateConfiguration_projectProtected_passwordConf()
+' workbook is created in the good path
+
+    On Error GoTo M_Error
+
+    Set testedConf = passwordConf
+
+    exportModulesAndRecreateWb Wb, testProject, testedConf
+
+    mAssert.Should recreatedWb.VBProject.Protection, "The configuration should be protected."
+    
+    On Error GoTo 0
+    Exit Sub
+
+M_Error:
+    Err.Source = "Test_vtkRecreateConfiguration_projectProtected_passwordConf of module vtkRecreateConfigurationTester"
+    mAssert.Should False, "Unexpected error " & Err.Number & " (" & Err.Description & ") in " & Err.Source
+    Exit Sub
+End Sub
+
 Private Function ITest_Suite() As TestSuite
     Set ITest_Suite = New TestSuite
     ITest_Suite.AddTest ITest_Manager.ClassName, "Test_vtkRecreateConfiguration_workbookIsCreatedInTheGoodPath_normalConf"
@@ -830,6 +895,9 @@ Private Function ITest_Suite() As TestSuite
     ITest_Suite.AddTest ITest_Manager.ClassName, "Test_vtkRecreateConfiguration_overwriteFile_normal"
     ITest_Suite.AddTest ITest_Manager.ClassName, "Test_vtkRecreateConfiguration_overwriteFile_addIn"
     ITest_Suite.AddTest ITest_Manager.ClassName, "Test_vtkRecreateConfiguration_DEVConf_normal"
+    ITest_Suite.AddTest ITest_Manager.ClassName, "Test_vtkRecreateConfiguration_workbookIsCreatedInTheGoodPath_passwordConf"
+    ITest_Suite.AddTest ITest_Manager.ClassName, "Test_vtkRecreateConfiguration_projectNotProtected_normalConf"
+    ITest_Suite.AddTest ITest_Manager.ClassName, "Test_vtkRecreateConfiguration_projectProtected_passwordConf"
 End Function
 
 Private Sub ITestCase_RunTest()
@@ -857,6 +925,9 @@ Private Sub ITestCase_RunTest()
         Case "Test_vtkRecreateConfiguration_overwriteFile_normal": Test_vtkRecreateConfiguration_overwriteFile_normal
         Case "Test_vtkRecreateConfiguration_overwriteFile_addIn": Test_vtkRecreateConfiguration_overwriteFile_addIn
         Case "Test_vtkRecreateConfiguration_DEVConf_normal": Test_vtkRecreateConfiguration_DEVConf_normal
+        Case "Test_vtkRecreateConfiguration_workbookIsCreatedInTheGoodPath_passwordConf": Test_vtkRecreateConfiguration_workbookIsCreatedInTheGoodPath_passwordConf
+        Case "Test_vtkRecreateConfiguration_projectNotProtected_normalConf": Test_vtkRecreateConfiguration_projectNotProtected_normalConf
+        Case "Test_vtkRecreateConfiguration_projectProtected_passwordConf": Test_vtkRecreateConfiguration_projectProtected_passwordConf
         Case Else: mAssert.Should False, "Invalid test name: " & mManager.methodName
     End Select
 End Sub
