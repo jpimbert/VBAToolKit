@@ -44,6 +44,27 @@ Public Sub Test_vtkDefaultIsAddIn()
     mAssert.Should Not vtkDefaultIsAddIn("TestFile.xls"), "xls extension is not Add-In"
 End Sub
 
+Public Sub Test_vtkProtectProject()
+    Dim Wb As Workbook, fullName As String, component As VBComponent
+    ' Create a new workbook for test, and populate it with a code module
+    Set Wb = vtkCreateExcelWorkbookForTestWithProjectName(projectName:="TestProject")
+    Set component = Wb.VBProject.VBComponents.Add(vbext_ct_StdModule)
+    component.CodeModule.AddFromString "Sub Test" & vbCrLf & "End Sub"
+    ' Save, Close and Reopen the verify there is no protection
+    fullName = Wb.fullName
+    Wb.Close saveChanges:=True
+    Set Wb = Workbooks.Open(fileName:=fullName)
+    mAssert.Should Not Wb.VBProject.Protection, "Project must not be protected"
+    ' Protect, then Save, close and reopen to verify there is a protection
+    vtkProtectProject project:=Wb.VBProject, password:="aPassword"
+    fullName = Wb.fullName
+    Wb.Close saveChanges:=True
+    Set Wb = Workbooks.Open(fileName:=fullName)
+    mAssert.Should Wb.VBProject.Protection, "Project must be protected"
+    ' Kill test workbook
+    vtkCloseAndKillWorkbook Wb:=Wb
+End Sub
+
 Public Sub Test_vtkDefaultExcelExtension()
     mAssert.Equals ".xlsm", vtkDefaultExcelExtension, "Default Excel 2007 extension"
 End Sub
@@ -51,12 +72,14 @@ End Sub
 Private Function ITest_Suite() As TestSuite
     Set ITest_Suite = New TestSuite
     ITest_Suite.AddTest ITest_Manager.ClassName, "Test_vtkDefaultIsAddIn"
+    ITest_Suite.AddTest ITest_Manager.ClassName, "Test_vtkProtectProject"
     ITest_Suite.AddTest ITest_Manager.ClassName, "Test_vtkDefaultExcelExtension"
 End Function
 
 Private Sub ITestCase_RunTest()
     Select Case mManager.methodName
         Case "Test_vtkDefaultIsAddIn": Test_vtkDefaultIsAddIn
+        Case "Test_vtkProtectProject": Test_vtkProtectProject
         Case "Test_vtkDefaultExcelExtension": Test_vtkDefaultExcelExtension
         Case Else: mAssert.Should False, "Invalid test name: " & mManager.methodName
     End Select
