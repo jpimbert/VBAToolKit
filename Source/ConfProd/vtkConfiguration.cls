@@ -173,6 +173,22 @@ Property Let template(newTemplate As String)
 End Property
 
 '---------------------------------------------------------------------------------------
+' Property  : password as string (wrapper on the parent vtkConfigurationManager)
+' Author    : Jean-Pierre Imbert
+' Date      : 04/12/2014
+' Purpose   : The Excel code password for the configuration
+'---------------------------------------------------------------------------------------
+'
+Property Get password() As String
+    password = m_parent.getConfigurationPasswordWithNumber(m_number)
+End Property
+
+Property Let password(newPassword As String)
+   On Error Resume Next
+    m_parent.setConfigurationPasswordWithNumber m_number, newPassword
+End Property
+
+'---------------------------------------------------------------------------------------
 ' Property  : modules as collection (Read Only)
 ' Author    : Jean-Pierre Imbert
 ' Date      : 28/08/2013

@@ -136,6 +136,7 @@ Public Sub Test_vtkExportConfigurationsAsXML_correctConfigurationContent()
     mAssert.Equals reloadDom.SelectSingleNode("/vtkConf/configuration[@cID=""c1""]/templatePath").Text, "Template\TestProjectTemplate.xlsm", "Expected template of first configuration"
     mAssert.Equals reloadDom.SelectSingleNode("/vtkConf/configuration[@cID=""c1""]/title").Text, "TestProjectName", "Expected title of first configuration"
     mAssert.Equals reloadDom.SelectSingleNode("/vtkConf/configuration[@cID=""c1""]/comment").Text, "Existing project for various tests of VBAToolKit", "Expected comment of first configuration"
+    mAssert.Equals reloadDom.SelectSingleNode("/vtkConf/configuration[@cID=""c1""]/password").Text, "aPassword", "Expected password of first configuration"
     
     mAssert.Equals reloadDom.SelectSingleNode("/vtkConf/configuration[@cID=""c2""]/name").Text, "TestProject_DEV", "Expected name of second configuration"
     mAssert.Equals reloadDom.SelectSingleNode("/vtkConf/configuration[@cID=""c2""]/path").Text, "Project\TestProject_DEV.xlsm", "Expected path of second configuration"
@@ -145,6 +146,10 @@ Public Sub Test_vtkExportConfigurationsAsXML_correctConfigurationContent()
    On Error GoTo Test_vtkExportConfigurationsAsXML_correctConfigurationContent_Error
     mAssert.Equals reloadDom.SelectSingleNode("/vtkConf/configuration[@cID=""c2""]/title").Text, "TestProject_DEV", "Expected title of second configuration"
     mAssert.Equals reloadDom.SelectSingleNode("/vtkConf/configuration[@cID=""c2""]/comment").Text, "Existing project for development for various tests of VBAToolKit", "Expected comment of second configuration"
+   On Error Resume Next
+    mAssert.Equals reloadDom.SelectSingleNode("/vtkConf/configuration[@cID=""c2""]/password").Text, "", "Expected password of second configuration"
+    mAssert.Equals Err.Number, 91, "The password element must not be present for the second configuration"
+   On Error GoTo Test_vtkExportConfigurationsAsXML_correctConfigurationContent_Error
 
     On Error GoTo 0
     Exit Sub

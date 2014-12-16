@@ -440,6 +440,9 @@ Public Sub vtkRecreateConfiguration(projectName As String, configurationName As 
         cmE.duplicate Wb, cm
     End If
     
+    ' Protect VBA Project with optional password
+    If conf.password <> "" Then vtkProtectProject project:=Wb.VBProject, password:=conf.password
+    
     ' VB will not let the workbook be saved under the name of an already opened workbook, which
     ' is annoying when recreating an add-in (always opened). The following code works around this.
     Dim tmpPath As String

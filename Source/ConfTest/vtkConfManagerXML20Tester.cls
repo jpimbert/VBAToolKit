@@ -122,6 +122,9 @@ Public Sub Test_ForbiddenSetterCalls()
     existingConfManager.setConfigurationTemplateWithNumber n:=1, template:="NewTemplate"
     mAssert.Equals Err.Number, VTK_READONLY_FILE, "Error returned when trying to call setConfigurationTemplateWithNumber on XML Conf File"
     Err.Number = 0
+    existingConfManager.setConfigurationPasswordWithNumber n:=1, password:="NewPassword"
+    mAssert.Equals Err.Number, VTK_READONLY_FILE, "Error returned when trying to call setConfigurationPasswordWithNumber on XML Conf File"
+    Err.Number = 0
     existingConfManager.addModule module:="NewModule1"
     mAssert.Equals Err.Number, VTK_READONLY_FILE, "Error returned when trying to call addModule on XML Conf File"
     Err.Number = 0
@@ -178,6 +181,14 @@ Public Sub TestGetConfigurationTemplateWithNumberFromExistingProject()
     mAssert.Equals existingConfManager.getConfigurationTemplateWithNumber(1), "", "Template path of first configuration given by number"
     mAssert.Equals existingConfManager.getConfigurationTemplateWithNumber(2), "Templates\ExistingProjectTemplate.xlsm", "Template path of second configuration given by number"
     mAssert.Equals existingConfManager.getConfigurationTemplateWithNumber(3), "", "Inexistant configuration number 3"
+End Sub
+
+Public Sub TestGetConfigurationPasswordWithNumberFromExistingProject()
+'       Verify the capability to get the configuration code password by number
+    mAssert.Equals existingConfManager.getConfigurationPasswordWithNumber(0), "", "Inexistant configuration number 0"
+    mAssert.Equals existingConfManager.getConfigurationPasswordWithNumber(1), "aPassword", "Code password of first configuration given by number"
+    mAssert.Equals existingConfManager.getConfigurationPasswordWithNumber(2), "", "Code password of second configuration given by number"
+    mAssert.Equals existingConfManager.getConfigurationPasswordWithNumber(3), "", "Inexistant configuration number 3"
 End Sub
 
 Public Sub TestGetConfigurationNumbersFromExistingProject()
@@ -240,7 +251,7 @@ Public Sub TestModulesFromExistingProject()
 '       Verify the capability to get the modules list
     Dim n As Integer
    On Error GoTo M_Error
-    mAssert.Equals existingConfManager.modules.count, 5, "Number of modules in the existing project"
+    mAssert.Equals existingConfManager.modules.Count, 5, "Number of modules in the existing project"
     For n = 1 To n
         mAssert.Should existingConfManager.modules(n).parent Is existingConfManager, "Parent of the vtkModule " & n & " of existing project"
         mAssert.Equals existingConfManager.modules(n).Number, n, "The number of vtkModule " & n & " of existing project"
@@ -257,7 +268,7 @@ End Sub
 Public Sub TestConfigurationsCollectionFromExistingProject()
 '       Verify the behavior of the configurations function of Conf manager
    On Error GoTo M_Error
-    mAssert.Equals existingConfManager.configurations.count, 2, "Number of configurations in the existing project"
+    mAssert.Equals existingConfManager.configurations.Count, 2, "Number of configurations in the existing project"
     ' Check the first configuration
     mAssert.Should existingConfManager.configurations(1).parent Is existingConfManager, "Parent of the first configuration"
     mAssert.Equals existingConfManager.configurations(1).Number, 1, "Number of the first configuration"
@@ -271,6 +282,8 @@ Public Sub TestConfigurationsCollectionFromExistingProject()
     mAssert.Equals existingConfManager.configurations("ExistingProject").template, "", "Template got by name of the first configuration"
     mAssert.Equals existingConfManager.configurations(1).projectName, "ExistingProjectName", "Project Name (Title) got by number of the first configuration"
     mAssert.Equals existingConfManager.configurations("ExistingProject").projectName, "ExistingProjectName", "Project Name (Title) got by name of the first configuration"
+    mAssert.Equals existingConfManager.configurations(1).password, "aPassword", "Password got by number of the first configuration"
+    mAssert.Equals existingConfManager.configurations("ExistingProject").password, "aPassword", "Password got by name of the first configuration"
     ' Check the second configuration
     mAssert.Should existingConfManager.configurations(2).parent Is existingConfManager, "Parent of the second configuration"
     mAssert.Equals existingConfManager.configurations(2).Number, 2, "Number of the second configuration"
@@ -284,6 +297,8 @@ Public Sub TestConfigurationsCollectionFromExistingProject()
     mAssert.Equals existingConfManager.configurations("ExistingProject_DEV").template, "Templates\ExistingProjectTemplate.xlsm", "Template got by name of the second configuration"
     mAssert.Equals existingConfManager.configurations(2).projectName, "ExistingProject_DEV", "Project Name (Title) got by number of the second configuration"
     mAssert.Equals existingConfManager.configurations("ExistingProject_DEV").projectName, "ExistingProject_DEV", "Project Name (Title) got by name of the second configuration"
+    mAssert.Equals existingConfManager.configurations(2).password, "", "Password got by number of the second configuration"
+    mAssert.Equals existingConfManager.configurations("ExistingProject_DEV").password, "", "Password got by name of the second configuration"
    On Error GoTo 0
     Exit Sub
 M_Error:
@@ -305,7 +320,7 @@ Public Sub TestGetConfigurationReferencesWithNumber()
         Next
         expectedCount = UBound(refNames) - LBound(refNames) + 1
         If existingConfManager.configurations(cn).isDEV Then expectedCount = expectedCount + 1
-        mAssert.Equals c2.count, expectedCount, "Count of references in configuration " & cn
+        mAssert.Equals c2.Count, expectedCount, "Count of references in configuration " & cn
         ' il faut boucler sur le tableau et rechercher dans la collection (si pas trouvé = erreur)
         For i = LBound(refNames) To UBound(refNames)
             Set r = c2(refNames(i))
@@ -336,7 +351,7 @@ Public Sub TestGetAllReferencesFromExistingWorkbook()
     For Each r In c1
         c2.Add r, r.name
     Next
-    mAssert.Equals c2.count, UBound(refNames) - LBound(refNames) + 1, "Count of all references of a new workbook"
+    mAssert.Equals c2.Count, UBound(refNames) - LBound(refNames) + 1, "Count of all references of a new workbook"
     ' il faut boucler sur le tableau et rechercher dans la collection (si pas trouvé = erreur)
     For i = LBound(refNames) To UBound(refNames)
         Set r = c2(refNames(i))
@@ -357,6 +372,7 @@ Private Function ITest_Suite() As TestSuite
     ITest_Suite.AddTest ITest_Manager.ClassName, "TestGetConfigurationProjectNameWithNumberFromExistingProject"
     ITest_Suite.AddTest ITest_Manager.ClassName, "TestGetConfigurationCommentWithNumberFromExistingProject"
     ITest_Suite.AddTest ITest_Manager.ClassName, "TestGetConfigurationTemplateWithNumberFromExistingProject"
+    ITest_Suite.AddTest ITest_Manager.ClassName, "TestGetConfigurationPasswordWithNumberFromExistingProject"
     ITest_Suite.AddTest ITest_Manager.ClassName, "TestGetConfigurationNumbersFromExistingProject"
     ITest_Suite.AddTest ITest_Manager.ClassName, "TestGetConfigurationPathFromExistingProject"
     ITest_Suite.AddTest ITest_Manager.ClassName, "TestGetModulesFromExistingProject"
@@ -381,6 +397,7 @@ Private Sub ITestCase_RunTest()
         Case "TestGetConfigurationProjectNameWithNumberFromExistingProject": TestGetConfigurationProjectNameWithNumberFromExistingProject
         Case "TestGetConfigurationCommentWithNumberFromExistingProject": TestGetConfigurationCommentWithNumberFromExistingProject
         Case "TestGetConfigurationTemplateWithNumberFromExistingProject": TestGetConfigurationTemplateWithNumberFromExistingProject
+        Case "TestGetConfigurationPasswordWithNumberFromExistingProject": TestGetConfigurationPasswordWithNumberFromExistingProject
         Case "TestGetConfigurationNumbersFromExistingProject": TestGetConfigurationNumbersFromExistingProject
         Case "TestGetConfigurationPathFromExistingProject": TestGetConfigurationPathFromExistingProject
         Case "TestGetModulesFromExistingProject": TestGetModulesFromExistingProject

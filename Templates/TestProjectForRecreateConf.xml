@@ -4,7 +4,7 @@
         <!ELEMENT info (vtkConfigurationsVersion,projectName)>
                 <!ELEMENT vtkConfigurationsVersion (#PCDATA)>
                 <!ELEMENT projectName (#PCDATA)>
-        <!ELEMENT configuration (name,path,templatePath?,title?,comment?)>
+        <!ELEMENT configuration (name,path,templatePath?,title?,comment?,password?)>
          <!ATTLIST configuration cID ID #REQUIRED>
          <!ATTLIST configuration refIDs IDREFS #IMPLIED>
                 <!ELEMENT name (#PCDATA)>
@@ -12,6 +12,7 @@
                 <!ELEMENT templatePath (#PCDATA)>
                 <!ELEMENT title        (#PCDATA)>
                 <!ELEMENT comment (#PCDATA)>
+                <!ELEMENT password (#PCDATA)>
         <!ELEMENT module (name, modulePath*)>
          <!ATTLIST module mID ID #REQUIRED>
                 <!ELEMENT modulePath (#PCDATA)>
@@ -155,7 +156,15 @@
         <title>ProjectName13</title>
         <comment>Comment for Workbook #13</comment>
     </configuration>
-    <module mID="m1">
+    <configuration cID="c14" refIDs="r1 r2 r3 r4 r5 r6 r7 r8 r9 r10 r11">
+        <name>TestProject_withPassword</name>
+        <path>TestProject_withPassword.xlsm</path>
+        <templatePath>Templates\TestProjectTemplate.xlsx</templatePath>
+        <title>ProjectName14</title>
+        <comment>Comment for Workbook #14</comment>
+	<password>aPassword</password>
+   </configuration>
+   <module mID="m1">
         <name>TestModule1</name>
         <modulePath confId="c2">TestModule1.bas</modulePath>
         <modulePath confId="c3">TestModule1.bas</modulePath>
@@ -168,6 +177,7 @@
         <modulePath confId="c11">TestModule1.bas</modulePath>
         <modulePath confId="c12">TestModule1.bas</modulePath>
         <modulePath confId="c13">TestModule1.bas</modulePath>
+        <modulePath confId="c14">TestModule1.bas</modulePath>
     </module>
     <module mID="m2">
         <name>TestModule2</name>
@@ -180,6 +190,7 @@
         <modulePath confId="c11">TestModule2.bas</modulePath>
         <modulePath confId="c12">TestModule2.bas</modulePath>
         <modulePath confId="c13">TestModule2.bas</modulePath>
+        <modulePath confId="c14">TestModule2.bas</modulePath>
     </module>
     <module mID="m3">
         <name>TestClassModule1</name>

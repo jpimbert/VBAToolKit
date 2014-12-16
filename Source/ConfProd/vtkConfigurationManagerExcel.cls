@@ -52,8 +52,9 @@ Private m_rootPath As String
 Private m_refManager As vtkReferenceManager
 Private m_devConfiguration As Integer
 Private Const sheetName As String = "vtkConfigurations"
-Private Const currentVersion As String = "vtkConfigurations v1.1"
+Private Const currentVersion As String = "vtkConfigurations v1.2"
 Private Const version10 As String = "vtkConfigurations v1.0"
+Private Const version11 As String = "vtkConfigurations v1.1"
 Private m_sheetVersion As String
 Private Const nbTitleColumns As Integer = 1
 Private Const nameLine = 1
@@ -61,6 +62,7 @@ Private Const pathLine = 2
 Private Const templateLine = 3
 Private Const projectNameLine = 4
 Private Const commentLine = 5
+Private Const passwordLine = 6
 
 Private Sub Class_Initialize()
     m_devConfiguration = -1
@@ -148,6 +150,17 @@ Private Function defaultTemplateWithNumber(n As Integer) As String
 End Function
 
 '---------------------------------------------------------------------------------------
+' Function  : defaultPasswordWithNumber as String - Read Only - Private
+' Author    : Jean-Pierre Imbert
+' Date      : 04/12/2014
+' Purpose   : return the default Excel code password of a configuration given its number
+'---------------------------------------------------------------------------------------
+'
+Private Function defaultPasswordWithNumber(n As Integer) As String
+    defaultPasswordWithNumber = ""
+End Function
+
+'---------------------------------------------------------------------------------------
 ' Property  : rootPath as String - Read Only - Public
 ' Author    : Jean-Pierre Imbert
 ' Date      : 09/08/2013
@@ -202,12 +215,13 @@ End Function
 ' Author    : Jean-Pierre Imbert
 ' Date      : 08/06/2014
 ' Purpose   : return the number of Title rows in the configuration sheet depend on its version
-'             - 2 for v1.0, 4 for 1.1
+'             - 2 for v1.0, 5 for v1.1, 6 for v1.2
 '---------------------------------------------------------------------------------------
 '
 Private Function nbTitleRows() As Integer
     If m_sheetVersion = version10 Then nbTitleRows = 2
-    If m_sheetVersion = currentVersion Then nbTitleRows = 5
+    If m_sheetVersion = version11 Then nbTitleRows = 5
+    If m_sheetVersion = currentVersion Then nbTitleRows = 6
 End Function
 
 '---------------------------------------------------------------------------------------
@@ -231,10 +245,14 @@ Private Sub setConfigurationSheet()
         End If
     ' Verify that the configuration sheet is in last known version
     If ws.Range("A1") <> currentVersion Then
-        If ws.Range("A1") <> version10 Then
-        ' Code to convert from previous version will be implemented here or in a specific method
+        If ws.Range("A1") <> version11 Then
+            If ws.Range("A1") <> version10 Then
+            ' Code to convert from previous version will be implemented here or in a specific method
+                Else
+                m_sheetVersion = version10
+                End If
             Else
-            m_sheetVersion = version10
+            m_sheetVersion = version11
             End If
         Else
         m_sheetVersion = currentVersion
@@ -252,15 +270,19 @@ End Sub
 '
 Private Sub initializeConfigurationSheet(ws As Worksheet)
     ws.Range("A1") = currentVersion
-    ws.Range("A2") = ""
-    ws.Range("A3") = "Path, template, name and comment"
-    ws.Range("A4") = ""
-    ws.Range("A5") = "Module Name"
+    ws.Range("A2") = "Path"
+    ws.Range("A3") = "Template"
+    ws.Range("A4") = "Name"
+    ws.Range("A5") = "Comment"
+    ws.Range("A6") = "Module Name \ Password"
     ws.Columns("A").ColumnWidth = 22
     ws.Range("A1").Font.Size = 8
-    ws.Range("A3").HorizontalAlignment = xlCenter
-    ws.Range("A5").HorizontalAlignment = xlCenter
-    ws.Range("A5").Font.Bold = True
+    ws.Range("A2").HorizontalAlignment = xlRight
+    ws.Range("A3").HorizontalAlignment = xlRight
+    ws.Range("A4").HorizontalAlignment = xlRight
+    ws.Range("A5").HorizontalAlignment = xlRight
+    ws.Range("A6").HorizontalAlignment = xlCenter
+    ws.Range("A6").Font.Bold = True
     If Me.projectName <> "" Then
         m_devConfiguration = 2
         ws.Range("B1") = vtkProjectForName(projectName).projectName
@@ -283,22 +305,50 @@ End Sub
 Public Sub updateConfigurationSheetFormat()
     Dim ws As Worksheet
     
-    If m_sheetVersion = version10 Then
+    If m_sheetVersion = version11 Then
         Set ws = configurationSheet
          
-        ws.Rows("3:5").EntireRow.Insert     ' Insert new lines for the new format
+        ws.Rows("6:6").EntireRow.Insert     ' Insert new lines for the new format
         
         ws.Range("A1") = currentVersion
-        ws.Range("A2") = ""
-        ws.Range("A3") = "Path, template, name and comment"
-        ws.Range("A4") = ""
-        ws.Range("A5") = "Module Name"
+        ws.Range("A2") = "Path"
+        ws.Range("A3") = "Template"
+        ws.Range("A4") = "Name"
+        ws.Range("A5") = "Comment"
+        ws.Range("A6") = "Module Name \ Password"
     
         ws.Range("A2").Font.Bold = False
         ws.Range("A3").Font.Bold = False
-        ws.Range("A3").HorizontalAlignment = xlCenter
-        ws.Range("A5").HorizontalAlignment = xlCenter
-        ws.Range("A5").Font.Bold = True
+        ws.Range("A2").HorizontalAlignment = xlRight
+        ws.Range("A3").HorizontalAlignment = xlRight
+        ws.Range("A4").HorizontalAlignment = xlRight
+        ws.Range("A5").HorizontalAlignment = xlRight
+        ws.Range("A6").HorizontalAlignment = xlCenter
+        ws.Range("A6").Font.Bold = True
+        
+        m_sheetVersion = currentVersion     ' Set the sheetVersion for correct behavior after conversion
+    End If
+
+    If m_sheetVersion = version10 Then
+        Set ws = configurationSheet
+         
+        ws.Rows("3:6").EntireRow.Insert     ' Insert new lines for the new format
+        
+        ws.Range("A1") = currentVersion
+        ws.Range("A2") = "Path"
+        ws.Range("A3") = "Template"
+        ws.Range("A4") = "Name"
+        ws.Range("A5") = "Comment"
+        ws.Range("A6") = "Module Name \ Password"
+    
+        ws.Range("A2").Font.Bold = False
+        ws.Range("A3").Font.Bold = False
+        ws.Range("A2").HorizontalAlignment = xlRight
+        ws.Range("A3").HorizontalAlignment = xlRight
+        ws.Range("A4").HorizontalAlignment = xlRight
+        ws.Range("A5").HorizontalAlignment = xlRight
+        ws.Range("A6").HorizontalAlignment = xlCenter
+        ws.Range("A6").Font.Bold = True
         
         m_sheetVersion = currentVersion     ' Set the sheetVersion for correct behavior after conversion
     End If
@@ -525,7 +575,7 @@ Public Function getConfigurationProjectNameWithNumber(n As Integer) As String
     Dim sResult As String
     sResult = ""
     If n >= 1 And n <= configurationCount Then
-        If m_sheetVersion = currentVersion Then
+        If m_sheetVersion = currentVersion Or m_sheetVersion = version11 Then
             sResult = configurationSheet.Cells(projectNameLine, n + nbTitleColumns)
             If sResult = "" Then sResult = defaultProjectNameWithNumber(n)
            Else
@@ -552,7 +602,7 @@ End Function
 '
 Public Sub setConfigurationProjectNameWithNumber(n As Integer, projectName As String)
     If n >= 1 And n <= configurationCount Then
-        If m_sheetVersion = currentVersion Then
+        If m_sheetVersion = currentVersion Or m_sheetVersion = version11 Then
             configurationSheet.Cells(projectNameLine, n + nbTitleColumns) = projectName
            Else
             Err.Raise VTK_OBSOLETE_CONFIGURATION_SHEET, "vtkConfigurationManagerExcel:setConfigurationProjectNameWithNumber", _
@@ -580,7 +630,7 @@ Public Function getConfigurationCommentWithNumber(n As Integer) As String
     Dim sResult As String
     sResult = ""
     If n >= 1 And n <= configurationCount Then
-        If m_sheetVersion = currentVersion Then
+        If m_sheetVersion = currentVersion Or m_sheetVersion = version11 Then
             sResult = configurationSheet.Cells(commentLine, n + nbTitleColumns)
             If sResult = "" Then sResult = defaultCommentWithNumber(n)
            Else
@@ -607,7 +657,7 @@ End Function
 '
 Public Sub setConfigurationCommentWithNumber(n As Integer, comment As String)
     If n >= 1 And n <= configurationCount Then
-        If m_sheetVersion = currentVersion Then
+        If m_sheetVersion = currentVersion Or m_sheetVersion = version11 Then
             configurationSheet.Cells(commentLine, n + nbTitleColumns) = comment
            Else
             Err.Raise VTK_OBSOLETE_CONFIGURATION_SHEET, "vtkConfigurationManagerExcel:setConfigurationCommentWithNumber", _
@@ -635,7 +685,7 @@ Public Function getConfigurationTemplateWithNumber(n As Integer) As String
     Dim sResult As String
     sResult = ""
     If n >= 1 And n <= configurationCount Then
-        If m_sheetVersion = currentVersion Then
+        If m_sheetVersion = currentVersion Or m_sheetVersion = version11 Then
             sResult = configurationSheet.Cells(templateLine, n + nbTitleColumns)
             If sResult = "" Then sResult = defaultTemplateWithNumber(n)
            Else
@@ -662,7 +712,7 @@ End Function
 '
 Public Sub setConfigurationTemplateWithNumber(n As Integer, template As String)
     If n >= 1 And n <= configurationCount Then
-        If m_sheetVersion = currentVersion Then
+        If m_sheetVersion = currentVersion Or m_sheetVersion = version11 Then
             configurationSheet.Cells(templateLine, n + nbTitleColumns) = template
            Else
             Err.Raise VTK_OBSOLETE_CONFIGURATION_SHEET, "vtkConfigurationManagerExcel:setConfigurationTemplateWithNumber", _
@@ -673,6 +723,61 @@ End Sub
 
 Public Sub vtkConfigurationManager_setConfigurationTemplateWithNumber(n As Integer, template As String)
     setConfigurationTemplateWithNumber n, template
+End Sub
+
+'---------------------------------------------------------------------------------------
+' Procedure : getConfigurationPasswordWithNumber
+' Author    : Jean-Pierre Imbert
+' Date      : 04/12/2014
+' Purpose   : return the n-th configuration Excel code password of the project, given n as integer
+'               - return "" if the configuration is inexistant
+'               - return the default pasword if
+'                   - it is not initialized in the configuration sheet v1.2
+'                   - the configuration sheet is v1.0 or v1.1, so there is no password field
+'---------------------------------------------------------------------------------------
+'
+Public Function getConfigurationPasswordWithNumber(n As Integer) As String
+    Dim sResult As String
+    sResult = ""
+    If n >= 1 And n <= configurationCount Then
+        If m_sheetVersion = currentVersion Then
+            sResult = configurationSheet.Cells(passwordLine, n + nbTitleColumns)
+            If sResult = "" Then sResult = defaultPasswordWithNumber(n)
+           Else
+            sResult = defaultPasswordWithNumber(n)
+            End If
+       Else
+        sResult = ""
+    End If
+    getConfigurationPasswordWithNumber = sResult
+End Function
+
+Public Function vtkConfigurationManager_getConfigurationPasswordWithNumber(n As Integer) As String
+    vtkConfigurationManager_getConfigurationPasswordWithNumber = getConfigurationPasswordWithNumber(n)
+End Function
+
+'---------------------------------------------------------------------------------------
+' Procedure : setConfigurationPasswordWithNumber
+' Author    : Jean-Pierre Imbert
+' Date      : 04/12/2014
+' Purpose   : change the n-th configuration password of the project, given n as integer
+'               - does nothing if the configuration is inexistant
+'               - does nothing and return an error if the configuration sheet is not v1.2
+'---------------------------------------------------------------------------------------
+'
+Public Sub setConfigurationPasswordWithNumber(n As Integer, password As String)
+    If n >= 1 And n <= configurationCount Then
+        If m_sheetVersion = currentVersion Then
+            configurationSheet.Cells(passwordLine, n + nbTitleColumns) = password
+           Else
+            Err.Raise VTK_OBSOLETE_CONFIGURATION_SHEET, "vtkConfigurationManagerExcel:setConfigurationPasswordWithNumber", _
+            "Impossible to set a configuration code password with this configuration sheet version (project=" & m_projectName & ", " & m_sheetVersion & ")"
+        End If
+    End If
+End Sub
+
+Public Sub vtkConfigurationManager_setConfigurationPasswordWithNumber(n As Integer, password As String)
+    setConfigurationPasswordWithNumber n, password
 End Sub
 
 '---------------------------------------------------------------------------------------

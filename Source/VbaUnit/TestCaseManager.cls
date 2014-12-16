@@ -40,7 +40,7 @@ Private Function ITestManager_Run(test As ITest, Optional RunManager As IRunMana
     TestCase.SetUp RunManager.Assert
     TestCase.RunTest
     ' Uncomment the following line for test tracking during test running
-'    Debug.Print "Run Runtest " & mClassName
+'    Debug.Print "Run Runtest " & mClassName & ":" & mMethodName
     TestCase.TearDown
     'debug.print "Run teardown"
     RunManager.result.EndTest TestCase
