@@ -4,7 +4,7 @@
         <!ELEMENT info (vtkConfigurationsVersion,projectName)>
                 <!ELEMENT vtkConfigurationsVersion (#PCDATA)>
                 <!ELEMENT projectName (#PCDATA)>
-        <!ELEMENT configuration (name,path,templatePath?,title?,comment?)>
+        <!ELEMENT configuration (name,path,templatePath?,title?,comment?,password?)>
          <!ATTLIST configuration cID ID #REQUIRED>
          <!ATTLIST configuration refIDs IDREFS #IMPLIED>
                 <!ELEMENT name (#PCDATA)>
@@ -12,6 +12,7 @@
                 <!ELEMENT templatePath (#PCDATA)>
                 <!ELEMENT title        (#PCDATA)>
                 <!ELEMENT comment (#PCDATA)>
+                <!ELEMENT password (#PCDATA)>
         <!ELEMENT module (name, modulePath*)>
          <!ATTLIST module mID ID #REQUIRED>
                 <!ELEMENT modulePath (#PCDATA)>

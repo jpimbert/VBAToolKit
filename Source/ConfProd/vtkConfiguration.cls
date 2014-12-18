@@ -110,10 +110,12 @@ Property Get isDEV() As Boolean
 End Property
 
 '---------------------------------------------------------------------------------------
-' Property  : path as string (wrapper on the parent vtkConfigurationManager)
+' Property  : path as string
 ' Author    : Jean-Pierre Imbert
 ' Date      : 28/08/2013
 ' Purpose   : The relative path of the configuration
+'             Tokens <xls> and <xla> are changed to the proper extension
+'             according to the current Excel version
 '---------------------------------------------------------------------------------------
 '
 Property Get path() As String
@@ -121,6 +123,22 @@ Property Get path() As String
 End Property
 
 Property Let path(newPath As String)
+    m_parent.setConfigurationPathWithNumber m_number, newPath
+End Property
+
+'---------------------------------------------------------------------------------------
+' Property  : genericPath as string (wrapper on the parent vtkConfigurationManager)
+' Author    : Jean-Pierre Imbert
+' Date      : 28/08/2013
+' Purpose   : The generic relative path of the configuration as read in the
+'             configuration manager; tokens <xla> and <xls> are not interpreted
+'---------------------------------------------------------------------------------------
+'
+Property Get genericPath() As String
+    genericPath = m_parent.getConfigurationPathWithNumber(m_number)
+End Property
+
+Property Let genericPath(newPath As String)
     m_parent.setConfigurationPathWithNumber m_number, newPath
 End Property
 
