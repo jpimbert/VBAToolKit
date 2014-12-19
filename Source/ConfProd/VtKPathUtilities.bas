@@ -141,7 +141,41 @@ vtkStripFilePathOrNameOfExtension_Error:
 End Function
 
 '---------------------------------------------------------------------------------------
-' Procedure : vtkStripVtkExtensionOfPathOrName
+' Procedure : vtkConvertGenericExcelPath
+' Author    : Jean-Pierre Imbert
+' Date      : 19/12/2014
+' Purpose   : - Returns a String containing the path of the Excel file where the generic
+'               extension (<xls> or <xla>) is converted to the actual extension for the
+'               current Excel version (xls, xlsm, xla, xlam)
+' Examples  : "dummy.ext" -> "dummy.ext"
+'             "folder\dummy.<xla>" with Excel 2003 -> "folder\dummy.xla"
+'             "folder\dummy.<xls>" with Excel 2007 -> "folder\dummy.xlsm"
+'---------------------------------------------------------------------------------------
+'
+Public Function vtkConvertGenericExcelPath(genericFilePath As String) As String
+    Dim extension As String, template As String, dotPosition As Integer, pathWithoutExt As String
+    
+    dotPosition = InStrRev(genericFilePath, ".")
+    If dotPosition <> 0 Then
+        extension = Mid(genericFilePath, dotPosition + 1)
+        pathWithoutExt = Left(genericFilePath, dotPosition - 1)
+        If Left$(extension, 1) = "<" And Right$(extension, 1) = ">" Then template = Mid(extension, 2, Len(extension) - 2)
+        If template = "" Then
+            vtkConvertGenericExcelPath = genericFilePath
+           ElseIf template = "xla" Then
+            vtkConvertGenericExcelPath = pathWithoutExt & vtkDefaultExcelAddInExtension()
+           ElseIf template = "xls" Then
+            vtkConvertGenericExcelPath = pathWithoutExt & vtkDefaultExcelExtension()
+           Else
+            Err.Raise VTK_WRONG_GENERIC_EXTENSION, "vtkConvertGenericExcelPath", "Unexpected extension template: " & extension
+        End If
+       Else
+        vtkConvertGenericExcelPath = genericFilePath
+    End If
+End Function
+
+'---------------------------------------------------------------------------------------
+' Procedure : vtkStripPathOrNameOfVtkExtension
 ' Author    : Lucas Vitorino
 ' Purpose   : - Returns the vtkProjectName associated with a workbook path or name or a configuration name.
 '

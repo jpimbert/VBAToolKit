@@ -301,10 +301,10 @@
         <modulePath confId="c2">Source\ConfTest\vtkImportExportUtilitiesTester.cls</modulePath>
     </module>
     <module mID="m40">
-        <name>vtKPathUtilities</name>
-        <modulePath confId="c1">Source\ConfProd\vtKPathUtilities.bas</modulePath>
-        <modulePath confId="c2">Source\ConfProd\vtKPathUtilities.bas</modulePath>
-        <modulePath confId="c3">Source\ConfProd\vtKPathUtilities.bas</modulePath>
+        <name>vtkPathUtilities</name>
+        <modulePath confId="c1">Source\ConfProd\vtkPathUtilities.bas</modulePath>
+        <modulePath confId="c2">Source\ConfProd\vtkPathUtilities.bas</modulePath>
+        <modulePath confId="c3">Source\ConfProd\vtkPathUtilities.bas</modulePath>
     </module>
     <module mID="m41">
         <name>vtkEventHandler</name>
