@@ -132,7 +132,7 @@ Public Sub Test_vtkExportConfigurationsAsXML_correctConfigurationContent()
     On Error GoTo Test_vtkExportConfigurationsAsXML_correctConfigurationContent_Error
 
     mAssert.Equals reloadDom.SelectSingleNode("/vtkConf/configuration[@cID=""c1""]/name").Text, "TestProject", "Expected name of first configuration"
-    mAssert.Equals reloadDom.SelectSingleNode("/vtkConf/configuration[@cID=""c1""]/path").Text, "Project\TestProject.xlsm", "Expected path of first configuration"
+    mAssert.Equals reloadDom.SelectSingleNode("/vtkConf/configuration[@cID=""c1""]/path").Text, "Project\TestProject.<xls>", "Expected path of first configuration"
     mAssert.Equals reloadDom.SelectSingleNode("/vtkConf/configuration[@cID=""c1""]/templatePath").Text, "Template\TestProjectTemplate.xlsm", "Expected template of first configuration"
     mAssert.Equals reloadDom.SelectSingleNode("/vtkConf/configuration[@cID=""c1""]/title").Text, "TestProjectName", "Expected title of first configuration"
     mAssert.Equals reloadDom.SelectSingleNode("/vtkConf/configuration[@cID=""c1""]/comment").Text, "Existing project for various tests of VBAToolKit", "Expected comment of first configuration"

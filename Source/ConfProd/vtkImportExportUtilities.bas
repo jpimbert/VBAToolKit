@@ -390,8 +390,8 @@ Public Sub vtkRecreateConfiguration(projectName As String, configurationName As 
     End If
     rootPath = cm.rootPath
     
-    ' Get the configuration number in the project and the path of the file
-    wbPath = cm.getConfigurationPath(configuration:=configurationName)
+    ' Get the actual path of the file (without template if any)
+    wbPath = cm.configurations(configurationName).path
     
     ' Make sure the workbook we want to create is not open
     ' NB : open add-ins don't count and are managed further down
