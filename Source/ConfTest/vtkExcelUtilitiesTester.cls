@@ -13,6 +13,8 @@ Implements ITestCase
 
 Private mManager As TestCaseManager
 Private mAssert As IAssert
+Private Const typical2003Version = 11
+Private Const typical2007Version = 12
 
 Private Sub Class_Initialize()
     Set mManager = New TestCaseManager
@@ -66,8 +68,24 @@ Public Sub Test_vtkProtectProject()
     vtkCloseAndKillWorkbook Wb:=Wb
 End Sub
 
-Public Sub Test_vtkDefaultExcelExtension()
+Public Sub Test_vtkDefaultExcelExtension2003()
+    vtkExcelVersionForTest = typical2003Version
+    mAssert.Equals ".xls", vtkDefaultExcelExtension, "Default Excel 2003 extension"
+End Sub
+
+Public Sub Test_vtkDefaultExcelExtension2007()
+    vtkExcelVersionForTest = typical2007Version
     mAssert.Equals ".xlsm", vtkDefaultExcelExtension, "Default Excel 2007 extension"
+End Sub
+
+Public Sub Test_vtkDefaultExcelAddInExtension2003()
+    vtkExcelVersionForTest = typical2003Version
+    mAssert.Equals ".xla", vtkDefaultExcelAddInExtension, "Default Excel 2003 Add-In extension"
+End Sub
+
+Public Sub Test_vtkDefaultExcelAddInExtension2007()
+    vtkExcelVersionForTest = typical2007Version
+    mAssert.Equals ".xlam", vtkDefaultExcelAddInExtension, "Default Excel 2007 Add-In extension"
 End Sub
 
 Public Sub Test_vtkExcelVersion_undefined()
@@ -85,7 +103,10 @@ Private Function ITest_Suite() As TestSuite
     Set ITest_Suite = New TestSuite
     ITest_Suite.AddTest ITest_Manager.ClassName, "Test_vtkDefaultIsAddIn"
     ITest_Suite.AddTest ITest_Manager.ClassName, "Test_vtkProtectProject"
-    ITest_Suite.AddTest ITest_Manager.ClassName, "Test_vtkDefaultExcelExtension"
+    ITest_Suite.AddTest ITest_Manager.ClassName, "Test_vtkDefaultExcelExtension2003"
+    ITest_Suite.AddTest ITest_Manager.ClassName, "Test_vtkDefaultExcelExtension2007"
+    ITest_Suite.AddTest ITest_Manager.ClassName, "Test_vtkDefaultExcelAddInExtension2003"
+    ITest_Suite.AddTest ITest_Manager.ClassName, "Test_vtkDefaultExcelAddInExtension2007"
     ITest_Suite.AddTest ITest_Manager.ClassName, "Test_vtkExcelVersion_undefined"
     ITest_Suite.AddTest ITest_Manager.ClassName, "Test_vtkExcelVersion_defined"
 End Function
@@ -94,7 +115,10 @@ Private Sub ITestCase_RunTest()
     Select Case mManager.methodName
         Case "Test_vtkDefaultIsAddIn": Test_vtkDefaultIsAddIn
         Case "Test_vtkProtectProject": Test_vtkProtectProject
-        Case "Test_vtkDefaultExcelExtension": Test_vtkDefaultExcelExtension
+        Case "Test_vtkDefaultExcelExtension2003": Test_vtkDefaultExcelExtension2003
+        Case "Test_vtkDefaultExcelExtension2007": Test_vtkDefaultExcelExtension2007
+        Case "Test_vtkDefaultExcelAddInExtension2003": Test_vtkDefaultExcelAddInExtension2003
+        Case "Test_vtkDefaultExcelAddInExtension2007": Test_vtkDefaultExcelAddInExtension2007
         Case "Test_vtkExcelVersion_undefined": Test_vtkExcelVersion_undefined
         Case "Test_vtkExcelVersion_defined": Test_vtkExcelVersion_defined
         Case Else: mAssert.Should False, "Invalid test name: " & mManager.methodName

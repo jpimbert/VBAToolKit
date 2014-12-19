@@ -133,10 +133,27 @@ End Function
 '---------------------------------------------------------------------------------------
 '
 Public Function vtkDefaultExcelExtension() As String
-    If Val(Application.Version) >= 12 Then
+    If vtkExcelVersion >= 12 Then
         vtkDefaultExcelExtension = ".xlsm"
     Else
         vtkDefaultExcelExtension = ".xls"
+    End If
+End Function
+
+'---------------------------------------------------------------------------------------
+' Function  : vtkDefaultExcelAddInExtension as String
+' Author    : Jean-Pierre Imbert
+' Date      : 19/12/2014
+' Purpose   : return the default extension for an Excel file
+'             - .xla for Excel until 2003 (11.0)
+'             - .xlam for Excel since 2007 (12.0)
+'---------------------------------------------------------------------------------------
+'
+Public Function vtkDefaultExcelAddInExtension() As String
+    If vtkExcelVersion >= 12 Then
+        vtkDefaultExcelAddInExtension = ".xlam"
+    Else
+        vtkDefaultExcelAddInExtension = ".xla"
     End If
 End Function
 
