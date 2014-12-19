@@ -110,7 +110,7 @@ Property Get isDEV() As Boolean
 End Property
 
 '---------------------------------------------------------------------------------------
-' Property  : path as string
+' Property  : path as string - readOnly
 ' Author    : Jean-Pierre Imbert
 ' Date      : 28/08/2013
 ' Purpose   : The relative path of the configuration
@@ -119,11 +119,7 @@ End Property
 '---------------------------------------------------------------------------------------
 '
 Property Get path() As String
-    path = m_parent.getConfigurationPathWithNumber(m_number)
-End Property
-
-Property Let path(newPath As String)
-    m_parent.setConfigurationPathWithNumber m_number, newPath
+    path = vtkConvertGenericExcelPath(Me.genericPath())
 End Property
 
 '---------------------------------------------------------------------------------------
