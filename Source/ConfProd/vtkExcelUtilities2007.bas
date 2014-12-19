@@ -21,6 +21,9 @@ Attribute VB_Name = "vtkExcelUtilities"
 '---------------------------------------------------------------------------------------
 
 Option Explicit
+
+Public vtkExcelVersionForTest As Integer
+
 '---------------------------------------------------------------------------------------
 ' Procedure : vtkCreateExcelWorkbook
 ' Author    : Jean-Pierre Imbert
@@ -71,7 +74,7 @@ End Function
 '
 Public Sub vtkCloseAndKillWorkbook(Wb As Workbook)
     Dim fullPath As String
-    fullPath = Wb.FullName
+    fullPath = Wb.fullName
     Wb.Close saveChanges:=False
     Kill PathName:=fullPath
 End Sub
@@ -134,6 +137,23 @@ Public Function vtkDefaultExcelExtension() As String
         vtkDefaultExcelExtension = ".xlsm"
     Else
         vtkDefaultExcelExtension = ".xls"
+    End If
+End Function
+
+'---------------------------------------------------------------------------------------
+' Function  : vtkExcelVersion as Integer
+' Author    : Jean-Pierre Imbert
+' Date      : 19/12/2014
+' Purpose   : return the numeric value of the Excel version
+'             - normally the current Excel version
+'             - or a forced value with the public variable vtkExcelVersionForTest
+'---------------------------------------------------------------------------------------
+'
+Public Function vtkExcelVersion() As Integer
+    If vtkExcelVersionForTest = 0 Then
+        vtkExcelVersion = Val(Application.Version)
+       Else
+        vtkExcelVersion = vtkExcelVersionForTest
     End If
 End Function
 

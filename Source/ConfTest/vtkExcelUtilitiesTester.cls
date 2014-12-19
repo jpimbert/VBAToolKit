@@ -31,6 +31,7 @@ Private Sub ITestCase_SetUp(Assert As IAssert)
 End Sub
 
 Private Sub ITestCase_TearDown()
+    vtkExcelVersionForTest = 0
     VBAToolKit.resetTestFolder
 End Sub
 
@@ -69,11 +70,24 @@ Public Sub Test_vtkDefaultExcelExtension()
     mAssert.Equals ".xlsm", vtkDefaultExcelExtension, "Default Excel 2007 extension"
 End Sub
 
+Public Sub Test_vtkExcelVersion_undefined()
+    ' When the Excel version is not forced, The actal Excel version is returned
+    mAssert.Equals vtkExcelVersion, Val(Application.Version), "Must be actual Excel version"
+End Sub
+
+Public Sub Test_vtkExcelVersion_defined()
+    ' When the Excel version is forced, The forced Excel version is returned
+    vtkExcelVersionForTest = 534
+    mAssert.Equals vtkExcelVersion, 534, "Must be forced Excel version"
+End Sub
+
 Private Function ITest_Suite() As TestSuite
     Set ITest_Suite = New TestSuite
     ITest_Suite.AddTest ITest_Manager.ClassName, "Test_vtkDefaultIsAddIn"
     ITest_Suite.AddTest ITest_Manager.ClassName, "Test_vtkProtectProject"
     ITest_Suite.AddTest ITest_Manager.ClassName, "Test_vtkDefaultExcelExtension"
+    ITest_Suite.AddTest ITest_Manager.ClassName, "Test_vtkExcelVersion_undefined"
+    ITest_Suite.AddTest ITest_Manager.ClassName, "Test_vtkExcelVersion_defined"
 End Function
 
 Private Sub ITestCase_RunTest()
@@ -81,6 +95,8 @@ Private Sub ITestCase_RunTest()
         Case "Test_vtkDefaultIsAddIn": Test_vtkDefaultIsAddIn
         Case "Test_vtkProtectProject": Test_vtkProtectProject
         Case "Test_vtkDefaultExcelExtension": Test_vtkDefaultExcelExtension
+        Case "Test_vtkExcelVersion_undefined": Test_vtkExcelVersion_undefined
+        Case "Test_vtkExcelVersion_defined": Test_vtkExcelVersion_defined
         Case Else: mAssert.Should False, "Invalid test name: " & mManager.methodName
     End Select
 End Sub
