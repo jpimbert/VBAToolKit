@@ -102,7 +102,7 @@ Public Sub vtkExportConfigurationsAsXML(projectName As String, filePath As Strin
         xmlFile.WriteLine Text:="    <reference refID=""" & ref.id & """>"
         xmlFile.WriteLine Text:="        <name>" & ref.name & "</name>"
         If ref.GUID Like "" Then
-            xmlFile.WriteLine Text:="        <path>" & ref.fullPath & "</path>"
+            xmlFile.WriteLine Text:="        <path>" & ref.relPath & "</path>"
            Else
             xmlFile.WriteLine Text:="        <guid>" & ref.GUID & "</guid>"
         End If

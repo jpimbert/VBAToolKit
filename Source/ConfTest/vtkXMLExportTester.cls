@@ -252,6 +252,22 @@ Test_vtkExportConfigurationsAsXML_correctRefContent_Error:
     Exit Sub
 End Sub
 
+Public Sub Test_vtkExportConfigurationsAsXML_correctRefPath()
+'   modules -> correct content
+    
+    On Error GoTo Test_vtkExportConfigurationsAsXML_correctRefContent_Error
+    
+    mAssert.Equals reloadDom.SelectSingleNode("/vtkConf/reference/name[.=""VBAToolKit""]/../path").Text, "Microsoft\AddIns\VBAToolKit.xlam", "Relative Path for VBAToolKit reference"
+
+    On Error GoTo 0
+    Exit Sub
+
+Test_vtkExportConfigurationsAsXML_correctRefContent_Error:
+    Err.Source = "Test_vtkExportConfigurationsAsXML_correctRefPath of module vtkXMLExportTester"
+    mAssert.Should False, "Unexpected error " & Err.Number & " (" & Err.Description & ") in " & Err.Source
+    Exit Sub
+End Sub
+
 Public Sub Test_vtkExportConfigurationsAsXML_NoProject()
 '   Verifies that an attempt to export a nonexistant project configuration raises the proper error
 
@@ -347,6 +363,7 @@ Private Function ITest_Suite() As TestSuite
     ITest_Suite.AddTest ITest_Manager.ClassName, "Test_vtkExportConfigurationsAsXML_correctReferenceNumber"
     ITest_Suite.AddTest ITest_Manager.ClassName, "Test_vtkExportConfigurationsAsXML_correctRefNumByConf"
     ITest_Suite.AddTest ITest_Manager.ClassName, "Test_vtkExportConfigurationsAsXML_correctRefContent"
+    ITest_Suite.AddTest ITest_Manager.ClassName, "Test_vtkExportConfigurationsAsXML_correctRefPath"
     ITest_Suite.AddTest ITest_Manager.ClassName, "Test_vtkExportConfigurationsAsXML_NoProject"
     ITest_Suite.AddTest ITest_Manager.ClassName, "Test_vtkExportConfigurationsAsXML_WrongPath"
     ITest_Suite.AddTest ITest_Manager.ClassName, "Test_vtkExportConfigurationsAsXML_InexistantFile"
@@ -364,6 +381,7 @@ Private Sub ITestCase_RunTest()
         Case "Test_vtkExportConfigurationsAsXML_correctReferenceNumber": Test_vtkExportConfigurationsAsXML_correctReferenceNumber
         Case "Test_vtkExportConfigurationsAsXML_correctRefNumByConf": Test_vtkExportConfigurationsAsXML_correctRefNumByConf
         Case "Test_vtkExportConfigurationsAsXML_correctRefContent": Test_vtkExportConfigurationsAsXML_correctRefContent
+        Case "Test_vtkExportConfigurationsAsXML_correctRefPath": Test_vtkExportConfigurationsAsXML_correctRefPath
         Case "Test_vtkExportConfigurationsAsXML_NoProject": Test_vtkExportConfigurationsAsXML_NoProject
         Case "Test_vtkExportConfigurationsAsXML_WrongPath": Test_vtkExportConfigurationsAsXML_WrongPath
         Case "Test_vtkExportConfigurationsAsXML_InexistantFile": Test_vtkExportConfigurationsAsXML_InexistantFile
