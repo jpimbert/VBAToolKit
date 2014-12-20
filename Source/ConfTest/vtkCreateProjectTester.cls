@@ -35,6 +35,9 @@ Implements ITestCase
 Private Const vtkTestProjectName = "TestProject"
 Private Const expectedReferenceCount = 10
 
+Private Const typical2003Version = 11
+Private Const typical2007Version = 12
+
 Private mManager As TestCaseManager
 Private mAssert As IAssert
 
@@ -62,13 +65,15 @@ Private Sub ITestCase_TearDown()
     Application.DisplayAlerts = False
     On Error Resume Next
     'Close Created WorkBook
-    Workbooks(vtkTestProjectName & ".xlsm").Close
-    Workbooks(vtkTestProjectName & "_DEV" & ".xlsm").Close
+    Workbooks(vtkTestProjectName & vtkDefaultExcelExtension).Close
+    Workbooks(vtkTestProjectName & "_DEV" & vtkDefaultExcelExtension).Close
     'Delete Created WorkBook
-    Kill VBAToolKit.vtkTestPath & "\" & vtkTestProjectName & "\Project\" & vtkTestProjectName & "_DEV.xlsm"
-    Kill VBAToolKit.vtkTestPath & "\" & vtkTestProjectName & "\Delivery\" & vtkTestProjectName & ".xlsm"
+    Kill VBAToolKit.vtkTestPath & "\" & vtkTestProjectName & "\Project\" & vtkTestProjectName & "_DEV" & vtkDefaultExcelExtension
+    Kill VBAToolKit.vtkTestPath & "\" & vtkTestProjectName & "\Delivery\" & vtkTestProjectName & vtkDefaultExcelExtension
 '   Delete Folder Tree
     vtkCleanFolder VBAToolKit.vtkTestPath
+    'Reset forced Excel version
+    vtkExcelVersionForTest = 0
     Application.DisplayAlerts = True
 End Sub
 
@@ -106,11 +111,24 @@ Public Sub TestMainFolderIsCreated()
     mAssert.Equals returnValue, VTK_OK, "The project creation must succeed"
 End Sub
 
-Public Sub TestDevXlsmFileCreated()
+Public Sub TestDevXlsmFileCreated2007()
 'test that xlsm file is created in the right path
     Dim returnValue As Long
+    vtkExcelVersionForTest = typical2007Version
+    On Error Resume Next
     returnValue = vtkCreateProject(path:=VBAToolKit.vtkTestPath, name:=vtkTestProjectName, displayError:=False)
     mAssert.Should Dir(VBAToolKit.vtkTestPath & "\" & vtkTestProjectName & "\" & "Project" & "\" & vtkTestProjectName & "_DEV.xlsm", vbDirectory) <> "", "the workbook must be created"
+    On Error GoTo 0
+End Sub
+
+Public Sub TestDevXlsmFileCreated2003()
+'test that xls file is created in the right path
+    Dim returnValue As Long
+    vtkExcelVersionForTest = typical2003Version
+    On Error Resume Next
+    returnValue = vtkCreateProject(path:=VBAToolKit.vtkTestPath, name:=vtkTestProjectName, displayError:=False)
+    mAssert.Should Dir(VBAToolKit.vtkTestPath & "\" & vtkTestProjectName & "\" & "Project" & "\" & vtkTestProjectName & "_DEV.xls", vbDirectory) <> "", "the workbook must be created"
+    On Error GoTo 0
 End Sub
 
 Public Sub TestDevXlsmFileIsNamedcorrectly()
@@ -121,11 +139,20 @@ Public Sub TestDevXlsmFileIsNamedcorrectly()
     mAssert.Equals Workbooks(vtkTestProjectName & "_DEV.xlsm").VBProject.name, vtkTestProjectName & "_DEV", "the workbook name must be like " & vtkTestProjectName & "_DEV"
 End Sub
 
-Public Sub TestDelivXlsmFileCreated()
+Public Sub TestDelivXlsmFileCreated2007()
 'test that xlsm file is created in the right path
     Dim returnValue As Long
+    vtkExcelVersionForTest = typical2007Version
     returnValue = vtkCreateProject(path:=VBAToolKit.vtkTestPath, name:=vtkTestProjectName, displayError:=False)
     mAssert.Should Dir(VBAToolKit.vtkTestPath & "\" & vtkTestProjectName & "\" & "Delivery" & "\" & vtkTestProjectName & ".xlsm", vbDirectory) <> "", "the workbook must be created"
+End Sub
+
+Public Sub TestDelivXlsmFileCreated2003()
+'test that xls file is created in the right path
+    Dim returnValue As Long
+    vtkExcelVersionForTest = typical2003Version
+    returnValue = vtkCreateProject(path:=VBAToolKit.vtkTestPath, name:=vtkTestProjectName, displayError:=False)
+    mAssert.Should Dir(VBAToolKit.vtkTestPath & "\" & vtkTestProjectName & "\" & "Delivery" & "\" & vtkTestProjectName & ".xls", vbDirectory) <> "", "the workbook must be created"
 End Sub
 
 Public Sub TestDevProjectIsNamedcorrectly()
@@ -159,7 +186,7 @@ returnValue = vtkCreateProject(path:=VBAToolKit.vtkTestPath, name:=vtkTestProjec
         End If
     Next
 mAssert.Equals j, 2, "the searched reference number must be equal to " & 2
-mAssert.Equals Workbooks(vtkTestProjectName & "_DEV.xlsm").VBProject.references.count, expectedReferenceCount + 1, "the total references number must be equal to " & expectedReferenceCount + 1
+mAssert.Equals Workbooks(vtkTestProjectName & "_DEV.xlsm").VBProject.references.Count, expectedReferenceCount + 1, "the total references number must be equal to " & expectedReferenceCount + 1
 End Sub
 
 Public Sub TestReferencesOfDeliveryWorkbookWasActivated()
@@ -178,7 +205,7 @@ returnValue = vtkCreateProject(path:=VBAToolKit.vtkTestPath, name:=vtkTestProjec
         End If
     Next
 mAssert.Equals j, 2, "the searched reference number must be equal to " & 2
-mAssert.Equals Workbooks(vtkTestProjectName & ".xlsm").VBProject.references.count, expectedReferenceCount, "the total references number must be equal to " & expectedReferenceCount
+mAssert.Equals Workbooks(vtkTestProjectName & ".xlsm").VBProject.references.Count, expectedReferenceCount, "the total references number must be equal to " & expectedReferenceCount
 End Sub
 
 Public Sub Test_VBAUnitModulesExportation()
@@ -299,9 +326,11 @@ Private Function ITest_Suite() As TestSuite
     ITest_Suite.AddTest ITest_Manager.ClassName, "TestCreateProjectDoesNothingWhenPathDoesntExist"
     ITest_Suite.AddTest ITest_Manager.ClassName, "TestCreateProjectAlreadyExisting"
     ITest_Suite.AddTest ITest_Manager.ClassName, "TestMainFolderIsCreated"
-    ITest_Suite.AddTest ITest_Manager.ClassName, "TestDevXlsmFileCreated"
+    ITest_Suite.AddTest ITest_Manager.ClassName, "TestDevXlsmFileCreated2007"
+    ITest_Suite.AddTest ITest_Manager.ClassName, "TestDevXlsmFileCreated2003"
     ITest_Suite.AddTest ITest_Manager.ClassName, "TestDevXlsmFileIsNamedcorrectly"
-    ITest_Suite.AddTest ITest_Manager.ClassName, "TestDelivXlsmFileCreated"
+    ITest_Suite.AddTest ITest_Manager.ClassName, "TestDelivXlsmFileCreated2007"
+    ITest_Suite.AddTest ITest_Manager.ClassName, "TestDelivXlsmFileCreated2003"
     ITest_Suite.AddTest ITest_Manager.ClassName, "TestDevProjectIsNamedcorrectly"
     ITest_Suite.AddTest ITest_Manager.ClassName, "TestDelivProjectIsNamedcorrectly"
     ITest_Suite.AddTest ITest_Manager.ClassName, "TestReferencesOfDevWorkbookWasActivated"
@@ -318,9 +347,11 @@ Private Sub ITestCase_RunTest()
         Case "TestCreateProjectDoesNothingWhenPathDoesntExist": TestCreateProjectDoesNothingWhenPathDoesntExist
         Case "TestCreateProjectAlreadyExisting": TestCreateProjectAlreadyExisting
         Case "TestMainFolderIsCreated": TestMainFolderIsCreated
-        Case "TestDevXlsmFileCreated": TestDevXlsmFileCreated
+        Case "TestDevXlsmFileCreated2007": TestDevXlsmFileCreated2007
+        Case "TestDevXlsmFileCreated2003": TestDevXlsmFileCreated2003
         Case "TestDevXlsmFileIsNamedcorrectly": TestDevXlsmFileIsNamedcorrectly
-        Case "TestDelivXlsmFileCreated": TestDelivXlsmFileCreated
+        Case "TestDelivXlsmFileCreated2007": TestDelivXlsmFileCreated2007
+        Case "TestDelivXlsmFileCreated2003": TestDelivXlsmFileCreated2003
         Case "TestDevProjectIsNamedcorrectly": TestDevProjectIsNamedcorrectly
         Case "TestDelivProjectIsNamedcorrectly": TestDelivProjectIsNamedcorrectly
         Case "TestReferencesOfDevWorkbookWasActivated": TestReferencesOfDevWorkbookWasActivated

@@ -22,6 +22,19 @@ Option Explicit
 '---------------------------------------------------------------------------------------
 
 '---------------------------------------------------------------------------------------
+' Procedure : escapedString
+' Author    : Jean-Pierre IMBERT
+' Date      : 19/12/2014
+' Purpose   : escape < and > characters for XML PCDATA
+'---------------------------------------------------------------------------------------
+'
+Public Function escapedString(str As String) As String
+    Dim str1 As String
+    str1 = Replace(str, "<", "&lt;")
+    escapedString = Replace(str1, ">", "&gt;")
+End Function
+
+'---------------------------------------------------------------------------------------
 ' Procedure : vtkExportConfigurationsAsXML
 ' Author    : Jean-Pierre IMBERT
 ' Date      : 07/11/2013
@@ -111,7 +124,7 @@ Public Sub vtkExportConfigurationsAsXML(projectName As String, filePath As Strin
             xmlFile.WriteLine Text:="    <configuration cID=""" & cf.id & """ refIDs=""" & refList & """>"
         End If
         xmlFile.WriteLine Text:="        <name>" & cf.name & "</name>"
-        xmlFile.WriteLine Text:="        <path>" & cf.path & "</path>"
+        xmlFile.WriteLine Text:="        <path>" & escapedString(cf.genericPath) & "</path>"
         If cf.template <> "" Then _
         xmlFile.WriteLine Text:="        <templatePath>" & cf.template & "</templatePath>"
         xmlFile.WriteLine Text:="        <title>" & cf.projectName & "</title>" ' must be initialized in Workbook with Wb.BuiltinDocumentProperties("Title").Value

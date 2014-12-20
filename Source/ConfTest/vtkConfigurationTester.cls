@@ -33,6 +33,9 @@ Option Explicit
 Implements ITest
 Implements ITestCase
 
+Private Const typical2003Version = 11
+Private Const typical2007Version = 12
+
 Private initializedWorkbook As Workbook    ' Existing Workbook opened for each test
 Private Const initializedWorkbookName As String = "InitializedProject_DEV.xlsm"
 Private confManager As vtkConfigurationManager   ' Configuration Manager for the existing workbook
@@ -67,6 +70,7 @@ End Sub
 Private Sub ITestCase_TearDown()
     vtkCloseAndKillWorkbook Wb:=initializedWorkbook ' close the existing Excel project
     vtkResetConfigurationManagers             ' reset all configuration managers
+    vtkExcelVersionForTest = 0                ' reset forced Excel version
     VBAToolKit.resetTestFolder
 End Sub
 
@@ -331,14 +335,49 @@ M_Error:
     mAssert.Should False, "Unexpected Error (" & Err.Number & "): " & Err.Description
 End Sub
 
-Public Sub Test_ConfigurationSetPath()
-    ' This test verifies the path setting of each vtkConfiguration object
+Public Sub Test_ConfigurationGetPath_WithTemplate()
+    ' This test verifies the path of each vtkConfiguration object
+    ' Generic path set with a template
+    
+   On Error GoTo M_Error
+
+    vtkExcelVersionForTest = typical2007Version
+    confManager.configurations(1).genericPath = "NewPath.<xls>"
+
+    mAssert.Equals confManager.configurations(1).path, "NewPath.xlsm", "Path of the vtkConfiguration object by Index"
+    mAssert.Equals confManager.configurations("InitializedProject_DEV").path, "NewPath.xlsm", "Path of the vtkConfiguration object by Name"
+
+   On Error GoTo 0
+   Exit Sub
+
+M_Error:
+    mAssert.Should False, "Unexpected Error (" & Err.Number & "): " & Err.Description
+End Sub
+
+Public Sub Test_ConfigurationGetGenericPath()
+    ' This test verifies the generic path of each vtkConfiguration object
+    ' collection just initialized from an Excel workbook
+    
+   On Error GoTo M_Error
+
+    mAssert.Equals confManager.configurations(1).genericPath, "Tests\InitializedProject_DEV.xlsm", "Generic Path of the vtkConfiguration object by Index"
+    mAssert.Equals confManager.configurations("InitializedProject_DEV").genericPath, "Tests\InitializedProject_DEV.xlsm", "Generic Path of the vtkConfiguration object by Name"
+
+   On Error GoTo 0
+   Exit Sub
+
+M_Error:
+    mAssert.Should False, "Unexpected Error (" & Err.Number & "): " & Err.Description
+End Sub
+
+Public Sub Test_ConfigurationSetGenericPath()
+    ' This test verifies the generic path setting of each vtkConfiguration object
     ' collection just initialized from an Excel workbook
 
    On Error GoTo M_Error
-    confManager.configurations(1).path = "NewPath"
-    mAssert.Equals confManager.configurations(1).path, "NewPath", "Path of the vtkConfiguration object by index"
-    mAssert.Equals confManager.configurations("InitializedProject_DEV").path, "NewPath", "Path of the vtkConfiguration object by name"
+    confManager.configurations(1).genericPath = "NewPath"
+    mAssert.Equals confManager.configurations(1).genericPath, "NewPath", "Generic Path of the vtkConfiguration object by index"
+    mAssert.Equals confManager.configurations("InitializedProject_DEV").genericPath, "NewPath", "Generic Path of the vtkConfiguration object by name"
     mAssert.Equals confManager.getConfigurationPathWithNumber(1), "NewPath", "Path of the modified configuration in the configuration manager"
 
    On Error GoTo 0
@@ -892,7 +931,9 @@ Private Function ITest_Suite() As TestSuite
     ITest_Suite.AddTest ITest_Manager.ClassName, "Test_ConfigurationGetDefaultPasswordFromVersion12"
     ITest_Suite.AddTest ITest_Manager.ClassName, "Test_ConfigurationIsDEV_True"
     ITest_Suite.AddTest ITest_Manager.ClassName, "Test_ConfigurationGetPath"
-    ITest_Suite.AddTest ITest_Manager.ClassName, "Test_ConfigurationSetPath"
+    ITest_Suite.AddTest ITest_Manager.ClassName, "Test_ConfigurationGetPath_WithTemplate"
+    ITest_Suite.AddTest ITest_Manager.ClassName, "Test_ConfigurationGetGenericPath"
+    ITest_Suite.AddTest ITest_Manager.ClassName, "Test_ConfigurationSetGenericPath"
     ITest_Suite.AddTest ITest_Manager.ClassName, "Test_ConfigurationSetProjectNameInVersion12"
     ITest_Suite.AddTest ITest_Manager.ClassName, "Test_ConfigurationSetProjectNameInVersion11"
     ITest_Suite.AddTest ITest_Manager.ClassName, "Test_ConfigurationSetProjectNameInVersion10"
@@ -940,7 +981,9 @@ Private Sub ITestCase_RunTest()
         Case "Test_ConfigurationGetDefaultPasswordFromVersion12": Test_ConfigurationGetDefaultPasswordFromVersion12
         Case "Test_ConfigurationIsDEV_True": Test_ConfigurationIsDEV_True
         Case "Test_ConfigurationGetPath": Test_ConfigurationGetPath
-        Case "Test_ConfigurationSetPath": Test_ConfigurationSetPath
+        Case "Test_ConfigurationGetPath_WithTemplate": Test_ConfigurationGetPath_WithTemplate
+        Case "Test_ConfigurationGetGenericPath": Test_ConfigurationGetGenericPath
+        Case "Test_ConfigurationSetGenericPath": Test_ConfigurationSetGenericPath
         Case "Test_ConfigurationSetProjectNameInVersion12": Test_ConfigurationSetProjectNameInVersion12
         Case "Test_ConfigurationSetProjectNameInVersion11": Test_ConfigurationSetProjectNameInVersion11
         Case "Test_ConfigurationSetProjectNameInVersion10": Test_ConfigurationSetProjectNameInVersion10

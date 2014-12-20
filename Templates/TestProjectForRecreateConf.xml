@@ -162,9 +162,15 @@
         <templatePath>Templates\TestProjectTemplate.xlsx</templatePath>
         <title>ProjectName14</title>
         <comment>Comment for Workbook #14</comment>
-	<password>aPassword</password>
-   </configuration>
-   <module mID="m1">
+        <password>aPassword</password>
+    </configuration>
+    <configuration cID="c15">
+        <name>TestProject_ExtTemplateConf</name>
+        <path>TestProject_ExtTemplateConf.&lt;xla&gt;</path>
+        <title>ProjectName15</title>
+        <comment>Comment for Workbook #15</comment>
+    </configuration>
+    <module mID="m1">
         <name>TestModule1</name>
         <modulePath confId="c2">TestModule1.bas</modulePath>
         <modulePath confId="c3">TestModule1.bas</modulePath>
@@ -178,6 +184,7 @@
         <modulePath confId="c12">TestModule1.bas</modulePath>
         <modulePath confId="c13">TestModule1.bas</modulePath>
         <modulePath confId="c14">TestModule1.bas</modulePath>
+        <modulePath confId="c15">TestModule1.bas</modulePath>
     </module>
     <module mID="m2">
         <name>TestModule2</name>
@@ -191,6 +198,7 @@
         <modulePath confId="c12">TestModule2.bas</modulePath>
         <modulePath confId="c13">TestModule2.bas</modulePath>
         <modulePath confId="c14">TestModule2.bas</modulePath>
+        <modulePath confId="c15">TestModule2.bas</modulePath>
     </module>
     <module mID="m3">
         <name>TestClassModule1</name>

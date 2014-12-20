@@ -35,6 +35,9 @@ Implements ITestCase
 Private mManager As TestCaseManager
 Private mAssert As IAssert
 
+Private Const typical2003Version = 11
+Private Const typical2007Version = 12
+
 Private fso As FileSystemObject
 
 Private Wb As Workbook
@@ -50,6 +53,7 @@ Private xlaConf As vtkConfiguration
 Private multitypeConf As vtkConfiguration
 Private noTemplateConf As vtkConfiguration
 Private passwordConf As vtkConfiguration
+Private extTemplateConf As vtkConfiguration
 Private VTKConf As vtkConfiguration
 Private VTKProjectConf As vtkConfiguration
 Private testedConf As vtkConfiguration
@@ -68,6 +72,7 @@ Private Const xlaConfName = "TestProject_xlaConf"
 Private Const multitypeConfName = "TestProject_multitypeConf"
 Private Const noTemplateConfName = "TestProject_NoTemplate"
 Private Const passwordConfName = "TestProject_withPassword"
+Private Const extTemplateConfName = "TestProject_ExtTemplateConf"
 Private Const VTKConfName = "TestProject_VTKConf"
 Private Const VTKProjectConfName = "VBAToolKit"
 
@@ -122,6 +127,7 @@ Private Sub ITestCase_SetUp(Assert As IAssert)
     Set multitypeConf = cm.configurations(multitypeConfName)
     Set noTemplateConf = cm.configurations(noTemplateConfName)
     Set passwordConf = cm.configurations(passwordConfName)
+    Set extTemplateConf = cm.configurations(extTemplateConfName)
     Set VTKConf = cm.configurations(VTKConfName)
     Set VTKProjectConf = cm.configurations(VTKProjectConfName)
 
@@ -141,6 +147,7 @@ Private Sub ITestCase_TearDown()
     VBAToolKit.resetTestFolder
     vtkResetProjects
     vtkResetConfigurationManagers
+    vtkExcelVersionForTest = 0
 End Sub
 
 ' TESTS TO BE WRITTEN
@@ -622,6 +629,31 @@ Test_vtkRecreateConfiguration_formatLikeExtension_XLA_Error:
     Exit Sub
 End Sub
 
+Public Sub Test_vtkRecreateConfiguration_extensionTemplate2007()
+' test the <xla> template format for Excel 2007
+
+    On Error GoTo Test_vtkRecreateConfiguration_extensionTemplate2007_Error
+
+    Set testedConf = extTemplateConf
+    vtkExcelVersionForTest = typical2007Version
+    
+    exportModulesAndRecreateWb Wb, testProject, testedConf
+
+    mAssert.Equals recreatedWb.FileFormat, _
+                   xlOpenXMLAddIn, _
+                   "File format is wrong."
+    mAssert.Equals vtkGetFileExtension(recreatedWb.fullName), "xlam", "Actual extension for Excel 2007"
+    verifyProperties recreatedWb, testedConf.Number
+
+    On Error GoTo 0
+    Exit Sub
+
+Test_vtkRecreateConfiguration_extensionTemplate2007_Error:
+    Err.Source = "Test_vtkRecreateConfiguration_extensionTemplate2007 of module vtkRecreateConfigurationTester"
+    mAssert.Should False, "Unexpected error " & Err.Number & " (" & Err.Description & ") in " & Err.Source
+    Exit Sub
+End Sub
+
 Public Sub Test_vtkRecreateConfiguration_workbookOpen()
 '  workbook with the same name is already open : raise error VTK_WORKBOOK_ALREADY_OPEN
 
@@ -888,6 +920,7 @@ Private Function ITest_Suite() As TestSuite
     ITest_Suite.AddTest ITest_Manager.ClassName, "Test_vtkRecreateConfiguration_formatLikeExtension_XLAM"
     ITest_Suite.AddTest ITest_Manager.ClassName, "Test_vtkRecreateConfiguration_formatLikeExtension_XLS"
     ITest_Suite.AddTest ITest_Manager.ClassName, "Test_vtkRecreateConfiguration_formatLikeExtension_XLA"
+    ITest_Suite.AddTest ITest_Manager.ClassName, "Test_vtkRecreateConfiguration_extensionTemplate2007"
     ITest_Suite.AddTest ITest_Manager.ClassName, "Test_vtkRecreateConfiguration_workbookOpen"
     ITest_Suite.AddTest ITest_Manager.ClassName, "Test_vtkRecreateConfiguration_addInOpen_XLAM"
     ITest_Suite.AddTest ITest_Manager.ClassName, "Test_vtkRecreateConfiguration_workbookAndVbProjectAlreadyOpen"
@@ -918,6 +951,7 @@ Private Sub ITestCase_RunTest()
         Case "Test_vtkRecreateConfiguration_formatLikeExtension_XLAM": Test_vtkRecreateConfiguration_formatLikeExtension_XLAM
         Case "Test_vtkRecreateConfiguration_formatLikeExtension_XLS": Test_vtkRecreateConfiguration_formatLikeExtension_XLS
         Case "Test_vtkRecreateConfiguration_formatLikeExtension_XLA": Test_vtkRecreateConfiguration_formatLikeExtension_XLA
+        Case "Test_vtkRecreateConfiguration_extensionTemplate2007": Test_vtkRecreateConfiguration_extensionTemplate2007
         Case "Test_vtkRecreateConfiguration_workbookOpen": Test_vtkRecreateConfiguration_workbookOpen
         Case "Test_vtkRecreateConfiguration_addInOpen_XLAM": Test_vtkRecreateConfiguration_addInOpen_XLAM
         Case "Test_vtkRecreateConfiguration_workbookAndVbProjectAlreadyOpen": Test_vtkRecreateConfiguration_workbookAndVbProjectAlreadyOpen

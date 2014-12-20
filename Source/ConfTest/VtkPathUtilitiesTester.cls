@@ -34,6 +34,8 @@ Implements ITestCase
 
 Private mManager As TestCaseManager
 Private mAssert As IAssert
+Private Const typical2003Version = 11
+Private Const typical2007Version = 12
 
 Private Sub Class_Initialize()
     Set mManager = New TestCaseManager
@@ -52,7 +54,7 @@ Private Sub ITestCase_SetUp(Assert As IAssert)
 End Sub
 
 Private Sub ITestCase_TearDown()
-
+    vtkExcelVersionForTest = 0
 End Sub
 
 Public Sub TestPathToTestFolder()
@@ -242,6 +244,122 @@ Public Sub Test_vtkIsPathAbsolute_RelativePath()
     mAssert.Should Not vtkIsPathAbsolute(path), "Path " & path & " is relative"
 End Sub
 
+Public Sub Test_vtkConvertGenericExcelPath_NoTemplate()
+    ' Test the generic path conversion with no extension template
+    Dim genericFilePath As String, expectedFilePath As String, actualFilePath As String
+    
+    genericFilePath = "dummyFolder\dummy_VTKEXT.extension"
+    expectedFilePath = "dummyFolder\dummy_VTKEXT.extension"
+    
+    On Error Resume Next
+    actualFilePath = vtkConvertGenericExcelPath(genericFilePath)
+    mAssert.Equals Err.Number, 0, "Error returned by vtkConvertGenericExcelPath function"
+    On Error GoTo 0
+    
+    mAssert.Equals actualFilePath, expectedFilePath, "Converted file path for generic path=" & genericFilePath
+    
+End Sub
+
+Public Sub Test_vtkConvertGenericExcelPath_Irrelevant()
+    ' Test the generic path conversion with irrelevant extension template
+    Dim genericFilePath As String, expectedFilePath As String, actualFilePath As String
+    
+    genericFilePath = "dummyFolder\dummy_VTKEXT.<extension>"
+    expectedFilePath = ""
+    
+    On Error Resume Next
+    actualFilePath = vtkConvertGenericExcelPath(genericFilePath)
+    mAssert.Equals Err.Number, VTK_WRONG_GENERIC_EXTENSION, "Error returned by vtkConvertGenericExcelPath function"
+    On Error GoTo 0
+    
+    mAssert.Equals actualFilePath, expectedFilePath, "Converted file path for generic path=" & genericFilePath
+    
+End Sub
+
+Public Sub Test_vtkConvertGenericExcelPath_XLA2003()
+    ' Test the generic path conversion with <xla> extension template and Excel 2003
+    Dim genericFilePath As String, expectedFilePath As String, actualFilePath As String
+    
+    genericFilePath = "dummyFolder\dummy_VTKEXT.<xla>"
+    expectedFilePath = "dummyFolder\dummy_VTKEXT.xla"
+    vtkExcelVersionForTest = typical2003Version
+    
+    On Error Resume Next
+    actualFilePath = vtkConvertGenericExcelPath(genericFilePath)
+    mAssert.Equals Err.Number, 0, "Error returned by vtkConvertGenericExcelPath function"
+    On Error GoTo 0
+    
+    mAssert.Equals actualFilePath, expectedFilePath, "Converted file path for generic path=" & genericFilePath
+    
+End Sub
+
+Public Sub Test_vtkConvertGenericExcelPath_XLA2007()
+    ' Test the generic path conversion with <xla> extension template and Excel 2007
+    Dim genericFilePath As String, expectedFilePath As String, actualFilePath As String
+    
+    genericFilePath = "dummyFolder\dummy_VTKEXT.<xla>"
+    expectedFilePath = "dummyFolder\dummy_VTKEXT.xlam"
+    vtkExcelVersionForTest = typical2007Version
+    
+    On Error Resume Next
+    actualFilePath = vtkConvertGenericExcelPath(genericFilePath)
+    mAssert.Equals Err.Number, 0, "Error returned by vtkConvertGenericExcelPath function"
+    On Error GoTo 0
+    
+    mAssert.Equals actualFilePath, expectedFilePath, "Converted file path for generic path=" & genericFilePath
+    
+End Sub
+
+Public Sub Test_vtkConvertGenericExcelPath_XLS2003()
+    ' Test the generic path conversion with <xls> extension template and Excel 2003
+    Dim genericFilePath As String, expectedFilePath As String, actualFilePath As String
+    
+    genericFilePath = "dummyFolder\dummy_VTKEXT.<xls>"
+    expectedFilePath = "dummyFolder\dummy_VTKEXT.xls"
+    vtkExcelVersionForTest = typical2003Version
+    
+    On Error Resume Next
+    actualFilePath = vtkConvertGenericExcelPath(genericFilePath)
+    mAssert.Equals Err.Number, 0, "Error returned by vtkConvertGenericExcelPath function"
+    On Error GoTo 0
+    
+    mAssert.Equals actualFilePath, expectedFilePath, "Converted file path for generic path=" & genericFilePath
+    
+End Sub
+
+Public Sub Test_vtkConvertGenericExcelPath_XLS2007()
+    ' Test the generic path conversion with <xls> extension template and Excel 2007
+    Dim genericFilePath As String, expectedFilePath As String, actualFilePath As String
+    
+    genericFilePath = "dummyFolder\dummy_VTKEXT.<xls>"
+    expectedFilePath = "dummyFolder\dummy_VTKEXT.xlsm"
+    vtkExcelVersionForTest = typical2007Version
+    
+    On Error Resume Next
+    actualFilePath = vtkConvertGenericExcelPath(genericFilePath)
+    mAssert.Equals Err.Number, 0, "Error returned by vtkConvertGenericExcelPath function"
+    On Error GoTo 0
+    
+    mAssert.Equals actualFilePath, expectedFilePath, "Converted file path for generic path=" & genericFilePath
+    
+End Sub
+
+Public Sub Test_vtkConvertGenericExcelPath_NoExtension()
+    ' Test the generic path conversion without extension
+    Dim genericFilePath As String, expectedFilePath As String, actualFilePath As String
+    
+    genericFilePath = "dummyFolder\dummy_VTKEXT"
+    expectedFilePath = "dummyFolder\dummy_VTKEXT"
+    
+    On Error Resume Next
+    actualFilePath = vtkConvertGenericExcelPath(genericFilePath)
+    mAssert.Equals Err.Number, 0, "Error returned by vtkConvertGenericExcelPath function"
+    On Error GoTo 0
+    
+    mAssert.Equals actualFilePath, expectedFilePath, "Converted file path for generic path=" & genericFilePath
+    
+End Sub
+
 Private Function ITest_Suite() As TestSuite
     Set ITest_Suite = New TestSuite
     ITest_Suite.AddTest ITest_Manager.ClassName, "TestPathToTestFolder"
@@ -286,6 +404,13 @@ Private Function ITest_Suite() As TestSuite
     ITest_Suite.AddTest ITest_Manager.ClassName, "Test_vtkIsPathAbsolute_UpcaseDrivePath"
     ITest_Suite.AddTest ITest_Manager.ClassName, "Test_vtkIsPathAbsolute_LowcaseDrivePath"
     ITest_Suite.AddTest ITest_Manager.ClassName, "Test_vtkIsPathAbsolute_RelativePath"
+    ITest_Suite.AddTest ITest_Manager.ClassName, "Test_vtkConvertGenericExcelPath_NoTemplate"
+    ITest_Suite.AddTest ITest_Manager.ClassName, "Test_vtkConvertGenericExcelPath_Irrelevant"
+    ITest_Suite.AddTest ITest_Manager.ClassName, "Test_vtkConvertGenericExcelPath_XLA2003"
+    ITest_Suite.AddTest ITest_Manager.ClassName, "Test_vtkConvertGenericExcelPath_XLA2007"
+    ITest_Suite.AddTest ITest_Manager.ClassName, "Test_vtkConvertGenericExcelPath_XLS2003"
+    ITest_Suite.AddTest ITest_Manager.ClassName, "Test_vtkConvertGenericExcelPath_XLS2007"
+    ITest_Suite.AddTest ITest_Manager.ClassName, "Test_vtkConvertGenericExcelPath_NoExtension"
 End Function
 
 Private Sub ITestCase_RunTest()
@@ -332,6 +457,13 @@ Private Sub ITestCase_RunTest()
         Case "Test_vtkIsPathAbsolute_UpcaseDrivePath": Test_vtkIsPathAbsolute_UpcaseDrivePath
         Case "Test_vtkIsPathAbsolute_LowcaseDrivePath": Test_vtkIsPathAbsolute_LowcaseDrivePath
         Case "Test_vtkIsPathAbsolute_RelativePath": Test_vtkIsPathAbsolute_RelativePath
+        Case "Test_vtkConvertGenericExcelPath_NoTemplate": Test_vtkConvertGenericExcelPath_NoTemplate
+        Case "Test_vtkConvertGenericExcelPath_Irrelevant": Test_vtkConvertGenericExcelPath_Irrelevant
+        Case "Test_vtkConvertGenericExcelPath_XLA2003": Test_vtkConvertGenericExcelPath_XLA2003
+        Case "Test_vtkConvertGenericExcelPath_XLA2007": Test_vtkConvertGenericExcelPath_XLA2007
+        Case "Test_vtkConvertGenericExcelPath_XLS2003": Test_vtkConvertGenericExcelPath_XLS2003
+        Case "Test_vtkConvertGenericExcelPath_XLS2007": Test_vtkConvertGenericExcelPath_XLS2007
+        Case "Test_vtkConvertGenericExcelPath_NoExtension": Test_vtkConvertGenericExcelPath_NoExtension
         Case Else: mAssert.Should False, "Invalid test name: " & mManager.methodName
     End Select
 End Sub
