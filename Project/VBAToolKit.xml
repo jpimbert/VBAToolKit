@@ -70,7 +70,7 @@
     </reference>
     <reference refID="r11">
         <name>VBAToolKit</name>
-        <path>C:\Documents and Settings\Demonn\Application Data\Microsoft\AddIns\VBAToolKit.xlam</path>
+        <path>Microsoft\AddIns\VBAToolKit.xlam</path>
     </reference>
     <configuration cID="c1" refIDs="r1 r2 r3 r4 r5 r6 r7 r8 r9">
         <name>VBAToolKit</name>
