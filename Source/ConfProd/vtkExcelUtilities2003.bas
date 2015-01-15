@@ -195,3 +195,18 @@ Public Function vtkReferencesInWorkbook(Wb As Workbook) As Collection
     Next
     Set vtkReferencesInWorkbook = c
 End Function
+
+'---------------------------------------------------------------------------------------
+' Sub       : vtkProtectProject
+' Author    : Jean-Pierre Imbert
+' Date      : 05/12/2014
+' Purpose   : Protect a VBAProject with a password
+'---------------------------------------------------------------------------------------
+'
+Sub vtkProtectProject(project As VBProject, password As String)
+    ' Set active project and work with the property window
+    Set Application.VBE.ActiveVBProject = project
+    Application.VBE.CommandBars(1).FindControl(id:=2578, recursive:=True).Execute
+    ' + means Maj, % means Alt, ~ means Return
+    SendKeys "+{TAB}{RIGHT}%V{+}{TAB}" & password & "{TAB}" & password & "~", True
+End Sub
