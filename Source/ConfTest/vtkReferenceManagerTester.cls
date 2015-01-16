@@ -45,7 +45,7 @@ Private existingRefManager As vtkReferenceManager   ' Reference Manager for the 
 Private Sub SaveThenReOpenNewWorkbook()
 ' Utility Function for saving then re-open the new workbook and re-initialize the reference manager
     Dim savedNewWorkbookPath As String
-    savedNewWorkbookPath = newWorkbook.FullName
+    savedNewWorkbookPath = newWorkbook.fullName
     newWorkbook.Close saveChanges:=True
     Set newWorkbook = Workbooks.Open(fileName:=savedNewWorkbookPath)
     Set newRefManager = New vtkReferenceManager
@@ -213,7 +213,7 @@ Public Sub TestAddConfiguration()
     mAssert.Equals ws.Range("E1"), existingWorkbook.VBProject.name & "_DEV", "Expected Title for DEV project column"
     mAssert.Equals ws.Range("F1"), "NewConfiguration", "Expected Title for the new configuration column"
     
-    mAssert.Equals existingRefManager.references(3).count, 0, "Number of references attached to the new configuration"
+    mAssert.Equals existingRefManager.references(3).Count, 0, "Number of references attached to the new configuration"
     
     Set confManager = Nothing
 
@@ -349,7 +349,7 @@ Public Sub TestGetReferencesFromNewWorkbook()
     
     ' Test references for the main configuration (#1)
     Set c = newRefManager.references(1)
-    mAssert.Equals c.count, 10, "Reference count for the main configuration"
+    mAssert.Equals c.Count, 10, "Reference count for the main configuration"
     mAssert.Equals c(1).name, "VBA", "Reference for the main configuration"
     mAssert.Equals c(2).name, "Excel", "Reference for the main configuration"
     mAssert.Equals c(3).name, "stdole", "Reference for the main configuration"
@@ -363,7 +363,7 @@ Public Sub TestGetReferencesFromNewWorkbook()
     
     ' Test references for the development configuration (#2)
     Set c = newRefManager.references(2)
-    mAssert.Equals c.count, 11, "Reference count for the development configuration"
+    mAssert.Equals c.Count, 11, "Reference count for the development configuration"
     mAssert.Equals c(1).name, "VBA", "Reference for the development configuration"
     mAssert.Equals c(2).name, "Excel", "Reference for the development configuration"
     mAssert.Equals c(3).name, "stdole", "Reference for the development configuration"
@@ -411,7 +411,7 @@ Public Sub TestGetReferencesWithNullDevConf()
     
     ' Test references for the main configuration (#1)
     Set c = newRefManager.references(1)
-    mAssert.Equals c.count, 10, "Reference count for the main configuration"
+    mAssert.Equals c.Count, 10, "Reference count for the main configuration"
     mAssert.Equals c(1).name, "VBA", "Reference for the main configuration"
     mAssert.Equals c(2).name, "Excel", "Reference for the main configuration"
     mAssert.Equals c(3).name, "stdole", "Reference for the main configuration"
@@ -425,7 +425,7 @@ Public Sub TestGetReferencesWithNullDevConf()
     
     ' Test references for the development configuration (#2)
     Set c = newRefManager.references(2)
-    mAssert.Equals c.count, 10, "Reference count for the development configuration"
+    mAssert.Equals c.Count, 10, "Reference count for the development configuration"
     mAssert.Equals c(1).name, "VBA", "Reference for the development configuration"
     mAssert.Equals c(2).name, "Excel", "Reference for the development configuration"
     mAssert.Equals c(3).name, "stdole", "Reference for the development configuration"
@@ -457,11 +457,11 @@ Public Sub TestGetReferencesWithNoDevConf()
     
     ' Test references for the main configuration (#1)
     Set c = newRefManager.references(1)
-    mAssert.Equals c.count, 0, "Reference count for the main configuration"
+    mAssert.Equals c.Count, 0, "Reference count for the main configuration"
     
     ' Test references for the development configuration (#2)
     Set c = newRefManager.references(2)
-    mAssert.Equals c.count, 0, "Reference count for the development configuration"
+    mAssert.Equals c.Count, 0, "Reference count for the development configuration"
     
    On Error GoTo 0
     Exit Sub

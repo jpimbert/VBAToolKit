@@ -10,12 +10,12 @@ Attribute VB_Exposed = False
 Option Explicit
 
 Public Function TestClasses() As Collection
-    Dim Components As VBComponents, Component As VBComponent
+    Dim Components As VBComponents, component As VBComponent
     Set TestClasses = New Collection
     Set Components = Application.VBE.ActiveVBProject.VBComponents
-    For Each Component In Components
-        If IsClassModule(Component.Type) And IsTestClassName(Component.name) Then
-            TestClasses.Add Component.name
+    For Each component In Components
+        If IsClassModule(component.Type) And IsTestClassName(component.name) Then
+            TestClasses.Add component.name
         End If
     Next
 End Function
@@ -43,6 +43,7 @@ Public Function SelectTestClass(TestClassName As String) As ITest
         Case "vtkWorkbookIsOpenTester": Set SelectTestClass = New vtkWorkbookIsOpenTester
         Case "vtkConfManagerExcel10Tester": Set SelectTestClass = New vtkConfManagerExcel10Tester
         Case "vtkConfManagerExcel11Tester": Set SelectTestClass = New vtkConfManagerExcel11Tester
+        Case "vtkConfManagerExcel12Tester": Set SelectTestClass = New vtkConfManagerExcel12Tester
         Case "vtkConfigurationManagersTester": Set SelectTestClass = New vtkConfigurationManagersTester
         Case "vtkProjectsTester": Set SelectTestClass = New vtkProjectsTester
         Case "vtkProjectTester": Set SelectTestClass = New vtkProjectTester
@@ -64,7 +65,6 @@ Public Function SelectTestClass(TestClassName As String) As ITest
         Case "vtkReferenceManagerTester": Set SelectTestClass = New vtkReferenceManagerTester
         Case "vtkConfManagerXML20Tester": Set SelectTestClass = New vtkConfManagerXML20Tester
         Case "vtkRecreateConfXMLTester": Set SelectTestClass = New vtkRecreateConfXMLTester
-        Case "vtkConfManagerExcel12Tester": Set SelectTestClass = New vtkConfManagerExcel12Tester
         Case Else:
     End Select
 End Function

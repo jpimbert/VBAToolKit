@@ -55,7 +55,7 @@ Private Const workbookNameWithConfigurationV11 As String = "WorkBookForConfigura
 Private Sub SaveThenReOpenNewWorkbook()
 ' Utility Function for saving then re-open the new workbook and re-initialize the configuration managers
     Dim savedNewWorkbookPath As String
-    savedNewWorkbookPath = newWorkbook.FullName
+    savedNewWorkbookPath = newWorkbook.fullName
 '    If newWorkbook.path = "" Then
 '        newWorkbook.Close SaveChanges:=True, Filename:=savedNewWorkbookPath
 '       Else
@@ -128,7 +128,7 @@ Public Sub TestConfigurationSheetDoesntExistInNewWorkbook()
     '   using a fresh configuration Manager (with no default sheet initialized)
     Dim cm As New vtkConfigurationManagerExcel, Wb As Workbook, wbFullName As String
     Set Wb = vtkCreateExcelWorkbookForTestWithProjectName("NewWorkbook")    ' create a fresh new Excel workbook
-    wbFullName = Wb.FullName
+    wbFullName = Wb.fullName
     mAssert.Should Not cm.isConfigurationInitializedForWorkbook(ExcelName:=Wb.name), "The Configuration sheet must not exist in new workbook"
     Wb.Close saveChanges:=False
     Kill PathName:=wbFullName

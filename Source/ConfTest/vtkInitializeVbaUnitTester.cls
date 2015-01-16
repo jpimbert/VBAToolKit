@@ -33,7 +33,7 @@ Option Explicit
 Implements ITest
 Implements ITestCase
 
-Private newWorkBook As Workbook
+Private newWorkbook As Workbook
 Private Const projectName As String = "NewProject"
 Private newConfManager As vtkConfigurationManager
 
@@ -54,12 +54,12 @@ End Property
 
 Private Sub ITestCase_SetUp(Assert As IAssert)
     Set mAssert = Assert
-    Set newWorkBook = vtkCreateExcelWorkbookForTestWithProjectName(projectName)    ' create an Excel project for tests
+    Set newWorkbook = vtkCreateExcelWorkbookForTestWithProjectName(projectName)    ' create an Excel project for tests
     Set newConfManager = vtkConfigurationManagerForProject(projectName)
 End Sub
 
 Private Sub ITestCase_TearDown()
-    vtkCloseAndKillWorkbook Wb:=newWorkBook     ' close the new Excel project
+    vtkCloseAndKillWorkbook Wb:=newWorkbook     ' close the new Excel project
     vtkResetConfigurationManagers             ' reset all configuration managers
 End Sub
 

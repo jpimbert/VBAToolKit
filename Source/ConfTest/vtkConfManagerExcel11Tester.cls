@@ -54,7 +54,7 @@ Private Const workbookNameWithConfigurationV10 As String = "WorkBookForConfigura
 Private Sub SaveThenReOpenNewWorkbook()
 ' Utility Function for saving then re-open the new workbook and re-initialize the configuration managers
     Dim savedNewWorkbookPath As String
-    savedNewWorkbookPath = newWorkbook.FullName
+    savedNewWorkbookPath = newWorkbook.fullName
 '    If newWorkbook.path = "" Then
 '        newWorkbook.Close SaveChanges:=True, Filename:=savedNewWorkbookPath
 '       Else
