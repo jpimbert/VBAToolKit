@@ -175,7 +175,7 @@ End Sub
 Private Function selfReference() As vtkReference
     Dim ref As New vtkReference
     ref.name = ThisWorkbook.VBProject.name
-    ref.fullPath = ThisWorkbook.FullName
+    ref.fullPath = ThisWorkbook.fullName
     Set selfReference = ref
 End Function
 
@@ -302,7 +302,7 @@ Public Sub addConfiguration()
         newColumn = m_referenceSheet.UsedRange.Columns.Count + 1
         m_referenceSheet.Columns(newColumn).ColumnWidth = 22
         m_referenceSheet.Columns(newColumn).HorizontalAlignment = xlCenter
-        m_referenceSheet.Cells(1, newColumn).FormulaLocal = "=INDIRECT(ADRESSE(1;" & newColumn - nbTitleColumns + m_nbTitleColumnsInConfSheet & ";4;1;""vtkConfigurations""))"
+        m_referenceSheet.Cells(1, newColumn).Formula = "=INDIRECT(ADDRESS(1," & newColumn - nbTitleColumns + m_nbTitleColumnsInConfSheet & ",4,1,""vtkConfigurations""))"
         m_referenceSheet.Cells(1, newColumn).Font.Bold = True
        Else
         Err.Raise Number:=VTK_NOTINITIALIZED, Source:="vtkReferenceManager:addConfiguration", Description:="Impossible to add a configuration to the reference sheet of a null workbook."

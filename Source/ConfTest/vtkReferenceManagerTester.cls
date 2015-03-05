@@ -35,7 +35,7 @@ Implements ITestCase
 Private mManager As TestCaseManager
 Private mAssert As IAssert
 
-Private newWorkbook As Workbook         ' New Workbook created for each test
+Private newWorkBook As Workbook         ' New Workbook created for each test
 Private newRefManager As vtkReferenceManager   ' Reference Manager for the new workbook
 
 Private existingWorkbook As Workbook    ' Existing Workbook opened for each test
@@ -45,11 +45,26 @@ Private existingRefManager As vtkReferenceManager   ' Reference Manager for the 
 Private Sub SaveThenReOpenNewWorkbook()
 ' Utility Function for saving then re-open the new workbook and re-initialize the reference manager
     Dim savedNewWorkbookPath As String
-    savedNewWorkbookPath = newWorkbook.fullName
-    newWorkbook.Close saveChanges:=True
-    Set newWorkbook = Workbooks.Open(fileName:=savedNewWorkbookPath)
+    savedNewWorkbookPath = newWorkBook.fullName
+    newWorkBook.Close saveChanges:=True
+    Set newWorkBook = Workbooks.Open(fileName:=savedNewWorkbookPath)
     Set newRefManager = New vtkReferenceManager
-    Set newRefManager.Workbook = newWorkbook
+    Set newRefManager.Workbook = newWorkBook
+End Sub
+
+Private Sub assertSheet(ws As Worksheet, Wb As Workbook, Optional newWorkBook As Boolean = False)
+    mAssert.Equals ws.Range("A1"), "vtkReferences v1.0", "Expected identification of the reference sheet"
+    mAssert.Equals ws.Range("B1"), "", "Expected Title for GUID column"
+    mAssert.Equals ws.Range("C1"), "-", "Expected Title for FullPath column"
+    mAssert.Equals ws.Range("D1"), Wb.VBProject.name, "Expected Title for main project column"
+    mAssert.Equals ws.Range("E1"), Wb.VBProject.name & "_DEV", "Expected Title for DEV project column"
+    If newWorkBook Then
+        mAssert.Equals ws.Range("D1").Formula, "=INDIRECT(ADDRESS(1,2,4,1,""vtkConfigurations""))", "Expected Formula for main project column"
+        mAssert.Equals ws.Range("E1").Formula, "=INDIRECT(ADDRESS(1,3,4,1,""vtkConfigurations""))", "Expected Formula for DEV project column"
+      Else
+        mAssert.Equals ws.Range("D1").Formula, "=vtkConfigurations!B1", "Expected Formula for main project column"
+        mAssert.Equals ws.Range("E1").Formula, "=vtkConfigurations!C1", "Expected Formula for DEV project column"
+    End If
 End Sub
 
 Private Sub Class_Initialize()
@@ -69,10 +84,10 @@ Private Sub ITestCase_SetUp(Assert As IAssert)
 
     Set mAssert = Assert
     
-    Set newWorkbook = vtkCreateExcelWorkbookForTestWithProjectName("NewProject")    ' create an Excel project for tests
-    Set newConfManager = vtkConfigurationManagerForProject(newWorkbook.VBProject.name) ' For vtkConfigurations sheet initialization
+    Set newWorkBook = vtkCreateExcelWorkbookForTestWithProjectName("NewProject")    ' create an Excel project for tests
+    Set newConfManager = vtkConfigurationManagerForProject(newWorkBook.VBProject.name) ' For vtkConfigurations sheet initialization
     Set newRefManager = New vtkReferenceManager
-    newRefManager.init Wb:=newWorkbook, confCount:=2, nbTitleColumnsInConfSheet:=1, devConf:=2
+    newRefManager.init Wb:=newWorkBook, confCount:=2, nbTitleColumnsInConfSheet:=1, devConf:=2
     
     Set existingWorkbook = getTestFileFromTemplate(fileName:=existingWorkbookNameForTest, destinationName:="ExistingProject_DEV.xlsm", openExcel:=True)
     Set existingRefManager = New vtkReferenceManager
@@ -81,7 +96,7 @@ Private Sub ITestCase_SetUp(Assert As IAssert)
 End Sub
 
 Private Sub ITestCase_TearDown()
-    vtkCloseAndKillWorkbook Wb:=newWorkbook     ' close the new Excel project
+    vtkCloseAndKillWorkbook Wb:=newWorkBook     ' close the new Excel project
     vtkCloseAndKillWorkbook Wb:=existingWorkbook ' close the existing Excel project
     vtkResetConfigurationManagers             ' reset all configuration managers
     Set newRefManager = Nothing
@@ -92,7 +107,7 @@ Public Sub TestReferenceSheetCreationForNewProject()
 '       Verify that a Reference Sheet is created in a new project
     Dim ws As Worksheet
     On Error Resume Next
-    Set ws = newWorkbook.Sheets("vtkReferences")
+    Set ws = newWorkBook.Sheets("vtkReferences")
     mAssert.Equals Err, 0, "Error number : A reference manager must create a Reference sheet"
     mAssert.Should ws Is newRefManager.referenceSheet, "The referenceSheet property of the ref manager must be equal to the reference sheet of the workbook"
     On Error GoTo 0
@@ -114,11 +129,7 @@ Public Sub TestReferenceSheetFormatForNewProjet()
    On Error GoTo TestReferenceSheetFormatForNewProjet_Error
 
     Set ws = newRefManager.referenceSheet
-    mAssert.Equals ws.Range("A1"), "vtkReferences v1.0", "Expected identification of the reference sheet"
-    mAssert.Equals ws.Range("B1"), "", "Expected Title for GUID column"
-    mAssert.Equals ws.Range("C1"), "-", "Expected Title for FullPath column"
-    mAssert.Equals ws.Range("D1"), newWorkbook.VBProject.name, "Expected Title for main project column"
-    mAssert.Equals ws.Range("E1"), newWorkbook.VBProject.name & "_DEV", "Expected Title for DEV project column"
+    assertSheet ws, newWorkBook, True
 
    On Error GoTo 0
    Exit Sub
@@ -133,11 +144,7 @@ Public Sub TestReferenceSheetFormatForExistingProjet()
    On Error GoTo TestReferenceSheetFormatForExistingProjet_Error
 
     Set ws = existingRefManager.referenceSheet
-    mAssert.Equals ws.Range("A1"), "vtkReferences v1.0", "Expected identification of the reference sheet"
-    mAssert.Equals ws.Range("B1"), "", "Expected Title for GUID column"
-    mAssert.Equals ws.Range("C1"), "-", "Expected Title for FullPath column"
-    mAssert.Equals ws.Range("D1"), existingWorkbook.VBProject.name, "Expected Title for main project column"
-    mAssert.Equals ws.Range("E1"), existingWorkbook.VBProject.name & "_DEV", "Expected Title for DEV project column"
+    assertSheet ws, existingWorkbook
 
    On Error GoTo 0
    Exit Sub
@@ -161,11 +168,7 @@ Public Sub TestAlignColumnCount()
     existingRefManager.init existingWorkbook, 3, nbTitleColumnsInConfSheet:=1
     
     Set ws = existingRefManager.referenceSheet
-    mAssert.Equals ws.Range("A1"), "vtkReferences v1.0", "Expected identification of the reference sheet"
-    mAssert.Equals ws.Range("B1"), "", "Expected Title for GUID column"
-    mAssert.Equals ws.Range("C1"), "-", "Expected Title for FullPath column"
-    mAssert.Equals ws.Range("D1"), existingWorkbook.VBProject.name, "Expected Title for main project column"
-    mAssert.Equals ws.Range("E1"), existingWorkbook.VBProject.name & "_DEV", "Expected Title for DEV project column"
+    assertSheet ws, existingWorkbook
     mAssert.Equals ws.Range("F1"), "NewConfiguration", "Expected Title for the new configuration column"
     
     Set confManager = Nothing
@@ -206,11 +209,7 @@ Public Sub TestAddConfiguration()
     existingRefManager.addConfiguration
     
     Set ws = existingRefManager.referenceSheet
-    mAssert.Equals ws.Range("A1"), "vtkReferences v1.0", "Expected identification of the reference sheet"
-    mAssert.Equals ws.Range("B1"), "", "Expected Title for GUID column"
-    mAssert.Equals ws.Range("C1"), "-", "Expected Title for FullPath column"
-    mAssert.Equals ws.Range("D1"), existingWorkbook.VBProject.name, "Expected Title for main project column"
-    mAssert.Equals ws.Range("E1"), existingWorkbook.VBProject.name & "_DEV", "Expected Title for DEV project column"
+    assertSheet ws, existingWorkbook
     mAssert.Equals ws.Range("F1"), "NewConfiguration", "Expected Title for the new configuration column"
     
     mAssert.Equals existingRefManager.references(3).Count, 0, "Number of references attached to the new configuration"
@@ -247,7 +246,7 @@ Public Sub TestInitializeStandardRefs()
     refNames = Array("Scripting", "VBIDE", "Shell32", "MSXML2", "ADODB", "VBAToolKit_DEV")
         
    On Error GoTo M_Error
-    Set ws = newWorkbook.Sheets("vtkReferences")
+    Set ws = newWorkBook.Sheets("vtkReferences")
     For i = LBound(refNames) To UBound(refNames)
         Set r = ws.Columns("A:A").Find(refNames(i), , xlValues, xlWhole)
         mAssert.Should Not r Is Nothing, "The reference named " & refNames(i) & " is not included in the reference sheet"
@@ -298,7 +297,7 @@ Public Sub TestGetAllReferencesFromNewWorkbook()
     Dim ws As Worksheet, r As Range, c As Collection, ref As vtkReference, i As Integer
         
    On Error GoTo M_Error
-    Set ws = newWorkbook.Sheets("vtkReferences")
+    Set ws = newWorkBook.Sheets("vtkReferences")
     Set c = newRefManager.allReferences
     For i = 1 To c.Count
         Set ref = c(i)
@@ -403,9 +402,9 @@ Public Sub TestGetReferencesWithNullDevConf()
     Dim c As Collection
       
     Set newRefManager = Nothing
-    newWorkbook.Sheets("vtkReferences").name = "oldOne"
+    newWorkBook.Sheets("vtkReferences").name = "oldOne"
     Set newRefManager = New vtkReferenceManager
-    newRefManager.init Wb:=newWorkbook, confCount:=2, nbTitleColumnsInConfSheet:=1, devConf:=0
+    newRefManager.init Wb:=newWorkBook, confCount:=2, nbTitleColumnsInConfSheet:=1, devConf:=0
       
    On Error GoTo M_Error
     
@@ -451,9 +450,9 @@ Public Sub TestGetReferencesWithNoDevConf()
    On Error GoTo M_Error
    
     Set newRefManager = Nothing
-    newWorkbook.Sheets("vtkReferences").name = "oldOne"
+    newWorkBook.Sheets("vtkReferences").name = "oldOne"
     Set newRefManager = New vtkReferenceManager
-    newRefManager.init Wb:=newWorkbook, confCount:=2, nbTitleColumnsInConfSheet:=1
+    newRefManager.init Wb:=newWorkBook, confCount:=2, nbTitleColumnsInConfSheet:=1
     
     ' Test references for the main configuration (#1)
     Set c = newRefManager.references(1)
