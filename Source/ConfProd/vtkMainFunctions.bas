@@ -99,6 +99,14 @@ Public Function vtkCreateProject(path As String, name As String, Optional displa
     
     ' Insert the BeforeSave handler in the newly created project
     vtkAddBeforeSaveHandlerInDEVWorkbook Wb:=wb, projectName:=project.projectName, confName:=project.projectDEVName
+    ' Declare the BeforeSave handler in the new project configuration
+    Dim module As VBComponent, nm As Integer, nc As Integer, moduleName As String, cm As vtkConfigurationManager
+    Set cm = vtkConfigurationManagerForProject(project.projectName)
+    nc = cm.getConfigurationNumber(project.projectDEVName)
+    moduleName = "thisWorkbook"
+    Set module = Wb.VBProject.VBComponents(moduleName)
+    nm = cm.addModule(moduleName)
+    cm.setModulePathWithNumber path:="Source\ConfTest\" & module.name & ".cls", numModule:=nm, numConfiguration:=nc
     ' Save configured and updated project for test
     Wb.Save
         
