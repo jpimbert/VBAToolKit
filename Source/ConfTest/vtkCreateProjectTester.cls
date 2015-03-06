@@ -237,6 +237,31 @@ Test_VBAUnitModulesImportation_Error:
     mAssert.Should False, "No error have to be raised during project creation (Err=" & Err.Number & ": " & Err.Description & ")"
 End Sub
 
+Public Sub Test_ThisWorkbookExportation()
+    '   Verify that the ThisWorkbook Excel Object is exported from a new VBAToolkit project
+    Dim returnValue As Long, fso As New FileSystemObject
+    
+    returnValue = vtkCreateProject(path:=VBAToolKit.vtkTestPath, name:=vtkTestProjectName, displayError:=False)
+    
+    mAssert.Should fso.FileExists(VBAToolKit.vtkTestPath & "\" & vtkTestProjectName & "\" & "Source\ConfTest\" & "ThisWorkbook.cls"), "ThisWorkBook Excel Object have to be exported"
+End Sub
+
+Public Sub Test_ThisWorkbookImportation()
+    '   Verify that the ThisWorkbook Excel Object is imported in the new VBAToolKit project
+    Dim returnValue As Long, fso As New FileSystemObject
+    
+    returnValue = vtkCreateProject(path:=VBAToolKit.vtkTestPath, name:=vtkTestProjectName, displayError:=False)
+
+    
+   On Error GoTo Test_VBAUnitModulesImportation_Error
+    mAssert.Should Not Workbooks(vtkTestProjectName & "_DEV.xlsm").VBProject.VBComponents("ThisWorkbook") Is Nothing, "ThisWorkbook Excel Object have to be imported"
+   On Error GoTo 0
+   Exit Sub
+
+Test_VBAUnitModulesImportation_Error:
+    mAssert.Should False, "No error have to be raised during project creation (Err=" & Err.Number & ": " & Err.Description & ")"
+End Sub
+
 Public Sub Test_vtkCreateProject_correctPathGitFolderIsCreated()
     Dim fso As New FileSystemObject
     
@@ -337,6 +362,8 @@ Private Function ITest_Suite() As TestSuite
     ITest_Suite.AddTest ITest_Manager.ClassName, "TestReferencesOfDeliveryWorkbookWasActivated"
     ITest_Suite.AddTest ITest_Manager.ClassName, "Test_VBAUnitModulesExportation"
     ITest_Suite.AddTest ITest_Manager.ClassName, "Test_VBAUnitModulesImportation"
+    ITest_Suite.AddTest ITest_Manager.ClassName, "Test_ThisWorkbookExportation"
+    ITest_Suite.AddTest ITest_Manager.ClassName, "Test_ThisWorkbookImportation"
     ITest_Suite.AddTest ITest_Manager.ClassName, "Test_vtkCreateProject_correctPathGitFolderIsCreated"
     ITest_Suite.AddTest ITest_Manager.ClassName, "Test_vtkCreateProject_handlerAddedInDEVWorkbook_modulesAreExported"
     ITest_Suite.AddTest ITest_Manager.ClassName, "Test_vtkCreateProject_handlerAddedInDEVWorkbook_xmlIsCreated"
@@ -358,6 +385,8 @@ Private Sub ITestCase_RunTest()
         Case "TestReferencesOfDeliveryWorkbookWasActivated": TestReferencesOfDeliveryWorkbookWasActivated
         Case "Test_VBAUnitModulesExportation": Test_VBAUnitModulesExportation
         Case "Test_VBAUnitModulesImportation": Test_VBAUnitModulesImportation
+        Case "Test_ThisWorkbookExportation": Test_ThisWorkbookExportation
+        Case "Test_ThisWorkbookImportation": Test_ThisWorkbookImportation
         Case "Test_vtkCreateProject_correctPathGitFolderIsCreated": Test_vtkCreateProject_correctPathGitFolderIsCreated
         Case "Test_vtkCreateProject_handlerAddedInDEVWorkbook_modulesAreExported": Test_vtkCreateProject_handlerAddedInDEVWorkbook_modulesAreExported
         Case "Test_vtkCreateProject_handlerAddedInDEVWorkbook_xmlIsCreated": Test_vtkCreateProject_handlerAddedInDEVWorkbook_xmlIsCreated
